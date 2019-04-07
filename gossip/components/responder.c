@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
-#define RESPONDER_TIMEOUT_SEC 1
+#define RESPONDER_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 
@@ -34,10 +34,8 @@ static logger_id_t logger_id;
  *
  * @return a status code
  */
-static retcode_t get_transaction_for_request(responder_t const *const responder,
-                                             tangle_t *const tangle,
-                                             neighbor_t *const neighbor,
-                                             flex_trit_t const *const hash,
+static retcode_t get_transaction_for_request(responder_t const *const responder, tangle_t *const tangle,
+                                             neighbor_t *const neighbor, flex_trit_t const *const hash,
                                              iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
 
@@ -56,8 +54,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
       }
-      if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                              tip, pack)) != RC_OK ||
+      if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tip, pack)) != RC_OK ||
           pack->num_loaded == 0) {
         return ret;
       }
@@ -67,8 +64,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
   // If the hash is non-null, a transaction was requested
   else {
     log_debug(logger_id, "Responding to regular transaction request\n");
-    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                            hash, pack)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, hash, pack)) != RC_OK) {
       log_warning(logger_id, "Loading transaction failed\n");
       return ret;
     }
@@ -90,10 +86,8 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
  *
  * @return a status code
  */
-static retcode_t respond_to_request(responder_t const *const responder,
-                                    tangle_t *const tangle,
-                                    neighbor_t *const neighbor,
-                                    flex_trit_t const *const hash,
+static retcode_t respond_to_request(responder_t const *const responder, tangle_t *const tangle,
+                                    neighbor_t *const neighbor, flex_trit_t const *const hash,
                                     iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
 
@@ -103,13 +97,11 @@ static retcode_t respond_to_request(responder_t const *const responder,
 
   if (pack->num_loaded != 0) {
     // If a transaction or a random tip was found, sends it back to the neighbor
-    iota_transaction_t *transaction =
-        ((iota_transaction_t **)(pack->models))[0];
+    iota_transaction_t *transaction = ((iota_transaction_t **)(pack->models))[0];
     flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
     transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);
-    if ((ret = neighbor_send(responder->node, tangle, neighbor,
-                             transaction_flex_trits)) != RC_OK) {
+    if ((ret = neighbor_send(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
       log_warning(logger_id, "Sending transaction failed\n");
       return ret;
     }
@@ -118,8 +110,7 @@ static retcode_t respond_to_request(responder_t const *const responder,
     // If a transaction was requested but not found, requests it
     if (!flex_trits_are_null(hash, FLEX_TRIT_SIZE_243) &&
         rand_handle_probability() < responder->node->conf.p_propagate_request) {
-      if ((ret = request_transaction(&responder->node->transaction_requester,
-                                     tangle, hash, false)) != RC_OK) {
+      if ((ret = request_transaction(&responder->node->transaction_requester, tangle, hash, false)) != RC_OK) {
         log_warning(logger_id, "Requesting transaction failed\n");
         return ret;
       }
@@ -157,8 +148,7 @@ static void *responder_routine(responder_t *const responder) {
 
   while (responder->running) {
     if (responder_is_empty(responder)) {
-      cond_handle_timedwait(&responder->cond, &lock_cond,
-                            RESPONDER_TIMEOUT_SEC);
+      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_MS);
     }
 
     rw_lock_handle_wrlock(&responder->lock);
@@ -173,11 +163,9 @@ static void *responder_routine(responder_t *const responder) {
 
     log_debug(logger_id, "Responding to request\n");
     hash_pack_reset(&pack);
-    if (get_transaction_for_request(responder, &tangle, request.neighbor,
-                                    request.hash, &pack) != RC_OK) {
+    if (get_transaction_for_request(responder, &tangle, request.neighbor, request.hash, &pack) != RC_OK) {
       log_warning(logger_id, "Getting transaction for request failed\n");
-    } else if (respond_to_request(responder, &tangle, request.neighbor,
-                                  request.hash, &pack) != RC_OK) {
+    } else if (respond_to_request(responder, &tangle, request.neighbor, request.hash, &pack) != RC_OK) {
       log_warning(logger_id, "Replying to request failed\n");
     }
   }
@@ -219,9 +207,7 @@ retcode_t responder_start(responder_t *const responder) {
 
   log_info(logger_id, "Spawning responder thread\n");
   responder->running = true;
-  if (thread_handle_create(&responder->thread,
-                           (thread_routine_t)responder_routine,
-                           responder) != 0) {
+  if (thread_handle_create(&responder->thread, (thread_routine_t)responder_routine, responder) != 0) {
     log_critical(logger_id, "Spawning responder thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }
@@ -240,6 +226,7 @@ retcode_t responder_stop(responder_t *const responder) {
 
   log_info(logger_id, "Shutting down responder thread\n");
   responder->running = false;
+  cond_handle_signal(&responder->cond);
   if (thread_handle_join(responder->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down responder thread failed\n");
     ret = RC_FAILED_THREAD_JOIN;
@@ -267,9 +254,7 @@ retcode_t responder_destroy(responder_t *const responder) {
   return ret;
 }
 
-retcode_t responder_on_next(responder_t *const responder,
-                            neighbor_t *const neighbor,
-                            flex_trit_t const *const hash) {
+retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neighbor, flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
 
   if (responder == NULL || neighbor == NULL || hash == NULL) {
@@ -281,8 +266,7 @@ retcode_t responder_on_next(responder_t *const responder,
   rw_lock_handle_unlock(&responder->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id,
-                "Pushing transaction_request to responder queue failed\n");
+    log_warning(logger_id, "Pushing transaction_request to responder queue failed\n");
     return ret;
   } else {
     cond_handle_signal(&responder->cond);

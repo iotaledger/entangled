@@ -7,7 +7,7 @@
 
 #include <unity/unity.h>
 
-#include "common/sign/v2/iss_curl.h"
+#include "common/crypto/iss/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 #include "utils/merkle.h"
 
@@ -30,21 +30,15 @@ void test_merkle(void) {
   trit_t hash[HASH_LENGTH_TRIT];
   Curl c;
   c.type = CURL_P_27;
-  init_curl(&c);
+  curl_init(&c);
 
   TEST_ASSERT_EQUAL_INT(expected_merkle_size, size);
   TEST_ASSERT_EQUAL_INT(expected_tree_depth, depth);
-  TEST_ASSERT_EQUAL_INT(0, merkle_create(merkle_tree, leaf_count, seed_trits,
-                                         start, security, &c));
+  TEST_ASSERT_EQUAL_INT(0, merkle_create(merkle_tree, leaf_count, seed_trits, start, security, &c));
   for (size_t i = 0; i < leaf_count; i++) {
-    TEST_ASSERT_EQUAL_INT(
-        0, merkle_branch(merkle_tree, siblings, size * HASH_LENGTH_TRIT, depth,
-                         i, leaf_count));
+    TEST_ASSERT_EQUAL_INT(0, merkle_branch(merkle_tree, siblings, size * HASH_LENGTH_TRIT, depth, i, leaf_count));
     memcpy(hash,
-           &merkle_tree[merkle_node_index(depth - 1,
-                                          merkle_leaf_index(i, leaf_count),
-                                          depth - 1) *
-                        HASH_LENGTH_TRIT],
+           &merkle_tree[merkle_node_index(depth - 1, merkle_leaf_index(i, leaf_count), depth - 1) * HASH_LENGTH_TRIT],
            HASH_LENGTH_TRIT);
     curl_reset(&c);
     merkle_root(hash, siblings, depth - 1, i, &c);

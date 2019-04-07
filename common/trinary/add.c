@@ -34,8 +34,7 @@ struct ha_o trit_full_add(trit_t const a, trit_t const b, trit_t const c) {
   return (struct ha_o){trit_sum(s_ab, c), (x > 0) - (x < 0)};
 }
 
-int add_internal(trit_t *const t, size_t const s, int8_t const negative,
-                 int64_t const v, struct ha_o r) {
+int add_internal(trit_t *const t, size_t const s, int8_t const negative, int64_t const v, struct ha_o r) {
   trit_t trit;
 
   if (!v && !r.c) return 0;

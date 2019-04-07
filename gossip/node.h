@@ -53,8 +53,7 @@ typedef struct node_s {
  *
  * @return a status code
  */
-retcode_t node_init(iota_node_t* const node, core_t* const core,
-                    tangle_t* const tangle);
+retcode_t node_init(iota_node_t* const node, core_t* const core, tangle_t* const tangle);
 
 /**
  * Starts a node

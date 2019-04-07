@@ -14,7 +14,6 @@
 
 #include "mam/sponge/spongos.h"
 #include "mam/sponge/spongos_types.h"
-#include "mam/test_utils/test_utils.h"
 
 static void mam_spongos_test(void) {
   mam_spongos_t spongos;
@@ -48,18 +47,14 @@ static void mam_spongos_test(void) {
   mam_spongos_commit(&spongos);
   mam_spongos_decr(&spongos, z, z);
   MAM_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(&spongos));
-  spongos_trits =
-      MAM_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(&spongos));
+  spongos_trits = MAM_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(&spongos));
   mam_spongos_serialize(&spongos, &spongos_trits);
-  spongos_trits =
-      trits_pickup(spongos_trits, mam_spongos_serialized_size(&spongos));
+  spongos_trits = trits_pickup(spongos_trits, mam_spongos_serialized_size(&spongos));
   memset(deserialized_spongos.sponge.state, 0, MAM_SPONGE_WIDTH);
-  TEST_ASSERT_EQUAL(
-      RC_OK, mam_spongos_deserialize(&spongos_trits, &deserialized_spongos));
+  TEST_ASSERT_EQUAL(RC_OK, mam_spongos_deserialize(&spongos_trits, &deserialized_spongos));
 
   TEST_ASSERT_EQUAL_INT(spongos.pos, deserialized_spongos.pos);
-  TEST_ASSERT_EQUAL_MEMORY(spongos.sponge.state,
-                           deserialized_spongos.sponge.state, MAM_SPONGE_WIDTH);
+  TEST_ASSERT_EQUAL_MEMORY(spongos.sponge.state, deserialized_spongos.sponge.state, MAM_SPONGE_WIDTH);
 
   TEST_ASSERT_TRUE(trits_cmp_eq(x, z));
 }

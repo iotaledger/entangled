@@ -30,8 +30,7 @@ extern "C" {
  *
  * @return error value.
  */
-retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
-                                 get_trytes_req_t* const req,
+retcode_t iota_client_get_trytes(const iota_client_service_t* const service, get_trytes_req_t* const req,
                                  get_trytes_res_t* res);
 
 #ifdef __cplusplus

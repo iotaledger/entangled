@@ -29,13 +29,11 @@ extern "C" {
 /*! \brief Trits needed to encode key number part of SKN. */
 #define MAM_MSS_SKN_KEY_NUMBER_SIZE 14
 /*! \brief Trits needed to encode `skn`: tree depth and key number. */
-#define MAM_MSS_SKN_SIZE \
-  (MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE)
+#define MAM_MSS_SKN_SIZE (MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE)
 /*! \brief MSS authentication path size of height `d`. */
 #define MAM_MSS_APATH_SIZE(d) (MAM_WOTS_PK_SIZE * d)
 /*! \brief MSS signature size with a tree of height `d`. */
-#define MAM_MSS_SIG_SIZE(d) \
-  (MAM_MSS_SKN_SIZE + MAM_WOTS_SIG_SIZE + MAM_MSS_APATH_SIZE(d))
+#define MAM_MSS_SIG_SIZE(d) (MAM_MSS_SKN_SIZE + MAM_WOTS_SIG_SIZE + MAM_MSS_APATH_SIZE(d))
 /*! \brief MSS signed hash value size. */
 #define MAM_MSS_HASH_SIZE MAM_WOTS_HASH_SIZE
 
@@ -85,11 +83,9 @@ typedef struct mss_mt_stack_s {
 #endif
 
 #if defined(MAM_MSS_TRAVERSAL)
-#define MAM_MSS_MT_MAX_STORED_SIZE(d) \
-  ((d) * ((d) + 3) / 2 * MAM_MSS_MT_HASH_SIZE)
+#define MAM_MSS_MT_MAX_STORED_SIZE(d) ((d) * ((d) + 3) / 2 * MAM_MSS_MT_HASH_SIZE)
 #else
-#define MAM_MSS_MT_MAX_STORED_SIZE(height) \
-  (((1 << ((height) + 1)) - 1) * MAM_MSS_MT_HASH_SIZE)
+#define MAM_MSS_MT_MAX_STORED_SIZE(height) (((1 << ((height) + 1)) - 1) * MAM_MSS_MT_HASH_SIZE)
 #endif
 #define MAM_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM_MSS_MT_MAX_STORED_SIZE(d))
 
@@ -97,7 +93,7 @@ typedef struct mss_mt_stack_s {
 typedef struct mss_s {
   mss_mt_height_t height; /*!< Merkle tree height. */
   mss_mt_idx_t skn;       /*!< Current WOTS private key number. */
-  mam_prng_t *prng; /*!< PRNG interface used to generate WOTS private keys. */
+  mam_prng_t *prng;       /*!< PRNG interface used to generate WOTS private keys. */
 #if defined(MAM_MSS_TRAVERSAL)
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
   trit_t *nodes_hashes;   /*!< Buffer storing hash-values of auxiliary nodes;
@@ -107,8 +103,7 @@ typedef struct mss_s {
 #else
   trit_t *mt; /*!< Buffer storing complete Merkle-tree. */
 #endif
-  trits_t nonce1,
-      nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
+  trits_t nonce1, nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
 
   trit_t root[MAM_MSS_PK_SIZE];
 } mam_mss_t;
@@ -150,8 +145,7 @@ It is achieved by allocating one extra node:
  * @return void
  */
 
-void mam_mss_init(mam_mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
-                  trits_t nonce1, trits_t nonce2);
+void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height, trits_t nonce1, trits_t nonce2);
 /**
  * Generate MSS keys, stores current and next auth_path
  *
@@ -167,9 +161,8 @@ void mam_mss_gen(mam_mss_t *mss);
  * @param skn [out] encoded height and current private key number
  * @return void
  */
-void mam_mss_skn(
-    mam_mss_t const *const mss, /*!< [in] MSS interface */
-    trits_t skn /*!< [out] encoded height and current private key number */
+void mam_mss_skn(mam_mss_t const *const mss, /*!< [in] MSS interface */
+                 trits_t skn                 /*!< [out] encoded height and current private key number */
 );
 
 /**
@@ -192,11 +185,38 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path);
  * @param hash [in] the hash to sign on
  * @param sig [out] the signature
  *
- * @return void
+ * @return retcode
  */
-void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig);
+retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig);
 
+/**
+ * Signs a hash and advances skn
+ *
+ * @param mss [in] MSS interface
+ * @param hash [in] the hash to sign on
+ * @param sig [out] the signature
+ *
+ * @return retcode
+ */
+retcode_t mam_mss_sign_and_next(mam_mss_t *mss, trits_t hash, trits_t sig);
+
+/**
+ * Advances skn
+ *
+ * @param mss [in] MSS interface
+ *
+ * @return True if can produce next signature
+ */
 bool mam_mss_next(mam_mss_t *mss);
+
+/**
+ * Returns the number of remaining secret keys (unused leaves on merkle tree)
+ *
+ * @param mss [in] MSS interface
+ *
+ * @return The number of remaining signatures
+ */
+size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss);
 
 /**
  * Verifies MSS signature.
@@ -209,8 +229,7 @@ bool mam_mss_next(mam_mss_t *mss);
  *
  * @return bool True is the signature is correct, False otherwise
  */
-bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
-                    trits_t hash, trits_t sig, trits_t pk);
+bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trits_t hash, trits_t sig, trits_t pk);
 
 /**
  * Allocate memory for internal Merkle tree structure.

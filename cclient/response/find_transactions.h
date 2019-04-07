@@ -20,6 +20,13 @@ typedef struct find_transactions_res {
 
 find_transactions_res_t* find_transactions_res_new();
 void find_transactions_res_free(find_transactions_res_t** res);
+static inline retcode_t find_transactions_res_hashes_add(find_transactions_res_t* const res,
+                                                         flex_trit_t const* const hash) {
+  return hash243_queue_push(&res->hashes, hash);
+}
+static inline flex_trit_t* find_transactions_res_hashes_get(find_transactions_res_t* const res, size_t index) {
+  return hash243_queue_at(&res->hashes, index);
+}
 
 #ifdef __cplusplus
 }

@@ -23,8 +23,8 @@ extern "C" {
 `p -> |...d...|......|`
 */
 typedef struct trits_s {
-  size_t n; /*!< total number of trits pointed to by `p` */
-  size_t d; /*!< offset of the first trit; number of available trits is `n-d` */
+  size_t n;  /*!< total number of trits pointed to by `p` */
+  size_t d;  /*!< offset of the first trit; number of available trits is `n-d` */
   trit_t *p; /*!< pointer to the trits */
 } trits_t;
 
@@ -39,6 +39,9 @@ typedef struct trits_s {
 #if 0
 #define MAM_TRITS_DEF(X, key) MAM_TRITS_DEF0(X, key) = MAM_TRITS_INIT(X, key)
 #endif
+
+static inline trit_t *trits_begin(trits_t x) { return x.p + x.d; }
+static inline trit_t *trits_end(trits_t x) { return x.p + x.d + x.n; }
 
 /*! \brief Check `x.n` against zero. */
 bool trits_is_empty(trits_t x);
@@ -98,9 +101,7 @@ bool trits_put_byte(trits_t x, byte b);
 /*! \brief Check whether `x` and `y` point to the same memory location.
 \note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
 versa. */
-static inline bool trits_is_same(trits_t x, trits_t y) {
-  return (x.p == y.p) && (x.d == y.d); /* && (x.n == y.n) */
-}
+static inline bool trits_is_same(trits_t x, trits_t y) { return (x.p == y.p) && (x.d == y.d); /* && (x.n == y.n) */ }
 
 /*! \brief Check whether `x` and `y` point to overlapped memory location. */
 static inline bool trits_is_overlapped(trits_t x, trits_t y) {
@@ -112,14 +113,10 @@ static inline bool trits_is_overlapped(trits_t x, trits_t y) {
 }
 
 /*! \brief Get trits: `t`[i] := `x`[i]. */
-static inline void trits_get(trits_t x, trit_t *t) {
-  memcpy(t, x.p + x.d, trits_size(x));
-}
+static inline void trits_get(trits_t x, trit_t *t) { memcpy(t, x.p + x.d, trits_size(x)); }
 
 /*! \brief Put trits: `x`[i] := `t`[i]. */
-static inline void trits_put(trits_t x, trit_t *t) {
-  memcpy(x.p + x.d, t, trits_size(x));
-}
+static inline void trits_put(trits_t x, trit_t *t) { memcpy(x.p + x.d, t, trits_size(x)); }
 
 /*! \brief Convert trytes to string.
 \note `trits_size(x)` must be multiple of 3.

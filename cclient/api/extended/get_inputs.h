@@ -38,11 +38,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetInputs.ts#L70
  */
-retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
-                                 flex_trit_t const* const seed,
-                                 address_opt_t const addr_opt,
-                                 uint64_t const threshold,
-                                 inputs_t* const out_input);
+retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_trit_t const* const seed,
+                                 address_opt_t const addr_opt, uint64_t const threshold, inputs_t* const out_input);
 
 #ifdef __cplusplus
 }

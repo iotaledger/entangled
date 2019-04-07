@@ -13,6 +13,7 @@
 #include "common/errors.h"
 #include "gossip/conf.h"
 #include "gossip/tips_cache.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -31,6 +32,7 @@ typedef struct tips_solidifier_s {
   bool running;
   tips_cache_t *tips;
   transaction_solidifier_t *transaction_solidifier;
+  cond_handle_t cond;
 } tips_solidifier_t;
 
 /**
@@ -43,10 +45,8 @@ typedef struct tips_solidifier_s {
  *
  * @return a status code
  */
-retcode_t tips_solidifier_init(
-    tips_solidifier_t *const tips_solidifier, iota_gossip_conf_t *const conf,
-    tips_cache_t *const tips,
-    transaction_solidifier_t *const transaction_solidifier);
+retcode_t tips_solidifier_init(tips_solidifier_t *const tips_solidifier, iota_gossip_conf_t *const conf,
+                               tips_cache_t *const tips, transaction_solidifier_t *const transaction_solidifier);
 
 /**
  * Starts a tips solidifier

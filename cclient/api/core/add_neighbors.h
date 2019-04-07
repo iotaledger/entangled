@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_ADD_NEIGHBORS_H
 #define CCLIENT_API_ADD_NEIGHBORS_H
 
@@ -17,18 +26,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief
+ *
  * Add a list of neighbors to iri node. It should be noted that this is only
  * temporary, and the added neighbors will be removed from your set of neighbors
  * after you relaunch IRI.
  *
- * @param service IRI node end point.
+ * @param service client service
  * @param req Request containing list of neighbors to add
  * @param res Response containing a number of neighbor
- *
- * @return error value.
+ * @return
+ *  - `#RC_OK`
+ *  - `#RC_CCLIENT_OOM`
+ *  - `#RC_ERROR`
  */
-retcode_t iota_client_add_neighbors(const iota_client_service_t* const service,
-                                    const add_neighbors_req_t* const req,
+retcode_t iota_client_add_neighbors(const iota_client_service_t* const service, const add_neighbors_req_t* const req,
                                     add_neighbors_res_t* res);
 
 #ifdef __cplusplus
@@ -36,3 +48,5 @@ retcode_t iota_client_add_neighbors(const iota_client_service_t* const service,
 #endif
 
 #endif  // CCLIENT_API_ADD_NEIGHBORS_H
+
+/** @} */

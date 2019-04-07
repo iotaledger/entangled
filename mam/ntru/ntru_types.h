@@ -11,19 +11,28 @@
 #ifndef __MAM_NTRU_NTRU_TYPES_H__
 #define __MAM_NTRU_NTRU_TYPES_H__
 
-#include "common/errors.h"
 #include "mam/defs.h"
 #include "mam/ntru/poly.h"
-#include "mam/trits/trits.h"
 
-// NTRU public key - 3g(x)/(1+3f(x)) - size
-#define MAM_NTRU_PK_SIZE 9216
-// NTRU private key - f(x) - size
-#define MAM_NTRU_SK_SIZE 1024
 // NTRU id size
 #define MAM_NTRU_ID_SIZE 81
+// NTRU public key size
+#define MAM_NTRU_PK_SIZE 9216
+// NTRU secret key size
+#define MAM_NTRU_SK_SIZE 1024
+// NTRU session symmetric key size
+#define MAM_NTRU_KEY_SIZE MAM_SPONGE_KEY_SIZE
+// NTRU encrypted key size
+#define MAM_NTRU_EKEY_SIZE 9216
 
-// Recipient's NTRU public key
+/**
+ * The NTRU layer supports an NTRU-style public key encryption scheme
+ * Using NTRU a sender can encrypt session keys with a public key of a recipient
+ * The secret key must be kept in secret
+ * The corresponding public key, on the contrary, is publicly announced
+ */
+
+// Receiver's NTRU public key
 typedef struct mam_ntru_pk_s {
   trit_t key[MAM_NTRU_PK_SIZE];
 } mam_ntru_pk_t;
@@ -31,29 +40,17 @@ typedef struct mam_ntru_pk_s {
 typedef struct mam_ntru_pk_t_set_entry_s mam_ntru_pk_t_set_entry_t;
 typedef mam_ntru_pk_t_set_entry_t* mam_ntru_pk_t_set_t;
 
-size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
-retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
-                                 trits_t trits);
-retcode_t mam_ntru_pks_deserialize(trits_t const trits,
-                                   mam_ntru_pk_t_set_t* const ntru_pk_set);
-
-// NTRU layer interface
+// Sender's NTRU secret key
 typedef struct mam_ntru_sk_s {
-  // Public key trits
+  // Associated public key
   mam_ntru_pk_t public_key;
-  // Private key trits - small coefficients of polynomial f
+  // Secret key - small coefficients of polynomial f
   trit_t secret_key[MAM_NTRU_SK_SIZE];
-  // Internal representation (`poly_t`) of a private key: NTT(1+3f)
+  // Internal representation of a private key: NTT(1+3f)
   poly_t f;
 } mam_ntru_sk_t;
 
 typedef struct mam_ntru_sk_t_set_entry_s mam_ntru_sk_t_set_entry_t;
 typedef mam_ntru_sk_t_set_entry_t* mam_ntru_sk_t_set_t;
-
-size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set);
-retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
-                                 trits_t trits);
-retcode_t mam_ntru_sks_deserialize(trits_t const trits,
-                                   mam_ntru_sk_t_set_t* const ntru_sk_set);
 
 #endif  // __MAM_NTRU_NTRU_TYPES_H__

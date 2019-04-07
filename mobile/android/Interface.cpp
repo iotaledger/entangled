@@ -12,8 +12,8 @@
 #include "Interface.h"
 
 extern "C" {
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(
-    JNIEnv* env, jclass thiz, jstring jtrytes, jint mwm) {
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(JNIEnv* env, jclass thiz, jstring jtrytes,
+                                                                           jint mwm) {
   char* foundNonce = NULL;
   char const* trytes = env->GetStringUTFChars(jtrytes, 0);
   char* nonce = NULL;
@@ -41,9 +41,9 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(
  * Signature:
  * ([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)[Ljava/lang/String;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
-    JNIEnv* env, jclass thiz, jobjectArray txsTrytes, jstring trunk,
-    jstring branch, jint mwm) {
+JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(JNIEnv* env, jclass thiz,
+                                                                                jobjectArray txsTrytes, jstring trunk,
+                                                                                jstring branch, jint mwm) {
   bundle_transactions_t* bundle = NULL;
   iota_transaction_t tx;
   iota_transaction_t* curTx = NULL;
@@ -55,12 +55,10 @@ JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
   jstring outputTxtrytes = NULL;
   size_t i = 0;
 
-  flex_trits_from_trytes(flexTrunk, NUM_TRITS_TRUNK,
-                         (tryte_t*)env->GetStringUTFChars(trunk, 0),
-                         NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
-  flex_trits_from_trytes(flexBranch, NUM_TRITS_BRANCH,
-                         (tryte_t*)env->GetStringUTFChars(branch, 0),
-                         NUM_TRYTES_BRANCH, NUM_TRYTES_BRANCH);
+  flex_trits_from_trytes(flexTrunk, NUM_TRITS_TRUNK, (tryte_t*)env->GetStringUTFChars(trunk, 0), NUM_TRYTES_TRUNK,
+                         NUM_TRYTES_TRUNK);
+  flex_trits_from_trytes(flexBranch, NUM_TRITS_BRANCH, (tryte_t*)env->GetStringUTFChars(branch, 0), NUM_TRYTES_BRANCH,
+                         NUM_TRYTES_BRANCH);
 
   bundle_transactions_new(&bundle);
 
@@ -68,10 +66,8 @@ JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
   for (int i = 0; i < txNum; i++) {
     jstring txString = (jstring)(env->GetObjectArrayElement(txsTrytes, i));
     const char* txTrytes = env->GetStringUTFChars(txString, 0);
-    flex_trits_from_trytes(serializedFlexTrits,
-                           NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t*)txTrytes,
-                           NUM_TRYTES_SERIALIZED_TRANSACTION,
-                           NUM_TRYTES_SERIALIZED_TRANSACTION);
+    flex_trits_from_trytes(serializedFlexTrits, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t*)txTrytes,
+                           NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
     transaction_deserialize_from_trits(&tx, serializedFlexTrits, false);
     bundle_transactions_add(bundle, &tx);
   }
@@ -80,15 +76,12 @@ JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
     goto done;
   }
 
-  outputTxsTrytes =
-      env->NewObjectArray(txNum, env->FindClass("java/lang/String"), 0);
+  outputTxsTrytes = env->NewObjectArray(txNum, env->FindClass("java/lang/String"), 0);
 
   BUNDLE_FOREACH(bundle, curTx) {
     transaction_serialize_on_flex_trits(curTx, serializedFlexTrits);
-    flex_trits_to_trytes((tryte_t*)serializedTrytes,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION, serializedFlexTrits,
-                         NUM_TRITS_SERIALIZED_TRANSACTION,
-                         NUM_TRITS_SERIALIZED_TRANSACTION);
+    flex_trits_to_trytes((tryte_t*)serializedTrytes, NUM_TRYTES_SERIALIZED_TRANSACTION, serializedFlexTrits,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
     outputTxtrytes = env->NewStringUTF(serializedTrytes);
     env->SetObjectArrayElement(outputTxsTrytes, i, outputTxtrytes);
     i++;
@@ -104,9 +97,9 @@ done:
  * Method:    iota_sign_address_gen_trytes
  * Signature: (Ljava/lang/String;II)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL
-Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(
-    JNIEnv* env, jclass thiz, jstring jseed, jint index, jint security) {
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(JNIEnv* env, jclass thiz,
+                                                                                          jstring jseed, jint index,
+                                                                                          jint security) {
   char* address = NULL;
   char const* seed = env->GetStringUTFChars(jseed, 0);
 
@@ -127,9 +120,9 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(
  * Method:    iota_sign_address_gen_trits
  * Signature: ([Ljava/lang/Byte;II)[Ljava/lang/Byte;
  */
-JNIEXPORT jbyteArray JNICALL
-Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
-    JNIEnv* env, jclass thiz, jbyteArray jseed, jint index, jint security) {
+JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(JNIEnv* env, jclass thiz,
+                                                                                            jbyteArray jseed,
+                                                                                            jint index, jint security) {
   trit_t* address = NULL;
   trit_t const* seed = (trit_t*)env->GetByteArrayElements(jseed, 0);
 
@@ -151,16 +144,15 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
  * Method:    iota_sign_signature_gen_trytes
  * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL
-Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(
-    JNIEnv* env, jclass thiz, jstring jseed, jint index, jint security,
-    jstring jBundleHash) {
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(JNIEnv* env, jclass thiz,
+                                                                                            jstring jseed, jint index,
+                                                                                            jint security,
+                                                                                            jstring jBundleHash) {
   char* signature = NULL;
   char const* seed = env->GetStringUTFChars(jseed, 0);
   char const* bundleHash = env->GetStringUTFChars(jBundleHash, 0);
 
-  if ((signature = iota_sign_signature_gen_trytes(seed, index, security,
-                                                  bundleHash)) == NULL) {
+  if ((signature = iota_sign_signature_gen_trytes(seed, index, security, bundleHash)) == NULL) {
     memset_safe((void*)seed, 81, 0, 81);
     return NULL;
   }
@@ -177,16 +169,15 @@ Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(
  * Method:    iota_sign_signature_gen_trits
  * Signature: ([Ljava/lang/Byte;II[Ljava/lang/Byte;)[Ljava/lang/Byte;
  */
-JNIEXPORT jbyteArray JNICALL
-Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(
-    JNIEnv* env, jclass thiz, jbyteArray jseed, jint index, jint security,
-    jbyteArray jBundleHash) {
+JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(JNIEnv* env, jclass thiz,
+                                                                                              jbyteArray jseed,
+                                                                                              jint index, jint security,
+                                                                                              jbyteArray jBundleHash) {
   trit_t* signature = NULL;
   trit_t const* seed = (trit_t*)env->GetByteArrayElements(jseed, 0);
   trit_t const* bundleHash = (trit_t*)env->GetByteArrayElements(jBundleHash, 0);
 
-  if ((signature = iota_sign_signature_gen_trits(seed, index, security,
-                                                 bundleHash)) == NULL) {
+  if ((signature = iota_sign_signature_gen_trits(seed, index, security, bundleHash)) == NULL) {
     memset_safe((void*)seed, 243, 0, 243);
     return NULL;
   }
@@ -205,8 +196,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(
  * Method:    iota_digest
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(
-    JNIEnv* env, jclass thiz, jstring jtrytes) {
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(JNIEnv* env, jclass thiz, jstring jtrytes) {
   char* digest = NULL;
   char const* trytes = env->GetStringUTFChars(jtrytes, 0);
 

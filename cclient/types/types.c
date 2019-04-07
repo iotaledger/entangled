@@ -12,18 +12,12 @@
 static logger_id_t logger_id;
 
 void logger_init_types() {
-// overwrite oom in utarray
-#undef oom
-#define oom() log_info(logger_id, "[%s:%d] OOM.\n", __func__, __LINE__)
-
   logger_id = logger_helper_enable(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
-           TYPES_LOGGER_ID);
+  log_info(logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__, TYPES_LOGGER_ID);
 }
 
 void logger_destroy_types() {
-  log_info(logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
-           TYPES_LOGGER_ID);
+  log_info(logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__, TYPES_LOGGER_ID);
   logger_helper_release(logger_id);
 }
 
@@ -33,8 +27,7 @@ char_buffer_t* char_buffer_new() {
     out->length = 0;
     out->data = NULL;
   } else {
-    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
-              STR_CCLIENT_NULL_PTR);
+    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__, STR_CCLIENT_NULL_PTR);
   }
   return out;
 }
@@ -73,29 +66,4 @@ void char_buffer_free(char_buffer_t* in) {
     }
     free(in);
   }
-}
-
-static UT_icd ut_transactions_icd = {sizeof(iota_transaction_t), NULL, NULL,
-                                     NULL};
-
-transaction_array_t transaction_array_new() {
-  transaction_array_t txs = NULL;
-  utarray_new(txs, &ut_transactions_icd);
-  return txs;
-}
-
-void transaction_array_push_back(transaction_array_t txs,
-                                 iota_transaction_t const* const tx) {
-  utarray_push_back(txs, tx);
-}
-
-size_t transaction_array_len(transaction_array_t txs) {
-  return utarray_len(txs);
-}
-void transaction_array_free(transaction_array_t txs) { utarray_free(txs); }
-
-iota_transaction_t* transaction_array_at(transaction_array_t txs,
-                                         size_t index) {
-  // return NULL if not found.
-  return (iota_transaction_t*)utarray_eltptr(txs, index);
 }

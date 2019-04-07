@@ -1,10 +1,20 @@
+cc_library(
+    name = "test_channel_utils",
+    srcs = ["test_channel_utils.c"],
+    hdrs = ["test_channel_utils.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mam/mam:channel",
+        "//mam/mam:mam_channel_t_set",
+    ],
+)
+
 cc_test(
     name = "test_message",
     timeout = "long",
     srcs = ["test_message.c"],
     deps = [
         "//mam/mam:message",
-        "//mam/test_utils",
         "@unity",
     ],
 )
@@ -17,7 +27,6 @@ cc_test(
         "//mam/mam:endpoint",
         "//mam/mam:mam_endpoint_t_set",
         "//mam/mam:message",
-        "//mam/test_utils",
         "@unity",
     ],
 )
@@ -27,10 +36,8 @@ cc_test(
     timeout = "long",
     srcs = ["test_channel.c"],
     deps = [
-        "//mam/mam:channel",
-        "//mam/mam:mam_channel_t_set",
+        ":test_channel_utils",
         "//mam/mam:message",
-        "//mam/test_utils",
         "@unity",
     ],
 )

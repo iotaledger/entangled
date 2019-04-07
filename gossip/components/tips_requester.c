@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define TIPS_REQUESTER_LOGGER_ID "tips_requester"
-#define TIPS_REQUESTER_INTERVAL 5
+#define TIPS_REQUESTER_INTERVAL_MS 5000ULL
 
 static logger_id_t logger_id;
 
@@ -25,8 +25,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   iota_packet_t packet;
   neighbor_t *iter = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
-  DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr,
-                                milestone_pack);
+  DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
   connection_config_t db_conf = {.db_path = tips_requester->node->conf.db_path};
   tangle_t tangle;
 
@@ -41,27 +40,27 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (tips_requester->running) {
     hash_pack_reset(&milestone_pack);
-    if (iota_tangle_milestone_load_last(&tangle, &milestone_pack) != RC_OK ||
-        milestone_pack.num_loaded == 0) {
+    if (iota_tangle_milestone_load_last(&tangle, &milestone_pack) != RC_OK || milestone_pack.num_loaded == 0) {
       continue;
     }
     hash_pack_reset(&transaction_pack);
-    if (iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH,
-                                     latest_milestone.hash,
-                                     &transaction_pack) != RC_OK ||
+    if (iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, latest_milestone.hash, &transaction_pack) !=
+            RC_OK ||
         transaction_pack.num_loaded == 0) {
       continue;
     }
-    transaction_serialize_on_flex_trits(transaction_ptr,
-                                        transaction_flex_trits);
+    transaction_serialize_on_flex_trits(transaction_ptr, transaction_flex_trits);
     if (iota_packet_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
       continue;
     }
-    if (iota_packet_set_request(
-            &packet, latest_milestone.hash,
-            tips_requester->node->conf.request_hash_size_trit) != RC_OK) {
+    if (iota_packet_set_request(&packet, latest_milestone.hash, tips_requester->node->conf.request_hash_size_trit) !=
+        RC_OK) {
       continue;
     }
 
@@ -72,8 +71,11 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       }
     }
     rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
-    sleep(TIPS_REQUESTER_INTERVAL);
+    cond_handle_timedwait(&tips_requester->cond, &lock_cond, TIPS_REQUESTER_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -86,17 +88,16 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
  * Public functions
  */
 
-retcode_t tips_requester_init(tips_requester_t *const tips_requester,
-                              node_t *const node) {
+retcode_t tips_requester_init(tips_requester_t *const tips_requester, node_t *const node) {
   if (tips_requester == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
 
-  logger_id =
-      logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
 
   tips_requester->running = false;
   tips_requester->node = node;
+  cond_handle_init(&tips_requester->cond);
 
   return RC_OK;
 }
@@ -108,9 +109,7 @@ retcode_t tips_requester_start(tips_requester_t *const tips_requester) {
 
   log_info(logger_id, "Spawning tips requester thread\n");
   tips_requester->running = true;
-  if (thread_handle_create(&tips_requester->thread,
-                           (thread_routine_t)tips_requester_routine,
-                           tips_requester) != 0) {
+  if (thread_handle_create(&tips_requester->thread, (thread_routine_t)tips_requester_routine, tips_requester) != 0) {
     log_critical(logger_id, "Spawning tips requester thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }
@@ -127,6 +126,7 @@ retcode_t tips_requester_stop(tips_requester_t *const tips_requester) {
 
   log_info(logger_id, "Shutting down tips requester thread\n");
   tips_requester->running = false;
+  cond_handle_signal(&tips_requester->cond);
   if (thread_handle_join(tips_requester->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down tips requester thread failed\n");
     return RC_FAILED_THREAD_JOIN;
@@ -143,6 +143,7 @@ retcode_t tips_requester_destroy(tips_requester_t *const tips_requester) {
   }
 
   tips_requester->node = NULL;
+  cond_handle_destroy(&tips_requester->cond);
 
   logger_helper_release(logger_id);
 

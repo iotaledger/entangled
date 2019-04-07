@@ -33,10 +33,8 @@ extern "C" {
  *,
  *   https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetNewAddress.ts#L131
  */
-retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
-                                      flex_trit_t const* const seed,
-                                      address_opt_t const addr_opt,
-                                      hash243_queue_t* out_addresses);
+retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, flex_trit_t const* const seed,
+                                      address_opt_t const addr_opt, hash243_queue_t* out_addresses);
 
 #ifdef __cplusplus
 }

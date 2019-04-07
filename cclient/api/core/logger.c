@@ -12,14 +12,11 @@
 logger_id_t client_core_logger_id;
 
 void logger_init_client_core() {
-  client_core_logger_id =
-      logger_helper_enable(CCLIENT_CORE_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(client_core_logger_id, "[%s:%d] enable logger %s.\n", __func__,
-           __LINE__, CCLIENT_CORE_LOGGER_ID);
+  client_core_logger_id = logger_helper_enable(CCLIENT_CORE_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(client_core_logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__, CCLIENT_CORE_LOGGER_ID);
 }
 
 void logger_destroy_client_core() {
-  log_info(client_core_logger_id, "[%s:%d] destroy logger %s.\n", __func__,
-           __LINE__, CCLIENT_CORE_LOGGER_ID);
+  log_info(client_core_logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__, CCLIENT_CORE_LOGGER_ID);
   logger_helper_release(client_core_logger_id);
 }

@@ -35,9 +35,8 @@ void hash_array_free(hash_array_p array);
 flex_trit_t* hash_array_at(hash_array_p array, uint32_t index);
 void hash_array_reserve(hash_array_p array, uint32_t len);
 
-#define HASH_ARRAY_FOREACH(array, elt)                        \
-  for (elt = (flex_trit_t*)utarray_front(array); elt != NULL; \
-       elt = (flex_trit_t*)utarray_next(array, elt))
+#define HASH_ARRAY_FOREACH(array, elt) \
+  for (elt = (flex_trit_t*)utarray_front(array); elt != NULL; elt = (flex_trit_t*)utarray_next(array, elt))
 
 #ifdef __cplusplus
 }

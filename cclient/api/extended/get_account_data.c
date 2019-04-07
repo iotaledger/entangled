@@ -11,10 +11,8 @@
 #include "cclient/api/extended/get_account_data.h"
 #include "cclient/api/extended/logger.h"
 
-retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
-                                       flex_trit_t const* const seed,
-                                       size_t const security,
-                                       account_data_t* out_account) {
+retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, flex_trit_t const* const seed,
+                                       size_t const security, account_data_t* out_account) {
   retcode_t ret_code = RC_OK;
   address_opt_t const addr_opt = {.security = security, .start = 0, .total = 0};
   flex_trit_t* tmp_addr = NULL;
@@ -28,15 +26,13 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
   // security validation
   if (addr_opt.security == 0 || addr_opt.security > 3) {
     ret_code = RC_CCLIENT_INVALID_SECURITY;
-    log_error(client_extended_logger_id, "%s %s\n", __func__,
-              error_2_string(ret_code));
+    log_error(client_extended_logger_id, "%s %s\n", __func__, error_2_string(ret_code));
     goto done;
   }
 
   // get addresses
   for (addr_index = 0;; addr_index++) {
-    tmp_addr =
-        iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
+    tmp_addr = iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
     if (tmp_addr) {
       // check tx
       size_t tx_num = 0;
@@ -44,17 +40,13 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
       find_tx_res = find_transactions_res_new();
       if (!find_tx_req || !find_tx_res) {
         ret_code = RC_CCLIENT_OOM;
-        log_error(
-            client_extended_logger_id,
-            "%s find transactions request or response object failed: %s\n",
-            __func__, error_2_string(ret_code));
+        log_error(client_extended_logger_id, "%s find transactions request or response object failed: %s\n", __func__,
+                  error_2_string(ret_code));
         goto done;
       }
       ret_code = hash243_queue_push(&find_tx_req->addresses, tmp_addr);
       if (ret_code) {
-        log_error(client_extended_logger_id,
-                  "%s hash243_queue_push failed: %s\n", __func__,
-                  error_2_string(ret_code));
+        log_error(client_extended_logger_id, "%s hash243_queue_push failed: %s\n", __func__, error_2_string(ret_code));
         goto done;
       }
 
@@ -65,8 +57,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
           // appending address
           ret_code = hash243_queue_push(&out_account->addresses, tmp_addr);
           if (ret_code) {
-            log_error(client_extended_logger_id,
-                      "%s hash243_queue_push failed: %s\n", __func__,
+            log_error(client_extended_logger_id, "%s hash243_queue_push failed: %s\n", __func__,
                       error_2_string(ret_code));
             goto done;
           }
@@ -74,11 +65,9 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
           // appending tx
           tx_iter = NULL;
           CDL_FOREACH(find_tx_res->hashes, tx_iter) {
-            ret_code =
-                hash243_queue_push(&out_account->transactions, tx_iter->hash);
+            ret_code = hash243_queue_push(&out_account->transactions, tx_iter->hash);
             if (ret_code) {
-              log_error(client_extended_logger_id,
-                        "%s hash243_queue_push failed: %s\n", __func__,
+              log_error(client_extended_logger_id, "%s hash243_queue_push failed: %s\n", __func__,
                         error_2_string(ret_code));
               goto done;
             }
@@ -96,8 +85,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
     } else {
       // gen address failed.
       ret_code = RC_CCLIENT_NULL_PTR;
-      log_error(client_extended_logger_id, "%s address generation failed: %s\n",
-                __func__, error_2_string(ret_code));
+      log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret_code));
       goto done;
     }
   }
@@ -107,10 +95,8 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
     balances_res = get_balances_res_new();
     if (!balances_req || !balances_res) {
       ret_code = RC_CCLIENT_OOM;
-      log_error(
-          client_extended_logger_id,
-          "%s create get balances request or response object failed: %s\n",
-          __func__, error_2_string(ret_code));
+      log_error(client_extended_logger_id, "%s create get balances request or response object failed: %s\n", __func__,
+                error_2_string(ret_code));
       goto done;
     }
 

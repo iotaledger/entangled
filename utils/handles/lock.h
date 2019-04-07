@@ -18,8 +18,7 @@ extern "C" {
  * by the underlying API
  */
 
-#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
-    (defined(__APPLE__) && defined(__MACH__))
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <Windows.h>
@@ -31,21 +30,13 @@ extern "C" {
 
 typedef pthread_mutex_t lock_handle_t;
 
-static inline int lock_handle_init(lock_handle_t* const lock) {
-  return pthread_mutex_init(lock, NULL);
-}
+static inline int lock_handle_init(lock_handle_t* const lock) { return pthread_mutex_init(lock, NULL); }
 
-static inline int lock_handle_lock(lock_handle_t* const lock) {
-  return pthread_mutex_lock(lock);
-}
+static inline int lock_handle_lock(lock_handle_t* const lock) { return pthread_mutex_lock(lock); }
 
-static inline int lock_handle_unlock(lock_handle_t* const lock) {
-  return pthread_mutex_unlock(lock);
-}
+static inline int lock_handle_unlock(lock_handle_t* const lock) { return pthread_mutex_unlock(lock); }
 
-static inline int lock_handle_destroy(lock_handle_t* const lock) {
-  return pthread_mutex_destroy(lock);
-}
+static inline int lock_handle_destroy(lock_handle_t* const lock) { return pthread_mutex_destroy(lock); }
 
 #elif defined(_WIN32)
 

@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup serialization_json
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_SERIALIZATION_JSON_ADD_NEIGHBORS_H
 #define CCLIENT_SERIALIZATION_JSON_ADD_NEIGHBORS_H
 
@@ -18,20 +27,48 @@ extern "C" {
 #include "cclient/response/add_neighbors.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_add_neighbors_serialize_request(
-    const serializer_t* const s, const add_neighbors_req_t* const obj,
-    char_buffer_t* out);
+/**
+ * @brief add_neighbors request object to JSON string
+ *
+ * @param s JSON serializer
+ * @param obj add_neighbors request object
+ * @param out JSON string
+ * @return error code
+ */
+retcode_t json_add_neighbors_serialize_request(const serializer_t* const s, const add_neighbors_req_t* const obj,
+                                               char_buffer_t* out);
 
-retcode_t json_add_neighbors_serialize_response(
-    const serializer_t* const s, const add_neighbors_res_t* const obj,
-    char_buffer_t* out);
+/**
+ * @brief add_neighbors response object to JSON string
+ *
+ * @param s JSON serializer
+ * @param obj add_neighbors response object
+ * @param out JSON string
+ * @return error code
+ */
+retcode_t json_add_neighbors_serialize_response(const serializer_t* const s, const add_neighbors_res_t* const obj,
+                                                char_buffer_t* out);
 
-retcode_t json_add_neighbors_deserialize_request(const serializer_t* const s,
-                                                 const char* const obj,
+/**
+ * @brief JSON string to add_neighbors request object
+ *
+ * @param s JSON serializer
+ * @param obj JSON string
+ * @param out add_neighbors request object
+ * @return error code
+ */
+retcode_t json_add_neighbors_deserialize_request(const serializer_t* const s, const char* const obj,
                                                  add_neighbors_req_t* out);
 
-retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
-                                                  const char* const obj,
+/**
+ * @brief JSON string to add_neighbors response object
+ *
+ * @param s JSON serializer
+ * @param obj JSON string
+ * @param out add_neighbors response object
+ * @return error code
+ */
+retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s, const char* const obj,
                                                   add_neighbors_res_t* out);
 
 #ifdef __cplusplus
@@ -39,3 +76,5 @@ retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
 #endif
 
 #endif  // CCLIENT_SERIALIZATION_JSON_ADD_NEIGHBORS
+
+/** @} */

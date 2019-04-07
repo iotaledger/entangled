@@ -22,17 +22,13 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   FILE *file = NULL;
   size_t len = 0;
   char *content = NULL;
-  cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL,
-        *coordinator = NULL;
+  cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL, *coordinator = NULL;
 
   if ((file = fopen(conf->snapshot_conf_file, "r")) == NULL) {
-    log_error(logger_id, "Snapshot configuration file not found\n");
-    ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
   }
 
-  if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) <= 0 ||
-      fseek(file, 0, SEEK_SET) < 0) {
+  if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) <= 0 || fseek(file, 0, SEEK_SET) < 0) {
     log_error(logger_id, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
     goto done;
@@ -55,10 +51,8 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
     goto json_error;
   }
 
-  if ((timestamp = cJSON_GetObjectItemCaseSensitive(json, "timestamp")) ==
-          NULL ||
-      (coordinator = cJSON_GetObjectItemCaseSensitive(json, "coordinator")) ==
-          NULL) {
+  if ((timestamp = cJSON_GetObjectItemCaseSensitive(json, "timestamp")) == NULL ||
+      (coordinator = cJSON_GetObjectItemCaseSensitive(json, "coordinator")) == NULL) {
     goto json_error;
   }
 
@@ -72,8 +66,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
       strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
     goto json_error;
   }
-  flex_trits_from_trytes(conf->coordinator, HASH_LENGTH_TRIT,
-                         (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
+  flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
@@ -82,8 +75,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   }
   conf->last_milestone = tmp->valueint;
 
-  if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) !=
-      NULL) {
+  if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) != NULL) {
     tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
     if (tmp == NULL || !cJSON_IsNumber(tmp)) {
       goto json_error;
@@ -101,9 +93,8 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
         strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
       goto json_error;
     }
-    flex_trits_from_trytes(conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT,
-                           (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
-                           HASH_LENGTH_TRYTE);
+    flex_trits_from_trytes(conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT, (tryte_t *)tmp->valuestring,
+                           HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   }
 
   goto done;
@@ -136,18 +127,23 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
     return RC_NULL_PARAM;
   }
 
-  logger_id =
-      logger_helper_enable(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
 
-  memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
   conf->alpha = DEFAULT_TIP_SELECTION_ALPHA;
   conf->below_max_depth = DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH;
-  strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
-  strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
-  strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
-  conf->num_keys_in_milestone = DEFAULT_NUM_KEYS_IN_MILESTONE;
+  flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  conf->coordinator_num_keys_in_milestone = DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE;
+  conf->coordinator_max_milestone_index = 1 << conf->coordinator_num_keys_in_milestone;
+  conf->coordinator_security_level = DEFAULT_COORDINATOR_SECURITY_LEVEL;
+  conf->coordinator_signature_type = DEFAULT_COORDINATOR_SIGNATURE_TYPE;
+  memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
   conf->mwm = DEFAULT_MWN;
+  strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
+  strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
+  strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
+  conf->snapshot_signature_skip_validation = DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION;
 
   ret = iota_snapshot_conf_init(conf);
 

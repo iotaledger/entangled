@@ -10,10 +10,8 @@
 #include "cclient/api/extended/logger.h"
 #include "cclient/api/extended/send_trytes.h"
 
-retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
-                                    flex_trit_t const* const tail_hash,
-                                    int const depth, int const mwm,
-                                    bundle_transactions_t* const bundle) {
+retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
+                                    int const depth, int const mwm, bundle_transactions_t* const bundle) {
   retcode_t ret_code = RC_OK;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   iota_transaction_t* curr_tx = NULL;
@@ -32,25 +30,22 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
         }
 
         // send trytes
-        ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, NULL,
-                                           false, (transaction_array_t)bundle);
+        ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, NULL, false, (transaction_array_t*)bundle);
         if (ret_code != RC_OK) {
-          log_error(client_extended_logger_id,
-                    "%s iota_client_send_trytes failed: %s\n", __func__,
+          log_error(client_extended_logger_id, "%s iota_client_send_trytes failed: %s\n", __func__,
                     error_2_string(ret_code));
         }
       } else {
         ret_code = RC_CCLIENT_INVALID_BUNDLE;
-        log_error(client_extended_logger_id, "%s: %s error code: %d\n",
-                  __func__, error_2_string(ret_code), bundle_status);
+        log_error(client_extended_logger_id, "%s: %s error code: %d\n", __func__, error_2_string(ret_code),
+                  bundle_status);
       }
     }
 
     hash_array_free(trytes);
   } else {
     ret_code = RC_CCLIENT_OOM;
-    log_error(client_extended_logger_id, "%s new hash array failed: %s\n",
-              __func__, error_2_string(ret_code));
+    log_error(client_extended_logger_id, "%s new hash array failed: %s\n", __func__, error_2_string(ret_code));
   }
   return ret_code;
 }

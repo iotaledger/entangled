@@ -33,8 +33,7 @@ void mam_spongos_init(mam_spongos_t *const spongos);
  * @param spongos A spongos interface
  * @param fork The fork
  */
-void mam_mam_spongos_fork(mam_spongos_t const *const spongos,
-                          mam_spongos_t *const fork);
+void mam_mam_spongos_fork(mam_spongos_t const *const spongos, mam_spongos_t *const fork);
 
 /**
  * Commits changes in the rate part
@@ -58,8 +57,7 @@ void mam_spongos_absorb(mam_spongos_t *const spongos, trits_t input);
  * @param n Number of input data
  * @param inputs Inputs data
  */
-void mam_spongos_absorbn(mam_spongos_t *const spongos, size_t const n,
-                         trits_t *const inputs);
+void mam_spongos_absorbn(mam_spongos_t *const spongos, size_t const n, trits_t *const inputs);
 
 /**
  * Generates output data
@@ -75,8 +73,7 @@ void mam_spongos_squeeze(mam_spongos_t *const spongos, trits_t output);
  * @param spongos A spongos interface
  * @param expected_output Expected output data
  */
-bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos,
-                            trits_t expected_output);
+bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos, trits_t expected_output);
 
 /**
  * Hashes input data
@@ -85,8 +82,7 @@ bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos,
  * @param input Input data
  * @param output Output data
  */
-void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input,
-                      trits_t output);
+void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input, trits_t output);
 
 /**
  * Hashes n input data
@@ -96,8 +92,7 @@ void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input,
  * @param inputs Inputs data
  * @param output Output data
  */
-void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n,
-                       trits_t *inputs, trits_t output);
+void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n, trits_t *inputs, trits_t output);
 
 /**
  * Encrypts plaintext
@@ -106,8 +101,7 @@ void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n,
  * @param plaintext Plaintext input
  * @param ciphertext Ciphertext output
  */
-void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
-                      trits_t ciphertext);
+void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext, trits_t ciphertext);
 
 /**
  * Decrypts ciphertext
@@ -116,8 +110,7 @@ void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
  * @param ciphertext Ciphertext input
  * @param plaintext Plaintext output
  */
-void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
-                      trits_t plaintext);
+void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext, trits_t plaintext);
 
 /**
  * Copy spongos from src to dst

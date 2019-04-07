@@ -24,22 +24,18 @@ struct HashedTX {
 
 boost::future<void> handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
-    cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
-        hashToSeenTimestamp,
-    std::chrono::time_point<std::chrono::system_clock> received,
-    std::weak_ptr<cppclient::IotaAPI> iriClient, std::string lmhs);
+    cuckoohash_map<std::string, std::chrono::system_clock::time_point>& hashToSeenTimestamp,
+    std::chrono::time_point<std::chrono::system_clock> received, std::weak_ptr<cppclient::IotaAPI> iriClient,
+    std::string lmhs);
 
-std::set<std::string> getUnconfirmedTXs(
-    std::weak_ptr<cppclient::IotaAPI> client,
-    std::shared_ptr<iri::TXMessage> tx, std::string lmhs);
+std::set<std::string> getUnconfirmedTXs(std::weak_ptr<cppclient::IotaAPI> client, std::shared_ptr<iri::TXMessage> tx,
+                                        std::string lmhs);
 
-boost::future<void> removeConfirmedTransactions(
-    std::weak_ptr<cppclient::IotaAPI> client,
-    const std::vector<std::string>& tips, std::vector<std::string>& txs);
+boost::future<void> removeConfirmedTransactions(std::weak_ptr<cppclient::IotaAPI> client,
+                                                const std::vector<std::string>& tips, std::vector<std::string>& txs);
 
 nonstd::optional<std::string> fillTX(
-    boost::future<nonstd::optional<cppclient::GetTransactionsToApproveResponse>>
-        response);
+    boost::future<nonstd::optional<cppclient::GetTransactionsToApproveResponse>> response);
 
 nonstd::optional<std::string> powTX(nonstd::optional<std::string>, int mwm);
 

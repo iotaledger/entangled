@@ -1,0 +1,13 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup crypto_curl_p curl-p 
+ * @ingroup common_crypto
+ * @brief The curl-p implementations. 
+ *
+ */

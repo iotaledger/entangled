@@ -34,10 +34,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetBundle.ts#L38
  */
-retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
-                                 flex_trit_t const* const tail_hash,
-                                 bundle_transactions_t* const bundle,
-                                 bundle_status_t* const bundle_status);
+retcode_t iota_client_get_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
+                                 bundle_transactions_t* const bundle, bundle_status_t* const bundle_status);
 
 #ifdef __cplusplus
 }

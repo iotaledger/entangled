@@ -27,9 +27,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetTransactionObjects.ts#L35
  */
-retcode_t iota_client_get_transaction_objects(
-    iota_client_service_t const* const serv, get_trytes_req_t* const tx_hashes,
-    transaction_array_t out_tx_objs);
+retcode_t iota_client_get_transaction_objects(iota_client_service_t const* const serv,
+                                              get_trytes_req_t* const tx_hashes, transaction_array_t* out_tx_objs);
 
 #ifdef __cplusplus
 }

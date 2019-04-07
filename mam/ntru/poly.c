@@ -72,8 +72,7 @@ void poly_intt(poly_t const t, poly_t f) {
       r = j & ~(((size_t)1 << i) - 1);
       /*r = j - (j % (1 << i));*/
       c = u[j + j];
-      d = poly_coeff_mul(u[j + j + 1],
-                         poly_gamma_exp[2 * MAM_POLY_N - (r + r)]);
+      d = poly_coeff_mul(u[j + j + 1], poly_gamma_exp[2 * MAM_POLY_N - (r + r)]);
       f[j] = poly_coeff_add(c, d);
       f[j + MAM_POLY_N / 2] = poly_coeff_sub(c, d);
     }
@@ -84,8 +83,7 @@ void poly_intt(poly_t const t, poly_t f) {
 
   for (size_t i = 0; i < MAM_POLY_N; ++i) {
     /* TODO: precomp γ⁻ⁱn⁻¹? */
-    c = poly_coeff_mul(MAM_POLY_COEFF_N_INV,
-                       poly_gamma_exp[2 * MAM_POLY_N - i]);
+    c = poly_coeff_mul(MAM_POLY_COEFF_N_INV, poly_gamma_exp[2 * MAM_POLY_N - i]);
     f[i] = poly_coeff_mul(c, f[i]);
   }
 }

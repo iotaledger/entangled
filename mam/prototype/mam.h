@@ -8,7 +8,7 @@
 #ifndef __MAM_PROTOTYPE_MAM_H__
 #define __MAM_PROTOTYPE_MAM_H__
 
-#include "common/curl-p/hamming.h"
+#include "common/crypto/curl-p/hamming.h"
 #include "common/trinary/trit_long.h"
 #include "mam/prototype/mask.h"
 
@@ -24,9 +24,8 @@ extern "C" {
  * @param merkle_root The merkle root
  * @param enc_curl A curl instance used for encryption/decryption
  */
-void mam_init_encryption(trit_t const *const side_key,
-                         size_t const side_key_length,
-                         trit_t const *const merkle_root, Curl *const enc_curl);
+void mam_init_encryption(trit_t const *const side_key, size_t const side_key_length, trit_t const *const merkle_root,
+                         Curl *const enc_curl);
 
 /**
  * Computes the minimum length of a payload
@@ -38,8 +37,7 @@ void mam_init_encryption(trit_t const *const side_key,
  *
  * @return The minimum length of the payload
  */
-int payload_min_length(size_t const message_length,
-                       size_t const merkle_tree_length, size_t const index,
+int payload_min_length(size_t const message_length, size_t const merkle_tree_length, size_t const index,
                        size_t const security);
 
 /**
@@ -63,14 +61,11 @@ int payload_min_length(size_t const message_length,
  *
  * @return Success/error code
  */
-int mam_create(trit_t *const payload, size_t const payload_length,
-               trit_t const *const message, size_t const message_length,
-               trit_t const *const side_key, size_t const side_key_length,
-               trit_t const *const merkle_tree, size_t const merkle_tree_length,
-               size_t const leaf_count, size_t const index,
-               trit_t const *const next_root, size_t const start,
-               trit_t const *const seed, size_t const security,
-               Curl *const enc_curl);
+int mam_create(trit_t *const payload, size_t const payload_length, trit_t const *const message,
+               size_t const message_length, trit_t const *const side_key, size_t const side_key_length,
+               trit_t const *const merkle_tree, size_t const merkle_tree_length, size_t const leaf_count,
+               size_t const index, trit_t const *const next_root, size_t const start, trit_t const *const seed,
+               size_t const security, Curl *const enc_curl);
 
 /**
  * Decrypts, parses and validates an encrypted payload
@@ -89,12 +84,9 @@ int mam_create(trit_t *const payload, size_t const payload_length,
  *
  * @return Success/error code
  */
-int mam_parse(trit_t *const payload, size_t const payload_length,
-              trit_t *const message, size_t *const message_length,
-              trit_t const *const side_key, size_t const side_key_length,
-              trit_t const *const root, size_t *const index,
-              trit_t *const next_root, size_t *const security,
-              Curl *const enc_curl);
+int mam_parse(trit_t *const payload, size_t const payload_length, trit_t *const message, size_t *const message_length,
+              trit_t const *const side_key, size_t const side_key_length, trit_t const *const root, size_t *const index,
+              trit_t *const next_root, size_t *const security, Curl *const enc_curl);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup cclient_extended Extended API
+ * @ingroup cclient
+ * @brief Extended API implementations. 
+ *
+ * The Extended API is a API set that is commonly used in an applications.
+ */

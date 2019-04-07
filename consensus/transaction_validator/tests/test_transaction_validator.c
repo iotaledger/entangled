@@ -21,10 +21,8 @@ static iota_consensus_conf_t conf;
 void transaction_invalid_value() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
@@ -40,10 +38,8 @@ void transaction_invalid_value() {
 void transaction_invalid_hash() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
@@ -59,14 +55,11 @@ void transaction_invalid_hash() {
 void transaction_invalid_attachment_timestamp_too_futuristic() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
-  transaction_set_attachment_timestamp(
-      tx1, current_timestamp_ms() + 99 * 60 * 60 * 1000);
+  transaction_set_attachment_timestamp(tx1, current_timestamp_ms() + 99 * 60 * 60 * 1000);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = 0;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
@@ -79,10 +72,8 @@ void transaction_invalid_attachment_timestamp_too_futuristic() {
 void transaction_invalid_attachment_timestamp_too_old() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
@@ -98,17 +89,14 @@ void transaction_invalid_attachment_timestamp_too_old() {
 void transaction_invalid_value_tx_wrong_address() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
-  transaction_address(tx1)[FLEX_TRIT_SIZE_243 - 1] =
-      transaction_address(tx1)[4];
+  transaction_address(tx1)[FLEX_TRIT_SIZE_243 - 1] = transaction_address(tx1)[4];
   TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
@@ -118,10 +106,8 @@ void transaction_invalid_value_tx_wrong_address() {
 void transaction_invalid_timestamp_too_futuristic() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_set_attachment_timestamp(tx1, 0);
@@ -138,10 +124,8 @@ void transaction_invalid_timestamp_too_futuristic() {
 void transaction_invalid_timestamp_too_old() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_set_attachment_timestamp(tx1, 0);
@@ -159,10 +143,8 @@ void transaction_invalid_timestamp_too_old() {
 void transaction_is_valid() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;

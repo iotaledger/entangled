@@ -130,17 +130,13 @@ class TXMessage : public IRIMessage {
   const std::string& address() { return this->_address; }
   int64_t value() { return this->_value; }
   const std::string& obsoleteTag() { return this->_obsoleteTag; }
-  const std::chrono::system_clock::time_point& timestamp() {
-    return this->_timestamp;
-  }
+  const std::chrono::system_clock::time_point& timestamp() { return this->_timestamp; }
   uint64_t currentIndex() { return this->_currentIndex; }
   uint64_t lastIndex() { return this->_lastIndex; }
   const std::string& bundle() { return this->_bundle; }
   const std::string& trunk() { return this->_trunk; }
   const std::string& branch() { return this->_branch; }
-  const std::chrono::system_clock::time_point& arrivalTime() {
-    return this->_arrivalTime;
-  }
+  const std::chrono::system_clock::time_point& arrivalTime() { return this->_arrivalTime; }
 
  private:
   std::string _hash;
@@ -166,9 +162,7 @@ class LMHSMessage : public IRIMessage {
   inline IRIMessageType type() { return IRIMessageType::LMHS; }
 
  public:
-  const std::string& latestSolidMilestoneHash() {
-    return this->_latestSolidMilestoneHash;
-  }
+  const std::string& latestSolidMilestoneHash() { return this->_latestSolidMilestoneHash; }
 
  private:
   std::string _latestSolidMilestoneHash;
@@ -184,9 +178,7 @@ class LMSIMessage : public IRIMessage {
   inline IRIMessageType type() { return IRIMessageType::LMSI; }
 
  public:
-  const uint64_t latestSolidMilestoneIndex() {
-    return this->_latestSolidMilestoneIndex;
-  }
+  const uint64_t latestSolidMilestoneIndex() { return this->_latestSolidMilestoneIndex; }
 
  private:
   uint64_t _latestSolidMilestoneIndex;

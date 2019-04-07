@@ -4,8 +4,8 @@ cc_library(
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//common/crypto/iss:normalize",
         "//common/model:bundle",
-        "//common/sign:normalize",
         "//consensus:conf",
         "//consensus/tangle",
     ],

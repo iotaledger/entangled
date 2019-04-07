@@ -21,7 +21,7 @@ extern "C" {
  *
  * @param {iota_client_service_t} serv - client service
  * @param {hash243_queue_t} transactions - List of transactions hashes
- * @param {get_inclusion_state_res_t} out_states - List of inclusion states
+ * @param {get_inclusion_states_res_t} out_states - List of inclusion states
  *
  * @returns {retcode_t}
  * - `INVALID_HASH`: Invalid transaction hash
@@ -29,9 +29,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetLatestInclusion.ts#L34
  */
-retcode_t iota_client_get_latest_inclusion(
-    iota_client_service_t const* const serv, hash243_queue_t const transactions,
-    get_inclusion_state_res_t* out_states);
+retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const serv, hash243_queue_t const transactions,
+                                           get_inclusion_states_res_t* out_states);
 
 #ifdef __cplusplus
 }

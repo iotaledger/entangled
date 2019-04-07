@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "utils/containers/hash/hash243_set.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
@@ -26,6 +27,7 @@ typedef struct transaction_requester_s {
   hash243_set_t transactions;
   node_t *node;
   rw_lock_handle_t lock;
+  cond_handle_t cond;
 } transaction_requester_t;
 
 #ifdef __cplusplus
@@ -40,8 +42,7 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t requester_init(transaction_requester_t *const transaction_requester,
-                         node_t *const node);
+retcode_t requester_init(transaction_requester_t *const transaction_requester, node_t *const node);
 
 /**
  * Destroys a transaction requester
@@ -50,8 +51,7 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester,
  *
  * @return a status code
  */
-retcode_t requester_destroy(
-    transaction_requester_t *const transaction_requester);
+retcode_t requester_destroy(transaction_requester_t *const transaction_requester);
 
 /**
  * Get all the requested transactions and milestones from a transaction
@@ -62,9 +62,8 @@ retcode_t requester_destroy(
  *
  * @return a status code
  */
-retcode_t requester_get_requested_transactions(
-    transaction_requester_t *const transaction_requester,
-    hash243_set_t *const transactions);
+retcode_t requester_get_requested_transactions(transaction_requester_t *const transaction_requester,
+                                               hash243_set_t *const transactions);
 
 /**
  * Gets the number of transactions to request from a transaction requester
@@ -92,9 +91,7 @@ bool requester_is_full(transaction_requester_t *const transaction_requester);
  *
  * @return a status code
  */
-retcode_t requester_clear_request(
-    transaction_requester_t *const transaction_requester,
-    flex_trit_t const *const hash);
+retcode_t requester_clear_request(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash);
 
 /**
  * Adds a transaction to be requested by a transaction requester
@@ -106,10 +103,8 @@ retcode_t requester_clear_request(
  *
  * @return a status code
  */
-retcode_t request_transaction(
-    transaction_requester_t *const transaction_requester,
-    tangle_t *const tangle, flex_trit_t const *const hash,
-    bool const is_milestone);
+retcode_t request_transaction(transaction_requester_t *const transaction_requester, tangle_t *const tangle,
+                              flex_trit_t const *const hash, bool const is_milestone);
 
 /**
  * Gets a transaction to request from a transaction requester
@@ -121,9 +116,8 @@ retcode_t request_transaction(
  *
  * @return a status code
  */
-retcode_t get_transaction_to_request(
-    transaction_requester_t *const transaction_requester,
-    tangle_t *const tangle, flex_trit_t *const hash, bool const milestone);
+retcode_t get_transaction_to_request(transaction_requester_t *const transaction_requester, tangle_t *const tangle,
+                                     flex_trit_t *const hash, bool const milestone);
 
 /**
  * Tells whether the requester queue is empty or not
@@ -132,8 +126,7 @@ retcode_t get_transaction_to_request(
  *
  * @return true if empty, false otherwise
  */
-static inline bool requester_is_empty(
-    transaction_requester_t *const requester) {
+static inline bool requester_is_empty(transaction_requester_t *const requester) {
   return requester->milestones == NULL && requester->transactions == NULL;
 }
 

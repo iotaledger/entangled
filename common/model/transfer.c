@@ -7,8 +7,9 @@
 
 #include <stdbool.h>
 
+#include "common/crypto/iss/normalize.h"
 #include "common/model/transfer.h"
-#include "common/sign/normalize.h"
+#include "common/trinary/add.h"
 
 #define TRANSFER_LOGGER_ID "transfer"
 
@@ -18,8 +19,7 @@ static logger_id_t logger_id;
  * Private interface
  ***********************************************************************************************************/
 
-static void transfer_iterator_next_data_transaction(
-    transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
+static void transfer_iterator_next_data_transaction(transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_data_t* trans_data = NULL;
   uint32_t data_len = 0, offset = 0, len = 0;
   size_t flex_ret = 0;
@@ -29,26 +29,21 @@ static void transfer_iterator_next_data_transaction(
     // Length of message in trits
     data_len = trans_data->len;
     // Offset of message data for current index
-    offset = transfer_iterator->current_transfer_transaction_index *
-             NUM_TRITS_SIGNATURE;
+    offset = transfer_iterator->current_transfer_transaction_index * NUM_TRITS_SIGNATURE;
     // Length of the message data for the current transaction
     len = data_len - offset;
     len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
-    flex_ret = flex_trits_slice(
-        transfer_iterator->transaction->data.signature_or_message, len,
-        trans_data->data, data_len, offset, len);
+    flex_ret = flex_trits_slice(transfer_iterator->transaction->data.signature_or_message, len, trans_data->data,
+                                data_len, offset, len);
     if (flex_ret == 0) {
-      log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
-                  __LINE__);
+      log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__, __LINE__);
     }
   } else {
-    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__, __LINE__);
   }
 }
 
-static void transfer_iterator_next_output_transaction(
-    transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
+static void transfer_iterator_next_output_transaction(transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_value_out_t* output_info = NULL;
   iota_transaction_t* tx = NULL;
   size_t flex_ret = 0;
@@ -60,33 +55,24 @@ static void transfer_iterator_next_output_transaction(
       if (transfer_iterator->transaction_signature) {
         free(transfer_iterator->transaction_signature);
       }
-      iota_signature_generator iota_signature_gen =
-          transfer_iterator->iota_signature_gen;
-      transfer_iterator->transaction_signature =
-          (flex_trit_t*)iota_signature_gen(
-              output_info->seed, output_info->seed_index, output_info->security,
-              transfer_iterator->bundle_hash);
+      iota_signature_generator iota_signature_gen = transfer_iterator->iota_signature_gen;
+      transfer_iterator->transaction_signature = (flex_trit_t*)iota_signature_gen(
+          output_info->seed, output_info->seed_index, output_info->security, transfer_iterator->bundle_hash);
       transaction_set_value(tx, transfer->value);
     }
-    flex_ret = flex_trits_slice(
-        tx->data.signature_or_message, NUM_TRITS_SIGNATURE,
-        transfer_iterator->transaction_signature,
-        NUM_TRITS_SIGNATURE * output_info->security,
-        NUM_TRITS_SIGNATURE *
-            transfer_iterator->current_transfer_transaction_index,
-        NUM_TRITS_SIGNATURE);
+    flex_ret = flex_trits_slice(tx->data.signature_or_message, NUM_TRITS_SIGNATURE,
+                                transfer_iterator->transaction_signature, NUM_TRITS_SIGNATURE * output_info->security,
+                                NUM_TRITS_SIGNATURE * transfer_iterator->current_transfer_transaction_index,
+                                NUM_TRITS_SIGNATURE);
     if (flex_ret == 0) {
-      log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
-                  __LINE__);
+      log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__, __LINE__);
     }
   } else {
-    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__, __LINE__);
   }
 }
 
-static void transfer_iterator_next_input_transaction(
-    transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
+static void transfer_iterator_next_input_transaction(transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_value_in_t* value_in = NULL;
   iota_transaction_t* tx = transfer_iterator->transaction;
 
@@ -95,8 +81,7 @@ static void transfer_iterator_next_input_transaction(
     memcpy(transaction_signature(tx), value_in->data, value_in->len);
     transaction_set_value(tx, transfer->value);
   } else {
-    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__, __LINE__);
   }
 }
 
@@ -128,15 +113,12 @@ bool validate_output(transfer_value_out_t const* const output) {
 }
 
 // create data transfer object.
-transfer_t* transfer_data_new(flex_trit_t const* const address,
-                              flex_trit_t const* const tag,
-                              flex_trit_t const* const data, uint32_t data_len,
-                              uint64_t timestamp) {
+transfer_t* transfer_data_new(flex_trit_t const* const address, flex_trit_t const* const tag,
+                              flex_trit_t const* const data, uint32_t data_len, uint64_t timestamp) {
   transfer_data_t* tf_data = NULL;
   transfer_t* transfer = NULL;
   if (!address) {
-    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -146,8 +128,7 @@ transfer_t* transfer_data_new(flex_trit_t const* const address,
   }
 
   if (!data && data_len != 0) {
-    log_error(logger_id, "[%s:%d] data length should be 0.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] data length should be 0.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -175,10 +156,8 @@ transfer_t* transfer_data_new(flex_trit_t const* const address,
 }
 
 // create a value_out transfer object.
-transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
-                                   flex_trit_t const* const tag,
-                                   flex_trit_t const* const address,
-                                   int64_t value, uint64_t timestamp) {
+transfer_t* transfer_value_out_new(transfer_value_out_t const* const output, flex_trit_t const* const tag,
+                                   flex_trit_t const* const address, int64_t value, uint64_t timestamp) {
   transfer_value_out_t* value_out = NULL;
   transfer_t* tf = NULL;
   if (!validate_output(output)) {
@@ -187,8 +166,7 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
   }
 
   if (!address) {
-    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -221,15 +199,12 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
 }
 
 // create a value_int transfer object.
-transfer_t* transfer_value_in_new(flex_trit_t const* const address,
-                                  flex_trit_t const* const tag, int64_t value,
-                                  flex_trit_t const* const data,
-                                  uint32_t data_len, uint64_t timestamp) {
+transfer_t* transfer_value_in_new(flex_trit_t const* const address, flex_trit_t const* const tag, int64_t value,
+                                  flex_trit_t const* const data, uint32_t data_len, uint64_t timestamp) {
   transfer_value_in_t* value_in = NULL;
   transfer_t* tf = NULL;
   if (!address) {
-    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -239,8 +214,7 @@ transfer_t* transfer_value_in_new(flex_trit_t const* const address,
   }
 
   if (!data && data_len != 0) {
-    log_error(logger_id, "[%s:%d] data length should be 0.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] data length should be 0.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -307,8 +281,7 @@ transfer_ctx_t* transfer_ctx_new() {
 
 void transfer_ctx_free(transfer_ctx_t* transfer_ctx) { free(transfer_ctx); }
 
-bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
-                       uint32_t len) {
+bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[], uint32_t len) {
   uint32_t i;
   int64_t total = 0;
   transfer_t* transfer = NULL;
@@ -321,8 +294,7 @@ bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
 }
 
 // Calculates the bundle hash for a collection of transfers
-void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
-                       transfer_t* transfers[], uint32_t tx_len) {
+void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl, transfer_t* transfers[], uint32_t tx_len) {
   size_t i, j, count, current_index = 0;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   trit_t bundle_trit[HASH_LENGTH_TRIT];
@@ -331,12 +303,11 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
   int64_t value;
   bool valid_bundle = false;
   trit_t first_tx_tag_trits[NUM_TRITS_TAG];
-  flex_trits_to_trits(first_tx_tag_trits, NUM_TRITS_TAG,
-                      transfers[0]->obsolete_tag, NUM_TRITS_TAG, NUM_TRITS_TAG);
+  flex_trits_to_trits(first_tx_tag_trits, NUM_TRITS_TAG, transfers[0]->obsolete_tag, NUM_TRITS_TAG, NUM_TRITS_TAG);
 
   while (!valid_bundle) {
   loop:
-    init_kerl(kerl);
+    kerl_init(kerl);
     // Calculate bundle hash
     current_index = 0;
     for (i = 0; i < tx_len; i++) {
@@ -344,17 +315,15 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
       count = transfer_transactions_count(tf);
       for (j = 0; j < count; j++) {
         value = tf->type == VALUE_OUT ? (j == 0 ? tf->value : 0) : tf->value;
-        absorb_essence(kerl, tf->address, value, tf->obsolete_tag,
-                       tf->timestamp, current_index, transfer_ctx->count - 1,
-                       essence_trits);
+        absorb_essence(kerl, tf->address, value, tf->obsolete_tag, tf->timestamp, current_index,
+                       transfer_ctx->count - 1, essence_trits);
         current_index++;
       }
     }
 
     // Squeeze kerl to get the bundle hash
     kerl_squeeze(kerl, bundle_trit, HASH_LENGTH_TRIT);
-    flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit,
-                          HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
     // normalize
     normalize_flex_hash(transfer_ctx->bundle, normalized_hash);
@@ -363,8 +332,8 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
       if (normalized_hash[i] == 13) {
         // Insecure bundle. Increment Tag and recompute bundle hash.
         add_assign(first_tx_tag_trits, NUM_TRITS_TAG, 1);
-        flex_trits_from_trits(transfers[0]->obsolete_tag, NUM_TRITS_TAG,
-                              first_tx_tag_trits, NUM_TRITS_TAG, NUM_TRITS_TAG);
+        flex_trits_from_trits(transfers[0]->obsolete_tag, NUM_TRITS_TAG, first_tx_tag_trits, NUM_TRITS_TAG,
+                              NUM_TRITS_TAG);
         goto loop;
       }
     }
@@ -372,12 +341,10 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
   }
 }
 
-transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
-                                           uint32_t len, Kerl* kerl,
+transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], uint32_t len, Kerl* kerl,
                                            iota_transaction_t* transaction) {
   transfer_ctx_t transfer_ctx = {};
-  transfer_iterator_t* transfer_iterator =
-      (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
+  transfer_iterator_t* transfer_iterator = (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
   if (!transfer_iterator) {
     log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
@@ -397,8 +364,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
   if (transfer_ctx_init(&transfer_ctx, transfers, len)) {
     transfer_iterator->transactions_count = transfer_ctx.count;
     transfer_ctx_hash(&transfer_ctx, kerl, transfers, len);
-    memcpy(transfer_iterator->bundle_hash, transfer_ctx.bundle,
-           FLEX_TRIT_SIZE_243);
+    memcpy(transfer_iterator->bundle_hash, transfer_ctx.bundle, FLEX_TRIT_SIZE_243);
   } else {
     log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
     return NULL;
@@ -421,14 +387,11 @@ void transfer_iterator_free(transfer_iterator_t** iter) {
   }
 }
 
-iota_transaction_t* transfer_iterator_next(
-    transfer_iterator_t* transfer_iterator) {
+iota_transaction_t* transfer_iterator_next(transfer_iterator_t* transfer_iterator) {
   iota_transaction_t* transaction = NULL;
 
-  if (transfer_iterator->current_transfer <
-      transfer_iterator->transfers_count) {
-    transfer_t* transfer =
-        transfer_iterator->transfers[transfer_iterator->current_transfer];
+  if (transfer_iterator->current_transfer < transfer_iterator->transfers_count) {
+    transfer_t* transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
     uint32_t count = transfer_transactions_count(transfer);
     if (transfer_iterator->current_transfer_transaction_index >= count) {
       transfer_iterator->current_transfer++;
@@ -444,10 +407,8 @@ iota_transaction_t* transfer_iterator_next(
     transaction_set_tag(transaction, transfer->tag);
     transaction_set_obsolete_tag(transaction, transfer->obsolete_tag);
     transaction_set_timestamp(transaction, transfer->timestamp);
-    transaction_set_current_index(transaction,
-                                  transfer_iterator->current_transaction_index);
-    transaction_set_last_index(transaction,
-                               transfer_iterator->transactions_count - 1);
+    transaction_set_current_index(transaction, transfer_iterator->current_transaction_index);
+    transaction_set_last_index(transaction, transfer_iterator->transactions_count - 1);
     transaction->loaded_columns_mask.essence = MASK_ESSENCE_ALL;
     transaction->loaded_columns_mask.data = MASK_DATA_SIG_OR_MSG;
 
@@ -469,21 +430,17 @@ iota_transaction_t* transfer_iterator_next(
   return transaction;
 }
 
-void absorb_essence(Kerl* const kerl, flex_trit_t const* address, int64_t value,
-                    flex_trit_t const* obsolete_tag, uint64_t timestamp,
-                    int64_t current_index, int64_t last_index,
-                    trit_t* const essence_trits) {
+void absorb_essence(Kerl* const kerl, flex_trit_t const* address, int64_t value, flex_trit_t const* obsolete_tag,
+                    uint64_t timestamp, int64_t current_index, int64_t last_index, trit_t* const essence_trits) {
   memset(essence_trits, 0, NUM_TRITS_ESSENCE);
 
   trit_t* curr_pos = essence_trits;
 
-  flex_trits_to_trits(curr_pos, NUM_TRITS_ADDRESS, address, NUM_TRITS_ADDRESS,
-                      NUM_TRITS_ADDRESS);
+  flex_trits_to_trits(curr_pos, NUM_TRITS_ADDRESS, address, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
   curr_pos = &curr_pos[NUM_TRITS_ADDRESS];
   long_to_trits(value, curr_pos);
   curr_pos = &curr_pos[NUM_TRITS_VALUE];
-  flex_trits_to_trits(curr_pos, NUM_TRITS_OBSOLETE_TAG, obsolete_tag,
-                      NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
+  flex_trits_to_trits(curr_pos, NUM_TRITS_OBSOLETE_TAG, obsolete_tag, NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
   curr_pos = &curr_pos[NUM_TRITS_OBSOLETE_TAG];
   long_to_trits(timestamp, curr_pos);
   curr_pos = &curr_pos[NUM_TRITS_TIMESTAMP];

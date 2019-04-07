@@ -4,7 +4,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/crypto/sponge",
         "//utils/containers/hash:hash243_queue",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
@@ -15,13 +17,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":milestone_tracker_shared",
-        "//common/sign/v1:iss_curl",
+        "//common/crypto/iss/v1:iss",
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
         "//consensus/snapshot",
         "//consensus/transaction_solidifier",
         "//utils:macros",
-        "//utils:merkle",
         "//utils:time",
     ],
 )

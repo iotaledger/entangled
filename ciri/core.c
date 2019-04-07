@@ -21,9 +21,7 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   core->running = false;
 
   log_info(logger_id, "Initializing consensus\n");
-  if (iota_consensus_init(&core->consensus, tangle,
-                          &core->node.transaction_requester,
-                          &core->node.tips) != RC_OK) {
+  if (iota_consensus_init(&core->consensus, tangle, &core->node.transaction_requester, &core->node.tips) != RC_OK) {
     log_critical(logger_id, "Initializing consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_INIT;
   }
@@ -32,13 +30,6 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   if (node_init(&core->node, core, tangle) != RC_OK) {
     log_critical(logger_id, "Initializing node gossip components failed\n");
     return RC_CORE_FAILED_NODE_INIT;
-  }
-
-  log_info(logger_id, "Initializing API\n");
-  if (iota_api_init(&core->api, &core->node, &core->consensus, SR_JSON) !=
-      RC_OK) {
-    log_critical(logger_id, "Initializing API failed\n");
-    return RC_CORE_FAILED_API_INIT;
   }
 
   return RC_OK;
@@ -59,12 +50,6 @@ retcode_t core_start(core_t* const core, tangle_t* const tangle) {
   if (node_start(&core->node) != RC_OK) {
     log_critical(logger_id, "Starting node gossip components failed\n");
     return RC_CORE_FAILED_NODE_START;
-  }
-
-  log_info(logger_id, "Starting API\n");
-  if (iota_api_start(&core->api) != RC_OK) {
-    log_critical(logger_id, "Starting API failed\n");
-    return RC_CORE_FAILED_API_START;
   }
 
   core->running = true;
@@ -89,12 +74,6 @@ retcode_t core_stop(core_t* const core) {
     ret = RC_CORE_FAILED_NODE_STOP;
   }
 
-  log_info(logger_id, "Stopping API\n");
-  if (iota_api_stop(&core->api) != RC_OK) {
-    log_error(logger_id, "Stopping API failed\n");
-    ret = RC_CORE_FAILED_API_STOP;
-  }
-
   log_info(logger_id, "Stopping consensus\n");
   if (iota_consensus_stop(&core->consensus) != RC_OK) {
     log_critical(logger_id, "Stopping consensus failed\n");
@@ -111,12 +90,6 @@ retcode_t core_destroy(core_t* const core) {
     return RC_CORE_NULL_CORE;
   } else if (core->running) {
     return RC_CORE_STILL_RUNNING;
-  }
-
-  log_info(logger_id, "Destroying API\n");
-  if (iota_api_destroy(&core->api) != RC_OK) {
-    log_error(logger_id, "Destroying API failed\n");
-    ret = RC_CORE_FAILED_API_DESTROY;
   }
 
   log_info(logger_id, "Destroying node gossip components\n");

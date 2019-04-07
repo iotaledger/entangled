@@ -34,12 +34,9 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTrytes.ts#L38
  */
-retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
-                                  hash8019_array_p const trytes,
-                                  uint32_t const depth, uint32_t const mwm,
-                                  flex_trit_t const* const reference,
-                                  bool const local_pow,
-                                  transaction_array_t out_transactions);
+retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8019_array_p const trytes,
+                                  uint32_t const depth, uint32_t const mwm, flex_trit_t const* const reference,
+                                  bool const local_pow, transaction_array_t* out_transactions);
 
 #ifdef __cplusplus
 }

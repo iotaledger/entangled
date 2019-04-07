@@ -44,10 +44,8 @@ typedef struct iota_ciri_conf_s {
  *
  * @return a status code
  */
-retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
-                                 iota_consensus_conf_t *const consensus_conf,
-                                 iota_gossip_conf_t *const gossip_conf,
-                                 iota_api_conf_t *const api_conf);
+retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t *const ciri_conf, iota_consensus_conf_t *const consensus_conf,
+                                      iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf);
 
 /**
  * Initializes configurations with values from file
@@ -60,10 +58,8 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
  *
  * @return a status code
  */
-retcode_t iota_ciri_conf_file(iota_ciri_conf_t *const ciri_conf,
-                              iota_consensus_conf_t *const consensus_conf,
-                              iota_gossip_conf_t *const gossip_conf,
-                              iota_api_conf_t *const api_conf);
+retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t *const ciri_conf, iota_consensus_conf_t *const consensus_conf,
+                                   iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf);
 
 /**
  * Initializes configurations with values from CLI
@@ -72,16 +68,28 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t *const ciri_conf,
  * @param ciri_conf cIRI configuration variables
  * @param consensus_conf Consensus configuration variables
  * @param gossip_conf Gossip configuration variables
+ * @param api_conf API configuration variables
  * @param argc Number of arguments of the CLI
  * @param argv Arguments of the CLI
  *
  * @return a status code
  */
-retcode_t iota_ciri_conf_cli(iota_ciri_conf_t *const ciri_conf,
-                             iota_consensus_conf_t *const consensus_conf,
-                             iota_gossip_conf_t *const gossip_conf,
-                             iota_api_conf_t *const api_conf, int argc,
-                             char **argv);
+retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t *const ciri_conf, iota_consensus_conf_t *const consensus_conf,
+                                  iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf, int argc,
+                                  char **argv);
+
+/**
+ * Destroys configurations
+ *
+ * @param ciri_conf cIRI configuration variables
+ * @param consensus_conf Consensus configuration variables
+ * @param gossip_conf Gossip configuration variables
+ * @param api_conf API configuration variables
+ *
+ * @return a status code
+ */
+retcode_t iota_ciri_conf_destroy(iota_ciri_conf_t *const ciri_conf, iota_consensus_conf_t *const consensus_conf,
+                                 iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf);
 
 #ifdef __cplusplus
 }

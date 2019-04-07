@@ -9,13 +9,11 @@
 
 get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
   get_transactions_to_approve_req_t* req =
-      (get_transactions_to_approve_req_t*)calloc(
-          1, sizeof(get_transactions_to_approve_req_t));
+      (get_transactions_to_approve_req_t*)calloc(1, sizeof(get_transactions_to_approve_req_t));
   return req;
 }
 
-void get_transactions_to_approve_req_free(
-    get_transactions_to_approve_req_t** const req) {
+void get_transactions_to_approve_req_free(get_transactions_to_approve_req_t** const req) {
   if (!req || !(*req)) {
     return;
   }
@@ -29,14 +27,12 @@ void get_transactions_to_approve_req_free(
   *req = NULL;
 }
 
-void get_transactions_to_approve_req_set_depth(
-    get_transactions_to_approve_req_t* const req, uint32_t const depth) {
+void get_transactions_to_approve_req_set_depth(get_transactions_to_approve_req_t* const req, uint32_t const depth) {
   req->depth = depth;
 }
 
-void get_transactions_to_approve_req_set_reference(
-    get_transactions_to_approve_req_t* const req,
-    flex_trit_t const* const reference) {
+void get_transactions_to_approve_req_set_reference(get_transactions_to_approve_req_t* const req,
+                                                   flex_trit_t const* const reference) {
   if (req->reference == NULL) {
     req->reference = (flex_trit_t*)malloc(FLEX_TRIT_SIZE_243);
   }

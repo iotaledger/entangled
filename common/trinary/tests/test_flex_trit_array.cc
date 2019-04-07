@@ -10,8 +10,7 @@
 #include "common/trinary/flex_trit_array.h"
 
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
-const int8_t TRITS_IN[] = {-1, 0, 1, 1, 0, 1, 1,  0, -1,
-                           -1, 1, 0, 1, 1, 0, -1, 1, 0};
+const int8_t TRITS_IN[] = {-1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1, 0};
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 const uint8_t TRITS_IN[] = {0x48, 0x4a, 0x53, 0x42, 0x44, 0x42};
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)

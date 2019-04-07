@@ -10,8 +10,8 @@
 
 #include "common/stdint.h"
 
-#define HIGH_BITS 0xFFFFFFFFFFFFFFFF
-#define LOW_BITS 0x0000000000000000
+extern uint64_t const HIGH_BITS;
+extern uint64_t const LOW_BITS;
 
 typedef uint64_t ptrit_s;
 

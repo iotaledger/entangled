@@ -10,9 +10,8 @@
 #include "common/network/network.h"
 #include "common/network/uri_parser.h"
 
-bool uri_parse(char const *const uri, char *const scheme,
-               size_t const scheme_len, char *const host, size_t const host_len,
-               uint16_t *const port) {
+bool uri_parse(char const *const uri, char *const scheme, size_t const scheme_len, char *const host,
+               size_t const host_len, uint16_t *const port) {
   size_t length = 0;
   size_t offset = 0;
   char *delim = NULL;

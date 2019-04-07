@@ -12,9 +12,8 @@
 #include "common/trinary/trit_byte.h"
 #include "utils/macros.h"
 
-size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
-                        flex_trit_t const *const flex_trits, size_t const len,
-                        size_t const start, size_t const num_trits) {
+size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len, flex_trit_t const *const flex_trits,
+                        size_t const len, size_t const start, size_t const num_trits) {
   // Bounds checking
   if (num_trits == 0 || num_trits > to_len || (start + num_trits) > len) {
     return 0;
@@ -76,8 +75,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   for (i = index, j = 0; j < num_bytes; i++, j++) {
     bytes_to_trits(((byte_t *)flex_trits + i), 1, trits, 5);
     if (offset && i < end_index) {
-      bytes_to_trits(((byte_t *)flex_trits + i + 1), 1, ((trit_t *)trits + 5),
-                     5);
+      bytes_to_trits(((byte_t *)flex_trits + i + 1), 1, ((trit_t *)trits + 5), 5);
     }
     to_flex_trits[j] = trits_to_byte(trits + offset, 5);
   }
@@ -90,36 +88,28 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   return num_bytes;
 }
 
-size_t flex_trits_insert(flex_trit_t *const to_flex_trits, size_t const to_len,
-                         flex_trit_t const *const flex_trits, size_t const len,
-                         size_t const start, size_t const num_trits) {
+size_t flex_trits_insert(flex_trit_t *const to_flex_trits, size_t const to_len, flex_trit_t const *const flex_trits,
+                         size_t const len, size_t const start, size_t const num_trits) {
   // Bounds checking
-  if (num_trits == 0 || num_trits > len || num_trits > to_len ||
-      start >= to_len || (start + num_trits) > to_len) {
+  if (num_trits == 0 || num_trits > len || num_trits > to_len || start >= to_len || (start + num_trits) > to_len) {
     return 0;
   }
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   memcpy(to_flex_trits + start, flex_trits, num_trits);
 #else
   for (size_t i = 0; i < num_trits; i++) {
-    flex_trits_set_at(to_flex_trits, to_len, start + i,
-                      flex_trits_at(flex_trits, len, i));
+    flex_trits_set_at(to_flex_trits, to_len, start + i, flex_trits_at(flex_trits, len, i));
   }
 #endif
   return num_trits;
 }
 
-size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits,
-                                  size_t const dst_len,
-                                  flex_trit_t const *const src_trits,
-                                  size_t const src_len,
-                                  size_t const src_start_pos,
-                                  size_t const dst_start_pos,
-                                  size_t const num_trits) {
+size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits, size_t const dst_len,
+                                  flex_trit_t const *const src_trits, size_t const src_len, size_t const src_start_pos,
+                                  size_t const dst_start_pos, size_t const num_trits) {
   // Bounds checking
-  if (num_trits == 0 || num_trits > src_len || num_trits > dst_len ||
-      src_start_pos >= src_len || (src_start_pos + num_trits) > src_len ||
-      dst_start_pos >= dst_len || (dst_start_pos + num_trits) > dst_len) {
+  if (num_trits == 0 || num_trits > src_len || num_trits > dst_len || src_start_pos >= src_len ||
+      (src_start_pos + num_trits) > src_len || dst_start_pos >= dst_len || (dst_start_pos + num_trits) > dst_len) {
     return 0;
   }
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
@@ -133,8 +123,7 @@ size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits,
   return num_trits;
 }
 
-size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len,
-                           flex_trit_t const *const flex_trits,
+size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len, flex_trit_t const *const flex_trits,
                            size_t const len, size_t const num_trits) {
   // Bounds checking
   if (num_trits == 0 || num_trits > len || num_trits > to_len) {
@@ -157,8 +146,7 @@ size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len,
   return num_bytes;
 }
 
-size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
-                             size_t const to_len, trit_t const *const trits,
+size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits, size_t const to_len, trit_t const *const trits,
                              size_t const len, size_t const num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len || num_trits == 0) {
@@ -180,8 +168,7 @@ size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
   return num_trits;
 }
 
-size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
-                            const flex_trit_t *flex_trits, size_t len,
+size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len, const flex_trit_t *flex_trits, size_t len,
                             size_t num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len * 3) {
@@ -201,8 +188,7 @@ size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
     trits_to_trytes(trits, (tryte_t *)(trytes + num_bytes), residual);
   }
   memcpy(trytes, flex_trits, num_bytes);
-#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE) || \
-    defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE) || defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   union _shifter {
     uint64_t val;
     trit_t trits[8];
@@ -213,8 +199,7 @@ size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
   for (int i = 0, j = 0; trits_counter || offset; j++) {
     if (offset < 3) {
       max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, trits_counter);
-      flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i++],
-                          max_trits, max_trits);
+      flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i++], max_trits, max_trits);
       trits_counter -= max_trits;
       offset += max_trits;
     }
@@ -231,8 +216,7 @@ size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
   return num_trits;
 }
 
-size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
-                              const tryte_t *trytes, size_t len,
+size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len, const tryte_t *trytes, size_t len,
                               size_t num_trytes) {
   // Bounds checking
   if (num_trytes > len || num_trytes * 3 > to_len) {
@@ -243,8 +227,7 @@ size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
   trytes_to_trits((tryte_t *)trytes, to_flex_trits, num_trytes);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
   memcpy(to_flex_trits, trytes, num_trytes);
-#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE) || \
-    defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE) || defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   union _shifter {
     uint64_t val;
     trit_t trits[8];
@@ -265,8 +248,7 @@ size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
       }
     }
     num_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, offset);
-    flex_trits_from_trits(to_flex_trits + j, num_trits, shifter.trits,
-                          num_trits, num_trits);
+    flex_trits_from_trits(to_flex_trits + j, num_trits, shifter.trits, num_trits, num_trits);
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> (num_trits << 3);
 #elif BYTE_ORDER == BIG_ENDIAN
@@ -278,9 +260,7 @@ size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
   return num_trytes;
 }
 
-size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
-                           const flex_trit_t *flex_trits, size_t len,
-                           size_t num_trits) {
+size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len, const flex_trit_t *flex_trits, size_t len, size_t num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len) {
     return 0;
@@ -288,8 +268,7 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   memset(bytes, 0, MIN_BYTES(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   trits_to_bytes((trit_t *)flex_trits, bytes, num_trits);
-#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE) || \
-    defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE) || defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
   union _shifter {
     uint64_t val;
     trit_t trits[8];
@@ -299,15 +278,13 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   size_t max_trits, trits_for_byte, trits_counter = num_trits;
   for (int i = 0, j = 0; trits_counter; i++, j++) {
     max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, trits_counter);
-    flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i],
-                        max_trits, max_trits);
+    flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i], max_trits, max_trits);
     trits_counter -= max_trits;
     offset += max_trits;
     if (offset < 5 && trits_counter) {
       i++;
       max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, trits_counter);
-      flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i],
-                          max_trits, max_trits);
+      flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i], max_trits, max_trits);
       trits_counter -= max_trits;
       offset += max_trits;
     }
@@ -334,8 +311,7 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   return num_trits;
 }
 
-size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
-                             const byte_t *bytes, size_t len,
+size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len, const byte_t *bytes, size_t len,
                              size_t num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len) {
@@ -345,8 +321,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   size_t num_bytes = MIN_BYTES(num_trits);
   bytes_to_trits(bytes, num_bytes, to_flex_trits, num_trits);
-#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE) || \
-    defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE) || defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
   union _shifter {
     uint64_t val;
     trit_t trits[8];
@@ -362,8 +337,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
       i++;
     }
     trits_for_byte = MIN(max_trits, NUM_TRITS_PER_FLEX_TRIT);
-    flex_trits_from_trits(&to_flex_trits[j], trits_counter, shifter.trits,
-                          trits_for_byte, trits_for_byte);
+    flex_trits_from_trits(&to_flex_trits[j], trits_counter, shifter.trits, trits_for_byte, trits_for_byte);
     trits_counter -= trits_for_byte;
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> (trits_for_byte << 3);

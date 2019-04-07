@@ -16,8 +16,7 @@ TryteTransaction::TryteTransaction(const std::string &trytes) {
   size_t to_len = trytes.size() * 3;
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(to_len);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, to_len, (const tryte_t *)trytes.data(),
-                         trytes.size(), trytes.size());
+  flex_trits_from_trytes(trits, to_len, (const tryte_t *)trytes.data(), trytes.size(), trytes.size());
   transaction_deserialize_from_trits(iota_transaction, trits, true);
 }
 
@@ -26,8 +25,7 @@ TryteTransaction::~TryteTransaction() { transaction_free(iota_transaction); }
 std::string TryteTransaction::signature(void) {
   auto trits = transaction_signature(iota_transaction);
   std::string trytes(NUM_TRYTES_SIGNATURE, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE, trits,
-                       NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE, trits, NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
   return trytes;
 }
 
@@ -35,8 +33,7 @@ std::string TryteTransaction::signature(void) {
 void TryteTransaction::setSignature(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_SIGNATURE);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_SIGNATURE,
-                         (const tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE,
+  flex_trits_from_trytes(trits, NUM_TRITS_SIGNATURE, (const tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE,
                          NUM_TRYTES_SIGNATURE);
   transaction_set_signature(iota_transaction, trits);
 }
@@ -45,8 +42,7 @@ void TryteTransaction::setSignature(const std::string &trytes) {
 std::string TryteTransaction::message(void) {
   auto trits = transaction_message(iota_transaction);
   std::string trytes(NUM_TRYTES_SIGNATURE, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE, trits,
-                       NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE, trits, NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
   return trytes;
 }
 
@@ -54,8 +50,7 @@ std::string TryteTransaction::message(void) {
 void TryteTransaction::setMessage(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_SIGNATURE);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_SIGNATURE,
-                         (const tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE,
+  flex_trits_from_trytes(trits, NUM_TRITS_SIGNATURE, (const tryte_t *)trytes.data(), NUM_TRYTES_SIGNATURE,
                          NUM_TRYTES_SIGNATURE);
   transaction_set_message(iota_transaction, trits);
 }
@@ -64,8 +59,7 @@ void TryteTransaction::setMessage(const std::string &trytes) {
 std::string TryteTransaction::address(void) {
   auto trits = transaction_address(iota_transaction);
   std::string trytes(NUM_TRYTES_ADDRESS, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_ADDRESS, trits,
-                       NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_ADDRESS, trits, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
   return trytes;
 }
 
@@ -73,28 +67,23 @@ std::string TryteTransaction::address(void) {
 void TryteTransaction::setAddress(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_ADDRESS);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_ADDRESS,
-                         (const tryte_t *)trytes.data(), NUM_TRYTES_ADDRESS,
+  flex_trits_from_trytes(trits, NUM_TRITS_ADDRESS, (const tryte_t *)trytes.data(), NUM_TRYTES_ADDRESS,
                          NUM_TRYTES_ADDRESS);
   transaction_set_address(iota_transaction, trits);
 }
 
 // Get the transaction value
-int64_t TryteTransaction::value(void) {
-  return transaction_value(iota_transaction);
-}
+int64_t TryteTransaction::value(void) { return transaction_value(iota_transaction); }
 
 // Set the transaction value
-void TryteTransaction::setValue(int64_t value) {
-  transaction_set_value(iota_transaction, value);
-}
+void TryteTransaction::setValue(int64_t value) { transaction_set_value(iota_transaction, value); }
 
 // Get the transaction obsolete tag
 std::string TryteTransaction::obsoleteTag(void) {
   auto trits = transaction_obsolete_tag(iota_transaction);
   std::string trytes(NUM_TRYTES_OBSOLETE_TAG, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_OBSOLETE_TAG, trits,
-                       NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_OBSOLETE_TAG, trits, NUM_TRITS_OBSOLETE_TAG,
+                       NUM_TRITS_OBSOLETE_TAG);
   return trytes;
 }
 
@@ -102,48 +91,34 @@ std::string TryteTransaction::obsoleteTag(void) {
 void TryteTransaction::setObsoleteTag(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_OBSOLETE_TAG);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_OBSOLETE_TAG,
-                         (const tryte_t *)trytes.data(),
-                         NUM_TRYTES_OBSOLETE_TAG, NUM_TRYTES_OBSOLETE_TAG);
+  flex_trits_from_trytes(trits, NUM_TRITS_OBSOLETE_TAG, (const tryte_t *)trytes.data(), NUM_TRYTES_OBSOLETE_TAG,
+                         NUM_TRYTES_OBSOLETE_TAG);
   transaction_set_obsolete_tag(iota_transaction, trits);
 }
 
 // Get the transaction timestamp
-uint64_t TryteTransaction::timestamp(void) {
-  return transaction_timestamp(iota_transaction);
-}
+uint64_t TryteTransaction::timestamp(void) { return transaction_timestamp(iota_transaction); }
 
 // Set the transaction timestamp
-void TryteTransaction::setTimestamp(uint64_t timestamp) {
-  transaction_set_timestamp(iota_transaction, timestamp);
-}
+void TryteTransaction::setTimestamp(uint64_t timestamp) { transaction_set_timestamp(iota_transaction, timestamp); }
 
 // Get the transaction current index
-int64_t TryteTransaction::currentIndex(void) {
-  return transaction_current_index(iota_transaction);
-}
+int64_t TryteTransaction::currentIndex(void) { return transaction_current_index(iota_transaction); }
 
 // Set the transaction current index
-void TryteTransaction::setCurrentIndex(int64_t index) {
-  transaction_set_current_index(iota_transaction, index);
-}
+void TryteTransaction::setCurrentIndex(int64_t index) { transaction_set_current_index(iota_transaction, index); }
 
 // Get the transaction last index
-int64_t TryteTransaction::lastIndex(void) {
-  return transaction_last_index(iota_transaction);
-}
+int64_t TryteTransaction::lastIndex(void) { return transaction_last_index(iota_transaction); }
 
 // Set the transaction last index
-void TryteTransaction::setLastIndex(int64_t last_index) {
-  transaction_set_last_index(iota_transaction, last_index);
-}
+void TryteTransaction::setLastIndex(int64_t last_index) { transaction_set_last_index(iota_transaction, last_index); }
 
 // Get the transaction bundle
 std::string TryteTransaction::bundle(void) {
   auto trits = transaction_bundle(iota_transaction);
   std::string trytes(NUM_TRYTES_BUNDLE, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_BUNDLE, trits,
-                       NUM_TRITS_BUNDLE, NUM_TRITS_BUNDLE);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_BUNDLE, trits, NUM_TRITS_BUNDLE, NUM_TRITS_BUNDLE);
   return trytes;
 }
 
@@ -151,9 +126,7 @@ std::string TryteTransaction::bundle(void) {
 void TryteTransaction::setBundle(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_BUNDLE);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_BUNDLE,
-                         (const tryte_t *)trytes.data(), NUM_TRYTES_BUNDLE,
-                         NUM_TRYTES_BUNDLE);
+  flex_trits_from_trytes(trits, NUM_TRITS_BUNDLE, (const tryte_t *)trytes.data(), NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
   transaction_set_bundle(iota_transaction, trits);
 }
 
@@ -161,8 +134,7 @@ void TryteTransaction::setBundle(const std::string &trytes) {
 std::string TryteTransaction::trunk(void) {
   auto trits = transaction_trunk(iota_transaction);
   std::string trytes(NUM_TRYTES_TRUNK, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_TRUNK, trits,
-                       NUM_TRITS_TRUNK, NUM_TRITS_TRUNK);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_TRUNK, trits, NUM_TRITS_TRUNK, NUM_TRITS_TRUNK);
   return trytes;
 }
 
@@ -170,8 +142,7 @@ std::string TryteTransaction::trunk(void) {
 void TryteTransaction::setTrunk(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_TRUNK);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_TRUNK, (const tryte_t *)trytes.data(),
-                         NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
+  flex_trits_from_trytes(trits, NUM_TRITS_TRUNK, (const tryte_t *)trytes.data(), NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
   transaction_set_trunk(iota_transaction, trits);
 }
 
@@ -179,8 +150,7 @@ void TryteTransaction::setTrunk(const std::string &trytes) {
 std::string TryteTransaction::branch(void) {
   auto trits = transaction_branch(iota_transaction);
   std::string trytes(NUM_TRYTES_BRANCH, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_BRANCH, trits,
-                       NUM_TRITS_BRANCH, NUM_TRITS_BRANCH);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_BRANCH, trits, NUM_TRITS_BRANCH, NUM_TRITS_BRANCH);
   return trytes;
 }
 
@@ -188,9 +158,7 @@ std::string TryteTransaction::branch(void) {
 void TryteTransaction::setBranch(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_BRANCH);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_BRANCH,
-                         (const tryte_t *)trytes.data(), NUM_TRYTES_BRANCH,
-                         NUM_TRYTES_BRANCH);
+  flex_trits_from_trytes(trits, NUM_TRITS_BRANCH, (const tryte_t *)trytes.data(), NUM_TRYTES_BRANCH, NUM_TRYTES_BRANCH);
   transaction_set_branch(iota_transaction, trits);
 }
 
@@ -198,8 +166,7 @@ void TryteTransaction::setBranch(const std::string &trytes) {
 std::string TryteTransaction::tag(void) {
   auto trits = transaction_tag(iota_transaction);
   std::string trytes(NUM_TRYTES_TAG, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_TAG, trits,
-                       NUM_TRITS_TAG, NUM_TRITS_TAG);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_TAG, trits, NUM_TRITS_TAG, NUM_TRITS_TAG);
   return trytes;
 }
 
@@ -207,15 +174,12 @@ std::string TryteTransaction::tag(void) {
 void TryteTransaction::setTag(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_TAG);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_TAG, (const tryte_t *)trytes.data(),
-                         NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+  flex_trits_from_trytes(trits, NUM_TRITS_TAG, (const tryte_t *)trytes.data(), NUM_TRYTES_TAG, NUM_TRYTES_TAG);
   transaction_set_tag(iota_transaction, trits);
 }
 
 // Get the transaction attachment timestamp
-int64_t TryteTransaction::attachmentTimestamp(void) {
-  return transaction_attachment_timestamp(iota_transaction);
-}
+int64_t TryteTransaction::attachmentTimestamp(void) { return transaction_attachment_timestamp(iota_transaction); }
 
 // Set the transaction attachment timestamp
 void TryteTransaction::setAttachmentTimestamp(int64_t timestamp) {
@@ -246,8 +210,7 @@ void TryteTransaction::setAttachmentTimestampUpper(int64_t timestamp) {
 std::string TryteTransaction::nonce(void) {
   auto trits = transaction_nonce(iota_transaction);
   std::string trytes(NUM_TRYTES_NONCE, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_NONCE, trits,
-                       NUM_TRITS_NONCE, NUM_TRITS_NONCE);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_NONCE, trits, NUM_TRITS_NONCE, NUM_TRITS_NONCE);
   return trytes;
 }
 
@@ -255,8 +218,7 @@ std::string TryteTransaction::nonce(void) {
 void TryteTransaction::setNonce(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_NONCE);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_NONCE, (const tryte_t *)trytes.data(),
-                         NUM_TRYTES_NONCE, NUM_TRYTES_NONCE);
+  flex_trits_from_trytes(trits, NUM_TRITS_NONCE, (const tryte_t *)trytes.data(), NUM_TRYTES_NONCE, NUM_TRYTES_NONCE);
   transaction_set_nonce(iota_transaction, trits);
 }
 
@@ -264,8 +226,7 @@ void TryteTransaction::setNonce(const std::string &trytes) {
 std::string TryteTransaction::hash(void) {
   auto trits = transaction_hash(iota_transaction);
   std::string trytes(NUM_TRYTES_HASH, '9');
-  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_HASH, trits,
-                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  flex_trits_to_trytes((tryte_t *)trytes.data(), NUM_TRYTES_HASH, trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
   return trytes;
 }
 
@@ -273,8 +234,7 @@ std::string TryteTransaction::hash(void) {
 void TryteTransaction::setHash(const std::string &trytes) {
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_HASH);
   flex_trit_t trits[flex_len];
-  flex_trits_from_trytes(trits, NUM_TRITS_HASH, (const tryte_t *)trytes.data(),
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(trits, NUM_TRITS_HASH, (const tryte_t *)trytes.data(), NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   transaction_set_hash(iota_transaction, trits);
 }
 

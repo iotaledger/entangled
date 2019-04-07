@@ -7,7 +7,7 @@ cc_library(
     deps =
         [
             ":mask",
-            "//common/curl-p:hamming",
+            "//common/crypto/curl-p:hamming",
             "//common/trinary:trit_long",
             "//utils:merkle",
         ],
@@ -19,7 +19,7 @@ cc_library(
     hdrs = ["mask.h"],
     deps =
         [
-            "//common/curl-p:trit",
+            "//common/crypto/curl-p:trit",
             "//common/trinary:add",
         ],
 )

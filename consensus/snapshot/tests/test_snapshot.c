@@ -25,42 +25,38 @@ void test_snapshot_conf() {
   TEST_ASSERT_EQUAL_INT(conf.snapshot_signature_index, 9UL);
   TEST_ASSERT_EQUAL_INT(conf.snapshot_signature_depth, 6UL);
   TEST_ASSERT_EQUAL_INT(conf.last_milestone, 774804UL);
-  flex_trits_to_trytes(sig_pubkey, HASH_LENGTH_TRYTE,
-                       conf.snapshot_signature_pubkey, HASH_LENGTH_TRIT,
+  flex_trits_to_trytes(sig_pubkey, HASH_LENGTH_TRYTE, conf.snapshot_signature_pubkey, HASH_LENGTH_TRIT,
                        HASH_LENGTH_TRIT);
-  flex_trits_to_trytes(coo, HASH_LENGTH_TRYTE, conf.coordinator,
-                       HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  TEST_ASSERT_EQUAL_MEMORY(sig_pubkey, (tryte_t*)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC", NUM_TRYTES_ADDRESS);
-  TEST_ASSERT_EQUAL_MEMORY(coo, (tryte_t*)"KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU", NUM_TRYTES_ADDRESS);
+  flex_trits_to_trytes(coo, HASH_LENGTH_TRYTE, conf.coordinator_address, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  TEST_ASSERT_EQUAL_MEMORY(
+      sig_pubkey, (tryte_t *)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC",
+      NUM_TRYTES_ADDRESS);
+  TEST_ASSERT_EQUAL_MEMORY(
+      coo, (tryte_t *)"KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU",
+      NUM_TRYTES_ADDRESS);
 }
 
 void test_snapshot_init_file_not_found() {
   strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot_not_found.txt");
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) ==
-              RC_SNAPSHOT_FILE_NOT_FOUND);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_FILE_NOT_FOUND);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
 void test_snapshot_init_file_badly_formatted() {
-  strcpy(conf.snapshot_file,
-         "consensus/snapshot/tests/snapshot_badly_formatted.txt");
+  strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot_badly_formatted.txt");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_INVALID_FILE);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
 void test_snapshot_init_file_inconsistent() {
-  strcpy(conf.snapshot_file,
-         "consensus/snapshot/tests/snapshot_inconsistent.txt");
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) ==
-              RC_SNAPSHOT_INCONSISTENT_SNAPSHOT);
+  strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot_inconsistent.txt");
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_INCONSISTENT_SNAPSHOT);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
 void test_snapshot_init_file_invalid_supply() {
-  strcpy(conf.snapshot_file,
-         "consensus/snapshot/tests/snapshot_invalid_supply.txt");
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) ==
-              RC_SNAPSHOT_INVALID_SUPPLY);
+  strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot_invalid_supply.txt");
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_INVALID_SUPPLY);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
@@ -88,8 +84,7 @@ void test_snapshot_get_balance() {
                          (tryte_t*)"Z9999999999999999999999999999999999999999999999999999"
                          "9999999999999999999999999999",
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(iota_snapshot_get_balance(&snapshot, address, &balance) ==
-              RC_SNAPSHOT_BALANCE_NOT_FOUND);
+  TEST_ASSERT(iota_snapshot_get_balance(&snapshot, address, &balance) == RC_SNAPSHOT_BALANCE_NOT_FOUND);
   TEST_ASSERT_EQUAL_INT(balance, 3000000);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
@@ -104,16 +99,15 @@ void test_snapshot_create_and_apply_patch() {
   strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot.txt");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
   flex_trits_from_trytes(hash1, NUM_TRITS_HASH,
-                         (tryte_t*)"O99999999999999999999999999999999999999999999999999999999999999999999999999999999",
+                         (tryte_t *)"O99999999999999999999999999999999999999999999999999999999999999999999999999999999",
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT(state_delta_add(&delta, hash1, (int64_t)-50) == RC_OK);
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &delta, &patch) == RC_OK);
-  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &delta, 1) ==
-              RC_SNAPSHOT_INCONSISTENT_PATCH);
+  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &delta, 1) == RC_SNAPSHOT_INCONSISTENT_PATCH);
   state_delta_destroy(&patch);
   flex_trits_from_trytes(hash2, NUM_TRITS_HASH,
-                                     (tryte_t*)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
-                                     NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+                         (tryte_t *)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
+                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT(state_delta_add(&delta, hash2, (int64_t)50) == RC_OK);
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &delta, &patch) == RC_OK);
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &delta, 2) == RC_OK);
@@ -132,7 +126,7 @@ int main(int argc, char *argv[]) {
 
   iota_consensus_conf_init(&conf);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(conf.snapshot_signature_file, "");
+  conf.snapshot_signature_skip_validation = true;
 
   RUN_TEST(test_snapshot_conf);
   RUN_TEST(test_snapshot_init_file_not_found);

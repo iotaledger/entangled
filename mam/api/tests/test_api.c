@@ -12,11 +12,15 @@
 
 #include "common/trinary/tryte_ascii.h"
 #include "mam/api/api.h"
-#include "mam/test_utils/test_utils.h"
+#include "mam/mam/mam_channel_t_set.h"
+#include "mam/mam/tests/test_channel_utils.h"
+#include "mam/ntru/mam_ntru_sk_t_set.h"
 
 static mam_api_t api;
-static mam_channel_t *cha = NULL, *ch1a = NULL;
-static mam_endpoint_t *epa = NULL, *ep1a = NULL;
+static tryte_t ch_id[MAM_CHANNEL_ID_SIZE];
+static tryte_t ep_id[MAM_ENDPOINT_ID_SIZE];
+static tryte_t ch1_id[MAM_CHANNEL_ID_SIZE];
+static tryte_t ep1_id[MAM_ENDPOINT_ID_SIZE];
 
 static tryte_t API_SEED[] =
     "APISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPIS"
@@ -214,38 +218,20 @@ static tryte_t API_SEED[] =
   "Morbi at justo in ipsum imperdiet consectetur non et urna. Nam dapibus ex " \
   "quis ornare maximus. Etiam sit amet libero molestie."
 
-#define TEST_CHANNEL_NAME "CHANAME"
-#define TEST_CHANNEL_1_NAME "CHANAME9"
-#define TEST_END_POINT_NAME "EPANAME"
-#define TEST_END_POINT_1_NAME "EPANAME9"
 #define TEST_PRE_SHARED_KEY_A_STR "PSKIDAPSKIDAPSKIDAPSKIDAPSK"
 #define TEST_PRE_SHARED_KEY_A_NONCE_STR "PSKANONCE"
 #define TEST_PRE_SHARED_KEY_B_STR "PSKIDBPSKIDBPSKIDBPSKIDBPSK"
 #define TEST_PRE_SHARED_KEY_B_NONCE_STR "PSKBNONCE"
 #define TEST_NTRU_NONCE "NTRUBNONCE"
-#define TEST_MSS_DEPTH 1
+#define TEST_MSS_DEPTH 6
 
-static void test_api_write_header(
-    mam_api_t *const api, mam_psk_t const *const pska,
-    mam_psk_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_channel_t *const cha, mam_endpoint_t *const epa,
-    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  mam_channel_t *ch = cha;
-  mam_endpoint_t *ep = NULL;
-  mam_channel_t *ch1 = NULL;
-  mam_endpoint_t *ep1 = NULL;
+static void test_api_write_header(mam_api_t *const api, mam_psk_t const *const pska, mam_psk_t const *const pskb,
+                                  mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
+                                  mam_msg_keyload_t keyload, tryte_t const *const ch, tryte_t const *const ep,
+                                  tryte_t const *const ch1, tryte_t *const ep1, bundle_transactions_t *const bundle,
+                                  trit_t *const msg_id) {
   mam_psk_t_set_t psks = NULL;
   mam_ntru_pk_t_set_t ntru_pks = NULL;
-
-  if (mam_msg_pubkey_epid == pubkey) {
-    ep = epa;
-  } else if (mam_msg_pubkey_chid1 == pubkey) {
-    ch1 = ch1a;
-  } else if (mam_msg_pubkey_epid1 == pubkey) {
-    ep1 = ep1a;
-  }
 
   if (mam_msg_keyload_psk == keyload) {
     TEST_ASSERT(mam_psk_t_set_add(&psks, pska) == RC_OK);
@@ -254,99 +240,54 @@ static void test_api_write_header(
     TEST_ASSERT(mam_ntru_pk_t_set_add(&ntru_pks, ntru_pk) == RC_OK);
   }
 
-  TEST_ASSERT(mam_api_bundle_write_header(api, ch, ep, ch1, ep1, psks, ntru_pks,
-                                          0, bundle, msg_id) == RC_OK);
+  if (mam_msg_pubkey_epid == pubkey) {
+    TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(api, ch, ep, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  } else if (mam_msg_pubkey_chid1 == pubkey) {
+    TEST_ASSERT(mam_api_bundle_announce_new_channel(api, ch, ch1, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  } else if (mam_msg_pubkey_epid1 == pubkey) {
+    TEST_ASSERT(mam_api_bundle_announce_new_endpoint(api, ch, ep1, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  } else {
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(api, ch, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  }
 
   mam_psk_t_set_free(&psks);
   mam_ntru_pk_t_set_free(&ntru_pks);
 }
 
-static void test_api_write_packet(
-    mam_api_t *const api, bundle_transactions_t *const bundle,
-    trit_t *const msg_id, mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
-    mam_channel_t *const cha, mam_endpoint_t *const epa,
-    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    char const *payload1) {
+static void test_api_write_packet(mam_api_t *const api, bundle_transactions_t *const bundle, trit_t *const msg_id,
+                                  mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum, char const *payload1,
+                                  bool is_last_packet) {
   tryte_t *payload_trytes = NULL;
 
   payload_trytes = (tryte_t *)malloc(2 * strlen(payload1) * sizeof(tryte_t));
   ascii_to_trytes(payload1, payload_trytes);
 
-  TEST_ASSERT(mam_api_bundle_write_packet(api, cha, msg_id, payload_trytes,
-                                          2 * strlen(payload1), checksum,
+  TEST_ASSERT(mam_api_bundle_write_packet(api, msg_id, payload_trytes, 2 * strlen(payload1), checksum, is_last_packet,
                                           bundle) == RC_OK);
 
   free(payload_trytes);
 }
 
-static void test_api_read_msg(mam_api_t *const api,
-                              bundle_transactions_t *const bundle,
-                              mam_psk_t const *const pre_shared_key,
-                              mam_ntru_sk_t const *const ntru,
-                              mam_channel_t *const cha, char **payload2) {
+static void test_api_read_msg(mam_api_t *const api, bundle_transactions_t *const bundle,
+                              mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru, char **payload2,
+                              bool *const is_last_packet) {
   tryte_t *payload_trytes = NULL;
   size_t payload_size = 0;
 
-  TEST_ASSERT(mam_api_bundle_read_msg(api, bundle, &payload_trytes,
-                                      &payload_size) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(api, bundle, &payload_trytes, &payload_size, is_last_packet) == RC_OK);
 
   *payload2 = (char *)calloc(payload_size / 2 + 1, sizeof(char));
   trytes_to_ascii(payload_trytes, payload_size, *payload2);
   free(payload_trytes);
 }
 
-static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
-                                     mam_channel_t **const ch1,
-                                     mam_endpoint_t **const epa,
-                                     mam_endpoint_t **ep1) {
-  mss_mt_height_t d = TEST_MSS_DEPTH;
+static void test_api_create_channels(mam_api_t *api, mss_mt_height_t depth) {
+  mss_mt_height_t d = depth;
 
-  // TODO usse api methods
-  /* create channels */
-  {
-    trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
-    trits_from_str(cha_name, TEST_CHANNEL_NAME);
-
-    *cha = malloc(sizeof(mam_channel_t));
-    TEST_ASSERT(0 != *cha);
-    memset(*cha, 0, sizeof(mam_channel_t));
-    TEST_ASSERT(mam_channel_create(&api->prng, d, cha_name, *cha) == RC_OK);
-
-    /* create endpoints */
-    {
-      trits_t epa_name = trits_alloc(3 * strlen(TEST_END_POINT_NAME));
-      trits_from_str(epa_name, TEST_END_POINT_NAME);
-
-      *epa = malloc(sizeof(mam_endpoint_t));
-      TEST_ASSERT(0 != *epa);
-      memset(*epa, 0, sizeof(mam_endpoint_t));
-      TEST_ASSERT(mam_endpoint_create(&api->prng, d, (*cha)->name, epa_name,
-                                      *epa) == RC_OK);
-      trits_free(epa_name);
-    }
-    {
-      trits_t ep1a_name = trits_alloc(3 * strlen(TEST_END_POINT_1_NAME));
-      trits_from_str(ep1a_name, TEST_END_POINT_1_NAME);
-
-      *ep1 = malloc(sizeof(mam_endpoint_t));
-      TEST_ASSERT(0 != *ep1);
-      memset(*ep1, 0, sizeof(mam_endpoint_t));
-      TEST_ASSERT(mam_endpoint_create(&api->prng, d, (*cha)->name, ep1a_name,
-                                      *ep1) == RC_OK);
-      trits_free(ep1a_name);
-    }
-    {
-      trits_t ch1a_name = trits_alloc(3 * strlen(TEST_CHANNEL_1_NAME));
-      trits_from_str(ch1a_name, TEST_CHANNEL_1_NAME);
-
-      *ch1 = malloc(sizeof(mam_channel_t));
-      TEST_ASSERT(0 != *ch1);
-      memset(*ch1, 0, sizeof(mam_channel_t));
-      TEST_ASSERT(mam_channel_create(&api->prng, d, ch1a_name, *ch1) == RC_OK);
-      trits_free(ch1a_name);
-    }
-    trits_free(cha_name);
-  }
+  TEST_ASSERT(mam_api_create_channel(api, d, ch_id) == RC_OK);
+  TEST_ASSERT(mam_api_create_endpoint(api, d, ch_id, ep_id) == RC_OK);
+  TEST_ASSERT(mam_api_create_endpoint(api, d, ch_id, ep1_id) == RC_OK);
+  TEST_ASSERT(mam_api_create_channel(api, d, ch1_id) == RC_OK);
 }
 
 static void test_api_generic() {
@@ -355,28 +296,29 @@ static void test_api_generic() {
   trit_t msg_id[MAM_MSG_ID_SIZE];
   char *payload2 = NULL;
   mam_ntru_sk_t ntru[1];
-  mam_psk_t pska[1], pskb[1];
+  mam_psk_t pska, pskb;
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
     MAM_TRITS_DEF0(ntru_nonce, 30);
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
-    TEST_ASSERT(ntru_init(ntru) == RC_OK);
-    ntru_gen(ntru, &api.prng, ntru_nonce);
+    TEST_ASSERT(ntru_sk_reset(ntru) == RC_OK);
+    ntru_sk_gen(ntru, &api.prng, ntru_nonce);
     TEST_ASSERT(mam_api_add_ntru_sk(&api, ntru) == RC_OK);
   }
 
   /* gen psk */
   {
-    trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(&api.prng, MAM_PRNG_DST_SEC_KEY,
-                 TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
-    trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(&api.prng, MAM_PRNG_DST_SEC_KEY,
-                 TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
-    TEST_ASSERT(mam_api_add_psk(&api, pskb) == RC_OK);
+    mam_psk_gen(&pska, &api.prng, (tryte_t *)TEST_PRE_SHARED_KEY_A_STR, (tryte_t *)TEST_PRE_SHARED_KEY_A_NONCE_STR,
+                strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
+
+    mam_psk_gen(&pskb, &api.prng, (tryte_t *)TEST_PRE_SHARED_KEY_B_STR, (tryte_t *)TEST_PRE_SHARED_KEY_B_NONCE_STR,
+                strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
+    TEST_ASSERT(mam_api_add_psk(&api, &pskb) == RC_OK);
   }
+
+  bool is_last_packet;
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (mam_msg_pubkey_t pubkey = 0; (int)pubkey < 4; ++pubkey) {
@@ -386,14 +328,14 @@ static void test_api_generic() {
       for (mam_msg_checksum_t checksum = 0; (int)checksum < 3; ++checksum) {
         bundle_transactions_new(&bundle);
 
-        /* send header and packet */
-        test_api_write_header(&api, pska, pskb, &ntru->public_key, pubkey,
-                              keyload, cha, epa, ch1a, ep1a, bundle, msg_id);
-        test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, cha, epa,
-                              ch1a, ep1a, PAYLOAD);
+        /* write header and packet */
+        test_api_write_header(&api, &pska, &pskb, &ntru->public_key, pubkey, keyload, ch_id, ep_id, ch1_id, ep1_id,
+                              bundle, msg_id);
+        test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, PAYLOAD, true);
 
-        /* recv header and packet */
-        test_api_read_msg(&api, bundle, pskb, ntru, cha, &payload2);
+        /* read header and packet */
+        test_api_read_msg(&api, bundle, &pskb, ntru, &payload2, &is_last_packet);
+        TEST_ASSERT(is_last_packet);
         TEST_ASSERT_EQUAL_STRING(PAYLOAD, payload2);
 
         /* cleanup */
@@ -407,7 +349,7 @@ static void test_api_generic() {
   TEST_ASSERT(e == RC_OK);
 }
 
-static void test_api_multiple_packets() {
+static void test_api_multiple_packets_run(mam_api_t *const param_api, size_t const num_packets) {
   bundle_transactions_t *bundle = NULL;
   trit_t msg_id[MAM_MSG_ID_SIZE];
   tryte_t *payload_in = (tryte_t *)
@@ -428,27 +370,30 @@ static void test_api_multiple_packets() {
   size_t payload_in_size = strlen((char *)payload_in);
   tryte_t *payload_out = NULL;
   size_t payload_out_size = 0;
+  bool is_last_packet;
 
-  // send and receive header
+  // write and read header
   {
     bundle_transactions_new(&bundle);
-    TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
-                                            NULL, 0, bundle, msg_id) == RC_OK);
-    TEST_ASSERT(mam_api_bundle_read_msg(&api, bundle, &payload_out,
-                                        &payload_out_size) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(param_api, ch_id, NULL, NULL, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read(param_api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
     TEST_ASSERT(payload_out == NULL);
     TEST_ASSERT(payload_out_size == 0);
     bundle_transactions_free(&bundle);
   }
 
-  // send and receive packets
-  for (size_t i = 0; i < 256; i++) {
+  // write and read packets
+  for (size_t i = 0; i < num_packets; i++) {
     bundle_transactions_new(&bundle);
-    TEST_ASSERT(mam_api_bundle_write_packet(
-                    &api, cha, msg_id, payload_in, payload_in_size,
-                    (mam_msg_checksum_t)(i % 3), bundle) == RC_OK);
-    TEST_ASSERT(mam_api_bundle_read_packet(&api, bundle, &payload_out,
-                                           &payload_out_size) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_packet(param_api, msg_id, payload_in, payload_in_size, (mam_msg_checksum_t)(i % 3),
+                                            i == (num_packets - 1) ? true : false, bundle) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read(param_api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
+    if (i < num_packets - 1) {
+      TEST_ASSERT(!is_last_packet);
+    } else {
+      TEST_ASSERT(is_last_packet);
+    }
+
     TEST_ASSERT_EQUAL_MEMORY(payload_in, payload_out, payload_in_size);
     free(payload_out);
     payload_out = NULL;
@@ -457,63 +402,65 @@ static void test_api_multiple_packets() {
   }
 }
 
+static void test_api_multiple_packets() { test_api_multiple_packets_run(&api, 36); }
+
 static void test_api_serialization() {
   mam_api_t deserialized_api;
   size_t serialized_size = mam_api_serialized_size(&api);
   MAM_TRITS_DEF0(buffer, serialized_size);
   buffer = MAM_TRITS_INIT(buffer, serialized_size);
+
   mam_api_serialize(&api, &buffer);
   buffer = trits_pickup_all(buffer);
   TEST_ASSERT((mam_api_deserialize(&buffer, &deserialized_api) == RC_OK));
 
-  TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng,
-                           MAM_PRNG_KEY_SIZE);
-  TEST_ASSERT_TRUE(
-      mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
-  TEST_ASSERT_TRUE(
-      mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &api.ntru_pks));
+  TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng, MAM_PRNG_KEY_SIZE);
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &api.ntru_pks));
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&deserialized_api.psks, &api.psks));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(&deserialized_api.write_ctxs, &api.write_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(&deserialized_api.read_ctxs, &api.read_ctxs));
+  TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(deserialized_api.channels, api.channels));
+  TEST_ASSERT_EQUAL_INT(deserialized_api.channel_ord, api.channel_ord);
 
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_send_context_t_map_cmp(
-      &deserialized_api.send_ctxs, &api.send_ctxs));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_recv_context_t_map_cmp(
-      &deserialized_api.recv_ctxs, &api.recv_ctxs));
-
-  TEST_ASSERT_TRUE(
-      mam_channel_t_set_cmp(&deserialized_api.channels, &api.channels));
+  test_api_multiple_packets_run(&deserialized_api, 2);
 
   mam_api_destroy(&deserialized_api);
+}
+
+static void test_api_save_load() {
+  mam_api_t loaded_api;
+
+  TEST_ASSERT(mam_api_save(&api, "mam-api.bin") == RC_OK);
+  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api) == RC_OK);
+
+  TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &api.prng, MAM_PRNG_KEY_SIZE);
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &api.ntru_sks));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&loaded_api.ntru_pks, &api.ntru_pks));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&loaded_api.psks, &api.psks));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(&loaded_api.write_ctxs, &api.write_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(&loaded_api.read_ctxs, &api.read_ctxs));
+  TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(loaded_api.channels, api.channels));
+  TEST_ASSERT_EQUAL_INT(loaded_api.channel_ord, api.channel_ord);
+
+  test_api_multiple_packets_run(&loaded_api, 2);
+
+  mam_api_destroy(&loaded_api);
 }
 
 int main(void) {
   UNITY_BEGIN();
 
   TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
-  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a);
-
+  test_api_create_channels(&api, TEST_MSS_DEPTH);
   RUN_TEST(test_api_generic);
-  RUN_TEST(test_api_multiple_packets);
   RUN_TEST(test_api_serialization);
+  RUN_TEST(test_api_save_load);
+  TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
-  /* destroy channels/endpoints */
-  {
-    if (cha) {
-      mam_channel_destroy(cha);
-      free(cha);
-    }
-    if (ch1a) {
-      mam_channel_destroy(ch1a);
-      free(ch1a);
-    }
-    if (epa) {
-      mam_endpoint_destroy(epa);
-      free(epa);
-    }
-    if (ep1a) {
-      mam_endpoint_destroy(ep1a);
-      free(ep1a);
-    }
-  }
+  TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
+  test_api_create_channels(&api, 4);
+  RUN_TEST(test_api_multiple_packets);
   TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
   return UNITY_END();
