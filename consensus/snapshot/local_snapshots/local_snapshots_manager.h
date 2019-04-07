@@ -14,11 +14,11 @@
 #include "consensus/conf.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/local_snapshots/local_snapshots_service.h"
+#include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
-#include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,10 +30,11 @@ typedef struct local_snapshots_manager_s {
   thread_handle_t local_snapshots_thread;
   cond_handle_t cond_local_snapshots;
   milestone_tracker_t const *mt;
+
   snapshots_provider_t const *snapshots_provider;
 
-      // Muteable data
-      tangle_t tangle;
+  // Muteable data
+  tangle_t tangle;
   size_t last_snapshot_transactions_count;
 } local_snapshots_manager_t;
 
@@ -82,7 +83,6 @@ retcode_t iota_local_snapshots_manager_take_snapshot(local_snapshots_manager_t *
 
 retcode_t iota_local_snapshots_manager_determine_new_entry_point(local_snapshots_manager_t *const lsm,
                                                                  iota_stor_pack_t *const entry_point);
-
 
 #ifdef __cplusplus
 }
