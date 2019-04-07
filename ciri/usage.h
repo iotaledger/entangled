@@ -58,7 +58,8 @@ typedef enum cli_arg_value_e {
   // Local snapshots
 
   CONF_LOCAL_SNAPSHOTS_ENABLED,
-  CONF_PRUNNING_ENABLED
+  CONF_PRUNNING_ENABLED,
+  CONF_TRANSACTIONS_GROWTH_THRESHOLD
 
 } cli_arg_value_t;
 
@@ -185,6 +186,8 @@ static struct cli_argument_s {
     {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "whether or not local snapshots should are enabled",
      REQUIRED_ARG},
     {"prunning-enabled", CONF_PRUNNING_ENABLED, "whether or not prunning should be enabled", REQUIRED_ARG},
+    {"transactions-grwoth-threshold", CONF_TRANSACTIONS_GROWTH_THRESHOLD,
+     "Minimal number of new transactions from last local snapshot for triggering a new local snapshot", REQUIRED_ARG},
     {NULL, 0, NULL, NO_ARG},
 
 };

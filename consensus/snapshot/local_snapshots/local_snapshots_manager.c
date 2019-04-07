@@ -6,8 +6,10 @@
  */
 
 #include "consensus/snapshot/local_snapshots/local_snapshots_manager.h"
+#include "common/storage/connection.h"
 #include "consensus/snapshot/local_snapshots/conf.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS 10000
 
@@ -19,13 +21,27 @@ static void* local_snapshots_manager_routine(void* arg) {
   local_snapshots_manager_t* lsm = (local_snapshots_manager_t*)arg;
   lock_handle_t lock_cond;
   retcode_t err;
+  size_t transactions_count;
+  size_t exponential_delay_factor = 1;
+
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
+
   while (lsm->running) {
     if (local_snapshots_should_take_snapshot(lsm)) {
-      ERR_BIND_GOTO(local_snapshots_take_snapshot(lsm), err, cleanup);
+      err = local_snapshots_take_snapshot(lsm);
+      if (err == RC_OK) {
+        exponential_delay_factor = 1;
+      } else if (err == RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID) {
+        log_info(logger_id, "Node is still syncing, local snapshot is delayed in %d ms\n",
+                 exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+        exponential_delay_factor *= 2;
+      } else {
+        goto cleanup;
+      }
     }
-    cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond, LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+    cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond,
+                          exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
   }
 
 cleanup:
@@ -36,12 +52,29 @@ cleanup:
   return NULL;
 }
 
-bool local_snapshots_should_take_snapshot(local_snapshots_manager_t const* const lsm) { return false; }
+bool local_snapshots_should_take_snapshot(local_snapshots_manager_t const* const lsm) {
+  size_t new_transactions_count;
+  if (iota_tangle_transaction_count(&lsm->tangle, &new_transactions_count) != RC_OK) {
+    log_critical(logger_id, "Failed in querying db size\n");
+    return false;
+  }
+  if ((new_transactions_count - lsm->last_snapshot_transactions_count) >=
+      lsm->conf->local_snapshots.transactions_growth_threshold) {
+    return true;
+  }
+  return false;
+}
 
-retcode_t local_snapshots_take_snapshot(local_snapshots_manager_t* const lsm) { return RC_CONSENSUS_NOT_IMPLEMENTED; }
+retcode_t local_snapshots_take_snapshot(local_snapshots_manager_t* const lsm) {
+  retcode_t err;
+  // TODO - implement + uncomment
+  // ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count),err);
+  return RC_CONSENSUS_NOT_IMPLEMENTED;
+}
 
 retcode_t iota_local_snapshots_init(local_snapshots_manager_t* lsm, iota_consensus_conf_t const* const conf,
                                     milestone_tracker_t const* const mt) {
+  retcode_t err;
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
   }
@@ -57,6 +90,10 @@ retcode_t iota_local_snapshots_init(local_snapshots_manager_t* lsm, iota_consens
   lsm->mt = mt;
 
   cond_handle_init(&lsm->cond_local_snapshots);
+
+  connection_config_t db_conf = {.db_path = lsm->conf->db_path};
+
+  ERR_BIND_RETURN(iota_tangle_init(&lsm->tangle, &db_conf), err);
 
   return RC_OK;
 }
@@ -105,6 +142,10 @@ retcode_t iota_local_snapshots_destroy(local_snapshots_manager_t* const lsm) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
   } else if (lsm->running) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_STILL_RUNNING;
+  }
+
+  if (iota_tangle_destroy(&lsm->tangle) != RC_OK) {
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   cond_handle_destroy(&lsm->cond_local_snapshots);
