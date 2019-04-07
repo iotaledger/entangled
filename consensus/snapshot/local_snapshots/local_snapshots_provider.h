@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 typedef struct local_snapshots_provider_s {
+  uint64_t start_snapshot_index;
 } local_snapshots_provider_t;
 
 #ifdef __cplusplus

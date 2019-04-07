@@ -32,10 +32,11 @@ static void *local_snapshots_manager_routine(void *arg) {
       err = iota_local_snapshots_manager_take_snapshot(lsm);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
-      } else if (err == RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID) {
-        log_info(logger_id, "Node is still syncing, local snapshot is delayed in %d ms\n",
-                 exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+      } else if (err == RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID ||
+                 err == RC_SNAPSHOT_LOCAL_SNAPSHOTS_NOT_ENOUGH_DEPTH) {
         exponential_delay_factor *= 2;
+        log_warning(logger_id, "Local snapshot is delayed in %d ms, error code: %d\n",
+                    exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS, err);
       } else {
         goto cleanup;
       }
@@ -58,8 +59,10 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
     log_critical(logger_id, "Failed in querying db size\n");
     return false;
   }
-  if ((new_transactions_count - lsm->last_snapshot_transactions_count) >=
-      lsm->conf->local_snapshots.transactions_growth_threshold) {
+  if (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
+       lsm->conf->local_snapshots.transactions_growth_threshold) &&
+      (lsm->mt->latest_milestone_index - lsm->local_snapshots_provider.start_snapshot_index) >
+          lsm->conf->local_snapshots.local_snapshot_min_depth) {
     return true;
   }
   return false;
@@ -67,9 +70,25 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
 
 retcode_t iota_local_snapshots_manager_take_snapshot(local_snapshots_manager_t *const lsm) {
   retcode_t err;
+
+  DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
+
+  ERR_BIND_RETURN(iota_local_snapshots_manager_determine_new_entry_point(lsm, &pack), err);
+
   // TODO - implement + uncomment
   // ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count),err);
   return RC_CONSENSUS_NOT_IMPLEMENTED;
+}
+
+retcode_t iota_local_snapshots_manager_determine_new_entry_point(local_snapshots_manager_t *const lsm,
+                                                                 iota_stor_pack_t *const entry_point) {
+  retcode_t err;
+  uint64_t index = lsm->mt->latest_milestone_index - lsm->conf->local_snapshots.local_snapshot_min_depth - 1;
+  if (index == 0) {
+    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_NOT_ENOUGH_DEPTH;
+  }
+  ERR_BIND_RETURN(iota_tangle_milestone_load_next(&lsm->tangle, index, entry_point), err);
+  return RC_OK;
 }
 
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm, iota_consensus_conf_t const *const conf,
@@ -99,11 +118,14 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm, iota
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
+  retcode_t err;
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
   }
 
   lsm->running = true;
+
+  ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count), err);
 
   cond_handle_signal(&lsm->cond_local_snapshots);
   log_info(logger_id, "Spawning local snapshots manager thread\n");
