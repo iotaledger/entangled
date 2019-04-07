@@ -61,7 +61,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
   }
   if (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
        lsm->conf->local_snapshots.transactions_growth_threshold) &&
-      (lsm->mt->latest_milestone_index - lsm->local_snapshots_provider.start_snapshot_index) >
+      (lsm->snapshots_provider->latest_snapshot.index - lsm->snapshots_provider->inital_snapshot.index) >
           lsm->conf->local_snapshots.local_snapshot_min_depth) {
     return true;
   }
@@ -91,8 +91,9 @@ retcode_t iota_local_snapshots_manager_determine_new_entry_point(local_snapshots
   return RC_OK;
 }
 
-retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm, iota_consensus_conf_t const *const conf,
-                                            milestone_tracker_t const *const mt) {
+retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
+                                            snapshots_provider_t *const snapshots_provider,
+                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt) {
   retcode_t err;
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
@@ -107,12 +108,14 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm, iota
   lsm->running = false;
   lsm->conf = conf;
   lsm->mt = mt;
+  lsm->snapshots_provider = snapshots_provider;
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
   connection_config_t db_conf = {.db_path = lsm->conf->db_path};
-
-  ERR_BIND_RETURN(iota_tangle_init(&lsm->tangle, &db_conf), err);
+  if (strcmp(db_conf.db_path, "") != 0) {
+    ERR_BIND_RETURN(iota_tangle_init(&lsm->tangle, &db_conf), err);
+  }
 
   return RC_OK;
 }

@@ -21,6 +21,7 @@ cc_library(
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
         "//consensus/snapshot",
+        "//consensus/snapshot:snapshots_provider",
         "//consensus/transaction_solidifier",
         "//utils:macros",
         "//utils:time",

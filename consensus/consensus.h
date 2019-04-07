@@ -30,11 +30,11 @@ typedef struct iota_consensus_s {
   ep_randomizer_t ep_randomizer;
   ledger_validator_t ledger_validator;
   milestone_tracker_t milestone_tracker;
-  snapshot_t snapshot;
   tip_selector_t tip_selector;
   transaction_validator_t transaction_validator;
   transaction_solidifier_t transaction_solidifier;
   local_snapshots_manager_t local_snapshots_manager;
+  snapshots_provider_t snapshots_provider;
 } iota_consensus_t;
 
 #ifdef __cplusplus

@@ -193,3 +193,19 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
 
   return ret;
 }
+
+retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst) {
+  retcode_t ret;
+  dst->index = src->index;
+  dst->conf = src->conf;
+
+  if (dst == NULL || src == NULL) {
+    return RC_SNAPSHOT_NULL_SELF;
+  }
+
+  rw_lock_handle_init(&dst->rw_lock);
+  dst->state = NULL;
+
+  ERR_BIND_RETURN(state_delta_copy(&src->state, &dst->state), ret);
+  return RC_OK;
+}

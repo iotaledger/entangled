@@ -316,7 +316,7 @@ static void* milestone_solidifier(void* arg) {
 }
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
-                                      snapshot_t* const snapshot, ledger_validator_t* const lv,
+                                      snapshots_provider_t* const snapshots_provider, ledger_validator_t* const lv,
                                       transaction_solidifier_t* const ts) {
   if (mt == NULL) {
     return RC_NULL_PARAM;
@@ -326,7 +326,6 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
   mt->conf = conf;
-  mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
@@ -334,6 +333,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
+  mt->snapshots_provider = snapshots_provider;
   cond_handle_init(&mt->cond_validator);
   cond_handle_init(&mt->cond_solidifier);
 

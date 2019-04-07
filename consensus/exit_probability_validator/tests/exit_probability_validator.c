@@ -35,7 +35,7 @@ static uint32_t max_depth = 15;
 static uint32_t max_txs_below_max_depth = 10;
 
 static exit_prob_transaction_validator_t epv;
-static snapshot_t snapshot;
+static snapshots_provider_t snapshots_provider;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
@@ -53,22 +53,22 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   strcpy(consensus_conf.snapshot_file, snapshot_path);
   strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
   consensus_conf.snapshot_signature_skip_validation = true;
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
+  TEST_ASSERT(iota_snapshots_provider_init(&snapshots_provider, &consensus_conf) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, NULL, NULL) == RC_OK);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &snapshot, &lv, &ts) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &snapshots_provider, &lv, &ts) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &consensus_conf, &mt) == RC_OK);
   // We want to avoid unnecessary validation
-  mt.latest_snapshot->index = 99999999999;
+  mt.snapshots_provider->latest_snapshot.index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(&consensus_conf, &mt, &lv, epv) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(epv->lv);
-  iota_snapshot_destroy(&snapshot);
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_transaction_solidifier_destroy(&ts);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
+  iota_snapshots_provider_destroy(&snapshots_provider);
 }
 
 void test_transaction_does_not_exist() {

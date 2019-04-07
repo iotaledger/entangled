@@ -68,3 +68,22 @@ void hash_to_{TYPE}_map_keys(hash_to_{TYPE}_map_t *const map, hash243_set_t * co
     hash243_set_add(keys,curr_entry->hash);
   }
 }
+
+
+
+retcode_t hash_to_{TYPE}_map_copy(hash_to_{TYPE}_map_t const *const src,
+hash_to_{TYPE}_map_t *const dst){
+
+  retcode_t ret;
+  hash_to_{TYPE}_map_entry_t *curr_entry = NULL;
+  hash_to_{TYPE}_map_entry_t *tmp_entry = NULL;
+
+  HASH_ITER(hh, *src, curr_entry, tmp_entry) {
+    ret = hash_to_{TYPE}_map_add(dst,curr_entry->hash, curr_entry->value);
+    if (ret != RC_OK){
+      return ret;
+    }
+  }
+
+  return RC_OK;
+}

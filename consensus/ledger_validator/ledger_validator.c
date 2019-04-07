@@ -80,12 +80,13 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv, tangle_t con
       goto done;
     }
     if (delta != NULL && !state_delta_empty(delta)) {
-      if ((ret = iota_snapshot_create_patch(lv->milestone_tracker->latest_snapshot, &delta, &patch)) != RC_OK) {
+      if ((ret = iota_snapshot_create_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
+                                            &patch)) != RC_OK) {
         goto done;
       }
       if (state_delta_is_consistent(&patch)) {
-        if ((ret = iota_snapshot_apply_patch(lv->milestone_tracker->latest_snapshot, &delta, milestone.index)) !=
-            RC_OK) {
+        if ((ret = iota_snapshot_apply_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
+                                             milestone.index)) != RC_OK) {
           goto done;
         }
         *consistent_index = milestone.index;
@@ -234,15 +235,16 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
   *has_snapshot = transaction_snapshot_index(&tx) != 0;
   if (!(*has_snapshot)) {
     if ((ret = get_latest_delta(lv, tangle, NULL, &delta, milestone->hash,
-                                iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot), true, &valid_delta)) !=
-        RC_OK) {
+                                iota_snapshot_get_index(&lv->milestone_tracker->snapshots_provider->latest_snapshot),
+                                true, &valid_delta)) != RC_OK) {
       log_error(logger_id, "Getting latest delta failed\n");
       goto done;
     } else if (!valid_delta) {
       *has_snapshot = false;
       goto done;
     }
-    if ((ret = iota_snapshot_create_patch(lv->milestone_tracker->latest_snapshot, &delta, &patch)) != RC_OK) {
+    if ((ret = iota_snapshot_create_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
+                                          &patch)) != RC_OK) {
       log_error(logger_id, "Creating patch failed\n");
       goto done;
     }
@@ -256,8 +258,8 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
           goto done;
         }
       }
-      if ((ret = iota_snapshot_apply_patch(lv->milestone_tracker->latest_snapshot, &delta, milestone->index)) !=
-          RC_OK) {
+      if ((ret = iota_snapshot_apply_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
+                                           milestone->index)) != RC_OK) {
         log_error(logger_id, "Applying patch failed\n");
         goto done;
       }
@@ -324,8 +326,8 @@ retcode_t iota_consensus_ledger_validator_update_delta(ledger_validator_t const 
   }
 
   if ((ret = get_latest_delta(lv, tangle, &visited_hashes, &tip_state, tip,
-                              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot), false, &valid_delta)) !=
-      RC_OK) {
+                              iota_snapshot_get_index(&lv->milestone_tracker->snapshots_provider->latest_snapshot),
+                              false, &valid_delta)) != RC_OK) {
     log_error(logger_id, "Getting latest delta failed\n");
     goto done;
   }
@@ -339,7 +341,8 @@ retcode_t iota_consensus_ledger_validator_update_delta(ledger_validator_t const 
     goto done;
   }
 
-  if ((ret = iota_snapshot_create_patch(lv->milestone_tracker->latest_snapshot, &tip_state, &patch)) != RC_OK) {
+  if ((ret = iota_snapshot_create_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &tip_state,
+                                        &patch)) != RC_OK) {
     log_error(logger_id, "Creating patch failed\n");
     goto done;
   }

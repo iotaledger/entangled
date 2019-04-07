@@ -45,9 +45,9 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
     return ret;
   }
 
-  log_info(logger_id, "Initializing snapshot\n");
-  if ((ret = iota_snapshot_init(&consensus->snapshot, &consensus->conf)) != RC_OK) {
-    log_critical(logger_id, "Initializing snapshot failed\n");
+  log_info(logger_id, "Initializing snapshots provider\n");
+  if ((ret = iota_snapshots_provider_init(&consensus->snapshots_provider, &consensus->conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing snapshots provider failed failed\n");
     return ret;
   }
 
@@ -59,8 +59,9 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   }
 
   log_info(logger_id, "Initializing milestone tracker\n");
-  if ((ret = iota_milestone_tracker_init(&consensus->milestone_tracker, &consensus->conf, &consensus->snapshot,
-                                         &consensus->ledger_validator, &consensus->transaction_solidifier)) != RC_OK) {
+  if ((ret =
+           iota_milestone_tracker_init(&consensus->milestone_tracker, &consensus->conf, &consensus->snapshots_provider,
+                                       &consensus->ledger_validator, &consensus->transaction_solidifier)) != RC_OK) {
     log_critical(logger_id, "Initializing milestone tracker failed\n");
     return ret;
   }
@@ -88,8 +89,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   }
 
   log_info(logger_id, "Initializing local snapshots manager\n");
-  if ((ret = iota_local_snapshots_manager_init(&consensus->local_snapshots_manager, &consensus->conf,
-                                               &consensus->milestone_tracker)) != RC_OK) {
+  if ((ret = iota_local_snapshots_manager_init(&consensus->local_snapshots_manager, &consensus->snapshots_provider,
+                                               &consensus->conf, &consensus->milestone_tracker)) != RC_OK) {
     log_critical(logger_id, "Initializing local snapshots manager failed failed\n");
     return ret;
   }
@@ -184,11 +185,6 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
     log_error(logger_id, "Destroying transaction solidifier failed\n");
   }
 
-  log_info(logger_id, "Destroying snapshot\n");
-  if ((ret = iota_snapshot_destroy(&consensus->snapshot)) != RC_OK) {
-    log_error(logger_id, "Destroying snapshot failed\n");
-  }
-
   log_info(logger_id, "Destroying tip selector\n");
   if ((ret = iota_consensus_tip_selector_destroy(&consensus->tip_selector))) {
     log_error(logger_id, "Destroying tip selector failed\n");
@@ -202,6 +198,11 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   log_info(logger_id, "Destroying local snapshots manager\n");
   if ((ret = iota_local_snapshots_manager_destroy(&consensus->local_snapshots_manager)) != RC_OK) {
     log_error(logger_id, "Destroying local snapshots manager failed\n");
+  }
+
+  log_info(logger_id, "Destroying snapshots provider\n");
+  if ((ret = iota_snapshots_provider_destroy(&consensus->snapshots_provider)) != RC_OK) {
+    log_error(logger_id, "Destroying snapshots provider failed\n");
   }
 
   logger_helper_release(logger_id);

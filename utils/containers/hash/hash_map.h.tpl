@@ -38,6 +38,9 @@ void hash_to_{TYPE}_map_free(hash_to_{TYPE}_map_t *const map);
 void hash_to_{TYPE}_map_keys(hash_to_{TYPE}_map_t *const map,
                              hash243_set_t * const keys);
 
+retcode_t hash_to_{TYPE}_map_copy(hash_to_{TYPE}_map_t const *const src,
+        hash_to_{TYPE}_map_t *const dst);
+
 #ifdef __cplusplus
 }
 #endif

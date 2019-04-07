@@ -75,6 +75,8 @@ int main(void) {
   config.db_path = test_db_path;
   api.core = &core;
 
+  strncpy(api.core->consensus.conf.db_path, config.db_path, 128);
+
   TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);

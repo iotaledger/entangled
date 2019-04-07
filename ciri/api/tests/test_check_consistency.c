@@ -172,6 +172,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) == RC_OK);
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
+
   TEST_ASSERT(error == NULL);
   if (consistency) {
     TEST_ASSERT_TRUE(res->state);
@@ -199,20 +200,21 @@ int main(void) {
   config.db_path = test_db_path;
   api.core = &core;
 
+  strncpy(api.core->consensus.conf.db_path, config.db_path, 128);
+
   TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);
 
   setUp();
-
   // Avoid verifying snapshot signature
   api.core->consensus.conf.snapshot_signature_skip_validation = true;
 
   TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
                                   &api.core->node.tips) == RC_OK);
 
-  state_delta_destroy(&api.core->consensus.snapshot.state);
+  state_delta_destroy(&api.core->consensus.snapshots_provider.latest_snapshot.state);
 
   tearDown();
 
@@ -228,7 +230,7 @@ int main(void) {
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_2_OF_4_ADDRESS, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  state_delta_add(&api.core->consensus.snapshot.state, hash, 1545071560);
+  state_delta_add(&api.core->consensus.snapshots_provider.latest_snapshot.state, hash, 1545071560);
 
   RUN_TEST(test_check_consistency_true);
 
