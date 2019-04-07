@@ -17,4 +17,3 @@ extern NSString* const TX_2_TRYTES;
 extern int8_t* SEED_TRITS[243];
 
 #endif /* Constants_h */
-

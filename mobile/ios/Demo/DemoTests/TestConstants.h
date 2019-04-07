@@ -9,8 +9,8 @@
 #ifndef TestConstants_h
 #define TestConstants_h
 
-extern NSString * const EXPECTED_NONCE;
-extern NSString * const EXPECTED_ADDRESS;
-extern NSString * const EXPECTED_SIGNATURE;
+extern NSString* const EXPECTED_NONCE;
+extern NSString* const EXPECTED_ADDRESS;
+extern NSString* const EXPECTED_SIGNATURE;
 
 #endif /* TestConstants_h */

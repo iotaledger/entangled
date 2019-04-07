@@ -37,9 +37,7 @@
   return outputNonce;
 }
 
-+ (int8_t*)iota_ios_sign_address_gen_trits:(int8_t*)seed
-                                     index:(const int)index
-                                  security:(const int)security {
++ (int8_t*)iota_ios_sign_address_gen_trits:(int8_t*)seed index:(const int)index security:(const int)security {
   trit_t* address = NULL;
   address = iota_sign_address_gen_trits((trit_t*)seed, index, security);
   return (int8_t*)address;
@@ -50,15 +48,11 @@
                                     security:(const int)security
                                   bundleHash:(int8_t*)bundleHash {
   trit_t* signature = NULL;
-  signature = iota_sign_signature_gen_trits(
-      (trit_t*)seed, index, security, (trit_t*)bundleHash);
+  signature = iota_sign_signature_gen_trits((trit_t*)seed, index, security, (trit_t*)bundleHash);
   return (int8_t*)signature;
 }
 
-+ (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes
-                          trunk:(NSString*)trunk
-                         branch:(NSString*)branch
-                            mwm:(int)mwm {
++ (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes trunk:(NSString*)trunk branch:(NSString*)branch mwm:(int)mwm {
   bundle_transactions_t* bundle = NULL;
   iota_transaction_t tx;
   iota_transaction_t* curTx = NULL;
@@ -69,21 +63,16 @@
   NSMutableArray* outputTxsTrytes = [NSMutableArray array];
   NSMutableString* outputTxsTrytesSerialized = @"";
 
-  flex_trits_from_trytes(
-      flexTrunk, NUM_TRITS_TRUNK,
-      (tryte_t*)[trunk cStringUsingEncoding:NSUTF8StringEncoding],
-      NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
-  flex_trits_from_trytes(
-      flexBranch, NUM_TRITS_BRANCH,
-      (tryte_t*)[branch cStringUsingEncoding:NSUTF8StringEncoding],
-      NUM_TRYTES_BRANCH, NUM_TRYTES_BRANCH);
+  flex_trits_from_trytes(flexTrunk, NUM_TRITS_TRUNK, (tryte_t*)[trunk cStringUsingEncoding:NSUTF8StringEncoding],
+                         NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
+  flex_trits_from_trytes(flexBranch, NUM_TRITS_BRANCH, (tryte_t*)[branch cStringUsingEncoding:NSUTF8StringEncoding],
+                         NUM_TRYTES_BRANCH, NUM_TRYTES_BRANCH);
   bundle_transactions_new(&bundle);
 
   for (NSString* txString in txsTrytes) {
-    flex_trits_from_trytes(
-        serializedFlexTrits, NUM_TRITS_SERIALIZED_TRANSACTION,
-        (tryte_t*)[txString cStringUsingEncoding:NSUTF8StringEncoding],
-        NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+    flex_trits_from_trytes(serializedFlexTrits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                           (tryte_t*)[txString cStringUsingEncoding:NSUTF8StringEncoding],
+                           NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
     transaction_deserialize_from_trits(&tx, serializedFlexTrits, false);
     bundle_transactions_add(bundle, &tx);
   }
@@ -94,12 +83,9 @@
 
   BUNDLE_FOREACH(bundle, curTx) {
     transaction_serialize_on_flex_trits(curTx, serializedFlexTrits);
-    flex_trits_to_trytes((tryte_t*)serializedTrytes,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION, serializedFlexTrits,
-                         NUM_TRITS_SERIALIZED_TRANSACTION,
-                         NUM_TRITS_SERIALIZED_TRANSACTION);
-    outputTxsTrytesSerialized =
-        [NSString stringWithFormat:@"%s", serializedTrytes];
+    flex_trits_to_trytes((tryte_t*)serializedTrytes, NUM_TRYTES_SERIALIZED_TRANSACTION, serializedFlexTrits,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
+    outputTxsTrytesSerialized = [NSString stringWithFormat:@"%s", serializedTrytes];
     [outputTxsTrytes addObject:outputTxsTrytesSerialized];
   }
 
