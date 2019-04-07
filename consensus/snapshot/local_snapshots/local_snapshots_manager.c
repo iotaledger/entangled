@@ -59,6 +59,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
     log_critical(logger_id, "Failed in querying db size\n");
     return false;
   }
+
   if (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
        lsm->conf->local_snapshots.transactions_growth_threshold) &&
       (lsm->snapshots_provider->latest_snapshot.index - lsm->snapshots_provider->inital_snapshot.index) >

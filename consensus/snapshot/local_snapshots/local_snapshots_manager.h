@@ -13,6 +13,7 @@
 
 #include "consensus/conf.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
