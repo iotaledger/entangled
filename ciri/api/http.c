@@ -474,9 +474,11 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char
     return process_remove_neighbors_request(http, payload, out);
   } else if (strcmp(command, "storeTransactions") == 0) {
     return process_store_transactions_request(http, payload, out);
+  } else {
+    error_serialize_response(http, &error, "Unknown command", out);
   }
 
-  return RC_API_INVALID_COMMAND;
+  return RC_OK;
 }
 
 static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind, const char *key, const char *value) {
@@ -499,7 +501,6 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
   struct MHD_Response *response = NULL;
   cJSON *json_obj = NULL, *json_item = NULL;
   char_buffer_t *response_buf = NULL;
-  char *command_str = NULL;
 
   if (strncmp(method, MHD_HTTP_METHOD_POST, 4) != 0) {
     return MHD_NO;
@@ -548,27 +549,35 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
     goto cleanup;
   }
 
-  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "command");
-  if (!cJSON_IsString(json_item) || (json_item->valuestring == NULL)) {
-    cJSON_Delete(json_obj);
-    ret = MHD_NO;
-    goto cleanup;
-  }
-
-  command_str = strdup(json_item->valuestring);
-  cJSON_Delete(json_obj);
-
   response_buf = char_buffer_new();
-  iota_api_http_process_request(api, command_str, sess->request->data, response_buf);
-  free(command_str);
+
+  if (!cJSON_HasObjectItem(json_obj, "command")) {
+    error_res_t *error = NULL;
+
+    error_serialize_response(api, &error, "Command parameter has not been specified in the request", response_buf);
+  } else {
+    char *command_str = NULL;
+
+    json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "command");
+    if (!cJSON_IsString(json_item) || (json_item->valuestring == NULL)) {
+      cJSON_Delete(json_obj);
+      ret = MHD_NO;
+      goto cleanup;
+    }
+
+    command_str = strdup(json_item->valuestring);
+    iota_api_http_process_request(api, command_str, sess->request->data, response_buf);
+    free(command_str);
+  }
 
   response = MHD_create_response_from_buffer(response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);
   MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE, "application/json");
   ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
   MHD_destroy_response(response);
 
-  char_buffer_free(response_buf);
 cleanup:
+  char_buffer_free(response_buf);
+  cJSON_Delete(json_obj);
   if (sess) {
     if (sess->request) {
       char_buffer_free(sess->request);
