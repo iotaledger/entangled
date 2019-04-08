@@ -442,6 +442,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   memcpy(res->coordinator_address, api->core->consensus.conf.coordinator_address, FLEX_TRIT_SIZE_243);
 
   return RC_OK;
+
 }
 
 retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error) {
