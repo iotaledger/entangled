@@ -230,7 +230,7 @@ static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *co
 
   // TODO Deserialize request
 
-  if ((ret = iota_api_get_inclusion_states(http->api, req, res, &error)) != RC_OK) {
+  if ((ret = iota_api_get_inclusion_states(http->api, tangle, req, res, &error)) != RC_OK) {
     error_serialize_response(http, &error, NULL, out);
   }
 
