@@ -222,8 +222,34 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangl
 retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *const tangle,
                                         get_inclusion_states_req_t const *const req,
                                         get_inclusion_states_res_t *const res, error_res_t **const error) {
-  if (api == NULL || req == NULL || res == NULL || error == NULL) {
+  retcode_t ret = RC_OK;
+
+  if (api == NULL || tangle == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
+  }
+
+  if (invalid_subtangle_status(api)) {
+    return RC_API_INVALID_SUBTANGLE_STATUS;
+  }
+
+  {
+    hash243_queue_entry_t *iter = NULL;
+    DECLARE_PACK_SINGLE_TX(tx, txp, pack);
+    uint64_t lssm_index = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+
+    CDL_FOREACH(req->hashes, iter) {
+      hash_pack_reset(&pack);
+      if ((ret = iota_tangle_transaction_load_partial(tangle, iter->hash, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
+        return ret;
+      }
+
+      if (pack.num_loaded == 0 || transaction_snapshot_index(txp) == 0 ||
+          transaction_snapshot_index(txp) > lssm_index) {
+        get_inclusion_states_res_states_add(res, false);
+      } else if (transaction_snapshot_index(txp) <= lssm_index) {
+        get_inclusion_states_res_states_add(res, true);
+      }
+    }
   }
 
   return RC_OK;
