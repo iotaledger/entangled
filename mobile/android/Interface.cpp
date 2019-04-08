@@ -22,7 +22,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(JNIEn
     return NULL;
   }
 
-  if ((foundNonce = iota_pow_trytes((const char*)trytes, mwm)) == NULL) {
+  if ((foundNonce = iota_pow_trytes((char const*)trytes, mwm)) == NULL) {
     env->ReleaseStringUTFChars(jtrytes, trytes);
     free(nonce);
     return NULL;
@@ -57,8 +57,8 @@ JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
   jstring outputTxtrytes = NULL;
   size_t i = 0;
 
-  const char* ctrunk = env->GetStringUTFChars(trunk, 0);
-  const char* cbranch = env->GetStringUTFChars(branch, 0);
+  char const* ctrunk = env->GetStringUTFChars(trunk, 0);
+  char const* cbranch = env->GetStringUTFChars(branch, 0);
   flex_trits_from_trytes(flexTrunk, NUM_TRITS_TRUNK, (tryte_t*)ctrunk, NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
   flex_trits_from_trytes(flexBranch, NUM_TRITS_BRANCH, (tryte_t*)cbranch, NUM_TRYTES_BRANCH, NUM_TRYTES_BRANCH);
   env->ReleaseStringUTFChars(trunk, ctrunk);
@@ -69,7 +69,7 @@ JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
   int txNum = env->GetArrayLength(txsTrytes);
   for (int i = 0; i < txNum; i++) {
     jstring txString = (jstring)(env->GetObjectArrayElement(txsTrytes, i));
-    const char* txTrytes = env->GetStringUTFChars(txString, 0);
+    char const* txTrytes = env->GetStringUTFChars(txString, 0);
     flex_trits_from_trytes(serializedFlexTrits, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t*)txTrytes,
                            NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
     env->ReleaseStringUTFChars(txString, txTrytes);
