@@ -177,8 +177,9 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusi
  *
  * @return a status code
  */
-retcode_t iota_api_get_balances(iota_api_t const *const api, get_balances_req_t const *const req,
-                                get_balances_res_t *const res, error_res_t **const error);
+retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tangle,
+                                get_balances_req_t const *const req, get_balances_res_t *const res,
+                                error_res_t **const error);
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input

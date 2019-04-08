@@ -32,6 +32,18 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *
   return RC_OK;
 }
 
+retcode_t state_delta_sum_if_present(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value) {
+  retcode_t ret = RC_OK;
+  state_delta_entry_t *entry = NULL;
+
+  state_delta_find(*state, hash, entry);
+  if (entry) {
+    entry->value += value;
+  }
+
+  return RC_OK;
+}
+
 retcode_t state_delta_add_or_replace(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value) {
   retcode_t ret = RC_OK;
   state_delta_entry_t *entry = NULL;
@@ -69,6 +81,19 @@ retcode_t state_delta_apply_patch(state_delta_t *const state, state_delta_t cons
 
   HASH_ITER(hh, *patch, iter, tmp) {
     if ((ret = state_delta_add_or_sum(state, iter->hash, iter->value)) != RC_OK) {
+      return ret;
+    }
+  }
+
+  return ret;
+}
+
+retcode_t state_delta_apply_patch_if_present(state_delta_t *const state, state_delta_t const *const patch) {
+  retcode_t ret = RC_OK;
+  state_delta_entry_t *iter = NULL, *tmp = NULL;
+
+  HASH_ITER(hh, *patch, iter, tmp) {
+    if ((ret = state_delta_sum_if_present(state, iter->hash, iter->value)) != RC_OK) {
       return ret;
     }
   }
