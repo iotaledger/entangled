@@ -484,6 +484,27 @@ GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(const std::vector<std
   return {response["states"].get<std::vector<bool>>()};
 }
 
+WereAddressesSpentFromResponse IotaJsonAPI::wereAddressesSpentFrom(const std::vector<std::string>& addresses) {
+  VLOG(3) << __FUNCTION__;
+  json req;
+  req["command"] = "wereAddressesSpentFrom";
+  req["addresses"] = addresses;
+
+  auto maybeResponse = post(std::move(req));
+
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
+
+  auto& response = maybeResponse.value();
+  if (response["states"].is_null()) {
+    return {};
+  }
+
+  return {response["states"].get<std::vector<bool>>()};
+}
+
 template <typename T>
 std::vector<T> IotaJsonAPI::nextBatch(const std::vector<T>& vec, uint32_t& numBatchedEntries, uint32_t batchSize) {
   auto numToQuery = (vec.size() - numBatchedEntries) > batchSize ? batchSize : (vec.size() - numBatchedEntries);
