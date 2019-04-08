@@ -8,8 +8,8 @@ cc_library(
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     defines = select({
-        "//config:mainnet": GOSSIP_MAINNET_VARIABLES,
-        "//config:testnet": GOSSIP_TESTNET_VARIABLES,
+        "//ciri:mainnet": GOSSIP_MAINNET_VARIABLES,
+        "//ciri:testnet": GOSSIP_TESTNET_VARIABLES,
         "//conditions:default": GOSSIP_MAINNET_VARIABLES,
     }),
     visibility = ["//visibility:public"],
