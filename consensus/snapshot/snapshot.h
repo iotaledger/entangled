@@ -24,7 +24,7 @@ extern "C" {
 typedef struct snapshot_s {
   iota_consensus_conf_t *conf;
   rw_lock_handle_t rw_lock;
-  size_t index;
+  uint64_t index;
   state_delta_t state;
 } snapshot_t;
 
@@ -54,7 +54,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
  *
  * @return the snapshot index
  */
-size_t iota_snapshot_get_index(snapshot_t *const snapshot);
+uint64_t iota_snapshot_get_index(snapshot_t *const snapshot);
 
 /**
  * Gets the balance of a given address hash
@@ -87,7 +87,7 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot, state_delta_t *
  *
  * @return a status code
  */
-retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *const patch, size_t index);
+retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index);
 
 #ifdef __cplusplus
 }

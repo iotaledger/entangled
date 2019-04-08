@@ -94,6 +94,8 @@ class IotaAPI {
                                                         const std::vector<std::string>& tips) = 0;
 
   virtual bool broadcastTransactions(const std::vector<std::string>& trytes) = 0;
+
+  virtual WereAddressesSpentFromResponse wereAddressesSpentFrom(const std::vector<std::string>& addresses) = 0;
 };
 }  // namespace cppclient
 

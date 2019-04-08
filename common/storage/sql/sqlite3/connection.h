@@ -8,6 +8,8 @@
 #ifndef __COMMON_STORAGE_SQL_SQLITE3_CONNECTION_H__
 #define __COMMON_STORAGE_SQL_SQLITE3_CONNECTION_H__
 
+#include <sqlite3.h>
+
 #include "common/storage/connection.h"
 #include "common/storage/sql/statements.h"
 
