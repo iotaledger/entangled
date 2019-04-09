@@ -228,13 +228,16 @@ static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *co
     goto done;
   }
 
-  // TODO Deserialize request
+  if ((ret = http->serializer.vtable.get_inclusion_states_deserialize_request(&http->serializer, payload, req)) !=
+      RC_OK) {
+    goto done;
+  }
 
   if ((ret = iota_api_get_inclusion_states(http->api, tangle, req, res, &error)) != RC_OK) {
     error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_inclusion_states_serialize_response(&http->serializer, res, out);
   }
-
-  // TODO Serialize response
 
 done:
   get_inclusion_states_req_free(&req);
