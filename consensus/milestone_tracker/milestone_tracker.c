@@ -76,7 +76,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
                    NUM_TRITS_SIGNATURE);
   }
   iss_address(&sponge, digest, root, mt->conf->coordinator_security_level * HASH_LENGTH_TRIT);
-  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->coordinator_num_keys_in_milestone, candidate->index);
+  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->coordinator_depth, candidate->index);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   if (memcmp(coo, mt->conf->coordinator_address, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;
