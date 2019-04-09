@@ -13,7 +13,7 @@
 #include "cclient/serialization/json/json_serializer.h"
 #include "cclient/types/types.h"
 #include "ciri/api/api.h"
-#include "ciri/api/http.h"
+#include "ciri/api/http/http.h"
 #include "utils/logger_helper.h"
 
 #define API_HTTP_LOGGER_ID "api_http"

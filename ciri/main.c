@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "ciri/api/api.h"
-#include "ciri/api/http.h"
+#include "ciri/api/http/http.h"
 #include "ciri/core.h"
 #include "utils/handles/rand.h"
 #include "utils/handles/signal.h"
