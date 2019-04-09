@@ -15,7 +15,7 @@ get_inclusion_states_res_t* get_inclusion_states_res_new() {
   return res;
 }
 
-retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, bool state) {
+retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, int state) {
   if (!res->states) {
     utarray_new(res->states, &ut_int_icd);
   }

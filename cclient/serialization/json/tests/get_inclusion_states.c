@@ -79,9 +79,8 @@ void test_get_inclusion_states_serialize_response(void) {
   get_inclusion_states_res_t* get_is = get_inclusion_states_res_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  TEST_ASSERT(get_inclusion_states_res_states_set(get_is, 1) == RC_OK);
-  TEST_ASSERT(get_inclusion_states_res_states_set(get_is, 0) == RC_OK);
-
+  TEST_ASSERT(get_inclusion_states_res_states_add(get_is, true) == RC_OK);
+  TEST_ASSERT(get_inclusion_states_res_states_add(get_is, false) == RC_OK);
   serializer.vtable.get_inclusion_states_serialize_response(&serializer, get_is, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);

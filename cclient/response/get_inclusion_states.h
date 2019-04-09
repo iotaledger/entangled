@@ -19,7 +19,7 @@ typedef struct {
 } get_inclusion_states_res_t;
 
 get_inclusion_states_res_t* get_inclusion_states_res_new();
-retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, bool state);
+retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, int state);
 void get_inclusion_states_res_free(get_inclusion_states_res_t** res);
 bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* in, int index);
 int get_inclusion_states_res_states_count(get_inclusion_states_res_t* in);
