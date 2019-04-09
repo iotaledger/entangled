@@ -99,6 +99,27 @@ retcode_t json_boolean_array_to_utarray(cJSON const* const obj, char const* cons
   return RC_OK;
 }
 
+retcode_t utarray_to_json_boolean_array(UT_array const* const ut, cJSON* const json_root, char const* const obj_name) {
+  if (!ut) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_NULL_PARAM);
+    return RC_NULL_PARAM;
+  }
+  if (utarray_len(ut) > 0) {
+    cJSON* array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
+      return RC_CCLIENT_JSON_CREATE;
+    }
+
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+    int* p = NULL;
+    while ((p = (int*)utarray_next(ut, p))) {
+      cJSON_AddItemToArray(array_obj, cJSON_CreateBool(*p));
+    }
+  }
+  return RC_OK;
+}
+
 retcode_t json_string_array_to_utarray(cJSON const* const obj, char const* const obj_name, UT_array* const ut) {
   char* str = NULL;
 
