@@ -19,6 +19,7 @@ typedef struct error_res_s {
 } error_res_t;
 
 error_res_t* error_res_new(char const* const error);
+char* error_res_get_message(error_res_t const* const res);
 void error_res_free(error_res_t** res);
 
 #ifdef __cplusplus

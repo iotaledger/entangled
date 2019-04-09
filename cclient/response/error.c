@@ -22,6 +22,13 @@ error_res_t* error_res_new(char const* const error) {
   return res;
 }
 
+char* error_res_get_message(error_res_t const* const res) {
+  if (res == NULL || res->error == NULL) {
+    return NULL;
+  }
+  return res->error->data;
+}
+
 void error_res_free(error_res_t** res) {
   if (!res || !(*res)) {
     return;
