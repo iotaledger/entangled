@@ -21,14 +21,14 @@ static logger_id_t logger_id;
  */
 
 static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **const error) {
-  bool valid = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index !=
-               api->core->consensus.milestone_tracker.milestone_start_index;
+  bool invalid = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index ==
+                 api->core->consensus.milestone_tracker.milestone_start_index;
 
-  if (!valid) {
+  if (invalid) {
     *error = error_res_new(API_INVALID_SUBTANGLE);
   }
 
-  return valid;
+  return invalid;
 }
 
 /*
