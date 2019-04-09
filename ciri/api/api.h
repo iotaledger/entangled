@@ -19,6 +19,7 @@
 #define API_TAILS_NOT_CONSISTENT                                          \
   "tails are not consistent (would lead to inconsistent ledger state or " \
   "below max depth)"
+#define API_INVALID_SUBTANGLE "This operation cannot be executed: The subtangle has not been updated yet"
 
 #ifdef __cplusplus
 extern "C" {
