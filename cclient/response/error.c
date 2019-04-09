@@ -7,26 +7,19 @@
 
 #include "cclient/response/error.h"
 
-error_res_t* error_res_new() {
+error_res_t* error_res_new(char const* const error) {
   error_res_t* res = (error_res_t*)malloc(sizeof(error_res_t));
 
   if (res) {
-    res->error = NULL;
-  }
-  return res;
-}
-
-retcode_t error_res_set(error_res_t* res, char const* const error) {
-  if (!res->error) {
     res->error = char_buffer_new();
+    if (!res->error) {
+      free(res);
+      return NULL;
+    }
+    char_buffer_set(res->error, error);
   }
 
-  if (!res->error) {
-    return RC_OOM;
-  }
-
-  char_buffer_set(res->error, error);
-  return RC_OK;
+  return res;
 }
 
 void error_res_free(error_res_t** res) {

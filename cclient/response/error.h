@@ -18,8 +18,7 @@ typedef struct error_res_s {
   char_buffer_t* error;
 } error_res_t;
 
-error_res_t* error_res_new();
-retcode_t error_res_set(error_res_t* res, char const* const error);
+error_res_t* error_res_new(char const* const error);
 void error_res_free(error_res_t** res);
 
 #ifdef __cplusplus

@@ -32,11 +32,10 @@ static retcode_t error_serialize_response(iota_api_http_t *const http, error_res
   retcode_t ret = RC_OK;
 
   if (*error == NULL) {
-    *error = error_res_new();
     if (message == NULL) {
-      error_res_set(*error, "Internal server error");
+      *error = error_res_new("Internal server error");
     } else {
-      error_res_set(*error, message);
+      *error = error_res_new(message);
     }
   }
   ret = http->serializer.vtable.error_serialize_response(&http->serializer, *error, out);
