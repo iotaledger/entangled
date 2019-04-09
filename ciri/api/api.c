@@ -381,11 +381,28 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
 
 retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
                                  error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  neighbor_t *iter = NULL;
+  char uri[MAX_HOST_LENGTH + 6];
+
   if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  return RC_OK;
+  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
+  LL_FOREACH(api->core->node.neighbors, iter) {
+    char_buffer_t *address = char_buffer_new();
+
+    snprintf(uri, MAX_HOST_LENGTH + 6, "%s:%d", iter->endpoint.host, iter->endpoint.port);
+    char_buffer_set(address, uri);
+    if ((ret = get_neighbors_res_add_neighbor(res, address, iter->nbr_all_tx, iter->nbr_invalid_tx,
+                                              iter->nbr_new_tx)) != RC_OK) {
+      break;
+    }
+  }
+  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
+
+  return ret;
 }
 
 retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_t *const res,
