@@ -38,7 +38,9 @@ int get_inclusion_states_res_states_count(get_inclusion_states_res_t* in) { retu
 
 void get_inclusion_states_res_free(get_inclusion_states_res_t** res) {
   if (*res) {
-    utarray_free((*res)->states);
+    if ((*res)->states) {
+      utarray_free((*res)->states);
+    }
     free(*res);
     *res = NULL;
   }
