@@ -8,8 +8,8 @@ cc_library(
     srcs = ["api.c"],
     hdrs = ["api.h"],
     defines = select({
-        "//config:mainnet": CIRI_MAINNET_VARIABLES,
-        "//config:testnet": CIRI_TESTNET_VARIABLES,
+        "//ciri:mainnet": CIRI_MAINNET_VARIABLES,
+        "//ciri:testnet": CIRI_TESTNET_VARIABLES,
         "//conditions:default": CIRI_MAINNET_VARIABLES,
     }),
     deps = [

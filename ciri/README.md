@@ -65,6 +65,7 @@ Long option | Short option | Description | Example input
 `--requester-queue-size` | | Size of the transaction requester queue. | `--requester-queue-size 10000`
 `--tcp-receiver-port` | `-t` | TCP listen port. | `-t 15600`
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
+`--tips-solidifier-enabled` | | Scan the current tips and attempt to mark them as solid. | `--tips-solidifier-enabled true`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
 `--http_port` | `-p` | HTTP API listen port. | `--http_port 14265`
 `--max-find-transactions` | | The maximal number of transactions that may be returned by the 'findTransactions' API call. If the number of transactions found exceeds this number an error will be returned | `--max-find-transactions 100000`

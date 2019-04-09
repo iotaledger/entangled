@@ -74,6 +74,8 @@ int main(int argc, char* argv[]) {
 
   logger_output_level_set(stdout, ciri_core.conf.log_level);
 
+  log_info(logger_id, "Welcome to %s v%s\n", CIRI_NAME, CIRI_VERSION);
+
   log_info(logger_id, "Initializing storage\n");
   if (storage_init() != RC_OK) {
     log_critical(logger_id, "Initializing storage failed\n");
