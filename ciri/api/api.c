@@ -20,50 +20,20 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static bool invalid_subtangle_status(iota_api_t const *const api) {
-  return (api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index ==
-          api->core->consensus.milestone_tracker.milestone_start_index);
+static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **const error) {
+  bool invalid = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index ==
+                 api->core->consensus.milestone_tracker.milestone_start_index;
+
+  if (invalid) {
+    *error = error_res_new(API_INVALID_SUBTANGLE);
+  }
+
+  return invalid;
 }
 
 /*
  * Public functions
  */
-
-retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_t *const res,
-                                 error_res_t **const error) {
-  if (api == NULL || res == NULL || error == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  char_buffer_set(res->app_name, CIRI_NAME);
-  char_buffer_set(res->app_version, CIRI_VERSION);
-  memcpy(res->latest_milestone, api->core->consensus.milestone_tracker.latest_milestone, FLEX_TRIT_SIZE_243);
-  res->latest_milestone_index = api->core->consensus.milestone_tracker.latest_milestone_index;
-  memcpy(res->latest_solid_subtangle_milestone, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone,
-         FLEX_TRIT_SIZE_243);
-  res->latest_solid_subtangle_milestone_index =
-      api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
-  res->milestone_start_index = api->core->consensus.milestone_tracker.milestone_start_index;
-  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
-  res->neighbors = neighbors_count(api->core->node.neighbors);
-  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
-  res->packets_queue_size = broadcaster_size(&api->core->node.broadcaster);
-  res->time = current_timestamp_ms();
-  res->tips = tips_cache_size(&api->core->node.tips);
-  res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
-  memcpy(res->coordinator_address, api->core->consensus.conf.coordinator_address, FLEX_TRIT_SIZE_243);
-
-  return RC_OK;
-}
-
-retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
-                                 error_res_t **const error) {
-  if (api == NULL || res == NULL || error == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  return RC_OK;
-}
 
 retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_t const *const req,
                                  add_neighbors_res_t *const res, error_res_t **const error) {
@@ -93,56 +63,142 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
   return ret;
 }
 
-retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbors_req_t const *const req,
-                                    remove_neighbors_res_t *const res, error_res_t **const error) {
-  char **uri;
-  neighbor_t neighbor;
+retcode_t iota_api_attach_to_tangle(iota_api_t const *const api, attach_to_tangle_req_t const *const req,
+                                    attach_to_tangle_res_t *const res, error_res_t **const error) {
   retcode_t ret = RC_OK;
+  bundle_transactions_t *bundle = NULL;
+  iota_transaction_t *tx_iter = NULL;
+  flex_trit_t *trytes_iter = NULL;
+  iota_transaction_t tx;
+  flex_trit_t tx_trytes[FLEX_TRIT_SIZE_8019];
 
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  res->removed_neighbors = 0;
-  for (uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
-    if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
+  bundle_transactions_new(&bundle);
+
+  HASH_ARRAY_FOREACH(req->trytes, trytes_iter) {
+    transaction_deserialize_from_trits(&tx, trytes_iter, false);
+    bundle_transactions_add(bundle, &tx);
+  }
+
+  if ((ret = iota_pow_bundle(bundle, req->trunk, req->branch, req->mwm)) != RC_OK) {
+    goto done;
+  }
+
+  BUNDLE_FOREACH(bundle, tx_iter) {
+    transaction_serialize_on_flex_trits(tx_iter, tx_trytes);
+    hash_array_push(res->trytes, tx_trytes);
+  }
+
+done:
+  bundle_transactions_free(&bundle);
+
+  return RC_OK;
+}
+
+retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast_transactions_req_t const *const req,
+                                          error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  flex_trit_t *elt = NULL;
+  iota_transaction_t tx;
+
+  if (api == NULL || req == NULL || error == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (req->trytes == NULL) {
+    return ret;
+  }
+
+  HASH_ARRAY_FOREACH(req->trytes, elt) {
+    transaction_deserialize_from_trits(&tx, elt, true);
+    if (!iota_consensus_transaction_validate(&api->core->consensus.transaction_validator, &tx)) {
+      continue;
+    }
+    // TODO priority queue on weight_magnitude
+    if ((ret = broadcaster_on_next(&api->core->node.broadcaster, elt)) != RC_OK) {
       return ret;
     }
-    log_info(logger_id, "Removing neighbor %s\n", *uri);
-    rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
-    if (neighbors_remove(&api->core->node.neighbors, &neighbor) == RC_OK) {
-      res->removed_neighbors++;
-    } else {
-      log_warning(logger_id, "Removing neighbor %s failed\n", *uri);
-    }
-    rw_lock_handle_unlock(&api->core->node.neighbors_lock);
   }
 
   return ret;
 }
 
-retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error) {
+retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *const tangle,
+                                     check_consistency_req_t const *const req, check_consistency_res_t *const res,
+                                     error_res_t **const error) {
   retcode_t ret = RC_OK;
-  hash243_set_t tips = NULL;
-  hash243_set_entry_t *iter = NULL;
-  hash243_set_entry_t *tmp = NULL;
+  hash243_queue_entry_t *iter = NULL;
+  bundle_transactions_t *bundle = NULL;
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
+  exit_prob_transaction_validator_t walker_validator;
+  DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (api == NULL || res == NULL || error == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if ((ret = tips_cache_get_tips(&api->core->node.tips, &tips)) != RC_OK) {
-    goto done;
+  res->state = false;
+
+  if (invalid_subtangle_status(api, error)) {
+    return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
-  HASH_ITER(hh, tips, iter, tmp) {
-    if ((ret = hash243_stack_push(&res->hashes, iter->hash)) != RC_OK) {
+  CDL_FOREACH(req->tails, iter) {
+    bundle_transactions_new(&bundle);
+    hash_pack_reset(&pack);
+    if ((ret = iota_tangle_transaction_load_partial(tangle, iter->hash, &pack, PARTIAL_TX_MODEL_ESSENCE_METADATA)) !=
+        RC_OK) {
       goto done;
+    }
+    if (pack.num_loaded == 0) {
+      ret = RC_API_TAIL_MISSING;
+      goto done;
+    }
+    if (tx.essence.current_index != 0) {
+      ret = RC_API_NOT_TAIL;
+      goto done;
+    }
+    if (!tx.metadata.solid) {
+      check_consistency_res_info_set(res, API_TAILS_NOT_SOLID);
+      goto done;
+    }
+    if ((ret = iota_consensus_bundle_validator_validate(tangle, iter->hash, bundle, &bundle_status)) != RC_OK) {
+      goto done;
+    }
+    if (bundle_status != BUNDLE_VALID || bundle_transactions_size(bundle) == 0) {
+      check_consistency_res_info_set(res, API_TAILS_BUNDLE_INVALID);
+      goto done;
+    }
+    bundle_transactions_free(&bundle);
+  }
+
+  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+
+  if ((ret = iota_consensus_exit_prob_transaction_validator_init(
+           &api->core->consensus.conf, &api->core->consensus.milestone_tracker, &api->core->consensus.ledger_validator,
+           &walker_validator)) == RC_OK) {
+    CDL_FOREACH(req->tails, iter) {
+      if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(&walker_validator, tangle, iter->hash,
+                                                                         &res->state)) != RC_OK) {
+        break;
+      }
+      if (!res->state) {
+        check_consistency_res_info_set(res, API_TAILS_NOT_CONSISTENT);
+        break;
+      }
     }
   }
 
+  iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator);
+
+  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+
 done:
-  hash243_set_free(&tips);
+  bundle_transactions_free(&bundle);
+
   return ret;
 }
 
@@ -183,76 +239,6 @@ retcode_t iota_api_find_transactions(iota_api_t const *const api, tangle_t *cons
 done:
   hash_pack_free(&pack);
   return ret;
-}
-
-retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangle, get_trytes_req_t const *const req,
-                              get_trytes_res_t *const res, error_res_t **const error) {
-  retcode_t ret = RC_OK;
-  hash243_queue_entry_t *iter = NULL;
-  flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-
-  if (api == NULL || req == NULL || res == NULL || error == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if (hash243_queue_count(req->hashes) > api->conf.max_get_trytes) {
-    return RC_API_MAX_GET_TRYTES;
-  }
-
-  CDL_FOREACH(req->hashes, iter) {
-    hash_pack_reset(&pack);
-    // NOTE Concurrency needs to be taken care of
-    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, iter->hash, &pack)) != RC_OK) {
-      return ret;
-    }
-
-    if (pack.num_loaded != 0) {
-      transaction_serialize_on_flex_trits(txp, tx_trits);
-    } else {
-      memset(tx_trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
-    }
-
-    hash8019_queue_push(&res->trytes, tx_trits);
-  }
-
-  return ret;
-}
-
-retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *const tangle,
-                                        get_inclusion_states_req_t const *const req,
-                                        get_inclusion_states_res_t *const res, error_res_t **const error) {
-  retcode_t ret = RC_OK;
-
-  if (api == NULL || tangle == NULL || req == NULL || res == NULL || error == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if (invalid_subtangle_status(api)) {
-    return RC_API_INVALID_SUBTANGLE_STATUS;
-  }
-
-  {
-    hash243_queue_entry_t *iter = NULL;
-    DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-    uint64_t lssm_index = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
-
-    CDL_FOREACH(req->hashes, iter) {
-      hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load_partial(tangle, iter->hash, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
-        return ret;
-      }
-
-      if (pack.num_loaded == 0 || transaction_snapshot_index(txp) == 0 ||
-          transaction_snapshot_index(txp) > lssm_index) {
-        get_inclusion_states_res_states_add(res, false);
-      } else if (transaction_snapshot_index(txp) <= lssm_index) {
-        get_inclusion_states_res_states_add(res, true);
-      }
-    }
-  }
-
-  return RC_OK;
 }
 
 retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tangle,
@@ -357,6 +343,103 @@ done:
   return ret;
 }
 
+retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *const tangle,
+                                        get_inclusion_states_req_t const *const req,
+                                        get_inclusion_states_res_t *const res, error_res_t **const error) {
+  retcode_t ret = RC_OK;
+
+  if (api == NULL || tangle == NULL || req == NULL || res == NULL || error == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (invalid_subtangle_status(api, error)) {
+    return RC_API_INVALID_SUBTANGLE_STATUS;
+  }
+
+  {
+    hash243_queue_entry_t *iter = NULL;
+    DECLARE_PACK_SINGLE_TX(tx, txp, pack);
+    uint64_t lssm_index = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+
+    CDL_FOREACH(req->hashes, iter) {
+      hash_pack_reset(&pack);
+      if ((ret = iota_tangle_transaction_load_partial(tangle, iter->hash, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
+        return ret;
+      }
+
+      if (pack.num_loaded == 0 || transaction_snapshot_index(txp) == 0 ||
+          transaction_snapshot_index(txp) > lssm_index) {
+        get_inclusion_states_res_states_add(res, false);
+      } else if (transaction_snapshot_index(txp) <= lssm_index) {
+        get_inclusion_states_res_states_add(res, true);
+      }
+    }
+  }
+
+  return RC_OK;
+}
+
+retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
+                                 error_res_t **const error) {
+  if (api == NULL || res == NULL || error == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  return RC_OK;
+}
+
+retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_t *const res,
+                                 error_res_t **const error) {
+  if (api == NULL || res == NULL || error == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  char_buffer_set(res->app_name, CIRI_NAME);
+  char_buffer_set(res->app_version, CIRI_VERSION);
+  memcpy(res->latest_milestone, api->core->consensus.milestone_tracker.latest_milestone, FLEX_TRIT_SIZE_243);
+  res->latest_milestone_index = api->core->consensus.milestone_tracker.latest_milestone_index;
+  memcpy(res->latest_solid_subtangle_milestone, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone,
+         FLEX_TRIT_SIZE_243);
+  res->latest_solid_subtangle_milestone_index =
+      api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+  res->milestone_start_index = api->core->consensus.milestone_tracker.milestone_start_index;
+  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
+  res->neighbors = neighbors_count(api->core->node.neighbors);
+  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
+  res->packets_queue_size = broadcaster_size(&api->core->node.broadcaster);
+  res->time = current_timestamp_ms();
+  res->tips = tips_cache_size(&api->core->node.tips);
+  res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
+  memcpy(res->coordinator_address, api->core->consensus.conf.coordinator_address, FLEX_TRIT_SIZE_243);
+
+  return RC_OK;
+}
+
+retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  hash243_set_t tips = NULL;
+  hash243_set_entry_t *iter = NULL;
+  hash243_set_entry_t *tmp = NULL;
+
+  if (api == NULL || res == NULL || error == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((ret = tips_cache_get_tips(&api->core->node.tips, &tips)) != RC_OK) {
+    goto done;
+  }
+
+  HASH_ITER(hh, tips, iter, tmp) {
+    if ((ret = hash243_stack_push(&res->hashes, iter->hash)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  hash243_set_free(&tips);
+  return ret;
+}
+
 retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tangle_t *const tangle,
                                                get_transactions_to_approve_req_t const *const req,
                                                get_transactions_to_approve_res_t *const res,
@@ -372,7 +455,7 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
     return RC_API_INVALID_DEPTH_INPUT;
   }
 
-  if (invalid_subtangle_status(api)) {
+  if (invalid_subtangle_status(api, error)) {
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
@@ -387,39 +470,37 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
   return ret;
 }
 
-retcode_t iota_api_attach_to_tangle(iota_api_t const *const api, attach_to_tangle_req_t const *const req,
-                                    attach_to_tangle_res_t *const res, error_res_t **const error) {
+retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangle, get_trytes_req_t const *const req,
+                              get_trytes_res_t *const res, error_res_t **const error) {
   retcode_t ret = RC_OK;
-  bundle_transactions_t *bundle = NULL;
-  iota_transaction_t *tx_iter = NULL;
-  flex_trit_t *trytes_iter = NULL;
-  iota_transaction_t tx;
-  flex_trit_t tx_trytes[FLEX_TRIT_SIZE_8019];
+  hash243_queue_entry_t *iter = NULL;
+  flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
+  DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  bundle_transactions_new(&bundle);
-
-  HASH_ARRAY_FOREACH(req->trytes, trytes_iter) {
-    transaction_deserialize_from_trits(&tx, trytes_iter, false);
-    bundle_transactions_add(bundle, &tx);
+  if (hash243_queue_count(req->hashes) > api->conf.max_get_trytes) {
+    return RC_API_MAX_GET_TRYTES;
   }
 
-  if ((ret = iota_pow_bundle(bundle, req->trunk, req->branch, req->mwm)) != RC_OK) {
-    goto done;
+  CDL_FOREACH(req->hashes, iter) {
+    hash_pack_reset(&pack);
+    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, iter->hash, &pack)) != RC_OK) {
+      return ret;
+    }
+
+    if (pack.num_loaded != 0) {
+      transaction_serialize_on_flex_trits(txp, tx_trits);
+    } else {
+      memset(tx_trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+    }
+
+    hash8019_queue_push(&res->trytes, tx_trits);
   }
 
-  BUNDLE_FOREACH(bundle, tx_iter) {
-    transaction_serialize_on_flex_trits(tx_iter, tx_trytes);
-    hash_array_push(res->trytes, tx_trytes);
-  }
-
-done:
-  bundle_transactions_free(&bundle);
-
-  return RC_OK;
+  return ret;
 }
 
 retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, error_res_t **const error) {
@@ -430,29 +511,29 @@ retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, er
   return RC_OK;
 }
 
-retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast_transactions_req_t const *const req,
-                                          error_res_t **const error) {
+retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbors_req_t const *const req,
+                                    remove_neighbors_res_t *const res, error_res_t **const error) {
+  char **uri;
+  neighbor_t neighbor;
   retcode_t ret = RC_OK;
-  flex_trit_t *elt = NULL;
-  iota_transaction_t tx;
 
-  if (api == NULL || req == NULL || error == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if (req->trytes == NULL) {
-    return ret;
-  }
-
-  HASH_ARRAY_FOREACH(req->trytes, elt) {
-    transaction_deserialize_from_trits(&tx, elt, true);
-    if (!iota_consensus_transaction_validate(&api->core->consensus.transaction_validator, &tx)) {
-      continue;
-    }
-    // TODO priority queue on weight_magnitude
-    if ((ret = broadcaster_on_next(&api->core->node.broadcaster, elt)) != RC_OK) {
+  res->removed_neighbors = 0;
+  for (uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+    if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
       return ret;
     }
+    log_info(logger_id, "Removing neighbor %s\n", *uri);
+    rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
+    if (neighbors_remove(&api->core->node.neighbors, &neighbor) == RC_OK) {
+      res->removed_neighbors++;
+    } else {
+      log_warning(logger_id, "Removing neighbor %s failed\n", *uri);
+    }
+    rw_lock_handle_unlock(&api->core->node.neighbors_lock);
   }
 
   return ret;
@@ -481,7 +562,6 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
     if (exists) {
       continue;
     }
-    // NOTE Concurrency needs to be taken care of
     if ((ret = iota_tangle_transaction_store(tangle, &tx)) != RC_OK) {
       return ret;
     }
@@ -508,82 +588,6 @@ retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, check_
   }
 
   return RC_OK;
-}
-
-retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *const tangle,
-                                     check_consistency_req_t const *const req, check_consistency_res_t *const res,
-                                     error_res_t **const error) {
-  retcode_t ret = RC_OK;
-  hash243_queue_entry_t *iter = NULL;
-  bundle_transactions_t *bundle = NULL;
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-  exit_prob_transaction_validator_t walker_validator;
-  DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-
-  if (api == NULL || req == NULL || res == NULL || error == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  res->state = false;
-
-  if (invalid_subtangle_status(api)) {
-    return RC_API_INVALID_SUBTANGLE_STATUS;
-  }
-
-  CDL_FOREACH(req->tails, iter) {
-    bundle_transactions_new(&bundle);
-    hash_pack_reset(&pack);
-    if ((ret = iota_tangle_transaction_load_partial(tangle, iter->hash, &pack, PARTIAL_TX_MODEL_ESSENCE_METADATA)) !=
-        RC_OK) {
-      goto done;
-    }
-    if (pack.num_loaded == 0) {
-      ret = RC_API_TAIL_MISSING;
-      goto done;
-    }
-    if (tx.essence.current_index != 0) {
-      ret = RC_API_NOT_TAIL;
-      goto done;
-    }
-    if (!tx.metadata.solid) {
-      check_consistency_res_info_set(res, API_TAILS_NOT_SOLID);
-      goto done;
-    }
-    if ((ret = iota_consensus_bundle_validator_validate(tangle, iter->hash, bundle, &bundle_status)) != RC_OK) {
-      goto done;
-    }
-    if (bundle_status != BUNDLE_VALID || bundle_transactions_size(bundle) == 0) {
-      check_consistency_res_info_set(res, API_TAILS_BUNDLE_INVALID);
-      goto done;
-    }
-    bundle_transactions_free(&bundle);
-  }
-
-  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
-
-  if ((ret = iota_consensus_exit_prob_transaction_validator_init(
-           &api->core->consensus.conf, &api->core->consensus.milestone_tracker, &api->core->consensus.ledger_validator,
-           &walker_validator)) == RC_OK) {
-    CDL_FOREACH(req->tails, iter) {
-      if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(&walker_validator, tangle, iter->hash,
-                                                                         &res->state)) != RC_OK) {
-        break;
-      }
-      if (!res->state) {
-        check_consistency_res_info_set(res, API_TAILS_NOT_CONSISTENT);
-        break;
-      }
-    }
-  }
-
-  iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator);
-
-  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
-
-done:
-  bundle_transactions_free(&bundle);
-
-  return ret;
 }
 
 retcode_t iota_api_init(iota_api_t *const api, core_t *const core) {

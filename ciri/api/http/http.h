@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CIRI_API_API_HTTP_H__
-#define __CIRI_API_API_HTTP_H__
+#ifndef __CIRI_API_HTTP_HTTP_H__
+#define __CIRI_API_HTTP_HTTP_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -76,4 +76,4 @@ retcode_t iota_api_http_destroy(iota_api_http_t *const api);
 }
 #endif
 
-#endif
+#endif  // __CIRI_API_HTTP_HTTP_H__

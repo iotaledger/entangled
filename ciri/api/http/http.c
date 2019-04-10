@@ -13,7 +13,7 @@
 #include "cclient/serialization/json/json_serializer.h"
 #include "cclient/types/types.h"
 #include "ciri/api/api.h"
-#include "ciri/api/http.h"
+#include "ciri/api/http/http.h"
 #include "utils/logger_helper.h"
 
 #define API_HTTP_LOGGER_ID "api_http"
@@ -32,11 +32,10 @@ static retcode_t error_serialize_response(iota_api_http_t *const http, error_res
   retcode_t ret = RC_OK;
 
   if (*error == NULL) {
-    *error = error_res_new();
     if (message == NULL) {
-      error_res_set(*error, "Internal server error");
+      *error = error_res_new("Internal server error");
     } else {
-      error_res_set(*error, message);
+      *error = error_res_new(message);
     }
   }
   ret = http->serializer.vtable.error_serialize_response(&http->serializer, *error, out);

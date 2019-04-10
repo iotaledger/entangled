@@ -30,7 +30,8 @@ void test_check_consistency_invalid_subtangle_status(void) {
   error_res_t *error = NULL;
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
-  TEST_ASSERT(error == NULL);
+  TEST_ASSERT(error != NULL);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_INVALID_SUBTANGLE);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
