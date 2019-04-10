@@ -9,11 +9,10 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_inclusion_states_serialize_request(const serializer_t *const s,
-                                                      get_inclusion_states_req_t *const obj, char_buffer_t *out) {
+retcode_t json_get_inclusion_states_serialize_request(serializer_t const *const s,
+                                                      get_inclusion_states_req_t const *const req, char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *json_text = NULL;
-  size_t len = 0;
+  char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -23,23 +22,19 @@ retcode_t json_get_inclusion_states_serialize_request(const serializer_t *const 
 
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("getInclusionStates"));
 
-  ret = hash243_queue_to_json_array(obj->hashes, json_root, "transactions");
+  ret = hash243_queue_to_json_array(req->hashes, json_root, "transactions");
   if (ret != RC_OK) {
     goto done;
   }
 
-  ret = hash243_queue_to_json_array(obj->tips, json_root, "tips");
+  ret = hash243_queue_to_json_array(req->tips, json_root, "tips");
   if (ret != RC_OK) {
     goto done;
   }
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
@@ -48,8 +43,8 @@ done:
   return ret;
 }
 
-retcode_t json_get_inclusion_states_deserialize_response(const serializer_t *const s, const char *const obj,
-                                                         get_inclusion_states_res_t *out) {
+retcode_t json_get_inclusion_states_deserialize_request(serializer_t const *const s, char const *const obj,
+                                                        get_inclusion_states_req_t *const req) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
@@ -57,7 +52,59 @@ retcode_t json_get_inclusion_states_deserialize_response(const serializer_t *con
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
-  ret = json_boolean_array_to_utarray(json_obj, "states", out->states);
+  ret = json_array_to_hash243_queue(json_obj, "transactions", &req->hashes);
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  if (cJSON_HasObjectItem(json_obj, "tips")) {
+    ret = json_array_to_hash243_queue(json_obj, "tips", &req->tips);
+  }
+
+done:
+  cJSON_Delete(json_obj);
+  return ret;
+}
+
+retcode_t json_get_inclusion_states_serialize_response(serializer_t const *const s,
+                                                       get_inclusion_states_res_t const *const res,
+                                                       char_buffer_t *out) {
+  retcode_t ret = RC_OK;
+  char const *json_text = NULL;
+
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  cJSON *json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  ret = utarray_to_json_boolean_array(res->states, json_root, "states");
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    ret = char_buffer_set(out, json_text);
+    cJSON_free((void *)json_text);
+  }
+
+done:
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_inclusion_states_deserialize_response(serializer_t const *const s, char const *const obj,
+                                                         get_inclusion_states_res_t *const res) {
+  retcode_t ret = RC_OK;
+  cJSON *json_obj = cJSON_Parse(obj);
+  cJSON *json_item = NULL;
+
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
+
+  ret = json_boolean_array_to_utarray(json_obj, "states", res->states);
 
   cJSON_Delete(json_obj);
   return ret;
