@@ -32,8 +32,7 @@ static void *local_snapshots_manager_routine(void *arg) {
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, lsm->mt);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
-      } else if (err == RC_SNAPSHOT_LOCAL_SNAPSHOTS_MILESTONE_NOT_SOLID ||
-                 err == RC_SNAPSHOT_LOCAL_SNAPSHOTS_NOT_ENOUGH_DEPTH) {
+      } else if (err == RC_SNAPSHOT_SERVICE_MILESTONE_NOT_SOLID || err == RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH) {
         exponential_delay_factor *= 2;
         log_warning(logger_id, "Local snapshot is delayed in %d ms, error code: %d\n",
                     exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS, err);

@@ -84,6 +84,18 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
                                                            milestone_tracker_t const *const milestone_tracker,
                                                            iota_stor_pack_t *const entry_point);
 
+/**
+ * Applies a patch to a snapshot state
+ *
+ * @param snapshots_service The service
+ * @param snapshot patch The patch
+ * @param index The last milestone in the new snapshot
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshots_service_replay_milestones(snapshots_service_t *const snapshots_service,
+                                                   snapshot_t *const snapshot, uint64_t index);
+
 #ifdef __cplusplus
 }
 #endif
