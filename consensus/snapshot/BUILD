@@ -53,3 +53,19 @@ cc_library(
         ":snapshot",
     ],
 )
+
+cc_library(
+    name = "snapshots_service",
+    srcs = [
+        "snapshots_service.c",
+        "snapshots_service.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":snapshots_provider",
+        "//common:errors",
+        "//consensus:conf",
+        "//consensus/milestone_tracker",
+        "//consensus/tangle",
+    ],
+)

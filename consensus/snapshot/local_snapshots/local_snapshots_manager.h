@@ -13,8 +13,8 @@
 
 #include "consensus/conf.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
-#include "consensus/snapshot/local_snapshots/local_snapshots_service.h"
 #include "consensus/snapshot/snapshots_provider.h"
+#include "consensus/snapshot/snapshots_service.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
@@ -32,6 +32,7 @@ typedef struct local_snapshots_manager_s {
   milestone_tracker_t const *mt;
 
   snapshots_provider_t const *snapshots_provider;
+  snapshots_service_t *snapshots_service;
 
   // Muteable data
   tangle_t tangle;
@@ -77,12 +78,14 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
  */
 retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const lsm);
 
+/**
+ * Determines if a snapshot should be taken
+ *
+ * @param lsm The local snapshots manager
+ *
+ * @return True is snapshot should be taken
+ */
 bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm);
-
-retcode_t iota_local_snapshots_manager_take_snapshot(local_snapshots_manager_t *const lsm);
-
-retcode_t iota_local_snapshots_manager_determine_new_entry_point(local_snapshots_manager_t *const lsm,
-                                                                 iota_stor_pack_t *const entry_point);
 
 #ifdef __cplusplus
 }
