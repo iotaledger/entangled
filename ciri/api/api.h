@@ -156,12 +156,14 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangl
  * whether a transaction is confirmed or not.
  *
  * @param api The API
+ * @param tangle A tangle
  * @param req The request
  * @param res The response
  *
  * @return a status code
  */
-retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusion_states_req_t const *const req,
+retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *const tangle,
+                                        get_inclusion_states_req_t const *const req,
                                         get_inclusion_states_res_t *const res, error_res_t **const error);
 
 /**

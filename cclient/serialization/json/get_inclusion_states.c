@@ -104,6 +104,13 @@ retcode_t json_get_inclusion_states_deserialize_response(serializer_t const *con
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
+  if (!res->states) {
+    utarray_new(res->states, &ut_int_icd);
+  }
+  if (!res->states) {
+    return RC_OOM;
+  }
+
   ret = json_boolean_array_to_utarray(json_obj, "states", res->states);
 
   cJSON_Delete(json_obj);
