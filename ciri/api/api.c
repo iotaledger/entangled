@@ -352,7 +352,7 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
     return RC_NULL_PARAM;
   }
 
-  if (invalid_subtangle_status(api)) {
+  if (invalid_subtangle_status(api, error)) {
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
