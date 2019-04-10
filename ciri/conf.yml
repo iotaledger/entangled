@@ -36,7 +36,7 @@
 # coordinator-depth: 23
 # coordinator-security-level: 2
 # coordinator-signature-type: KERL
-# last-milestone: 1049999
+# last-milestone: 1050000
 # max-depth: 15
 # snapshot-file: /absolute/path/to/snapshot/file
 # snapshot-signature-depth: 6
@@ -44,4 +44,4 @@
 # snapshot-signature-index: 12
 # snapshot-signature-pubkey: "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC"
 # snapshot-signature-skip-validation: false
-# snapshot-timestamp: 1554901200
+# snapshot-timestamp: 1554904800

@@ -77,7 +77,7 @@ Long option | Short option | Description | Example input
 `--coordinator-depth` | | The depth of the Merkle tree which in turn determines the number of leaves (private keys) that the coordinator can use to sign a message. | `--coordinator-depth 23`
 `--coordinator-security-level` | | The security level used in coordinator signatures. | `--coordinator-security-level 2`
 `--coordinator-signature-type` | | The signature type used in coordinator signatures. Valid types: "CURL_P27", "CURL_P81" and "KERL". | `--coordinator-signature-type KERL`
-`--last-milestone` | | The index of the last milestone issued by the corrdinator before the last snapshot. | `--last-milestone 1049999`
+`--last-milestone` | | The index of the last milestone issued by the corrdinator before the last snapshot. | `--last-milestone 1050000`
 `--max-depth` | | Limits how many milestones behind the current one the random walk can start. | `--max-depth 15`
 `--snapshot-file` | | Path to the file that contains the state of the ledger at the last snapshot. | `--snapshot-file external/snapshot_mainnet/file/snapshot.txt`
 `--snapshot-signature-depth` | | Depth of the snapshot signature. | `--snapshot-signature-depth 6`
@@ -85,4 +85,4 @@ Long option | Short option | Description | Example input
 `--snapshot-signature-index` | | Index of the snapshot signature. | `--snapshot-signature-index 12`
 `--snapshot-signature-pubkey` | | Public key of the snapshot signature. | `--snapshot-signature-pubkey "TTX...YAC"`
 `--snapshot-signature-skip-validation` | | Skip validation of snapshot signature. Must be "true" or "false". | `--snapshot-signature-skip-validation false`
-`--snapshot-timestamp` | | Epoch time of the last snapshot | `--snapshot-timestamp 1554901200`
+`--snapshot-timestamp` | | Epoch time of the last snapshot | `--snapshot-timestamp 1554904800`
