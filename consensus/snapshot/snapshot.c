@@ -89,6 +89,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   snapshot->index = 0;
   snapshot->state = NULL;
 
+#if defined(IOTA_MAINNET)
   if (!snapshot->conf->snapshot_signature_skip_validation) {
     bool valid = false;
     if ((ret = iota_file_signature_validate(
@@ -101,6 +102,8 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
       return RC_SNAPSHOT_INVALID_SIGNATURE;
     }
   }
+#endif
+
   if ((ret = iota_snapshot_initial_state(snapshot, conf->snapshot_file))) {
     log_critical(logger_id, "Initializing snapshot initial state failed\n");
     return ret;
