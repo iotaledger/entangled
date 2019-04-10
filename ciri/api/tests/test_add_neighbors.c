@@ -95,10 +95,12 @@ void test_add_neighbors_with_invalid(void) {
 
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.6:15006") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.7@15007") == RC_OK);
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.8:15008") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "adp://8.8.8.7:15008") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.8:15009") == RC_OK);
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_NEIGHBOR_FAILED_URI_PARSING);
-  TEST_ASSERT(error == NULL);
+  TEST_ASSERT(error != NULL);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_URI_SCHEME);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 6);
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 1);

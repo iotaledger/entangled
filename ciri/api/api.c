@@ -37,22 +37,23 @@ static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **
 
 retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_t const *const req,
                                  add_neighbors_res_t *const res, error_res_t **const error) {
-  char **uri;
-  neighbor_t neighbor;
   retcode_t ret = RC_OK;
+  neighbor_t neighbor;
 
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
   res->added_neighbors = 0;
-  for (uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+
+  for (char **uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
+      *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;
     }
-    log_info(logger_id, "Adding neighbor %s\n", *uri);
     rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
     if (neighbors_add(&api->core->node.neighbors, &neighbor) == RC_OK) {
+      log_info(logger_id, "Added neighbor %s\n", *uri);
       res->added_neighbors++;
     } else {
       log_warning(logger_id, "Adding neighbor %s failed\n", *uri);
