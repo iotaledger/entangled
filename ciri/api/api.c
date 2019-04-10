@@ -25,7 +25,7 @@ static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **
                  api->core->consensus.milestone_tracker.milestone_start_index;
 
   if (invalid) {
-    *error = error_res_new(API_INVALID_SUBTANGLE);
+    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
   }
 
   return invalid;
@@ -162,14 +162,14 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
       goto done;
     }
     if (!tx.metadata.solid) {
-      check_consistency_res_info_set(res, API_TAILS_NOT_SOLID);
+      check_consistency_res_info_set(res, API_ERROR_TAILS_NOT_SOLID);
       goto done;
     }
     if ((ret = iota_consensus_bundle_validator_validate(tangle, iter->hash, bundle, &bundle_status)) != RC_OK) {
       goto done;
     }
     if (bundle_status != BUNDLE_VALID || bundle_transactions_size(bundle) == 0) {
-      check_consistency_res_info_set(res, API_TAILS_BUNDLE_INVALID);
+      check_consistency_res_info_set(res, API_ERROR_TAILS_BUNDLE_INVALID);
       goto done;
     }
     bundle_transactions_free(&bundle);
@@ -186,7 +186,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
         break;
       }
       if (!res->state) {
-        check_consistency_res_info_set(res, API_TAILS_NOT_CONSISTENT);
+        check_consistency_res_info_set(res, API_ERROR_TAILS_NOT_CONSISTENT);
         break;
       }
     }
