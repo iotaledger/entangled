@@ -95,7 +95,6 @@ void test_add_neighbors_with_invalid(void) {
 
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.6:15006") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.7@15007") == RC_OK);
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "adp://8.8.8.7:15008") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.8:15009") == RC_OK);
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_NEIGHBOR_FAILED_URI_PARSING);
@@ -109,6 +108,20 @@ void test_add_neighbors_with_invalid(void) {
   TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.6");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15006);
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_UDP);
+
+  add_neighbors_req_free(&req);
+  add_neighbors_res_free(&res);
+  error_res_free(&error);
+
+  req = add_neighbors_req_new();
+  res = add_neighbors_res_new();
+  error = NULL;
+
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "adp://8.8.8.7:15008") == RC_OK);
+
+  TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_NEIGHBOR_INVALID_PROTOCOL);
+  TEST_ASSERT(error != NULL);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_URI_SCHEME);
 
   add_neighbors_req_free(&req);
   add_neighbors_res_free(&res);

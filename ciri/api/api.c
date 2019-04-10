@@ -530,22 +530,24 @@ retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, er
 
 retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbors_req_t const *const req,
                                     remove_neighbors_res_t *const res, error_res_t **const error) {
-  char **uri;
-  neighbor_t neighbor;
   retcode_t ret = RC_OK;
+  neighbor_t neighbor;
 
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
   res->removed_neighbors = 0;
-  for (uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+
+  for (char **uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
+      *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;
     }
-    log_info(logger_id, "Removing neighbor %s\n", *uri);
+
     rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
     if (neighbors_remove(&api->core->node.neighbors, &neighbor) == RC_OK) {
+      log_info(logger_id, "Removed neighbor %s\n", *uri);
       res->removed_neighbors++;
     } else {
       log_warning(logger_id, "Removing neighbor %s failed\n", *uri);
