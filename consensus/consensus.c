@@ -88,6 +88,13 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
     return ret;
   }
 
+  log_info(logger_id, "Initializing local snapshots service\n");
+  if ((ret = iota_snapshots_service_init(&consensus->snapshots_service, &consensus->snapshots_provider,
+                                         &consensus->conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing snapshots service failed\n");
+    return ret;
+  }
+
   log_info(logger_id, "Initializing local snapshots manager\n");
   if ((ret = iota_local_snapshots_manager_init(&consensus->local_snapshots_manager, &consensus->snapshots_provider,
                                                &consensus->conf, &consensus->milestone_tracker)) != RC_OK) {
@@ -202,6 +209,11 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
 
   log_info(logger_id, "Destroying snapshots provider\n");
   if ((ret = iota_snapshots_provider_destroy(&consensus->snapshots_provider)) != RC_OK) {
+    log_error(logger_id, "Destroying snapshots provider failed\n");
+  }
+
+  log_info(logger_id, "Destroying snapshots service\n");
+  if ((ret = iota_snapshots_service_destroy(&consensus->snapshots_service)) != RC_OK) {
     log_error(logger_id, "Destroying snapshots provider failed\n");
   }
 

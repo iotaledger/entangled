@@ -34,6 +34,7 @@ typedef struct iota_consensus_s {
   transaction_validator_t transaction_validator;
   transaction_solidifier_t transaction_solidifier;
   local_snapshots_manager_t local_snapshots_manager;
+  snapshots_service_t snapshots_service;
   snapshots_provider_t snapshots_provider;
 } iota_consensus_t;
 

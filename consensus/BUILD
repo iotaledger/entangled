@@ -37,6 +37,7 @@ cc_library(
         "//consensus/milestone_tracker",
         "//consensus/snapshot",
         "//consensus/snapshot:snapshots_provider",
+        "//consensus/snapshot:snapshots_service",
         "//consensus/snapshot/local_snapshots:local_snapshots_manager",
         "//consensus/tangle",
         "//consensus/tip_selector",
