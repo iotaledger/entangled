@@ -1,6 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
-SNAPSHOT_REPOSITORY = "https://raw.githubusercontent.com/thibault-martinez/snapshots/mainnet-20190410"
+SNAPSHOT_REPOSITORY = "https://raw.githubusercontent.com/iotaledger/snapshots/master"
 SNAPSHOT_TIMESTAMP_MAINNET = "20190410"
 SNAPSHOT_TIMESTAMP_TESTNET = "20180329"
 
