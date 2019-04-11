@@ -19,29 +19,29 @@
 # requester-queue-size: 10000
 # tcp-receiver-port: 15600
 # tips-cache-size: 5000
-# udp-receiver-port: 14600
 # tips-solidifier-enabled: true
+# udp-receiver-port: 14600
 
 # API configuration
 
+# http_port: 14265
 # max-find-transactions: 100000
 # max-get-trytes: 10000
-# http_port: 14265
 
 # Consensus configuration
 
 # alpha: 0.001
 # below-max-depth: 20000
-# coordinator-address: "KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU"
-# coordinator-num-keys-in-milestone: 20
-# coordinator-security-level: 1
-# coordinator-signature-type: CURL_P27
-# last-milestone: 933209
+# coordinator-address: "EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9"
+# coordinator-depth: 23
+# coordinator-security-level: 2
+# coordinator-signature-type: KERL
+# last-milestone: 1050000
 # max-depth: 15
 # snapshot-file: /absolute/path/to/snapshot/file
 # snapshot-signature-depth: 6
 # snapshot-signature-file: /absolute/path/to/snapshot/signature/file
-# snapshot-signature-index: 10
+# snapshot-signature-index: 12
 # snapshot-signature-pubkey: "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC"
 # snapshot-signature-skip-validation: false
-# snapshot-timestamp: 1545469620
+# snapshot-timestamp: 1554904800
