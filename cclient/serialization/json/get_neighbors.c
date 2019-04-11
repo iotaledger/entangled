@@ -28,8 +28,12 @@ static retcode_t neighbor_info_utarray_to_json_array(UT_array const *const ut, c
 
       cJSON_AddStringToObject(json_nbr_info, "address", nbr_info->address->data);
       cJSON_AddNumberToObject(json_nbr_info, "numberOfAllTransactions", nbr_info->all_trans_num);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfInvalidTransactions", nbr_info->invalid_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfRandomTransactionRequests", nbr_info->random_trans_req_num);
       cJSON_AddNumberToObject(json_nbr_info, "numberOfNewTransactions", nbr_info->new_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfInvalidTransactions", nbr_info->invalid_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfStaleTransactions", nbr_info->stale_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfSentTransactions", nbr_info->sent_trans_num);
+      cJSON_AddStringToObject(json_nbr_info, "connectiontype", nbr_info->connection_type->data);
 
       cJSON_AddItemToArray(array_obj, json_nbr_info);
     }
@@ -78,6 +82,11 @@ retcode_t json_get_neighbors_deserialize_response(serializer_t const *const s, c
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
+  char_buffer_t *addr = char_buffer_new();
+  char_buffer_t *connection = char_buffer_new();
+  if (!addr || !connection) {
+    return RC_CCLIENT_OOM;
+  }
 
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
@@ -86,30 +95,48 @@ retcode_t json_get_neighbors_deserialize_response(serializer_t const *const s, c
   if (cJSON_IsArray(json_item)) {
     cJSON *current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
-      char_buffer_t *addr = char_buffer_new();
-      int all_trans, invalid_trans, new_trans;
+      uint32_t all_trans_num, random_trans_req_num, new_trans_num, invalid_trans_num, stale_trans_num, sent_trans_num;
       ret = json_get_string(current_obj, "address", addr);
       if (ret != RC_OK) {
         goto end;
       }
-      ret = json_get_int(current_obj, "numberOfAllTransactions", &all_trans);
+      ret = json_get_uint32(current_obj, "numberOfAllTransactions", &all_trans_num);
       if (ret != RC_OK) {
         goto end;
       }
-      ret = json_get_int(current_obj, "numberOfInvalidTransactions", &invalid_trans);
+      ret = json_get_uint32(current_obj, "numberOfRandomTransactionRequests", &random_trans_req_num);
       if (ret != RC_OK) {
         goto end;
       }
-      ret = json_get_int(current_obj, "numberOfNewTransactions", &new_trans);
+      ret = json_get_uint32(current_obj, "numberOfNewTransactions", &new_trans_num);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_uint32(current_obj, "numberOfInvalidTransactions", &invalid_trans_num);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_uint32(current_obj, "numberOfStaleTransactions", &stale_trans_num);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_uint32(current_obj, "numberOfSentTransactions", &sent_trans_num);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_string(current_obj, "connectiontype", connection);
       if (ret != RC_OK) {
         goto end;
       }
 
-      ret = get_neighbors_res_add_neighbor(out, addr, all_trans, invalid_trans, new_trans);
+      ret = get_neighbors_res_add_neighbor(out, addr->data, all_trans_num, random_trans_req_num, new_trans_num,
+                                           invalid_trans_num, stale_trans_num, sent_trans_num, connection->data);
     }
   }
 
 end:
   cJSON_Delete(json_obj);
+  char_buffer_free(addr);
+  char_buffer_free(connection);
   return ret;
 }
