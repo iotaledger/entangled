@@ -60,7 +60,8 @@ typedef enum cli_arg_value_e {
   CONF_LOCAL_SNAPSHOTS_ENABLED,
   CONF_PRUNNING_ENABLED,
   CONF_TRANSACTIONS_GROWTH_THRESHOLD,
-  CONF_LOCAL_SNAPSHOT_MIN_DEPTH
+  CONF_LOCAL_SNAPSHOT_MIN_DEPTH,
+  CONF_LOCAL_SNAPSHOT_PATH_BASE
 
 } cli_arg_value_t;
 
@@ -192,6 +193,8 @@ static struct cli_argument_s {
      "Minimal number of new transactions from last local snapshot for triggering a new local snapshot", REQUIRED_ARG},
     {"local-snapshot-min-depth", CONF_LOCAL_SNAPSHOT_MIN_DEPTH,
      "minimal milestones depth for new local snapshot entry point", REQUIRED_ARG},
+    {"local-snapshot-path-base", CONF_LOCAL_SNAPSHOT_PATH_BASE,
+     "The base path for both local snapshot addresses/balances data and metadata file", REQUIRED_ARG},
 
     {NULL, 0, NULL, NO_ARG},
 

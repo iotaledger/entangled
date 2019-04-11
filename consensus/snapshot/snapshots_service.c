@@ -62,8 +62,7 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
                                                            milestone_tracker_t const *const milestone_tracker,
                                                            iota_stor_pack_t *const entry_point) {
   retcode_t err;
-  uint64_t index =
-      milestone_tracker->latest_milestone_index - snapshots_service->conf->local_snapshots.local_snapshot_min_depth - 1;
+  uint64_t index = milestone_tracker->latest_milestone_index - snapshots_service->conf->local_snapshots.min_depth - 1;
   if (index == 0) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
@@ -89,8 +88,8 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   // TODO - implement rollback as well
 
   ERR_BIND_RETURN(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret);
-
   ERR_BIND_RETURN(iota_snapshots_service_replay_milestones(snapshots_service, &snapshot, milestone->index), ret);
+  ERR_BIND_RETURN(iota_snapshots_service_persist_snapshot(&snapshots_service, &snapshot), ret);
 
   return RC_OK;
 }
@@ -123,5 +122,23 @@ retcode_t iota_snapshots_service_replay_milestones(snapshots_service_t *const sn
     // TODO - mutex is not need to be taken inside "iota_snapshot_apply_patch" this time
     ERR_BIND_RETURN(iota_snapshot_apply_patch(snapshot, merged_balance_changes, last_applied_milestone->index), ret);
   }
+  return RC_OK;
+}
+
+retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const snapshots_service,
+                                                  snapshot_t *const snapshot) {
+  retcode_t ret;
+  iota_snapshot_lock_write(&snapshots_service->snapshots_provider->inital_snapshot);
+  ERR_BIND_GOTO(state_delta_merge_patch(&snapshots_service->snapshots_provider->inital_snapshot, &snapshot->state), ret,
+                cleanup);
+  iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
+  ERR_BIND_GOTO(iota_snapshots_provider_write_snapshot_to_file(
+                    snapshots_service->snapshots_provider, snapshot,
+                    snapshots_service->conf->local_snapshots.local_snapshots_path_base),
+                ret, cleanup);
+
+cleanup:
+  iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
+
   return RC_OK;
 }

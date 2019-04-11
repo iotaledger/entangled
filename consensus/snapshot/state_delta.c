@@ -6,6 +6,8 @@
  */
 
 #include "consensus/snapshot/state_delta.h"
+#include <inttypes.h>
+#include <stdlib.h>
 
 int64_t state_delta_sum(state_delta_t const *const state) {
   int64_t sum = 0;
@@ -168,3 +170,30 @@ retcode_t state_delta_deserialize(byte_t const *const bytes, size_t const size, 
 
   return RC_OK;
 }
+
+size_t state_delta_serialized_str_size(state_delta_t const *const delta) {
+  if (delta == NULL) {
+    return 0;
+  }
+  // For each line we persist the address followed by a ';' delimiter,
+  // followed by the value (max is IOTA_SUPPLY which is 16 digits), followed by a new line
+  return HASH_COUNT(*delta) * (81 + 1 + 16 + 1);
+}
+
+retcode_t state_delta_serialize_str(state_delta_t const *const delta, char *const str) {
+  state_delta_entry_t *iter = NULL, *tmp = NULL;
+
+  tryte_t address_trytes[81];
+  char svalue[10];
+
+  HASH_ITER(hh, *delta, iter, tmp) {
+    flex_trits_to_trytes(&address_trytes, 81, iter->hash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
+    strncpy(str, (char *)address_trytes, 81);
+    strncpy(str, ";", 1);
+    sprintf(str, "%" PRIu64 "\n", iter->value);
+  }
+
+  return RC_OK;
+}
+
+retcode_t state_delta_deserialize_str(byte_t const *const bytes, size_t const size, state_delta_t *const delta) {}

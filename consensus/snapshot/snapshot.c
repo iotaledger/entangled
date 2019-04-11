@@ -6,6 +6,7 @@
  */
 
 #include "consensus/snapshot/snapshot.h"
+#include <stdlib.h>
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "utils/logger_helper.h"
@@ -19,7 +20,7 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot, char const *const snapshot_file) {
+retcode_t iota_snapshot_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file) {
   retcode_t ret = RC_OK;
   char *line = NULL, *delim = NULL;
   int64_t value = 0, supply = 0;
@@ -72,6 +73,22 @@ done:
   return ret;
 }
 
+retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file) {
+  retcode_t ret;
+  size_t size;
+  size = state_delta_serialized_str_size(snapshot->state);
+  char *buffer;
+  if ((buffer = (byte_t *)calloc(size, sizeof(byte_t))) == NULL) {
+    ret = RC_STORAGE_OOM;
+    goto cleanup;
+  }
+
+  ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
+
+cleanup:
+  return ret;
+}
+
 /*
  * Public functions
  */
@@ -104,7 +121,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   }
 #endif
 
-  if ((ret = iota_snapshot_initial_state(snapshot, conf->snapshot_file))) {
+  if ((ret = iota_snapshot_read_from_file(snapshot, conf->snapshot_file))) {
     log_critical(logger_id, "Initializing snapshot initial state failed\n");
     return ret;
   }
@@ -209,3 +226,9 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
   ERR_BIND_RETURN(state_delta_copy(&src->state, &dst->state), ret);
   return RC_OK;
 }
+
+void iota_snapshot_lock_write(snapshot_t *const snapshot) { rw_lock_handle_wrlock(&snapshot->rw_lock); }
+
+void iota_snapshot_lock_read(snapshot_t *const snapshot) { rw_lock_handle_rdlock(&snapshot->rw_lock); }
+
+void iota_snapshot_unlock(snapshot_t *const snapshot) { rw_lock_handle_unlock(&snapshot->rw_lock); }
