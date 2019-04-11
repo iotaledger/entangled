@@ -21,7 +21,8 @@ typedef struct iota_consensus_local_snapshots_conf_s {
   bool local_snapshots_is_enabled;
   bool prunning_is_enabled;
   size_t transactions_growth_threshold;
-  size_t local_snapshot_min_depth;
+  size_t min_depth;
+  char local_snapshots_path_base[128];
 } iota_consensus_local_snapshots_conf_t;
 
 /**

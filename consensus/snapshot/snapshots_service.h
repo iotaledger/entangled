@@ -88,13 +88,24 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
  * Applies a patch to a snapshot state
  *
  * @param snapshots_service The service
- * @param snapshot patch The patch
+ * @param snapshot The initial snapshot to forward with changes
  * @param index The last milestone in the new snapshot
  *
  * @return a status code
  */
 retcode_t iota_snapshots_service_replay_milestones(snapshots_service_t *const snapshots_service,
                                                    snapshot_t *const snapshot, uint64_t index);
+
+/**
+ * Persist a snapshot
+ *
+ * @param snapshots_service The service
+ * @param snapshot The snapshot to persist
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const snapshots_service,
+                                                  snapshot_t *const snapshot);
 
 #ifdef __cplusplus
 }

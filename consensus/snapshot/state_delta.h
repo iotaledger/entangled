@@ -41,6 +41,11 @@ size_t state_delta_serialized_size(state_delta_t const *const delta);
 retcode_t state_delta_serialize(state_delta_t const *const delta, byte_t *const bytes);
 retcode_t state_delta_deserialize(byte_t const *const bytes, size_t const size, state_delta_t *const delta);
 
+size_t state_delta_serialized_str_size(hash_to_int64_t_map_entry_t *const *const delta);
+retcode_t state_delta_serialize_str(hash_to_int64_t_map_entry_t *const *const delta, char *const str);
+retcode_t state_delta_deserialize_str(byte_t const *const bytes, size_t const size,
+                                      hash_to_int64_t_map_entry_t **const delta);
+
 #ifdef __cplusplus
 }
 #endif

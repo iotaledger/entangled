@@ -99,6 +99,53 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
  */
 retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst);
 
+/**
+ * Locks snapshot for write
+ *
+ * @param snapshot The snapshot
+ *
+ * @return void
+ */
+void iota_snapshot_lock_write(snapshot_t *const snapshot);
+
+/**
+ * Locks snapshot for read
+ *
+ * @param snapshot The snapshot
+ *
+ * @return void
+ */
+void iota_snapshot_lock_read(snapshot_t *const snapshot);
+
+/**
+ * Unlocks snapshot
+ *
+ * @param snapshot The snapshot
+ *
+ * @return void
+ */
+void iota_snapshot_unlock(snapshot_t *const snapshot);
+
+/**
+ * Reads a snapshot from file
+ *
+ * @param snapshot The snapshot
+ * @param snapshot_file The file with serialized snapshot
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file);
+
+/**
+ * Writes a snapshot to file
+ *
+ * @param snapshot The snapshot
+ * @param snapshot_file The file with serialized snapshot
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file);
+
 #ifdef __cplusplus
 }
 #endif
