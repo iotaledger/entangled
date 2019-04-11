@@ -446,7 +446,7 @@ retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const r
     goto done;
   }
 
-  HASH_ITER(hh, tips, iter, tmp) {
+  HASH_STACK_ITER(tips, iter, tmp) {
     if ((ret = hash243_stack_push(&res->hashes, iter->hash)) != RC_OK) {
       goto done;
     }
@@ -454,6 +454,7 @@ retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const r
 
 done:
   hash243_set_free(&tips);
+
   return ret;
 }
 
