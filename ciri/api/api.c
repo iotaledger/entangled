@@ -433,29 +433,11 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
 }
 
 retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error) {
-  retcode_t ret = RC_OK;
-  hash243_set_t tips = NULL;
-  hash243_set_entry_t *iter = NULL;
-  hash243_set_entry_t *tmp = NULL;
-
   if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if ((ret = tips_cache_get_tips(&api->core->node.tips, &tips)) != RC_OK) {
-    goto done;
-  }
-
-  HASH_STACK_ITER(tips, iter, tmp) {
-    if ((ret = hash243_stack_push(&res->hashes, iter->hash)) != RC_OK) {
-      goto done;
-    }
-  }
-
-done:
-  hash243_set_free(&tips);
-
-  return ret;
+  return tips_cache_get_tips(&api->core->node.tips, &res->hashes);
 }
 
 retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tangle_t *const tangle,
