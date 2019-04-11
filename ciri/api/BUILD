@@ -8,8 +8,8 @@ cc_library(
     srcs = ["api.c"],
     hdrs = ["api.h"],
     defines = select({
-        "//config:mainnet": CIRI_MAINNET_VARIABLES,
-        "//config:testnet": CIRI_TESTNET_VARIABLES,
+        "//ciri:mainnet": CIRI_MAINNET_VARIABLES,
+        "//ciri:testnet": CIRI_TESTNET_VARIABLES,
         "//conditions:default": CIRI_MAINNET_VARIABLES,
     }),
     deps = [
@@ -20,25 +20,6 @@ cc_library(
         "//common:errors",
         "//common/helpers:pow",
         "//utils:logger_helper",
-    ],
-)
-
-cc_library(
-    name = "http",
-    srcs = ["http.c"],
-    hdrs = ["http.h"],
-    deps = [
-        ":api",
-        "//cclient/request:requests",
-        "//cclient/response:responses",
-        "//cclient/serialization:serializer",
-        "//cclient/serialization:serializer_json",
-        "//common:errors",
-        "//common/storage",
-        "//utils:logger_helper",
-        "//utils/handles:thread",
-        "@cJSON",
-        "@libmicrohttpd",
     ],
 )
 

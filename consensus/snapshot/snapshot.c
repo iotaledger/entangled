@@ -68,6 +68,7 @@ done:
   if (fp) {
     fclose(fp);
   }
+
   return ret;
 }
 
@@ -88,6 +89,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   snapshot->index = 0;
   snapshot->state = NULL;
 
+#if defined(IOTA_MAINNET)
   if (!snapshot->conf->snapshot_signature_skip_validation) {
     bool valid = false;
     if ((ret = iota_file_signature_validate(
@@ -100,11 +102,14 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
       return RC_SNAPSHOT_INVALID_SIGNATURE;
     }
   }
+#endif
+
   if ((ret = iota_snapshot_initial_state(snapshot, conf->snapshot_file))) {
     log_critical(logger_id, "Initializing snapshot initial state failed\n");
     return ret;
   }
   log_info(logger_id, "Consistent snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
+
   return ret;
 }
 
@@ -118,15 +123,17 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
   state_delta_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
   logger_helper_release(logger_id);
+
   return ret;
 }
 
-size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
-  size_t index;
+uint64_t iota_snapshot_get_index(snapshot_t *const snapshot) {
+  uint64_t index;
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
   index = snapshot->index;
   rw_lock_handle_unlock(&snapshot->rw_lock);
+
   return index;
 }
 
@@ -150,6 +157,7 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot, flex_trit_t *con
     *balance = entry->value;
   }
   rw_lock_handle_unlock(&snapshot->rw_lock);
+
   return ret;
 }
 
@@ -169,7 +177,7 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot, state_delta_t *
   return ret;
 }
 
-retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *const patch, size_t index) {
+retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index) {
   retcode_t ret = RC_OK;
   int64_t sum = 0;
 

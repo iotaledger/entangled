@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "ciri/api/api.h"
-#include "ciri/api/http.h"
+#include "ciri/api/http/http.h"
 #include "ciri/core.h"
 #include "utils/handles/rand.h"
 #include "utils/handles/signal.h"
@@ -54,24 +54,27 @@ int main(int argc, char* argv[]) {
 
   // Default configuration
 
-  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
+  if (iota_ciri_conf_default_init(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) !=
+      RC_OK) {
     return EXIT_FAILURE;
   }
 
   // File configuration
 
-  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
+  if (iota_ciri_conf_file_init(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // CLI configuration
 
-  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf, argc, argv) !=
-      RC_OK) {
+  if (iota_ciri_conf_cli_init(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf, argc,
+                              argv) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   logger_output_level_set(stdout, ciri_core.conf.log_level);
+
+  log_info(logger_id, "Welcome to %s v%s\n", CIRI_NAME, CIRI_VERSION);
 
   log_info(logger_id, "Initializing storage\n");
   if (storage_init() != RC_OK) {
@@ -155,6 +158,11 @@ int main(int argc, char* argv[]) {
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_error(logger_id, "Destroying tangle connection failed\n");
+    ret = EXIT_FAILURE;
+  }
+
+  if (iota_ciri_conf_destroy(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
+    log_error(logger_id, "Destroying configuration failed\n");
     ret = EXIT_FAILURE;
   }
 

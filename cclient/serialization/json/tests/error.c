@@ -10,11 +10,10 @@
 static void test_response(void) {
   serializer_t serializer;
   char const* json = "{\"error\":\"" TEST_ERROR "\"}";
-  error_res_t* res = error_res_new();
+  error_res_t* res = error_res_new(TEST_ERROR);
   char_buffer_t* serializer_out = char_buffer_new();
 
   init_json_serializer(&serializer);
-  error_res_set(res, TEST_ERROR);
 
   serializer.vtable.error_serialize_response(&serializer, res, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json, serializer_out->data);

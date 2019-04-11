@@ -6,8 +6,8 @@ cc_library(
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     defines = select({
-        "//config:mainnet": CONSENSUS_MAINNET_VARIABLES,
-        "//config:testnet": CONSENSUS_TESTNET_VARIABLES,
+        "//ciri:mainnet": CONSENSUS_MAINNET_VARIABLES,
+        "//ciri:testnet": CONSENSUS_TESTNET_VARIABLES,
         "//conditions:default": CONSENSUS_MAINNET_VARIABLES,
     }),
     visibility = ["//visibility:public"],

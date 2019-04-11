@@ -46,6 +46,11 @@ struct GetInclusionStatesResponse {
   std::vector<bool> states;
   nonstd::optional<std::string> error;
 };
+
+struct WereAddressesSpentFromResponse {
+  std::vector<bool> states;
+  nonstd::optional<std::string> error;
+};
 }  // namespace cppclient
 
 #endif  // CPPCLIENT_MESSAGES_H_

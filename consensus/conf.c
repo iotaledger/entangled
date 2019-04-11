@@ -61,6 +61,20 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   }
   conf->snapshot_timestamp_sec = timestamp->valueint;
 
+  // Coordinator parsing
+
+  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "depth");
+  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+    goto json_error;
+  }
+  conf->coordinator_depth = tmp->valueint;
+
+  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
+  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+    goto json_error;
+  }
+  conf->last_milestone = tmp->valueint;
+
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
   if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
       strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
@@ -69,24 +83,38 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
 
-  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
+  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "securityLevel");
   if (tmp == NULL || !cJSON_IsNumber(tmp)) {
     goto json_error;
   }
-  conf->last_milestone = tmp->valueint;
+  conf->coordinator_security_level = tmp->valueint;
+
+  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "signatureType");
+  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL) {
+    goto json_error;
+  }
+  if (strcmp(tmp->valuestring, "CURL_P27") == 0) {
+    conf->coordinator_signature_type = SPONGE_CURLP27;
+  } else if (strcmp(tmp->valuestring, "CURL_P81") == 0) {
+    conf->coordinator_signature_type = SPONGE_CURLP81;
+  } else if (strcmp(tmp->valuestring, "KERL") == 0) {
+    conf->coordinator_signature_type = SPONGE_KERL;
+  }
+
+  // Signature parsing
 
   if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) != NULL) {
-    tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
-    if (tmp == NULL || !cJSON_IsNumber(tmp)) {
-      goto json_error;
-    }
-    conf->snapshot_signature_index = tmp->valueint;
-
     tmp = cJSON_GetObjectItemCaseSensitive(signature, "depth");
     if (tmp == NULL || !cJSON_IsNumber(tmp)) {
       goto json_error;
     }
     conf->snapshot_signature_depth = tmp->valueint;
+
+    tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
+    if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+      goto json_error;
+    }
+    conf->snapshot_signature_index = tmp->valueint;
 
     tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
     if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
@@ -100,7 +128,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   goto done;
 
 json_error : {
-  const char *error_ptr = cJSON_GetErrorPtr();
+  char const *const error_ptr = cJSON_GetErrorPtr();
   if (error_ptr != NULL) {
     log_error(logger_id, "%s\n", error_ptr);
   }
@@ -133,8 +161,7 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
   conf->below_max_depth = DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH;
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
-  conf->coordinator_num_keys_in_milestone = DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE;
-  conf->coordinator_max_milestone_index = 1 << conf->coordinator_num_keys_in_milestone;
+  conf->coordinator_depth = DEFAULT_COORDINATOR_DEPTH;
   conf->coordinator_security_level = DEFAULT_COORDINATOR_SECURITY_LEVEL;
   conf->coordinator_signature_type = DEFAULT_COORDINATOR_SIGNATURE_TYPE;
   memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
@@ -145,7 +172,11 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
   strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
   conf->snapshot_signature_skip_validation = DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION;
 
-  ret = iota_snapshot_conf_init(conf);
+  if ((ret = iota_snapshot_conf_init(conf))) {
+    log_error(logger_id, "Parsing snapshot configuration file failed\n");
+  }
+
+  conf->coordinator_max_milestone_index = 1 << conf->coordinator_depth;
 
   logger_helper_release(logger_id);
 

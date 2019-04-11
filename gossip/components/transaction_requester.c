@@ -166,8 +166,6 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
   retcode_t ret = RC_OK;
   hash243_set_t *request_set = NULL;
   hash243_set_t *backup_set = NULL;
-  hash243_set_entry_t *iter = NULL;
-  hash243_set_entry_t *tmp = NULL;
   bool exists = false;
 
   if (transaction_requester == NULL || hash == NULL) {
@@ -201,7 +199,7 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
 
   if (rand_handle_probability() < transaction_requester->node->conf.p_remove_request &&
       request_set != &transaction_requester->milestones) {
-    hash243_set_remove_entry(request_set, iter);
+    hash243_set_remove(request_set, hash);
   }
 
 done:

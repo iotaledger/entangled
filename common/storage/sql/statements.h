@@ -10,40 +10,38 @@
 
 #include <inttypes.h>
 
-#include <sqlite3.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct iota_statements_s {
-  sqlite3_stmt* transaction_insert;
-  sqlite3_stmt* transaction_select_by_hash;
-  sqlite3_stmt* transaction_select_hashes_by_address;
-  sqlite3_stmt* transaction_select_hashes_of_approvers;
-  sqlite3_stmt* transaction_select_hashes_of_approvers_before_date;
-  sqlite3_stmt* transaction_select_hashes_of_transactions_to_request;
-  sqlite3_stmt* transaction_select_hashes_of_tips;
-  sqlite3_stmt* transaction_select_hashes_of_milestone_candidates;
-  sqlite3_stmt* transaction_update_snapshot_index;
-  sqlite3_stmt* transaction_update_solid_state;
-  sqlite3_stmt* transaction_exist;
-  sqlite3_stmt* transaction_exist_by_hash;
-  sqlite3_stmt* transaction_approvers_count;
-  sqlite3_stmt* transaction_count;
-  sqlite3_stmt* transaction_select_essence_and_metadata;
-  sqlite3_stmt* transaction_select_essence_attachment_and_metadata;
-  sqlite3_stmt* transaction_select_essence_and_consensus;
-  sqlite3_stmt* transaction_select_metadata;
-  sqlite3_stmt* milestone_insert;
-  sqlite3_stmt* milestone_select_by_hash;
-  sqlite3_stmt* milestone_select_first;
-  sqlite3_stmt* milestone_select_last;
-  sqlite3_stmt* milestone_select_next;
-  sqlite3_stmt* milestone_exist;
-  sqlite3_stmt* milestone_exist_by_hash;
-  sqlite3_stmt* state_delta_store;
-  sqlite3_stmt* state_delta_load;
+  void* transaction_insert;
+  void* transaction_select_by_hash;
+  void* transaction_select_hashes_by_address;
+  void* transaction_select_hashes_of_approvers;
+  void* transaction_select_hashes_of_approvers_before_date;
+  void* transaction_select_hashes_of_transactions_to_request;
+  void* transaction_select_hashes_of_tips;
+  void* transaction_select_hashes_of_milestone_candidates;
+  void* transaction_update_snapshot_index;
+  void* transaction_update_solid_state;
+  void* transaction_exist;
+  void* transaction_exist_by_hash;
+  void* transaction_approvers_count;
+  void* transaction_count;
+  void* transaction_select_essence_and_metadata;
+  void* transaction_select_essence_attachment_and_metadata;
+  void* transaction_select_essence_and_consensus;
+  void* transaction_select_metadata;
+  void* milestone_insert;
+  void* milestone_select_by_hash;
+  void* milestone_select_first;
+  void* milestone_select_last;
+  void* milestone_select_next;
+  void* milestone_exist;
+  void* milestone_exist_by_hash;
+  void* state_delta_store;
+  void* state_delta_load;
 } iota_statements_t;
 
 /*

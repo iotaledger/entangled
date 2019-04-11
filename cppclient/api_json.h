@@ -59,6 +59,8 @@ class IotaJsonAPI : virtual public IotaAPI {
   GetInclusionStatesResponse getInclusionStates(const std::vector<std::string>& trans,
                                                 const std::vector<std::string>& tips) override;
 
+  WereAddressesSpentFromResponse wereAddressesSpentFrom(const std::vector<std::string>& addresses) override;
+
   virtual nonstd::optional<nlohmann::json> post(const nlohmann::json& input) = 0;
 
  private:

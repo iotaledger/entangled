@@ -8,7 +8,7 @@ def fetch_snapshot_files():
     http_file(
         name = "snapshot_conf_mainnet",
         urls = [SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.json"],
-        sha256 = "e51ca0324704d79655962b63c90f76bfbae12f35f72124d7608b57fdeafd5caf",
+        sha256 = "3aa78a78c91302929778aa8e5b82f153b75c3f9cc8be45f413f3a99b37e70e24",
     )
     http_file(
         name = "snapshot_sig_mainnet",
@@ -23,7 +23,7 @@ def fetch_snapshot_files():
     http_file(
         name = "snapshot_conf_testnet",
         urls = [SNAPSHOT_REPOSITORY + "/testnet/" + SNAPSHOT_TIMESTAMP_TESTNET + "/snapshot.json"],
-        sha256 = "afec30dfa697852ee12d8c183f86c9d01882c4f9d7d8c4cc58a94488b6d73068",
+        sha256 = "aab8d01a1698468b03b7031d4f56def00ff927e5b1bccc3efccbda48022fac8e",
     )
     http_file(
         name = "snapshot_testnet",
