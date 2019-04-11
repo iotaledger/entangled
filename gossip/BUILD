@@ -76,6 +76,7 @@ cc_library(
         "//common:errors",
         "//common/trinary:flex_trit",
         "//utils/containers/hash:hash243_set",
+        "//utils/containers/hash:hash243_stack",
         "//utils/handles:rw_lock",
     ],
 )
