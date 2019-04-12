@@ -381,11 +381,27 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
 
 retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
                                  error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  neighbor_t *iter = NULL;
+  char address[MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1];
+
   if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  return RC_OK;
+  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
+  LL_FOREACH(api->core->node.neighbors, iter) {
+    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", iter->endpoint.host, iter->endpoint.port);
+    if ((ret = get_neighbors_res_add_neighbor(
+             res, address, iter->nbr_all_txs, iter->nbr_random_tx_reqs, iter->nbr_new_txs, iter->nbr_invalid_txs,
+             iter->nbr_stale_txs, iter->nbr_sent_txs, (iter->endpoint.protocol == PROTOCOL_TCP ? "TCP" : "UDP"))) !=
+        RC_OK) {
+      break;
+    }
+  }
+  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
+
+  return ret;
 }
 
 retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_t *const res,

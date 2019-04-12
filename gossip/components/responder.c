@@ -50,7 +50,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
     log_debug(logger_id, "Responding to random tip request\n");
     if (rand_handle_probability() < responder->node->conf.p_reply_random_tip &&
         !requester_is_empty(&responder->node->transaction_requester)) {
-      neighbor->nbr_random_tx_req++;
+      neighbor->nbr_random_tx_reqs++;
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
       }

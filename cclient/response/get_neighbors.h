@@ -58,7 +58,7 @@ void neighbor_info_t_dtor(void* _elt);
 
 get_neighbors_res_t* get_neighbors_res_new();
 void get_neighbors_res_free(get_neighbors_res_t* nbors);
-size_t get_neighbors_res_num(get_neighbors_res_t* nbors);
+static inline size_t get_neighbors_res_num(get_neighbors_res_t* nbors) { return utarray_len(nbors); }
 neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors, int index);
 void get_neighbors_res_dump(get_neighbors_res_t* nbors);
 retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors, char const* const addr, uint32_t all_trans_num,

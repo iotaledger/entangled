@@ -69,6 +69,15 @@ cc_test(
 )
 
 cc_test(
+    name = "test_get_neighbors",
+    srcs = ["test_get_neighbors.c"],
+    deps = [
+        "//ciri/api",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_get_node_info",
     srcs = ["test_get_node_info.c"],
     data = [":db_file"],

@@ -11,33 +11,35 @@
 
 static retcode_t neighbor_info_utarray_to_json_array(UT_array const *const ut, cJSON *const json_root,
                                                      char const *const obj_name) {
+  cJSON *array_obj = cJSON_CreateArray();
+  neighbor_info_t *nbr_info = NULL;
+
   if (!ut) {
     return RC_NULL_PARAM;
   }
-  if (utarray_len(ut) > 0) {
-    cJSON *array_obj = cJSON_CreateArray();
-    if (array_obj == NULL) {
-      log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
-      return RC_CCLIENT_JSON_CREATE;
-    }
 
-    cJSON_AddItemToObject(json_root, obj_name, array_obj);
-    neighbor_info_t *nbr_info = NULL;
-    while ((nbr_info = (neighbor_info_t *)utarray_next(ut, nbr_info))) {
-      cJSON *json_nbr_info = cJSON_CreateObject();
-
-      cJSON_AddStringToObject(json_nbr_info, "address", nbr_info->address->data);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfAllTransactions", nbr_info->all_trans_num);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfRandomTransactionRequests", nbr_info->random_trans_req_num);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfNewTransactions", nbr_info->new_trans_num);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfInvalidTransactions", nbr_info->invalid_trans_num);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfStaleTransactions", nbr_info->stale_trans_num);
-      cJSON_AddNumberToObject(json_nbr_info, "numberOfSentTransactions", nbr_info->sent_trans_num);
-      cJSON_AddStringToObject(json_nbr_info, "connectiontype", nbr_info->connection_type->data);
-
-      cJSON_AddItemToArray(array_obj, json_nbr_info);
-    }
+  if (array_obj == NULL) {
+    log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
+    return RC_CCLIENT_JSON_CREATE;
   }
+
+  cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+  while ((nbr_info = (neighbor_info_t *)utarray_next(ut, nbr_info))) {
+    cJSON *json_nbr_info = cJSON_CreateObject();
+
+    cJSON_AddStringToObject(json_nbr_info, "address", nbr_info->address->data);
+    cJSON_AddNumberToObject(json_nbr_info, "numberOfAllTransactions", nbr_info->all_trans_num);
+    cJSON_AddNumberToObject(json_nbr_info, "numberOfRandomTransactionRequests", nbr_info->random_trans_req_num);
+    cJSON_AddNumberToObject(json_nbr_info, "numberOfNewTransactions", nbr_info->new_trans_num);
+    cJSON_AddNumberToObject(json_nbr_info, "numberOfInvalidTransactions", nbr_info->invalid_trans_num);
+    cJSON_AddNumberToObject(json_nbr_info, "numberOfStaleTransactions", nbr_info->stale_trans_num);
+    cJSON_AddNumberToObject(json_nbr_info, "numberOfSentTransactions", nbr_info->sent_trans_num);
+    cJSON_AddStringToObject(json_nbr_info, "connectiontype", nbr_info->connection_type->data);
+
+    cJSON_AddItemToArray(array_obj, json_nbr_info);
+  }
+
   return RC_OK;
 }
 
