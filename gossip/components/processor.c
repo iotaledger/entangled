@@ -113,13 +113,13 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
       ret = iota_milestone_tracker_add_candidate(processor->milestone_tracker, transaction_hash(&transaction));
     }
 
-    neighbor->nbr_new_tx++;
+    neighbor->nbr_new_txs++;
   }
 
   return ret;
 
 failure:
-  neighbor->nbr_invalid_tx++;
+  neighbor->nbr_invalid_txs++;
   return ret;
 }
 
@@ -194,7 +194,7 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
   if (neighbor) {
     log_debug(logger_id, "Processing packet from tethered node %s://%s:%d\n", protocol, neighbor->endpoint.host,
               neighbor->endpoint.port);
-    neighbor->nbr_all_tx++;
+    neighbor->nbr_all_txs++;
 
     log_debug(logger_id, "Processing transaction bytes\n");
     if ((ret = process_transaction_bytes(processor, tangle, neighbor, packet, hash)) != RC_OK) {

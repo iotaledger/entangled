@@ -23,11 +23,12 @@ typedef struct tangle_s tangle_t;
 
 typedef struct neighbor_s {
   endpoint_t endpoint;
-  unsigned int nbr_all_tx;
-  unsigned int nbr_new_tx;
-  unsigned int nbr_invalid_tx;
-  unsigned int nbr_sent_tx;
-  unsigned int nbr_random_tx_req;
+  uint64_t nbr_all_txs;
+  uint64_t nbr_new_txs;
+  uint64_t nbr_invalid_txs;
+  uint64_t nbr_stale_txs;
+  uint64_t nbr_sent_txs;
+  uint64_t nbr_random_tx_reqs;
   struct neighbor_s *next;
 } neighbor_t;
 
