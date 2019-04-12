@@ -19,11 +19,6 @@ extern "C" {
 #endif
 
 typedef struct {
-  uint64_t total_balance;
-  hash243_queue_t addresses;
-} inputs_t;
-
-typedef struct {
   size_t balance;
   flex_trit_t latest_address[FLEX_TRIT_SIZE_243];
   hash243_queue_t addresses;

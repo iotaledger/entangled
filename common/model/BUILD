@@ -55,3 +55,13 @@ cc_library(
         "//common/model:transaction",
     ],
 )
+
+cc_library(
+    name = "inputs",
+    hdrs = ["inputs.h"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
+)
