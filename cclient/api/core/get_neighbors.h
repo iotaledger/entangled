@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_NEIGHBORS_H
 #define CCLIENT_API_GET_NEIGHBORS_H
 
@@ -16,16 +25,11 @@ extern "C" {
 #endif
 
 /**
- * Returns the set of neighbors service node is connected with, as well as their
- * activity counters regarding participation in the protocol. The activity
- * counters are reset after restarting IRI.
+ * @brief Returns a list of connected neighbors.
  *
- * https://iota.readme.io/reference#getneighborsactivity
- *
- * @param service IRI node end point.
- * @param res Response containing the neighbors' info
- *
- * @return error value.
+ * @param[in] service client service
+ * @param[out] res A list of neighbors.
+ * @return #retcode_t
  */
 retcode_t iota_client_get_neighbors(const iota_client_service_t* const service, get_neighbors_res_t* const res);
 
@@ -34,3 +38,5 @@ retcode_t iota_client_get_neighbors(const iota_client_service_t* const service, 
 #endif
 
 #endif  // CCLIENT_API_GET_NEIGHBORS_H
+
+/** @} */

@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_TRANSACTIONS_TO_APPROVE_H
 #define CCLIENT_API_GET_TRANSACTIONS_TO_APPROVE_H
 
@@ -17,20 +26,19 @@ extern "C" {
 #endif
 
 /**
- * Tip selection which returns trunkTransaction and branchTransaction. The input
- * value is depth, which basically determines how many bundles to go back to for
- * finding the transactions to approve. The higher your depth value, the more
- * "babysitting" you do for the network (as you have to confirm more
- * transactions).
+ * @brief Does the <b>tip selection</b>
  *
- * https://iota.readme.io/reference#gettransactionstoapprove
+ * Tip selection which returns <b>trunk</b> and <b>branch</b> transaction. The input value <b>depth</b>
+ * determines how many milestones to go back for finding the transactions to approve. The higher your <b>depth</b>
+ * value, the more work you have to do as you are confirming more transactions. If the <b>depth</b> is too large
+ * (usually above 15, it depends on the node's configuration) an error will be returned. The <b>reference</b> is an
+ * optional hash of a transaction you want to approve. If it can't be found at the specified <b>depth</b> then an
+ * error will be returned.
  *
- * @param service IRI node end point.
- * @param req Request containing number of bundles to go back to determine
- * the transactions for approval.
- * @param res Response containing transactions to approve (branch + trunk)
- *
- * @return error value.
+ * @param[in] service client service
+ * @param[in] req the <b>depth</b> and a <b>reference(optional)</b>
+ * @param[out] res A pair of approved transactions(trunk and branch transaction)
+ * @return #retcode_t
  */
 retcode_t iota_client_get_transactions_to_approve(const iota_client_service_t* const service,
                                                   const get_transactions_to_approve_req_t* const req,
@@ -41,3 +49,5 @@ retcode_t iota_client_get_transactions_to_approve(const iota_client_service_t* c
 #endif
 
 #endif  // CCLIENT_API_GET_TRANSACTIONS_TO_APPROVE_H
+
+/** @} */

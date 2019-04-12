@@ -25,17 +25,13 @@ extern "C" {
 #endif
 
 /**
- * @brief
+ * @brief Broadcast a list of transactions to all neighbors.
  *
- * Broadcast a list of transactions to all neighbors. The input trytes for this
- * call are provided by iota_client_attach_to_tangle.
+ * These trytes are returned by #iota_client_attach_to_tangle, or by doing proof of work somewhere else.
  *
- * https://iota.readme.io/reference#broadcasttransactions
- *
- * @param service client service
- * @param req Request containing the transactions to broadcast
- *
- * @return error code
+ * @param[in] service client service
+ * @param[in] req The list of transaction trytes to broadcast
+ * @return #retcode_t
  */
 retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const service,
                                              broadcast_transactions_req_t* req);

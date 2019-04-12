@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_CHECK_CONSISTENCY_H
 #define CCLIENT_API_CHECK_CONSISTENCY_H
 
@@ -17,21 +26,15 @@ extern "C" {
 #endif
 
 /**
- * Checks if a transaction is _consistent_ or a set of transactions are
- * _co-consistent_.
- * As long as a transaction is consistent it might be accepted
- * by the network. In case transaction is inconsistent, it will not be accepted,
- * and a reattachment is required by calling iota_client_replay_bundle().
+ * @brief Check the consistency of the subtangle formed by the provided tails.
  *
- * https://iota.readme.io/reference#checkconsistency
+ * As long as a transaction is consistent it might be accepted by the network. In case a transaction is inconsistent, it
+ * will not be accepted, and a reattachment is required by calling #iota_client_replay_bundle.
  *
- * @param service IRI node end point.
- * @param req - Request containing tail transaction hash (hash of
- * transaction with `currentIndex=0`), or array of tail transaction hashes.
- * @param res - Response containing consistency state of given transaction
- * or co-consistency of given transactions.
- *
- * @return The error value.
+ * @param[in] service client service
+ * @param[in] req The tails describing the subtangle.
+ * @param[out] res Consistency state of given transaction or co-consistency of given transactions.
+ * @return #retcode_t
  */
 retcode_t iota_client_check_consistency(const iota_client_service_t* const service, check_consistency_req_t* const req,
                                         check_consistency_res_t* res);
@@ -41,3 +44,5 @@ retcode_t iota_client_check_consistency(const iota_client_service_t* const servi
 #endif
 
 #endif  // CCLIENT_API_CHECK_CONSISTENCY_H
+
+/** @} */
