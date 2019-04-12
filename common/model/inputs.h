@@ -32,7 +32,7 @@ extern "C" {
 typedef struct {
   int64_t balance;
   uint64_t key_index;
-  int security;
+  uint8_t security;
   flex_trit_t address[FLEX_TRIT_SIZE_243];
 } input_t;
 
