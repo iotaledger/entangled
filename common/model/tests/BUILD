@@ -47,3 +47,13 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_inputs",
+    srcs = ["test_inputs.c"],
+    deps = [
+        ":defs",
+        "//common/model:inputs",
+        "@unity",
+    ],
+)

@@ -11,7 +11,7 @@
 #include "cclient/api/extended/logger.h"
 
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_trit_t const* const seed,
-                                 address_opt_t const addr_opt, uint64_t const threshold, inputs_t* const out_input) {
+                                 address_opt_t const addr_opt, uint64_t const threshold, inputs_t* const out_inputs) {
   retcode_t ret_code = RC_OK;
   hash243_queue_entry_t* q_iter = NULL;
   size_t counter = 0;
@@ -26,7 +26,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
     return ret_code;
   }
 
-  out_input->total_balance = 0;
+  out_inputs->total_balance = 0;
 
   // get address list
   ret_code = iota_client_get_new_address(serv, seed, addr_opt, &balances_req->addresses);
@@ -39,11 +39,14 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
   ret_code = iota_client_get_balances(serv, balances_req, balances_res);
   if (ret_code == RC_OK && balances_req->addresses) {
     // expect balance value is in order.
+    input_t tmp_input = {};
     CDL_FOREACH(balances_req->addresses, q_iter) {
-      if (out_input->total_balance < threshold) {
-        out_input->total_balance += get_balances_res_balances_at(balances_res, counter);
-        ret_code = hash243_queue_push(&out_input->addresses, q_iter->hash);
-        if (ret_code) {
+      if (out_inputs->total_balance < threshold) {
+        tmp_input.balance = get_balances_res_balances_at(balances_res, counter);
+        tmp_input.key_index = counter;
+        tmp_input.security = addr_opt.security;
+        memcpy(tmp_input.address, q_iter->hash, FLEX_TRIT_SIZE_243);
+        if ((ret_code = inputs_append(out_inputs, &tmp_input)) != RC_OK) {
           log_error(client_extended_logger_id, "%s get new address failed: %s\n", __func__, error_2_string(ret_code));
           goto done;
         }
@@ -51,7 +54,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
       counter++;
     }
     // check if balance is sufficient
-    if (out_input->total_balance < threshold) {
+    if (out_inputs->total_balance < threshold) {
       ret_code = RC_CCLIENT_INSUFFICIENT_BALANCE;
       log_warning(client_extended_logger_id, "insufficient balance\n");
     }

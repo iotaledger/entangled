@@ -33,7 +33,7 @@ extern "C" {
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetAccountData.ts#L84
  */
 retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, flex_trit_t const* const seed,
-                                       size_t const security, account_data_t* out_account);
+                                       uint8_t security, account_data_t* out_account);
 
 #ifdef __cplusplus
 }
