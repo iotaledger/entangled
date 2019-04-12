@@ -51,8 +51,12 @@ static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t
   struct timeval tv;
 
   gettimeofday(&tv, NULL);
-  ts.tv_sec = tv.tv_sec + timeout_ms / 1000;
-  ts.tv_nsec = tv.tv_usec * 1000 + (timeout_ms % 1000) * 1000000;
+  ts.tv_sec = tv.tv_sec + timeout_ms / 1000ULL;
+  ts.tv_nsec = tv.tv_usec * 1000ULL + (timeout_ms % 1000ULL) * 1000000ULL;
+  if (ts.tv_nsec >= 1000000000ULL) {
+    ts.tv_sec++;
+    ts.tv_nsec -= 1000000000ULL;
+  }
 
   return pthread_cond_timedwait(cond, lock, &ts);
 }
