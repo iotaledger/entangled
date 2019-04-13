@@ -13,6 +13,7 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
+#define hash{SIZE}_stack_empty(stack) STACK_EMPTY(stack)
 #define HASH_STACK_FOREACH(stack, iter) for (iter = stack; iter != NULL; iter = iter->next)
 
 #ifdef __cplusplus
@@ -26,17 +27,12 @@ typedef struct hash{SIZE}_stack_entry_s {
 
 typedef hash{SIZE}_stack_entry_t *hash{SIZE}_stack_t;
 
-static inline bool hash{SIZE}_stack_empty(hash{SIZE}_stack_t const stack) {
-  return STACK_EMPTY(stack);
-}
-
-retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t *const stack,
-                          flex_trit_t const *const hash);
+retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t * const stack, flex_trit_t const *const hash);
 void hash{SIZE}_stack_pop(hash{SIZE}_stack_t *const stack);
 flex_trit_t *hash{SIZE}_stack_peek(hash{SIZE}_stack_t const stack);
 void hash{SIZE}_stack_free(hash{SIZE}_stack_t *const stack);
 size_t hash{SIZE}_stack_count(hash{SIZE}_stack_t const stack);
-flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t index);
+flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t const index);
 
 #ifdef __cplusplus
 }

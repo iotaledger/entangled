@@ -9,13 +9,13 @@
 
 #include "utils/containers/hash/hash{SIZE}_stack.h"
 
-retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t *const stack,
-                          flex_trit_t const *const hash) {
+retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t * const stack, flex_trit_t const *const hash) {
   hash{SIZE}_stack_entry_t *entry = NULL;
 
   if ((entry = (hash{SIZE}_stack_entry_t *)malloc(sizeof(hash{SIZE}_stack_entry_t))) == NULL) {
     return RC_UTILS_OOM;
   }
+
   memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});
   STACK_PUSH(*stack, entry);
 
@@ -31,7 +31,7 @@ void hash{SIZE}_stack_pop(hash{SIZE}_stack_t *const stack) {
 }
 
 flex_trit_t *hash{SIZE}_stack_peek(hash{SIZE}_stack_t const stack) {
-  return (flex_trit_t *)(stack->hash);
+  return (flex_trit_t *)(STACK_TOP(stack)->hash);
 }
 
 void hash{SIZE}_stack_free(hash{SIZE}_stack_t *const stack) {
@@ -52,7 +52,7 @@ size_t hash{SIZE}_stack_count(hash{SIZE}_stack_t const stack) {
   return count;
 }
 
-flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t index) {
+flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t const index) {
   hash{SIZE}_stack_entry_t *iter = NULL;
   size_t count = 0;
 
