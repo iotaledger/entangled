@@ -13,6 +13,8 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
+#define HASH_STACK_FOREACH(stack, iter) for (iter = stack; iter != NULL; iter = iter->next)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

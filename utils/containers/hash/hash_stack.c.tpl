@@ -56,7 +56,7 @@ flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t index) {
   hash{SIZE}_stack_entry_t *iter = NULL;
   size_t count = 0;
 
-  for (iter = stack; iter != NULL; iter = iter->next) {
+  HASH_STACK_FOREACH(stack, iter) {
     if (count == index) {
       return (flex_trit_t *)(iter->hash);
     }
