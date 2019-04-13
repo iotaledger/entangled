@@ -8,7 +8,7 @@
 #ifndef __UTILS_CONTAINERS_HASH_HASH{SIZE}_STACK_H__
 #define __UTILS_CONTAINERS_HASH_HASH{SIZE}_STACK_H__
 
-#include "utlist.h"
+#include "utstack.h"
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
@@ -24,7 +24,10 @@ typedef struct hash{SIZE}_stack_entry_s {
 
 typedef hash{SIZE}_stack_entry_t *hash{SIZE}_stack_t;
 
-bool hash{SIZE}_stack_empty(hash{SIZE}_stack_t const stack);
+static inline bool hash{SIZE}_stack_empty(hash{SIZE}_stack_t const stack) {
+  return STACK_EMPTY(stack);
+}
+
 retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t *const stack,
                           flex_trit_t const *const hash);
 void hash{SIZE}_stack_pop(hash{SIZE}_stack_t *const stack);
