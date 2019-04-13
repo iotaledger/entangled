@@ -22,7 +22,7 @@ retcode_t json_get_inclusion_states_serialize_request(serializer_t const *const 
 
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("getInclusionStates"));
 
-  ret = hash243_queue_to_json_array(req->hashes, json_root, "transactions");
+  ret = hash243_queue_to_json_array(req->transactions, json_root, "transactions");
   if (ret != RC_OK) {
     goto done;
   }
@@ -52,7 +52,7 @@ retcode_t json_get_inclusion_states_deserialize_request(serializer_t const *cons
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
-  ret = json_array_to_hash243_queue(json_obj, "transactions", &req->hashes);
+  ret = json_array_to_hash243_queue(json_obj, "transactions", &req->transactions);
   if (ret != RC_OK) {
     goto done;
   }

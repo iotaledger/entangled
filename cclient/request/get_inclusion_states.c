@@ -10,7 +10,7 @@
 get_inclusion_states_req_t* get_inclusion_states_req_new() {
   get_inclusion_states_req_t* req = (get_inclusion_states_req_t*)malloc(sizeof(get_inclusion_states_req_t));
   if (req) {
-    req->hashes = NULL;
+    req->transactions = NULL;
     req->tips = NULL;
   }
   return req;
@@ -21,8 +21,8 @@ void get_inclusion_states_req_free(get_inclusion_states_req_t** req) {
     return;
   }
 
-  if ((*req)->hashes) {
-    hash243_queue_free(&(*req)->hashes);
+  if ((*req)->transactions) {
+    hash243_queue_free(&(*req)->transactions);
   }
   if ((*req)->tips) {
     hash243_queue_free(&(*req)->tips);
