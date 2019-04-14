@@ -578,46 +578,6 @@ done:
   return ret;
 }
 
-retcode_t iota_stor_transaction_load_hashes_of_requests(storage_connection_t const* const connection,
-                                                        iota_stor_pack_t* const pack, size_t const limit) {
-  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
-  retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_transactions_to_request;
-
-  if (sqlite3_bind_int(sqlite_statement, 1, limit) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
-    goto done;
-  }
-
-  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
-    goto done;
-  }
-
-done:
-  sqlite3_reset(sqlite_statement);
-  return ret;
-}
-
-retcode_t iota_stor_transaction_load_hashes_of_tips(storage_connection_t const* const connection,
-                                                    iota_stor_pack_t* const pack, size_t const limit) {
-  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
-  retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_tips;
-
-  if (sqlite3_bind_int(sqlite_statement, 1, limit) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
-    goto done;
-  }
-
-  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
-    goto done;
-  }
-
-done:
-  sqlite3_reset(sqlite_statement);
-  return ret;
-}
-
 retcode_t iota_stor_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
                                                                     iota_stor_pack_t* const pack,
                                                                     flex_trit_t const* const coordinator) {
