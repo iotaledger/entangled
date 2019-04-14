@@ -361,7 +361,7 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
     DECLARE_PACK_SINGLE_TX(tx, txp, pack);
     uint64_t lssm_index = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
 
-    CDL_FOREACH(req->hashes, iter) {
+    CDL_FOREACH(req->transactions, iter) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load_partial(tangle, iter->hash, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
         return ret;
