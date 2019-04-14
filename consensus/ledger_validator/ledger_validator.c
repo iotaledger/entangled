@@ -51,8 +51,8 @@ static retcode_t update_snapshot_milestone(ledger_validator_t const *const lv, t
   retcode_t ret;
   hash243_set_t hashes_to_update = NULL;
 
-  if ((ret = tangle_traversal_dfs_to_genesis(tangle, update_snapshot_milestone_do_func, hash, lv->conf->genesis_hash,
-                                             NULL, &hashes_to_update)) != RC_OK) {
+  if ((ret = tangle_traversal_dfs_to_past(tangle, update_snapshot_milestone_do_func, hash, lv->conf->genesis_hash, NULL,
+                                          &hashes_to_update)) != RC_OK) {
     return ret;
   }
   ret = iota_tangle_transactions_update_snapshot_index(tangle, hashes_to_update, index);
@@ -179,8 +179,8 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv, tangle_t *
                                               .is_milestone = is_milestone,
                                               .tangle = tangle};
 
-  ret = tangle_traversal_dfs_to_genesis(tangle, get_latest_delta_do_func, tip, lv->conf->genesis_hash, analyzed_hashes,
-                                        &params);
+  ret = tangle_traversal_dfs_to_past(tangle, get_latest_delta_do_func, tip, lv->conf->genesis_hash, analyzed_hashes,
+                                     &params);
   *valid_delta = params.valid_delta;
   return ret;
 }

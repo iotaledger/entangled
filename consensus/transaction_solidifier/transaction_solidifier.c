@@ -238,8 +238,8 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
                                             .is_solid = true,
                                             .solid_transactions_candidates = &solid_transactions_candidates};
 
-  if ((ret = tangle_traversal_dfs_to_genesis(tangle, check_solidity_do_func, hash, ts->conf->genesis_hash, NULL,
-                                             &params)) != RC_OK) {
+  if ((ret = tangle_traversal_dfs_to_past(tangle, check_solidity_do_func, hash, ts->conf->genesis_hash, NULL,
+                                          &params)) != RC_OK) {
     *is_solid = false;
     goto done;
   }
