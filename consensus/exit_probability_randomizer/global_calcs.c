@@ -13,7 +13,7 @@ retcode_t map_transition_probabilities(double alpha, hash_to_int64_t_map_t const
                                        hash243_set_t const *const approvers, double transition_probs[]) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
-  hash_to_int64_t_map_entry_t const *curr_rating = NULL;
+  hash_to_int64_t_map_entry_t *curr_rating = NULL;
   size_t num_approvers = hash243_set_size(approvers);
   double sum_transition_probabilities = 0;
   double max_weight = 0;
@@ -35,5 +35,6 @@ retcode_t map_transition_probabilities(double alpha, hash_to_int64_t_map_t const
   for (idx = 0; idx < num_approvers; ++idx) {
     transition_probs[idx] /= sum_transition_probabilities;
   }
+
   return RC_OK;
 }
