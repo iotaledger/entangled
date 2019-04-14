@@ -103,9 +103,6 @@ extern retcode_t iota_stor_transaction_load_hashes_of_approvers(storage_connecti
                                                                 flex_trit_t const* const approvee_hash,
                                                                 iota_stor_pack_t* const pack, int64_t before_timestamp);
 
-extern retcode_t iota_stor_transaction_load_hashes_of_tips(storage_connection_t const* const connection,
-                                                           iota_stor_pack_t* const pack, size_t const limit);
-
 extern retcode_t iota_stor_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
                                                                            iota_stor_pack_t* const pack,
                                                                            flex_trit_t const* const coordinator);
