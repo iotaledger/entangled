@@ -8,10 +8,13 @@
 #ifndef __UTILS_CONTAINERS_HASH_HASH{SIZE}_STACK_H__
 #define __UTILS_CONTAINERS_HASH_HASH{SIZE}_STACK_H__
 
-#include "utlist.h"
+#include "utstack.h"
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+
+#define hash{SIZE}_stack_empty(stack) STACK_EMPTY(stack)
+#define HASH_STACK_FOREACH(stack, iter) for (iter = stack; iter != NULL; iter = iter->next)
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,14 +27,12 @@ typedef struct hash{SIZE}_stack_entry_s {
 
 typedef hash{SIZE}_stack_entry_t *hash{SIZE}_stack_t;
 
-bool hash{SIZE}_stack_empty(hash{SIZE}_stack_t const stack);
-retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t *const stack,
-                          flex_trit_t const *const hash);
+retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t * const stack, flex_trit_t const *const hash);
 void hash{SIZE}_stack_pop(hash{SIZE}_stack_t *const stack);
 flex_trit_t *hash{SIZE}_stack_peek(hash{SIZE}_stack_t const stack);
 void hash{SIZE}_stack_free(hash{SIZE}_stack_t *const stack);
 size_t hash{SIZE}_stack_count(hash{SIZE}_stack_t const stack);
-flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t index);
+flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t const index);
 
 #ifdef __cplusplus
 }
