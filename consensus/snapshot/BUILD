@@ -17,6 +17,7 @@ cc_library(
     data = [":snapshot_files"],
     visibility = ["//visibility:public"],
     deps = [
+        ":snapshot_metadata",
         "//common:errors",
         "//common/model:transaction",
         "//common/trinary:trit_array",
@@ -67,5 +68,19 @@ cc_library(
         "//consensus:conf",
         "//consensus/milestone_tracker",
         "//consensus/tangle",
+    ],
+)
+
+cc_library(
+    name = "snapshot_metadata",
+    srcs = [
+        "snapshot_metadata.c",
+    ],
+    hdrs = ["snapshot_metadata.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//consensus:conf",
+        "//utils/containers/hash:hash_uint64_t_map",
     ],
 )
