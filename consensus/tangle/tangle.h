@@ -72,18 +72,6 @@ retcode_t iota_tangle_transaction_load_partial(tangle_t const *const tangle, fle
                                                iota_stor_pack_t *const pack, partial_transaction_model_e models_mask);
 
 /**
- * Loads hashes of missing transactions (i.e. only referred as trunk or branch)
- *
- * @param tangle The tangle
- * @param pack A pack to be filled with hashes
- * @param limit The maximum number of hashes to load
- *
- * @return a status code
- */
-retcode_t iota_tangle_transaction_load_hashes_of_requests(tangle_t const *const tangle, iota_stor_pack_t *const pack,
-                                                          size_t const limit);
-
-/**
  * Loads hashes of tips (i.e. not referenced by any transaction)
  *
  * @param tangle The tangle

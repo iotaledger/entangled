@@ -35,9 +35,6 @@ static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_of_approvers_before_date),
                            iota_statement_transaction_select_hashes_of_approvers_before_date);
-  ret |= prepare_statement(
-      connection->db, (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_of_transactions_to_request),
-      iota_statement_transaction_select_hashes_of_transactions_to_request);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_of_tips),
                            iota_statement_transaction_select_hashes_of_tips);
   ret |= prepare_statement(connection->db,
@@ -100,7 +97,6 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   ret |= finalize_statement(connection->statements.transaction_select_hashes_by_address);
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_approvers);
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_approvers_before_date);
-  ret |= finalize_statement(connection->statements.transaction_select_hashes_of_transactions_to_request);
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_tips);
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_milestone_candidates);
   ret |= finalize_statement(connection->statements.transaction_update_snapshot_index);
