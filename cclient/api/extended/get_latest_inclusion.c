@@ -37,7 +37,7 @@ retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const se
     goto done;
   }
 
-  inclusion_req->hashes = transactions;
+  inclusion_req->transactions = transactions;
   ret_code = hash243_queue_push(&inclusion_req->tips, node_info->latest_solid_subtangle_milestone);
   if (ret_code) {
     log_error(client_extended_logger_id, "%s hash queue push failed: %s\n", __func__, error_2_string(ret_code));
@@ -54,7 +54,7 @@ retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const se
 done:
   get_node_info_res_free(&node_info);
   // no need to free it, it should free via caller.
-  inclusion_req->hashes = NULL;
+  inclusion_req->transactions = NULL;
   get_inclusion_states_req_free(&inclusion_req);
   return ret_code;
 }
