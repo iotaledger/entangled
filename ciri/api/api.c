@@ -381,6 +381,13 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
   return RC_OK;
 }
 
+retcode_t iota_api_get_missing_transactions(iota_api_t const *const api, get_missing_transactions_res_t *const res,
+                                            error_res_t **const error) {
+  retcode_t ret = RC_OK;
+
+  return ret;
+}
+
 retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
                                  error_res_t **const error) {
   retcode_t ret = RC_OK;
