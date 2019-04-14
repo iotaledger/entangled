@@ -127,6 +127,8 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   }
   log_info(logger_id, "Consistent snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
 
+  ERR_BIND_RETURN(iota_snapshot_metadata_init(&snapshot->metadata), ret);
+
   return ret;
 }
 
@@ -139,6 +141,8 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
 
   state_delta_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
+
+  ERR_BIND_RETURN(iota_snapshot_metadata_destroy(&snapshot->metadata), ret);
   logger_helper_release(logger_id);
 
   return ret;

@@ -39,6 +39,7 @@ typedef struct iota_statements_s {
   void* milestone_select_first;
   void* milestone_select_last;
   void* milestone_select_next;
+  void* milestone_select_previous;
   void* milestone_exist;
   void* milestone_exist_by_hash;
   void* state_delta_store;

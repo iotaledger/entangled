@@ -184,6 +184,9 @@ char *iota_statement_milestone_select_last =
 char *iota_statement_milestone_select_next = "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
                                              " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=(?+1)";
 
+char *iota_statement_milestone_select_previous = "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
+                                                 " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=(?-1)";
+
 char *iota_statement_milestone_exist =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " MILESTONE_TABLE_NAME ")";

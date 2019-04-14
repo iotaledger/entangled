@@ -14,6 +14,7 @@
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/conf.h"
+#include "consensus/snapshot/snapshot_metadata.h"
 #include "consensus/snapshot/state_delta.h"
 #include "utils/handles/rw_lock.h"
 
@@ -26,6 +27,7 @@ typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
   uint64_t index;
   state_delta_t state;
+  snapshot_metadata_t metadata;
 } snapshot_t;
 
 /**
