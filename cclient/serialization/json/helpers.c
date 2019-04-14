@@ -302,7 +302,6 @@ retcode_t hash243_stack_to_json_array(hash243_stack_t stack, cJSON* const json_r
       return RC_CCLIENT_FLEX_TRITS;
     }
   }
-
   return RC_OK;
 }
 
