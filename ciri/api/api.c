@@ -9,6 +9,7 @@
 
 #include "ciri/api/api.h"
 #include "common/helpers/pow.h"
+#include "common/network/uri.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
@@ -46,7 +47,7 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
 
   res->added_neighbors = 0;
 
-  for (char **uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+  URIS_FOREACH(req->uris, uri) {
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
       *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;
@@ -522,7 +523,7 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbor
 
   res->removed_neighbors = 0;
 
-  for (char **uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+  URIS_FOREACH(req->uris, uri) {
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
       *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;

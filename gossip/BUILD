@@ -49,7 +49,7 @@ cc_library(
     deps = [
         ":neighbor_shared",
         ":node_shared",
-        "//common/network:uri_parser",
+        "//common/network:uri",
         "//gossip/components:transaction_requester",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
