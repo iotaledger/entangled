@@ -11,4 +11,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
+// max uint64 18446744073709551616
+#define MAX_CHARS_UNIT64 20
+
 #endif  // __UTILS_MACROS_H__

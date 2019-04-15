@@ -82,6 +82,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//consensus:conf",
+        "//utils:macros",
         "//utils/containers/hash:hash_uint64_t_map",
     ],
 )

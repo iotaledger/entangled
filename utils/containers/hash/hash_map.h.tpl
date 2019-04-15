@@ -26,6 +26,8 @@ typedef struct hash_to_{TYPE}_map_entry_s {
 
 typedef hash_to_{TYPE}_map_entry_t *hash_to_{TYPE}_map_t;
 
+size_t hash_to_{TYPE}_map_size(hash_to_{TYPE}_map_t map);
+
 retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
         flex_trit_t const *const hash,
 {TYPE} const value);
