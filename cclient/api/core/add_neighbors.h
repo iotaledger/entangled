@@ -28,8 +28,8 @@ extern "C" {
 /**
  * @brief Add a list of neighbors to the IRI node.
  *
- * Assumes <b>addNeighbors</b> command is abaliable on the node. It should be noted that this is only temporary, and the
- * added neighbors will be removed from your set of neighbors after you relaunch IRI.
+ * Assumes <b>addNeighbors</b> command is availiable on the node. It should be noted that this is only temporary, and
+ * the added neighbors will be removed from your set of neighbors after you relaunch IRI.
  *
  * The URI format:
  *

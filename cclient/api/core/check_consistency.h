@@ -28,8 +28,8 @@ extern "C" {
 /**
  * @brief Check the consistency of the subtangle formed by the provided tails.
  *
- * As long as a transaction is consistent it might be accepted by the network. In case a transaction is inconsistent, it
- * will not be accepted, and a reattachment is required by calling #iota_client_replay_bundle.
+ * An inconsistent transaction will not be accepted by the network, and a reattachment is required by
+ * #iota_client_replay_bundle.
  *
  * @param[in] service client service
  * @param[in] req The tails describing the subtangle.

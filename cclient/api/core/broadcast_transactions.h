@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Broadcast a list of transactions to all neighbors.
+ * @brief Broadcast a list of transactions to all node's neighbors.
  *
  * These trytes are returned by #iota_client_attach_to_tangle, or by doing proof of work somewhere else.
  *

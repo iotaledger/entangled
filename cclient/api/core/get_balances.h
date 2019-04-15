@@ -28,7 +28,7 @@ extern "C" {
 /**
  * @brief Fetches <b>confirmed<b/> balances of given addresses at the latest solid milestone.
  *
- * If the <b>tips</b> has not given it retruns the view by latest solid milestone.
+ * If the <b>tips</b> was not provided, the returned balance is correct as of the latest confirmed milestone.
  *
  * @param[in] service client service
  * @param[in] req Address, tips and a threshold for balance calculation.
