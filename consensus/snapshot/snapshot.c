@@ -9,8 +9,12 @@
 #include <stdlib.h>
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
+#include "utils/files.h"
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"
+
+#define SNAPSHOT_STATE_EXT ".state"
+#define SNAPSHOT_METADATA_EXT ".metadata"
 
 #define SNAPSHOT_LOGGER_ID "snapshot"
 
@@ -73,32 +77,29 @@ done:
   return ret;
 }
 
-retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file) {
+retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file_base) {
   retcode_t ret;
   size_t size;
-  FILE *fp = NULL;
+
+  char state_path[128];
+  char metadata_path[128];
 
   size = state_delta_serialized_str_size(snapshot->state);
-  char *buffer;
-  if ((buffer = (byte_t *)calloc(size, sizeof(byte_t))) == NULL) {
-    ret = RC_STORAGE_OOM;
-    goto cleanup;
+  char *state_buffer;
+  if ((state_buffer = (byte_t *)calloc(size, sizeof(byte_t))) == NULL) {
+    return RC_STORAGE_OOM;
   }
 
-  ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
+  strcat(state_path, snapshot_file_base);
+  strcat(state_path, SNAPSHOT_STATE_EXT);
 
-  if ((fp = fopen(snapshot_file, "w")) == NULL) {
-    log_critical(logger_id, "Opening snapshot file failed\n");
-    ret = RC_SNAPSHOT_FILE_OPEN_FAILED;
-    goto cleanup;
-  }
+  strcat(metadata_path, snapshot_file_base);
+  strcat(metadata_path, SNAPSHOT_METADATA_EXT);
 
-  fprintf(fp, "%s", buffer);
+  ERR_BIND_RETURN(state_delta_serialize_str(snapshot->state, state_buffer), ret);
+  ERR_BIND_RETURN(write_file(state_path, state_buffer), ret);
+  // TODO - metadata serialization and write file
 
-cleanup:
-  if (fp) {
-    fclose(fp);
-  }
   return ret;
 }
 

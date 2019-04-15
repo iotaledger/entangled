@@ -64,7 +64,6 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   snapshot_t next_snapshot;
   ERR_BIND_RETURN(
       iota_snapshots_service_generate_snapshot(snapshots_service, milestone_tracker, &milestone, &next_snapshot), ret);
-  // TODO - implement + uncomment
   ERR_BIND_RETURN(iota_snapshots_service_persist_snapshot(&snapshots_service, &next_snapshot), ret);
   return RC_OK;
 }

@@ -16,6 +16,7 @@ extern "C" {
 
 retcode_t copy_file(const char *to, const char *from);
 retcode_t remove_file(const char *file_path);
+retcode_t write_file(char const *const file_path, char const *const content);
 
 #ifdef __cplusplus
 }

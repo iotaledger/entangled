@@ -14,6 +14,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <memory.h>
+#include <stdbool.h>
 
 #include "utils/files.h"
 
@@ -73,4 +75,37 @@ retcode_t remove_file(const char *file_path) {
     return RC_UTILS_FAILED_REMOVE_FILE;
   }
   return RC_OK;
+}
+
+retcode_t write_file(char const *const file_path, char const *const content) {
+  retcode_t ret;
+  FILE *file;
+  char file_path_backup[256];
+  bool file_already_exist = false;
+  if ((file = fopen(file_path, "r"))) {
+    strcat(file_path_backup, file_path);
+    strcat(file_path_backup, ".backup");
+    if (rename(file_path, file_path_backup) == -1) {
+      return RC_UTILS_FAILED_WRITE_FILE;
+    }
+    fclose(file);
+    file_already_exist = true;
+  }
+
+  if ((file = fopen(file_path, "w"))) {
+    fputs(content, file);
+  } else {
+    if (file_already_exist && rename(file_path_backup, file_path) == -1) {
+      return RC_UTILS_FAILED_WRITE_FILE;
+    }
+  }
+
+  if (file_already_exist) {
+    ERR_BIND_GOTO(remove_file(file_path_backup), ret, cleanup);
+  }
+
+cleanup:
+  if (file) {
+    fclose(file);
+  }
 }
