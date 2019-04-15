@@ -54,24 +54,31 @@ retcode_t requester_destroy(transaction_requester_t *const transaction_requester
 }
 
 retcode_t requester_get_requested_transactions(transaction_requester_t *const transaction_requester,
-                                               hash243_set_t *const transactions) {
+                                               hash243_stack_t *const hashes) {
   retcode_t ret = RC_OK;
+  hash243_set_entry_t *iter = NULL;
+  hash243_set_entry_t *tmp = NULL;
 
-  if (transaction_requester == NULL || transactions == NULL) {
+  if (transaction_requester == NULL || hashes == NULL) {
     return RC_NULL_PARAM;
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
 
-  if ((ret = hash243_set_append(&transaction_requester->transactions, transactions)) != RC_OK) {
-    goto done;
+  HASH_SET_ITER(transaction_requester->transactions, iter, tmp) {
+    if ((ret = hash243_stack_push(hashes, iter->hash)) != RC_OK) {
+      goto done;
+    }
   }
-  if ((ret = hash243_set_append(&transaction_requester->milestones, transactions)) != RC_OK) {
-    goto done;
+  HASH_SET_ITER(transaction_requester->milestones, iter, tmp) {
+    if ((ret = hash243_stack_push(hashes, iter->hash)) != RC_OK) {
+      goto done;
+    }
   }
 
 done:
   rw_lock_handle_unlock(&transaction_requester->lock);
+
   return ret;
 }
 
