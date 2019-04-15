@@ -64,6 +64,16 @@ size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *con
  */
 retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const snapshot_metadata, char *const str);
 
+/**
+ * Serializes metadata from string buffer
+ *
+ * @param str The string buffer tp serialize to
+ * @param snapshot_metadata The snapshot metadata
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata);
+
 #ifdef __cplusplus
 }
 #endif

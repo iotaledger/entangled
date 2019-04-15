@@ -20,9 +20,9 @@ retcode_t iota_snapshot_metadata_destroy(snapshot_metadata_t *const snapshot_met
 }
 
 size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *const snapshot_metadata) {
-  // hash, index, timestamps each are followed by new line character
+  // hash, index, timestamps, solid entries map size, each are followed by new line character
   // each solid entry point map entry is two fields delimited by ';' and ended with a new line character
-  return FLEX_TRIT_SIZE_243 + 1 + MAX_CHARS_UNIT64 + 1 + MAX_CHARS_UNIT64 + 1 +
+  return FLEX_TRIT_SIZE_243 + 1 + MAX_CHARS_UNIT64 + 1 + MAX_CHARS_UNIT64 + 1 + MAX_CHARS_UNIT64 + 1 +
          hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points) *
              (MAX_CHARS_UNIT64 + 1 + FLEX_TRIT_SIZE_243 + 1);
 }
@@ -35,6 +35,7 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   snprintf(str, 81, "%s\n", hash_trytes);
   sprintf(str, "%" PRIu64 "\n", snapshot_metadata->index);
   sprintf(str, "%" PRIu64 "\n", snapshot_metadata->timestamp);
+  sprintf(str, "%" PRIu64 "\n", hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points));
 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
     flex_trits_to_trytes(&hash_trytes, 81, iter->hash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
@@ -42,4 +43,58 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
     strncpy(str, ";", 1);
     sprintf(str, "%" PRIu64 "\n", iter->value);
   }
+}
+retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata) {
+  retcode_t ret;
+  char c;
+  size_t num_solid_entry_points;
+  size_t i;
+  tryte_t curr_hash_trytes[81];
+  flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
+  uint64_t index;
+
+  if (sscanf(str, "%s", snapshot_metadata->hash) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%c", &c) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%" PRIu64 "", &snapshot_metadata->index) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%c", &c) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%" PRIu64 "", &snapshot_metadata->timestamp) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%c", &c) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%d", &num_solid_entry_points) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  if (sscanf(str, "%c", &c) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+
+  for (i = 0; i < num_solid_entry_points; ++i) {
+    if (sscanf(str, "%s", &curr_hash_trytes) != 1) {
+      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    }
+    if (sscanf(str, "%c", &c) != 1) {
+      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    }
+    if (sscanf(str, "%" PRIu64 "", &index) != 1) {
+      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    }
+    if (sscanf(str, "%c", &c) != 1) {
+      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    }
+
+    flex_trits_from_trytes(curr_hash, FLEX_TRIT_SIZE_243, curr_hash_trytes, 81, 81);
+    ERR_BIND_RETURN(hash_to_uint64_t_map_add(&snapshot_metadata->solid_entry_points, curr_hash, index), ret);
+  }
+
+  return RC_OK;
 }
