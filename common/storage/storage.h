@@ -114,6 +114,8 @@ extern retcode_t iota_stor_transaction_find(storage_connection_t const* const co
                                             hash243_queue_t const addresses, hash81_queue_t const tags,
                                             hash243_queue_t const approvees, iota_stor_pack_t* const pack);
 
+extern retcode_t iota_stor_transaction_clear_metadata(storage_connection_t const* const connection);
+
 /*
  * Milestone operations
  */

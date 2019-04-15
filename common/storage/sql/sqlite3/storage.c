@@ -803,6 +803,20 @@ done:
   return ret;
 }
 
+retcode_t iota_stor_transaction_clear_metadata(storage_connection_t const* const connection) {
+  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_clear_metadata;
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
 /*
  * Milestone operations
  */
