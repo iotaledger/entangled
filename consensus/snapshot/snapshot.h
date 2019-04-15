@@ -142,11 +142,11 @@ retcode_t iota_snapshot_read_from_file(snapshot_t *const snapshot, char const *c
  * Writes a snapshot to file
  *
  * @param snapshot The snapshot
- * @param snapshot_file The file with serialized snapshot
+ * @param snapshot_file_base The file with serialized snapshot
  *
  * @return a status code
  */
-retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file);
+retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file_base);
 
 #ifdef __cplusplus
 }

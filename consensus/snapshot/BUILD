@@ -23,6 +23,7 @@ cc_library(
         "//common/trinary:trit_array",
         "//consensus:conf",
         "//consensus/snapshot:state_delta",
+        "//utils:files",
         "//utils:logger_helper",
         "//utils:signed_files",
         "//utils/handles:rw_lock",

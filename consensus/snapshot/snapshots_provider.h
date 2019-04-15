@@ -54,7 +54,8 @@ retcode_t iota_snapshots_provider_destroy(snapshots_provider_t *const snapshots_
  * @return a status code
  */
 retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshots_provider_t *const snapshots_provider,
-                                                         snapshot_t const *const snapshot, char const *const file_path);
+                                                         snapshot_t const *const snapshot,
+                                                         char const *const file_path_base);
 
 #ifdef __cplusplus
 }
