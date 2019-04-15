@@ -33,7 +33,6 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *
 }
 
 retcode_t state_delta_sum_if_present(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value) {
-  retcode_t ret = RC_OK;
   state_delta_entry_t *entry = NULL;
 
   state_delta_find(*state, hash, entry);
