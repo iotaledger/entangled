@@ -65,7 +65,6 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   ERR_BIND_RETURN(
       iota_snapshots_service_generate_snapshot(snapshots_service, milestone_tracker, &milestone, &next_snapshot), ret);
   // TODO - implement + uncomment
-  // ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count),err);
   ERR_BIND_RETURN(iota_snapshots_service_persist_snapshot(&snapshots_service, &next_snapshot), ret);
   return RC_OK;
 }
@@ -195,7 +194,6 @@ typedef struct check_is_solid_entry_point_do_func_params_s {
   snapshot_t *snapshot;
   snapshots_service_t *snapshots_service;
   hash_to_uint64_t_map_t *solid_entry_points;
-  bool is_orphan;
 } check_is_solid_entry_point_do_func_params_t;
 
 static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
@@ -273,7 +271,6 @@ static retcode_t iota_snapshots_service_update_new_solid_entry_points(
   params.snapshot = initial_snapshot;
   params.target_milestone_index = target_milestone->index;
   params.snapshots_service = snapshots_service;
-  params.is_orphan = true;
   params.solid_entry_points = solid_entry_points;
 
   while (index > initial_snapshot->index) {
