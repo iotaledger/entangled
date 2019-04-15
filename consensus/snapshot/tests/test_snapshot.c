@@ -38,7 +38,7 @@ void test_snapshot_conf() {
 
 void test_snapshot_init_file_not_found() {
   strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot_not_found.txt");
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_FILE_NOT_FOUND);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_FILE_OPEN_FAILED);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 

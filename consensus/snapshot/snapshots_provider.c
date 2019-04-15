@@ -31,6 +31,8 @@ retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshots_provider_t *c
 
   ERR_BIND_GOTO(iota_snapshot_write_to_file(snapshot, file_path), ret, cleanup);
 
+  //TODO - implement write_metadata
+
 cleanup:
   iota_snapshot_unlock(snapshot);
   return ret;
