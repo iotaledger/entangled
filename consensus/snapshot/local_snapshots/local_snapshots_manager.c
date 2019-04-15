@@ -32,6 +32,10 @@ static void *local_snapshots_manager_routine(void *arg) {
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, lsm->mt);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
+        if (iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count) != RC_OK) {
+          log_critical(logger_id, "Failed in querying db size\n");
+          goto cleanup;
+        }
       } else if (err == RC_SNAPSHOT_SERVICE_MILESTONE_NOT_SOLID || err == RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH) {
         exponential_delay_factor *= 2;
         log_warning(logger_id, "Local snapshot is delayed in %d ms, error code: %d\n",
