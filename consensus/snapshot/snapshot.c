@@ -79,16 +79,19 @@ done:
 
 retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file_base) {
   retcode_t ret;
-  size_t size;
+  size_t state_size;
+  size_t metadata_size;
 
   char state_path[128];
   char metadata_path[128];
 
-  size = state_delta_serialized_str_size(snapshot->state);
-  char *state_buffer;
-  if ((state_buffer = (byte_t *)calloc(size, sizeof(byte_t))) == NULL) {
+  state_size = state_delta_serialized_str_size(snapshot->state);
+  char *buffer;
+  if ((buffer = (byte_t *)calloc(state_size, sizeof(char))) == NULL) {
     return RC_STORAGE_OOM;
   }
+
+  metadata_size = iota_snapshot_metadata_serialized_str_size(&snapshot->metadata);
 
   strcat(state_path, snapshot_file_base);
   strcat(state_path, SNAPSHOT_STATE_EXT);
@@ -96,9 +99,20 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   strcat(metadata_path, snapshot_file_base);
   strcat(metadata_path, SNAPSHOT_METADATA_EXT);
 
-  ERR_BIND_RETURN(state_delta_serialize_str(snapshot->state, state_buffer), ret);
-  ERR_BIND_RETURN(iota_utils_overwrite_file(state_path, state_buffer), ret);
-  // TODO - metadata serialization and write file
+  ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
+  ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
+
+  if ((buffer = (byte_t *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
+    return RC_STORAGE_OOM;
+  }
+
+  ERR_BIND_GOTO(iota_snapshot_metadata_serialize_str(&snapshot->metadata, buffer), ret, cleanup);
+  ERR_BIND_GOTO(iota_utils_overwrite_file(metadata_path, buffer), ret, cleanup);
+
+cleanup:
+  if (buffer) {
+    free(buffer);
+  }
 
   return ret;
 }

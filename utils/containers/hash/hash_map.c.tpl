@@ -87,3 +87,7 @@ hash_to_{TYPE}_map_t *const dst){
 
   return RC_OK;
 }
+
+size_t hash_to_{TYPE}_map_size(hash_to_{TYPE}_map_t const map){
+ return HASH_COUNT(map);
+}
