@@ -18,6 +18,7 @@
 #define MAIN_LOGGER_ID "ciri"
 #define STATS_LOG_INTERVAL_S 10
 
+static connection_config_t db_conf;
 static core_t ciri_core;
 static iota_api_t api;
 static iota_api_http_t http;
@@ -26,7 +27,6 @@ static tangle_t tangle;
 
 static retcode_t ciri_init() {
   retcode_t ret = RC_OK;
-  connection_config_t db_conf = {.db_path = ciri_core.conf.db_path};
 
   log_info(logger_id, "Initializing storage\n");
   if ((ret = storage_init()) != RC_OK) {
@@ -156,6 +156,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  db_conf.db_path = ciri_core.conf.db_path;
   logger_output_level_set(stdout, ciri_core.conf.log_level);
 
   log_info(logger_id, "Welcome to %s v%s\n", CIRI_NAME, CIRI_VERSION);
