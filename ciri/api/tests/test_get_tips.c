@@ -17,6 +17,7 @@ void test_get_tips_empty(void) {
   get_tips_res_t *res = get_tips_res_new();
   error_res_t *error = NULL;
 
+  TEST_ASSERT_EQUAL_INT(get_tips_res_hash_num(res), 0);
   TEST_ASSERT(iota_api_get_tips(&api, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(get_tips_res_hash_num(res), 0);
