@@ -19,7 +19,7 @@
 
 #include "utils/files.h"
 
-retcode_t copy_file(const char *to, const char *from) {
+retcode_t iota_utils_copy_file(const char *to, const char *from) {
   int fd_to, fd_from;
   char buf[4096];
   ssize_t nread;
@@ -67,7 +67,7 @@ out_error:
   return RC_UTILS_FAILED_TO_COPY_FILE;
 }
 
-retcode_t remove_file(const char *file_path) {
+retcode_t iota_utils_remove_file(const char *file_path) {
   int status;
 
   status = remove(file_path);
@@ -77,7 +77,7 @@ retcode_t remove_file(const char *file_path) {
   return RC_OK;
 }
 
-retcode_t write_file(char const *const file_path, char const *const content) {
+retcode_t iota_utils_overwrite_file(char const *const file_path, char const *const content) {
   retcode_t ret;
   FILE *file;
   char file_path_backup[256];
@@ -101,7 +101,7 @@ retcode_t write_file(char const *const file_path, char const *const content) {
   }
 
   if (file_already_exist) {
-    ERR_BIND_GOTO(remove_file(file_path_backup), ret, cleanup);
+    ERR_BIND_GOTO(iota_utils_remove_file(file_path_backup), ret, cleanup);
   }
 
 cleanup:

@@ -97,7 +97,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   strcat(metadata_path, SNAPSHOT_METADATA_EXT);
 
   ERR_BIND_RETURN(state_delta_serialize_str(snapshot->state, state_buffer), ret);
-  ERR_BIND_RETURN(write_file(state_path, state_buffer), ret);
+  ERR_BIND_RETURN(iota_utils_overwrite_file(state_path, state_buffer), ret);
   // TODO - metadata serialization and write file
 
   return ret;

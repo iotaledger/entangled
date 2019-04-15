@@ -401,7 +401,7 @@ int main(int argc, char *argv[]) {
     ciri_db_path = "ciri.db";
   }
 
-  copy_file(test_db_path, ciri_db_path);
+  iota_utils_copy_file(test_db_path, ciri_db_path);
 
   RUN_TEST(test_init_connection);
   RUN_TEST(test_initialized_db_empty_transaction);
