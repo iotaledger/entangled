@@ -123,6 +123,8 @@ retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_que
  * Milestone operations
  */
 
+retcode_t iota_tangle_milestone_clear(tangle_t const *const tangle);
+
 retcode_t iota_tangle_milestone_store(tangle_t const *const tangle, iota_milestone_t const *const data_in);
 
 retcode_t iota_tangle_milestone_load(tangle_t const *const tangle, flex_trit_t const *const hash,

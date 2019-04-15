@@ -28,17 +28,6 @@ static tangle_t tangle;
 static retcode_t ciri_init() {
   retcode_t ret = RC_OK;
 
-  log_info(logger_id, "Initializing storage\n");
-  if ((ret = storage_init()) != RC_OK) {
-    log_critical(logger_id, "Initializing storage failed\n");
-    return ret;
-  }
-
-  if ((ret = iota_tangle_init(&tangle, &db_conf)) != RC_OK) {
-    log_critical(logger_id, "Initializing tangle connection failed\n");
-    return ret;
-  }
-
   log_info(logger_id, "Initializing cIRI core\n");
   if ((ret = core_init(&ciri_core, &tangle)) != RC_OK) {
     log_critical(logger_id, "Initializing cIRI core failed\n");
@@ -110,15 +99,6 @@ static retcode_t ciri_destroy() {
     log_error(logger_id, "Destroying cIRI core failed\n");
   }
 
-  log_info(logger_id, "Destroying storage\n");
-  if ((ret = storage_destroy()) != RC_OK) {
-    log_error(logger_id, "Destroying storage failed\n");
-  }
-
-  if ((ret = iota_tangle_destroy(&tangle)) != RC_OK) {
-    log_error(logger_id, "Destroying tangle connection failed\n");
-  }
-
   return ret;
 }
 
@@ -161,6 +141,25 @@ int main(int argc, char* argv[]) {
 
   log_info(logger_id, "Welcome to %s v%s\n", CIRI_NAME, CIRI_VERSION);
 
+  log_info(logger_id, "Initializing storage\n");
+  if (storage_init() != RC_OK) {
+    log_critical(logger_id, "Initializing storage failed\n");
+    return EXIT_FAILURE;
+  }
+
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(logger_id, "Initializing tangle connection failed\n");
+    return EXIT_FAILURE;
+  }
+
+  if (ciri_core.conf.db_revalidate) {
+    log_info(logger_id, "Revalidating database\n");
+    if (iota_tangle_milestone_clear(&tangle) != RC_OK) {
+      log_critical(logger_id, "Revalidating database failed\n");
+      return EXIT_FAILURE;
+    }
+  }
+
   log_info(logger_id, "Initializing cIRI\n");
   if (ciri_init() != RC_OK) {
     log_critical(logger_id, "Initializing cIRI failed\n");
@@ -196,6 +195,17 @@ destroy:
   log_info(logger_id, "Destroying cIRI\n");
   if (ciri_destroy() != RC_OK) {
     log_error(logger_id, "Destroying cIRI failed\n");
+    ret = EXIT_FAILURE;
+  }
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_error(logger_id, "Destroying tangle connection failed\n");
+    ret = EXIT_FAILURE;
+  }
+
+  log_info(logger_id, "Destroying storage\n");
+  if (storage_destroy() != RC_OK) {
+    log_error(logger_id, "Destroying storage failed\n");
     ret = EXIT_FAILURE;
   }
 

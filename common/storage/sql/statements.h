@@ -31,6 +31,7 @@ typedef struct iota_statements_s {
   void* transaction_select_essence_attachment_and_metadata;
   void* transaction_select_essence_and_consensus;
   void* transaction_select_metadata;
+  void* milestone_clear;
   void* milestone_insert;
   void* milestone_select_by_hash;
   void* milestone_select_first;
@@ -86,6 +87,7 @@ extern char* iota_statement_transaction_find_build(size_t const bundles_count, s
  * Milestone statements
  */
 
+extern char* iota_statement_milestone_clear;
 extern char* iota_statement_milestone_insert;
 extern char* iota_statement_milestone_select_by_hash;
 extern char* iota_statement_milestone_select_first;

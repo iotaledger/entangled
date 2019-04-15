@@ -157,6 +157,8 @@ char *iota_statement_transaction_find_build(size_t const bundles_count, size_t c
  * Milestone statements
  */
 
+char *iota_statement_milestone_clear = "DELETE FROM " MILESTONE_TABLE_NAME;
+
 char *iota_statement_milestone_insert =
     "INSERT INTO " MILESTONE_TABLE_NAME "(" MILESTONE_COL_INDEX "," MILESTONE_COL_HASH ")VALUES(?,?)";
 
