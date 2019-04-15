@@ -184,6 +184,18 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
                                         get_inclusion_states_res_t *const res, error_res_t **const error);
 
 /**
+ * Returns hashes of transactions currently missing from the node.
+ *
+ * @param api The API [in]
+ * @param res The response [out]
+ * @param error An error response [out]
+ *
+ * @return a status code
+ */
+retcode_t iota_api_get_missing_transactions(iota_api_t const *const api, get_missing_transactions_res_t *const res,
+                                            error_res_t **const error);
+
+/**
  * Returns the set of neighbors the node is connected with, as well as their activity statistics or counters.
  * These numbers are reset after restarting cIRI.
  *
