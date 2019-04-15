@@ -31,7 +31,7 @@ retcode_t iota_snapshot_read_from_file(snapshot_t *const snapshot, char const *c
 
   if ((fp = fopen(snapshot_file, "r")) == NULL) {
     log_critical(logger_id, "Opening snapshot file failed\n");
-    ret = RC_SNAPSHOT_FILE_NOT_FOUND;
+    ret = RC_SNAPSHOT_FILE_OPEN_FAILED;
     goto done;
   }
 
@@ -76,6 +76,8 @@ done:
 retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file) {
   retcode_t ret;
   size_t size;
+  FILE *fp = NULL;
+
   size = state_delta_serialized_str_size(snapshot->state);
   char *buffer;
   if ((buffer = (byte_t *)calloc(size, sizeof(byte_t))) == NULL) {
@@ -85,7 +87,18 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
 
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
 
+  if ((fp = fopen(snapshot_file, "w")) == NULL) {
+    log_critical(logger_id, "Opening snapshot file failed\n");
+    ret = RC_SNAPSHOT_FILE_OPEN_FAILED;
+    goto cleanup;
+  }
+
+  fprintf(fp, "%s", buffer);
+
 cleanup:
+  if (fp) {
+    fclose(fp);
+  }
   return ret;
 }
 

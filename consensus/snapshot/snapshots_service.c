@@ -50,11 +50,11 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
 
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
                                                milestone_tracker_t const *const milestone_tracker) {
-  retcode_t err;
+  retcode_t ret;
 
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, milestone_tracker, &pack), err);
+  ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, milestone_tracker, &pack), ret);
 
   if (pack.num_loaded == 0) {
     log_error(logger_id, "Target milestone was not loaded\n");
@@ -63,10 +63,11 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
 
   snapshot_t next_snapshot;
   ERR_BIND_RETURN(
-      iota_snapshots_service_generate_snapshot(snapshots_service, milestone_tracker, &milestone, &next_snapshot), err);
+      iota_snapshots_service_generate_snapshot(snapshots_service, milestone_tracker, &milestone, &next_snapshot), ret);
   // TODO - implement + uncomment
   // ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count),err);
-  return RC_CONSENSUS_NOT_IMPLEMENTED;
+  ERR_BIND_RETURN(iota_snapshots_service_persist_snapshot(&snapshots_service, &next_snapshot), ret);
+  return RC_OK;
 }
 
 retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *const snapshots_service,
@@ -106,8 +107,6 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshots_service_replay_milestones(snapshots_service, &snapshot, target_milestone->index), ret,
                 cleanup);
-  ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(&snapshots_service, &snapshot), ret, cleanup);
-
   ERR_BIND_GOTO(iota_snapshots_service_update_solid_entry_points(&snapshots_service, snapshot, target_milestone), ret,
                 cleanup);
 

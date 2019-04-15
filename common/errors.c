@@ -166,7 +166,15 @@ const char* error_2_string(retcode_t err) {
     // Conf Module
     case RC_CIRI_CONF_INVALID_ARGUMENT:
     // Snapshot Module
+<<<<<<< HEAD
     case RC_SNAPSHOT_FILE_NOT_FOUND:
+=======
+    case RC_SNAPSHOT_NULL_SELF:
+    case RC_SNAPSHOT_NULL_STATE:
+    case RC_SNAPSHOT_NULL_HASH:
+    case RC_SNAPSHOT_NULL_BALANCE:
+    case RC_SNAPSHOT_FILE_OPEN_FAILED:
+>>>>>>> consensus/snapshot_service - write snapshot data
     case RC_SNAPSHOT_INVALID_FILE:
     case RC_SNAPSHOT_INVALID_SUPPLY:
     case RC_SNAPSHOT_INCONSISTENT_SNAPSHOT:
