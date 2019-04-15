@@ -40,12 +40,14 @@ $ bazel run --define network=mainnet|testnet -- ciri <optional flags>
 
 cIRI configuration file is a [YAML](http://yaml.org/) file with path `ciri/conf.yml`.
 
-Example file:
+An example file `ciri/conf.example.yml` is provided; you can rename it, uncomment and change values of options you want to use.
+
+Example syntax:
 
 ```yaml
 log-level: debug
 neighbors: "udp://148.148.148.148:14265"
-port: 14265
+http_port: 14265
 ```
 
 ### Command Line Interface
