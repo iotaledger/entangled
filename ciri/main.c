@@ -15,15 +15,70 @@
 #include "utils/handles/signal.h"
 #include "utils/logger_helper.h"
 
-#define MAIN_LOGGER_ID "main"
+#define MAIN_LOGGER_ID "ciri"
 #define STATS_LOG_INTERVAL_S 10
 
 static core_t ciri_core;
-static logger_id_t logger_id;
 static iota_api_t api;
 static iota_api_http_t http;
+static logger_id_t logger_id;
+static tangle_t tangle;
 
-static void signal_handler(int sig) {
+static retcode_t ciri_init() {
+  retcode_t ret = RC_OK;
+  connection_config_t db_conf = {.db_path = ciri_core.conf.db_path};
+
+  log_info(logger_id, "Initializing storage\n");
+  if ((ret = storage_init()) != RC_OK) {
+    log_critical(logger_id, "Initializing storage failed\n");
+    return ret;
+  }
+
+  if ((ret = iota_tangle_init(&tangle, &db_conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing tangle connection failed\n");
+    return ret;
+  }
+
+  log_info(logger_id, "Initializing cIRI core\n");
+  if ((ret = core_init(&ciri_core, &tangle)) != RC_OK) {
+    log_critical(logger_id, "Initializing cIRI core failed\n");
+    return ret;
+  }
+
+  log_info(logger_id, "Initializing API\n");
+  if ((ret = iota_api_init(&api, &ciri_core)) != RC_OK) {
+    log_critical(logger_id, "Initializing API failed\n");
+    return ret;
+  }
+
+  log_info(logger_id, "Initializing API HTTP\n");
+  if ((ret = iota_api_http_init(&http, &api, &db_conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing API HTTP failed\n");
+    return ret;
+  }
+
+  return ret;
+}
+
+static retcode_t ciri_start() {
+  retcode_t ret = RC_OK;
+
+  log_info(logger_id, "Starting cIRI core\n");
+  if ((ret = core_start(&ciri_core, &tangle)) != RC_OK) {
+    log_critical(logger_id, "Starting cIRI core failed\n");
+    return ret;
+  }
+
+  log_info(logger_id, "Starting API HTTP\n");
+  if ((ret = iota_api_http_start(&http)) != RC_OK) {
+    log_critical(logger_id, "Starting API HTTP failed\n");
+    return ret;
+  }
+
+  return ret;
+}
+
+static void ciri_stop(int sig) {
   if (ciri_core.running && sig == SIGINT) {
     log_info(logger_id, "Stopping API HTTP\n");
     if (iota_api_http_stop(&http) != RC_OK) {
@@ -37,11 +92,40 @@ static void signal_handler(int sig) {
   }
 }
 
+static retcode_t ciri_destroy() {
+  retcode_t ret = RC_OK;
+
+  log_info(logger_id, "Destroying API HTTP\n");
+  if ((ret = iota_api_http_destroy(&http)) != RC_OK) {
+    log_error(logger_id, "Destroying API HTTP failed\n");
+  }
+
+  log_info(logger_id, "Destroying API\n");
+  if ((ret = iota_api_destroy(&api)) != RC_OK) {
+    log_error(logger_id, "Destroying API failed\n");
+  }
+
+  log_info(logger_id, "Destroying cIRI core\n");
+  if ((ret = core_destroy(&ciri_core)) != RC_OK) {
+    log_error(logger_id, "Destroying cIRI core failed\n");
+  }
+
+  log_info(logger_id, "Destroying storage\n");
+  if ((ret = storage_destroy()) != RC_OK) {
+    log_error(logger_id, "Destroying storage failed\n");
+  }
+
+  if ((ret = iota_tangle_destroy(&tangle)) != RC_OK) {
+    log_error(logger_id, "Destroying tangle connection failed\n");
+  }
+
+  return ret;
+}
+
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
-  tangle_t tangle;
-  connection_config_t db_conf;
-  if (signal_handle_register(SIGINT, signal_handler) == SIG_ERR) {
+
+  if (signal_handle_register(SIGINT, ciri_stop) == SIG_ERR) {
     return EXIT_FAILURE;
   }
 
@@ -76,88 +160,41 @@ int main(int argc, char* argv[]) {
 
   log_info(logger_id, "Welcome to %s v%s\n", CIRI_NAME, CIRI_VERSION);
 
-  log_info(logger_id, "Initializing storage\n");
-  if (storage_init() != RC_OK) {
-    log_critical(logger_id, "Initializing storage failed\n");
+  log_info(logger_id, "Initializing cIRI\n");
+  if (ciri_init() != RC_OK) {
+    log_critical(logger_id, "Initializing cIRI failed\n");
     return EXIT_FAILURE;
   }
 
-  db_conf.db_path = ciri_core.conf.db_path;
-  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(logger_id, "Initializing tangle connection failed\n");
-    return EXIT_FAILURE;
+  log_info(logger_id, "Starting cIRI\n");
+  if (ciri_start() != RC_OK) {
+    log_critical(logger_id, "Starting cIRI failed\n");
+    ret = EXIT_FAILURE;
+    goto destroy;
   }
 
-  log_info(logger_id, "Initializing cIRI core\n");
-  if (core_init(&ciri_core, &tangle) != RC_OK) {
-    log_critical(logger_id, "Initializing cIRI core failed\n");
-    return EXIT_FAILURE;
-  }
+  {
+    size_t count = 0;
 
-  log_info(logger_id, "Initializing API\n");
-  if (iota_api_init(&api, &ciri_core) != RC_OK) {
-    log_critical(logger_id, "Initializing API failed\n");
-    return RC_CORE_FAILED_API_INIT;
-  }
-
-  log_info(logger_id, "Initializing API HTTP\n");
-  if (iota_api_http_init(&http, &api, &db_conf) != RC_OK) {
-    log_critical(logger_id, "Initializing API HTTP failed\n");
-    return RC_CORE_FAILED_API_HTTP_INIT;
-  }
-
-  log_info(logger_id, "Starting cIRI core\n");
-  if (core_start(&ciri_core, &tangle) != RC_OK) {
-    log_critical(logger_id, "Starting cIRI core failed\n");
-    return EXIT_FAILURE;
-  }
-
-  log_info(logger_id, "Starting API HTTP\n");
-  if (iota_api_http_start(&http) != RC_OK) {
-    log_critical(logger_id, "Starting API HTTP failed\n");
-    return RC_CORE_FAILED_API_HTTP_START;
-  }
-
-  size_t count = 0;
-  while (ciri_core.running) {
-    if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {
-      ret = EXIT_FAILURE;
-      break;
+    while (ciri_core.running) {
+      if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {
+        ret = EXIT_FAILURE;
+        break;
+      }
+      log_info(logger_id,
+               "Transactions: to process %d, to broadcast %d, to request %d, "
+               "to reply %d, count %d\n",
+               processor_size(&ciri_core.node.processor), broadcaster_size(&ciri_core.node.broadcaster),
+               requester_size(&ciri_core.node.transaction_requester), responder_size(&ciri_core.node.responder), count);
+      sleep(STATS_LOG_INTERVAL_S);
     }
-    log_info(logger_id,
-             "Transactions: to process %d, to broadcast %d, to request %d, "
-             "to reply %d, count %d\n",
-             processor_size(&ciri_core.node.processor), broadcaster_size(&ciri_core.node.broadcaster),
-             requester_size(&ciri_core.node.transaction_requester), responder_size(&ciri_core.node.responder), count);
-    sleep(STATS_LOG_INTERVAL_S);
   }
 
-  log_info(logger_id, "Destroying API HTTP\n");
-  if (iota_api_http_destroy(&http) != RC_OK) {
-    log_error(logger_id, "Destroying API HTTP failed\n");
-    ret = RC_CORE_FAILED_API_HTTP_DESTROY;
-  }
+destroy:
 
-  log_info(logger_id, "Destroying API\n");
-  if (iota_api_destroy(&api) != RC_OK) {
-    log_error(logger_id, "Destroying API failed\n");
-    ret = RC_CORE_FAILED_API_DESTROY;
-  }
-
-  log_info(logger_id, "Destroying cIRI core\n");
-  if (core_destroy(&ciri_core) != RC_OK) {
-    log_error(logger_id, "Destroying cIRI core failed\n");
-    ret = EXIT_FAILURE;
-  }
-
-  log_info(logger_id, "Destroying storage\n");
-  if (storage_destroy() != RC_OK) {
-    log_error(logger_id, "Destroying storage failed\n");
-    ret = EXIT_FAILURE;
-  }
-
-  if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_error(logger_id, "Destroying tangle connection failed\n");
+  log_info(logger_id, "Destroying cIRI\n");
+  if (ciri_destroy() != RC_OK) {
+    log_error(logger_id, "Destroying cIRI failed\n");
     ret = EXIT_FAILURE;
   }
 
