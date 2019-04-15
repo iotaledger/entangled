@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "common/network/uri_parser.h"
+#include "common/network/uri.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"

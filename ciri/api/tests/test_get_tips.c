@@ -8,11 +8,22 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "ciri/api/tests/defs.h"
 #include "gossip/node.h"
 
 static iota_api_t api;
 static core_t core;
+
+void test_get_tips_empty(void) {
+  get_tips_res_t *res = get_tips_res_new();
+  error_res_t *error = NULL;
+
+  TEST_ASSERT(iota_api_get_tips(&api, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
+  TEST_ASSERT_EQUAL_INT(get_tips_res_hash_num(res), 0);
+
+  get_tips_res_free(&res);
+  error_res_free(&error);
+}
 
 void test_get_tips(void) {
   get_tips_res_t *res = get_tips_res_new();
@@ -27,27 +38,23 @@ void test_get_tips(void) {
     trytes[0]++;
   }
 
-  node_t *node = &api.core->node;
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[5]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[6]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[7]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[8]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[9]) == RC_OK);
 
-  TEST_ASSERT(tips_cache_init(&node->tips, 5) == RC_OK);
+  TEST_ASSERT(tips_cache_set_solid(&api.core->node.tips, hashes[5]) == RC_OK);
+  TEST_ASSERT(tips_cache_set_solid(&api.core->node.tips, hashes[6]) == RC_OK);
+  TEST_ASSERT(tips_cache_set_solid(&api.core->node.tips, hashes[7]) == RC_OK);
+  TEST_ASSERT(tips_cache_set_solid(&api.core->node.tips, hashes[8]) == RC_OK);
+  TEST_ASSERT(tips_cache_set_solid(&api.core->node.tips, hashes[9]) == RC_OK);
 
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[5]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[6]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[7]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[8]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[9]) == RC_OK);
-
-  TEST_ASSERT(tips_cache_set_solid(&node->tips, hashes[5]) == RC_OK);
-  TEST_ASSERT(tips_cache_set_solid(&node->tips, hashes[6]) == RC_OK);
-  TEST_ASSERT(tips_cache_set_solid(&node->tips, hashes[7]) == RC_OK);
-  TEST_ASSERT(tips_cache_set_solid(&node->tips, hashes[8]) == RC_OK);
-  TEST_ASSERT(tips_cache_set_solid(&node->tips, hashes[9]) == RC_OK);
-
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[0]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[1]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[2]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[3]) == RC_OK);
-  TEST_ASSERT(tips_cache_add(&node->tips, hashes[4]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[0]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[1]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[2]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[3]) == RC_OK);
+  TEST_ASSERT(tips_cache_add(&api.core->node.tips, hashes[4]) == RC_OK);
 
   TEST_ASSERT(iota_api_get_tips(&api, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
@@ -60,8 +67,6 @@ void test_get_tips(void) {
     i--;
   }
 
-  TEST_ASSERT(tips_cache_destroy(&node->tips) == RC_OK);
-
   get_tips_res_free(&res);
   error_res_free(&error);
 }
@@ -71,7 +76,12 @@ int main(void) {
 
   api.core = &core;
 
+  TEST_ASSERT(tips_cache_init(&api.core->node.tips, 5) == RC_OK);
+
+  RUN_TEST(test_get_tips_empty);
   RUN_TEST(test_get_tips);
+
+  TEST_ASSERT(tips_cache_destroy(&api.core->node.tips) == RC_OK);
 
   return UNITY_END();
 }

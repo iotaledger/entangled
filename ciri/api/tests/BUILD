@@ -92,7 +92,6 @@ cc_test(
     name = "test_get_tips",
     srcs = ["test_get_tips.c"],
     deps = [
-        ":defs",
         "//ciri/api",
         "@unity",
     ],

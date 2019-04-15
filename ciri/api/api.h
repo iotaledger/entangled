@@ -14,12 +14,12 @@
 #include "ciri/core.h"
 #include "common/errors.h"
 
-#define API_TAILS_NOT_SOLID "tails are not solid (missing a referenced tx)"
-#define API_TAILS_BUNDLE_INVALID "tails are not consistent (bundle is invalid)"
-#define API_TAILS_NOT_CONSISTENT                                          \
-  "tails are not consistent (would lead to inconsistent ledger state or " \
-  "below max depth)"
-#define API_INVALID_SUBTANGLE "This operation cannot be executed: The subtangle has not been updated yet"
+#define API_ERROR_INVALID_SUBTANGLE "This operation cannot be executed: The subtangle has not been updated yet"
+#define API_ERROR_INVALID_URI_SCHEME "Invalid URI scheme"
+#define API_ERROR_TAILS_BUNDLE_INVALID "Tails are not consistent (bundle is invalid)"
+#define API_ERROR_TAILS_NOT_CONSISTENT \
+  "Tails are not consistent (would lead to inconsistent ledger state or below max depth)"
+#define API_ERROR_TAILS_NOT_SOLID "Tails are not solid (missing a referenced tx)"
 
 #ifdef __cplusplus
 extern "C" {

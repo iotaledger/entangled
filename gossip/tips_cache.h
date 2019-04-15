@@ -11,6 +11,7 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/containers/hash/hash243_set.h"
+#include "utils/containers/hash/hash243_stack.h"
 #include "utils/handles/rw_lock.h"
 
 // A fixed capacity FIFO-behaving tips cache
@@ -49,11 +50,11 @@ retcode_t tips_cache_destroy(tips_cache_t* const cache);
  * Gets all tips from a tips cache
  *
  * @param cache The cache
- * @param tips A set of tips to be filled
+ * @param tips A stack of tips to be filled
  *
  * @return a status code
  */
-retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_set_t* const tips);
+retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_stack_t* const tips);
 
 /**
  * Adds a tip to a tips cache

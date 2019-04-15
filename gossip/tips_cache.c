@@ -71,15 +71,21 @@ retcode_t tips_cache_destroy(tips_cache_t* const cache) {
   return RC_OK;
 }
 
-retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_set_t* const tips) {
+retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_stack_t* const tips) {
   retcode_t ret = RC_OK;
+  hash243_set_entry_t* iter = NULL;
+  hash243_set_entry_t* tmp = NULL;
 
   if (cache == NULL || tips == NULL) {
     return RC_NULL_PARAM;
   }
 
   rw_lock_handle_rdlock(&cache->tips_lock);
-  ret = hash243_set_append(&cache->tips, tips);
+  HASH_SET_ITER(cache->tips, iter, tmp) {
+    if ((ret = hash243_stack_push(tips, iter->hash)) != RC_OK) {
+      break;
+    }
+  }
   rw_lock_handle_unlock(&cache->tips_lock);
 
   if (ret != RC_OK) {
@@ -87,7 +93,11 @@ retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_set_t* const ti
   }
 
   rw_lock_handle_rdlock(&cache->solid_tips_lock);
-  ret = hash243_set_append(&cache->solid_tips, tips);
+  HASH_SET_ITER(cache->solid_tips, iter, tmp) {
+    if ((ret = hash243_stack_push(tips, iter->hash)) != RC_OK) {
+      break;
+    }
+  }
   rw_lock_handle_unlock(&cache->solid_tips_lock);
 
   return ret;

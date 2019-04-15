@@ -13,7 +13,7 @@ retcode_t json_remove_neighbors_serialize_request(serializer_t const *const s, r
                                                   char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -43,7 +43,7 @@ retcode_t json_remove_neighbors_deserialize_request(serializer_t const *const s,
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
@@ -57,7 +57,7 @@ retcode_t json_remove_neighbors_serialize_response(serializer_t const *const s, 
                                                    char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -81,7 +81,7 @@ retcode_t json_remove_neighbors_deserialize_response(serializer_t const *const s
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
