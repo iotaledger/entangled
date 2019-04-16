@@ -39,6 +39,7 @@ cc_library(
         "//common:errors",
         "//common/trinary:flex_trit",
         "//utils:hash_maps",
+        "//utils:macros",
         "//utils/containers/hash:hash_int64_t_map",
     ],
 )
