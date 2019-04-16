@@ -32,9 +32,10 @@
 #define TRANSACTION_COL_HASH "hash"
 #define TRANSACTION_COL_SNAPSHOT_INDEX "snapshot_index"
 #define TRANSACTION_COL_SOLID "solid"
+#define TRANSACTION_COL_VALIDITY "validity"
 #define TRANSACTION_COL_ARRIVAL_TIME "arrival_timestamp"
 
-#define TRANSACTION_NUM_COLS 19
+#define TRANSACTION_NUM_COLS 20
 
 /*
  * Milestone definitions
