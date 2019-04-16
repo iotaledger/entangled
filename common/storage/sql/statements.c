@@ -64,7 +64,7 @@ char *iota_statement_transaction_select_hashes_of_approvers_before_date =
 
 char *iota_statement_transaction_select_hashes_of_milestone_candidates =
     "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_ADDRESS
-    " LIKE ? EXCEPT SELECT " MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME;
+    " LIKE ? AND " TRANSACTION_COL_CURRENT_INDEX "=0 EXCEPT SELECT " MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME;
 
 char *iota_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=? WHERE " TRANSACTION_COL_HASH "=?";
