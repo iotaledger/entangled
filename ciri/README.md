@@ -47,7 +47,7 @@ Example syntax:
 ```yaml
 log-level: debug
 neighbors: "udp://148.148.148.148:14265"
-http_port: 14265
+http-port: 14265
 ```
 
 ### Command Line Interface
