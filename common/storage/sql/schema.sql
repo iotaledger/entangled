@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
   hash BLOB NOT NULL PRIMARY KEY,
   snapshot_index INTEGER NOT NULL DEFAULT 0,
   solid SMALLINT NOT NULL DEFAULT 0,
+  validity SMALLINT NOT NULL DEFAULT 0,
   arrival_timestamp INTEGER NOT NULL
 );
 
