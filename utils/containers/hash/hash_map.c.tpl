@@ -91,3 +91,26 @@ hash_to_{TYPE}_map_t *const dst){
 size_t hash_to_{TYPE}_map_size(hash_to_{TYPE}_map_t const map){
  return HASH_COUNT(map);
 }
+
+
+bool hash_to_{TYPE}_map_equal(hash_to_{TYPE}_map_t const lhs,
+        hash_to_{TYPE}_map_t const rhs){
+  if (HASH_COUNT(lhs) != HASH_COUNT(rhs)){
+    return false;
+  }
+
+  hash_to_{TYPE}_map_entry_t * rhs_entry = NULL;
+  hash_to_{TYPE}_map_entry_t *lhs_entry = NULL;
+  hash_to_{TYPE}_map_entry_t *tmp_entry = NULL;
+
+  HASH_ITER(hh, lhs, lhs_entry, tmp_entry) {
+    if (!hash_to_{TYPE}_map_find(&rhs,lhs_entry->hash,&rhs_entry)){
+      return false;
+    }
+    if (lhs_entry->value != rhs_entry->value){
+      return false;
+    }
+  }
+
+  return true;
+}

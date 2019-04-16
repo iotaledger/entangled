@@ -43,6 +43,9 @@ void hash_to_{TYPE}_map_keys(hash_to_{TYPE}_map_t *const map,
 retcode_t hash_to_{TYPE}_map_copy(hash_to_{TYPE}_map_t const *const src,
         hash_to_{TYPE}_map_t *const dst);
 
+bool hash_to_{TYPE}_map_equal(hash_to_{TYPE}_map_t const lhs,
+        hash_to_{TYPE}_map_t const rhs);
+
 #ifdef __cplusplus
 }
 #endif
