@@ -14,7 +14,7 @@ retcode_t iota_client_get_bundle(iota_client_service_t const* const serv, flex_t
   log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   retcode_t ret_code = iota_client_traverse_bundle(serv, tail_hash, bundle);
   if (ret_code == RC_OK) {
-    bundle_validator(bundle, bundle_status);
+    bundle_validate(bundle, bundle_status);
   }
   return ret_code;
 }

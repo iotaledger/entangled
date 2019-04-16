@@ -82,5 +82,5 @@ retcode_t iota_consensus_bundle_validator_validate(tangle_t const* const tangle,
     *status = BUNDLE_TAIL_NOT_FOUND;
     return res;
   }
-  return bundle_validator(bundle, status);
+  return bundle_validate(bundle, status);
 }
