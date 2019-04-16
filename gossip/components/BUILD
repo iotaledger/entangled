@@ -93,6 +93,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//utils/containers/hash:hash243_set",
+        "//utils/containers/hash:hash243_stack",
         "//utils/handles:cond",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",

@@ -23,7 +23,7 @@ void test_get_inclusion_states_serialize_request(void) {
 
   TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH,
                                      NUM_TRYTES_HASH));
-  TEST_ASSERT(hash243_queue_push(&get_is->hashes, trits_243) == RC_OK);
+  TEST_ASSERT(hash243_queue_push(&get_is->transactions, trits_243) == RC_OK);
 
   serializer.vtable.get_inclusion_states_serialize_request(&serializer, get_is, serializer_out);
   // test request with no tips
@@ -54,14 +54,14 @@ void test_get_inclusion_states_deserialize_request(void) {
 
   // test request with no tips
   serializer.vtable.get_inclusion_states_deserialize_request(&serializer, json_text_no_tips, deserialize_get_is);
-  req_transaction = hash243_queue_at(&deserialize_get_is->hashes, 0);
+  req_transaction = hash243_queue_at(&deserialize_get_is->transactions, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(hash243_queue_count(deserialize_get_is->tips) == 0);
 
   // test request with tips
   serializer.vtable.get_inclusion_states_deserialize_request(&serializer, json_text, deserialize_get_is);
-  req_transaction = hash243_queue_at(&deserialize_get_is->hashes, 0);
+  req_transaction = hash243_queue_at(&deserialize_get_is->transactions, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
 
@@ -79,9 +79,8 @@ void test_get_inclusion_states_serialize_response(void) {
   get_inclusion_states_res_t* get_is = get_inclusion_states_res_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  TEST_ASSERT(get_inclusion_states_res_states_set(get_is, 1) == RC_OK);
-  TEST_ASSERT(get_inclusion_states_res_states_set(get_is, 0) == RC_OK);
-
+  TEST_ASSERT(get_inclusion_states_res_states_add(get_is, true) == RC_OK);
+  TEST_ASSERT(get_inclusion_states_res_states_add(get_is, false) == RC_OK);
   serializer.vtable.get_inclusion_states_serialize_response(&serializer, get_is, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);

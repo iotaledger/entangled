@@ -24,25 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "http",
-    srcs = ["http.c"],
-    hdrs = ["http.h"],
-    deps = [
-        ":api",
-        "//cclient/request:requests",
-        "//cclient/response:responses",
-        "//cclient/serialization:serializer",
-        "//cclient/serialization:serializer_json",
-        "//common:errors",
-        "//common/storage",
-        "//utils:logger_helper",
-        "//utils/handles:thread",
-        "@cJSON",
-        "@libmicrohttpd",
-    ],
-)
-
-cc_library(
     name = "conf",
     srcs = ["conf.c"],
     hdrs = ["conf.h"],

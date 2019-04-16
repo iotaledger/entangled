@@ -263,9 +263,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_COORDINATOR_ADDRESS:  // --coordinator-address
       ret = get_trytes(value, consensus_conf->coordinator_address, HASH_LENGTH_TRYTE);
       break;
-    case CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE:  // --coordinator-num-keys-in-milestone
-      consensus_conf->coordinator_num_keys_in_milestone = atoi(value);
-      consensus_conf->coordinator_max_milestone_index = 1 << consensus_conf->coordinator_num_keys_in_milestone;
+    case CONF_COORDINATOR_DEPTH:  // --coordinator-depth
+      consensus_conf->coordinator_depth = atoi(value);
+      consensus_conf->coordinator_max_milestone_index = 1 << consensus_conf->coordinator_depth;
       break;
     case CONF_COORDINATOR_SECURITY_LEVEL:  // --coordinator-security-level
     {
@@ -364,7 +364,7 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
   }
 
   if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
-    return RC_CIRI_CONF_FILE_NOT_FOUND;
+    return RC_OK;
   }
 
   if (!yaml_parser_initialize(&parser)) {

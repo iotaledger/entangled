@@ -15,9 +15,9 @@
 #define IOTA_SUPPLY 2779530283277761LL
 
 #define DEFAULT_COORDINATOR_ADDRESS COORDINATOR_ADDRESS
-#define DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE COORDINATOR_NUM_KEYS_IN_MILESTONE
-#define DEFAULT_COORDINATOR_SECURITY_LEVEL 1
-#define DEFAULT_COORDINATOR_SIGNATURE_TYPE SPONGE_CURLP27
+#define DEFAULT_COORDINATOR_DEPTH COORDINATOR_DEPTH
+#define DEFAULT_COORDINATOR_SECURITY_LEVEL 2
+#define DEFAULT_COORDINATOR_SIGNATURE_TYPE SPONGE_KERL
 #define DEFAULT_MWN MWM
 #define DEFAULT_TIP_SELECTION_MAX_DEPTH 15
 #define DEFAULT_TIP_SELECTION_ALPHA 0.001
@@ -45,11 +45,11 @@ typedef struct iota_consensus_conf_s {
   uint64_t below_max_depth;
   // The address of the coordinator
   flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
-  // The maximal amount of possible milestones that can be issued
-  uint64_t coordinator_max_milestone_index;
   // The depth of the Merkle tree which in turn determines the number of leaves
   // (private keys) that the coordinator can use to sign a message
-  uint8_t coordinator_num_keys_in_milestone;
+  uint8_t coordinator_depth;
+  // The maximal amount of possible milestones that can be issued
+  uint64_t coordinator_max_milestone_index;
   // The security level used in coordinator signatures
   uint8_t coordinator_security_level;
   // The signature type used in coordinator signatures

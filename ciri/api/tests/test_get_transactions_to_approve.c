@@ -55,7 +55,8 @@ void test_get_transactions_to_approve_invalid_subtangle_status(void) {
   get_transactions_to_approve_req_set_depth(req, 5);
 
   TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
-  TEST_ASSERT(error == NULL);
+  TEST_ASSERT(error != NULL);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_SUBTANGLE);
 
   api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index = latest_solid_subtangle_milestone_index;
   api.core->consensus.milestone_tracker.milestone_start_index = milestone_start_index;

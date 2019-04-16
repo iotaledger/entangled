@@ -35,13 +35,13 @@ void test_get_tips_serialize_response(void) {
   get_tips_res_t* res = get_tips_res_new();
 
   flex_trit_t trits_243[FLEX_TRIT_SIZE_243];
-  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH,
+  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_3, NUM_TRYTES_HASH,
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
   TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_2, NUM_TRYTES_HASH,
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
-  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_3, NUM_TRYTES_HASH,
+  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH,
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
 

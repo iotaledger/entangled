@@ -24,6 +24,7 @@ void test_remove_neighbors(void) {
   TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.4:15004") == RC_OK);
 
   TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 2);
@@ -68,6 +69,7 @@ void test_remove_neighbors_with_not_paired(void) {
   TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.3:15003") == RC_OK);
 
   TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 2);
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 2);
@@ -95,13 +97,15 @@ void test_remove_neighbors_with_invalid(void) {
   remove_neighbors_res_t *res = remove_neighbors_res_new();
   error_res_t *error = NULL;
 
-  TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
+  TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 2);
 
   TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.6:15006") == RC_OK);
   TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.7@15007") == RC_OK);
   TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.5:15005") == RC_OK);
 
-  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_OK);
+  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_NEIGHBOR_FAILED_URI_PARSING);
+  TEST_ASSERT(error != NULL);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_URI_SCHEME);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 1);
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 1);
@@ -117,13 +121,26 @@ void test_remove_neighbors_with_invalid(void) {
   remove_neighbors_req_free(&req);
   remove_neighbors_res_free(&res);
   error_res_free(&error);
+
+  req = remove_neighbors_req_new();
+  res = remove_neighbors_res_new();
+  error = NULL;
+
+  TEST_ASSERT(remove_neighbors_req_add(req, "adp://8.8.8.7:15008") == RC_OK);
+
+  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_NEIGHBOR_INVALID_PROTOCOL);
+  TEST_ASSERT(error != NULL);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_URI_SCHEME);
+
+  remove_neighbors_req_free(&req);
+  remove_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 int main(void) {
   UNITY_BEGIN();
 
   api.core = &core;
-
   api.core->node.neighbors = NULL;
   rw_lock_handle_init(&api.core->node.neighbors_lock);
 
@@ -144,6 +161,7 @@ int main(void) {
 
   RUN_TEST(test_remove_neighbors);
   RUN_TEST(test_remove_neighbors_with_not_paired);
+  RUN_TEST(test_remove_neighbors_with_invalid);
 
   neighbors_free(&api.core->node.neighbors);
   rw_lock_handle_destroy(&api.core->node.neighbors_lock);

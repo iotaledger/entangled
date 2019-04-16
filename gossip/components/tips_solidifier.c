@@ -49,32 +49,33 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
   lock_handle_lock(&lock_cond);
 
   while (tips_solidifier->running) {
+    cond_handle_timedwait(&tips_solidifier->cond, &lock_cond, TIPS_SOLIDIFICATION_INTERVAL_MS);
     if (tips_cache_non_solid_size(tips_solidifier->tips) == 0) {
-      goto sleep;
+      continue;
     }
 
     if (tips_cache_random_tip(tips_solidifier->tips, tip) != RC_OK) {
       log_warning(logger_id, "Accessing random tip from cache failed\n");
-      goto sleep;
+      continue;
     }
 
     if (iota_tangle_transaction_approvers_count(&tangle, tip, &approvers_count) != RC_OK) {
       log_warning(logger_id, "Counting number of approvers of tip failed\n");
-      goto sleep;
+      continue;
     }
 
     if (approvers_count != 0) {
       if (tips_cache_remove(tips_solidifier->tips, tip) != RC_OK) {
         log_warning(logger_id, "Removing tip from cache failed\n");
       }
-      goto sleep;
+      continue;
     }
 
     is_solid = false;
     if (iota_consensus_transaction_solidifier_check_solidity(tips_solidifier->transaction_solidifier, &tangle, tip,
                                                              false, &is_solid) != RC_OK) {
       log_warning(logger_id, "Checking solidity of tip failed\n");
-      goto sleep;
+      continue;
     }
 
     if (is_solid) {
@@ -82,9 +83,6 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
         log_warning(logger_id, "Changing status of tip to solid failed\n");
       }
     }
-
-  sleep:
-    cond_handle_timedwait(&tips_solidifier->cond, &lock_cond, TIPS_SOLIDIFICATION_INTERVAL_MS);
   }
 
   lock_handle_unlock(&lock_cond);

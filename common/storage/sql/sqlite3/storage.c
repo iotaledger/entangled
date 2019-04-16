@@ -299,6 +299,8 @@ static void select_transactions_populate_from_row_essence_and_metadata(sqlite3_s
   tx->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 7));
   transaction_set_solid(tx, sqlite3_column_int(statement, 8));
+  transaction_set_validity(tx, sqlite3_column_int(statement, 9));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 10));
 }
 
 static void select_transactions_populate_from_row_essence_attachment_and_metadata(sqlite3_stmt* const statement,
@@ -326,7 +328,8 @@ static void select_transactions_populate_from_row_essence_attachment_and_metadat
   tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 14));
   transaction_set_solid(tx, sqlite3_column_int(statement, 15));
-  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 16));
+  transaction_set_validity(tx, sqlite3_column_int(statement, 16));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 17));
 }
 
 static void select_transactions_populate_from_row_essence_and_consensus(sqlite3_stmt* const statement,
@@ -349,7 +352,8 @@ static void select_transactions_populate_from_row_metadata(sqlite3_stmt* const s
                                                            iota_transaction_t* const tx) {
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
-  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 2));
+  transaction_set_validity(tx, sqlite3_column_int(statement, 2));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 3));
 }
 
 retcode_t iota_stor_transaction_count(storage_connection_t const* const connection, size_t* const count) {
@@ -565,46 +569,6 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(storage_connection_t co
   }
 
   if (before_timestamp != 0 && sqlite3_bind_int64(sqlite_statement, 3, before_timestamp) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
-    goto done;
-  }
-
-  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
-    goto done;
-  }
-
-done:
-  sqlite3_reset(sqlite_statement);
-  return ret;
-}
-
-retcode_t iota_stor_transaction_load_hashes_of_requests(storage_connection_t const* const connection,
-                                                        iota_stor_pack_t* const pack, size_t const limit) {
-  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
-  retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_transactions_to_request;
-
-  if (sqlite3_bind_int(sqlite_statement, 1, limit) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
-    goto done;
-  }
-
-  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
-    goto done;
-  }
-
-done:
-  sqlite3_reset(sqlite_statement);
-  return ret;
-}
-
-retcode_t iota_stor_transaction_load_hashes_of_tips(storage_connection_t const* const connection,
-                                                    iota_stor_pack_t* const pack, size_t const limit) {
-  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
-  retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_tips;
-
-  if (sqlite3_bind_int(sqlite_statement, 1, limit) != SQLITE_OK) {
     ret = RC_SQLITE3_FAILED_BINDING;
     goto done;
   }

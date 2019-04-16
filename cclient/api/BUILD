@@ -23,6 +23,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         ":api_core",
+        "//common/model:inputs",
         "//utils:time",
     ],
 )

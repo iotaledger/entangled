@@ -19,21 +19,16 @@ extern "C" {
 #endif
 
 typedef struct {
-  uint64_t total_balance;
-  hash243_queue_t addresses;
-} inputs_t;
-
-typedef struct {
-  size_t balance;
+  uint64_t balance;
   flex_trit_t latest_address[FLEX_TRIT_SIZE_243];
   hash243_queue_t addresses;
   hash243_queue_t transactions;
 } account_data_t;
 
 typedef struct {
-  size_t security;
-  size_t start;
-  size_t total;
+  uint64_t start;
+  uint64_t total;
+  uint8_t security;
 } address_opt_t;
 
 #ifdef __cplusplus

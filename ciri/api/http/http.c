@@ -13,7 +13,7 @@
 #include "cclient/serialization/json/json_serializer.h"
 #include "cclient/types/types.h"
 #include "ciri/api/api.h"
-#include "ciri/api/http.h"
+#include "ciri/api/http/http.h"
 #include "utils/logger_helper.h"
 
 #define API_HTTP_LOGGER_ID "api_http"
@@ -32,11 +32,10 @@ static retcode_t error_serialize_response(iota_api_http_t *const http, error_res
   retcode_t ret = RC_OK;
 
   if (*error == NULL) {
-    *error = error_res_new();
     if (message == NULL) {
-      error_res_set(*error, "Internal server error");
+      *error = error_res_new("Internal server error");
     } else {
-      error_res_set(*error, message);
+      *error = error_res_new(message);
     }
   }
   ret = http->serializer.vtable.error_serialize_response(&http->serializer, *error, out);
@@ -228,17 +227,43 @@ static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *co
     goto done;
   }
 
-  // TODO Deserialize request
-
-  if ((ret = iota_api_get_inclusion_states(http->api, req, res, &error)) != RC_OK) {
-    error_serialize_response(http, &error, NULL, out);
+  if ((ret = http->serializer.vtable.get_inclusion_states_deserialize_request(&http->serializer, payload, req)) !=
+      RC_OK) {
+    goto done;
   }
 
-  // TODO Serialize response
+  if ((ret = iota_api_get_inclusion_states(http->api, tangle, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_inclusion_states_serialize_response(&http->serializer, res, out);
+  }
 
 done:
   get_inclusion_states_req_free(&req);
   get_inclusion_states_res_free(&res);
+
+  return ret;
+}
+
+static inline retcode_t process_get_missing_transactions_request(iota_api_http_t *const http, char const *const payload,
+                                                                 char_buffer_t *const out) {
+  retcode_t ret = RC_OK;
+  get_missing_transactions_res_t *res = get_missing_transactions_res_new();
+  error_res_t *error = NULL;
+
+  if (res == NULL) {
+    ret = RC_OOM;
+    goto done;
+  }
+
+  if ((ret = iota_api_get_missing_transactions(http->api, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_missing_transactions_serialize_response(&http->serializer, res, out);
+  }
+
+done:
+  get_missing_transactions_res_free(&res);
 
   return ret;
 }
@@ -427,8 +452,8 @@ done:
   return ret;
 }
 
-static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char *command, const char *payload,
-                                               char_buffer_t *const out) {
+static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char const *const command,
+                                               char const *const payload, char_buffer_t *const out) {
   error_res_t *error = NULL;
 
   if (!tangle) {
@@ -460,6 +485,8 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char
     return process_get_balances_request(http, payload, out);
   } else if (strcmp(command, "getInclusionStates") == 0) {
     return process_get_inclusion_states_request(http, payload, out);
+  } else if (strcmp(command, "getMissingTransactions") == 0) {
+    return process_get_missing_transactions_request(http, payload, out);
   } else if (strcmp(command, "getNeighbors") == 0) {
     return process_get_neighbors_request(http, payload, out);
   } else if (strcmp(command, "getNodeInfo") == 0) {
@@ -501,6 +528,7 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
   struct MHD_Response *response = NULL;
   cJSON *json_obj = NULL, *json_item = NULL;
   char_buffer_t *response_buf = NULL;
+  error_res_t *error = NULL;
 
   if (strncmp(method, MHD_HTTP_METHOD_POST, 4) != 0) {
     return MHD_NO;
@@ -543,21 +571,14 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
     goto cleanup;
   }
 
-  json_obj = cJSON_Parse(sess->request->data);
-  if (!json_obj) {
-    ret = MHD_NO;
-    goto cleanup;
-  }
-
   response_buf = char_buffer_new();
+  json_obj = cJSON_Parse(sess->request->data);
 
-  if (!cJSON_HasObjectItem(json_obj, "command")) {
-    error_res_t *error = NULL;
-
+  if (!json_obj) {
+    error_serialize_response(api, &error, "Invalid JSON request", response_buf);
+  } else if (!cJSON_HasObjectItem(json_obj, "command")) {
     error_serialize_response(api, &error, "Command parameter has not been specified in the request", response_buf);
   } else {
-    char *command_str = NULL;
-
     json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "command");
     if (!cJSON_IsString(json_item) || (json_item->valuestring == NULL)) {
       cJSON_Delete(json_obj);
@@ -565,9 +586,7 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
       goto cleanup;
     }
 
-    command_str = strdup(json_item->valuestring);
-    iota_api_http_process_request(api, command_str, sess->request->data, response_buf);
-    free(command_str);
+    iota_api_http_process_request(api, json_item->valuestring, sess->request->data, response_buf);
   }
 
   response = MHD_create_response_from_buffer(response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);

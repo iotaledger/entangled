@@ -22,7 +22,7 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static void iota_consensus_exit_prob_map_add_exit_probs(hash_to_double_map_t **const hash_to_probs,
+static void iota_consensus_exit_prob_map_add_exit_probs(hash_to_double_map_t *const *const hash_to_probs,
                                                         flex_trit_t const *const hash, double value) {
   hash_to_double_map_entry_t *curr_approver_entry = NULL;
   if (hash_to_double_map_find(*hash_to_probs, hash, &curr_approver_entry)) {

@@ -18,7 +18,7 @@ typedef struct {
   /**
    * List of transactions you want to get the inclusion state for.
    */
-  hash243_queue_t hashes;
+  hash243_queue_t transactions;
   /**
    * List of tips (including milestones) you want to search for the inclusion
    * state.
@@ -32,10 +32,10 @@ void get_inclusion_states_req_free(get_inclusion_states_req_t** req);
 
 static inline retcode_t get_inclusion_states_req_hash_add(get_inclusion_states_req_t* const req,
                                                           flex_trit_t const* const hash) {
-  return hash243_queue_push(&req->hashes, hash);
+  return hash243_queue_push(&req->transactions, hash);
 }
 static inline flex_trit_t* get_inclusion_states_req_hash_get(get_inclusion_states_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->hashes, index);
+  return hash243_queue_at(&req->transactions, index);
 }
 
 static inline retcode_t get_inclusion_states_req_tip_add(get_inclusion_states_req_t* const req,

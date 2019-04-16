@@ -84,6 +84,16 @@ cc_test(
 )
 
 cc_test(
+    name = "get_missing_transactions",
+    srcs = ["get_missing_transactions.c"],
+    deps = [
+        ":shared",
+        "//cclient/serialization:serializer_json",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "get_neighbors",
     srcs = ["get_neighbors.c"],
     deps = [

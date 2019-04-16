@@ -10,6 +10,7 @@
 
 #define MAX_SCHEME_LENGTH 8
 #define MAX_HOST_LENGTH 255
+#define MAX_PORT_LENGTH 5
 
 typedef enum protocol_type_e { PROTOCOL_TCP, PROTOCOL_UDP } protocol_type_t;
 

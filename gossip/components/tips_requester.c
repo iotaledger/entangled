@@ -45,6 +45,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   lock_handle_lock(&lock_cond);
 
   while (tips_requester->running) {
+    cond_handle_timedwait(&tips_requester->cond, &lock_cond, TIPS_REQUESTER_INTERVAL_MS);
     hash_pack_reset(&milestone_pack);
     if (iota_tangle_milestone_load_last(&tangle, &milestone_pack) != RC_OK || milestone_pack.num_loaded == 0) {
       continue;
@@ -71,7 +72,6 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       }
     }
     rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
-    cond_handle_timedwait(&tips_requester->cond, &lock_cond, TIPS_REQUESTER_INTERVAL_MS);
   }
 
   lock_handle_unlock(&lock_cond);

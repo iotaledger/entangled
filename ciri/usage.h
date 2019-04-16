@@ -36,7 +36,7 @@ typedef enum cli_arg_value_e {
   CONF_ALPHA,
   CONF_BELOW_MAX_DEPTH,
   CONF_COORDINATOR_ADDRESS,
-  CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE,
+  CONF_COORDINATOR_DEPTH,
   CONF_COORDINATOR_SECURITY_LEVEL,
   CONF_COORDINATOR_SIGNATURE_TYPE,
   CONF_LAST_MILESTONE,
@@ -111,7 +111,7 @@ static struct cli_argument_s {
 
     // API configuration
 
-    {"http_port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+    {"http-port", 'p', "HTTP API listen port.", REQUIRED_ARG},
     {"max-find-transactions", CONF_MAX_FIND_TRANSACTIONS,
      "The maximal number of transactions that may be returned by the "
      "'findTransactions' API call. If the number of transactions found exceeds "
@@ -134,9 +134,9 @@ static struct cli_argument_s {
      "transaction that we are stepping on during the walk approves.",
      REQUIRED_ARG},
     {"coordinator-address", CONF_COORDINATOR_ADDRESS, "The address of the coordinator.", REQUIRED_ARG},
-    {"coordinator-num-keys-in-milestone", CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE,
-     "The depth of the Merkle tree which in turn determines the number of "
-     "leaves (private keys) that the coordinator can use to sign a message.",
+    {"coordinator-depth", CONF_COORDINATOR_DEPTH,
+     "The depth of the Merkle tree which in turn determines the number of leaves (private keys) that the coordinator "
+     "can use to sign a message.",
      REQUIRED_ARG},
     {"coordinator-security-level", CONF_COORDINATOR_SECURITY_LEVEL,
      "The security level used in coordinator signatures.", REQUIRED_ARG},

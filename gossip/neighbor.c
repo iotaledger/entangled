@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "common/network/uri_parser.h"
+#include "common/network/uri.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
@@ -74,7 +74,7 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, i
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
 
-  neighbor->nbr_sent_tx++;
+  neighbor->nbr_sent_txs++;
 
   return RC_OK;
 }

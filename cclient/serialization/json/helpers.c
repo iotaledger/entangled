@@ -283,27 +283,23 @@ retcode_t hash243_queue_to_json_array(hash243_queue_t queue, cJSON* const json_r
 }
 
 retcode_t hash243_stack_to_json_array(hash243_stack_t stack, cJSON* const json_root, char const* const obj_name) {
-  size_t array_count;
-  cJSON* array_obj = NULL;
+  cJSON* array_obj = cJSON_CreateArray();
+  hash243_stack_entry_t* iter = NULL;
+  tryte_t trytes_out[NUM_TRYTES_HASH + 1];
 
-  array_count = hash243_stack_count(stack);
-  if (array_count > 0) {
-    array_obj = cJSON_CreateArray();
-    if (array_obj == NULL) {
-      return RC_CCLIENT_JSON_CREATE;
-    }
-    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+  if (array_obj == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
 
-    for (int i = array_count - 1; i >= 0; i--) {
-      tryte_t trytes_out[NUM_TRYTES_HASH + 1];
-      size_t trits_count =
-          flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH, hash243_stack_at(stack, i), NUM_TRITS_HASH, NUM_TRITS_HASH);
-      trytes_out[NUM_TRYTES_HASH] = '\0';
-      if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
-      } else {
-        return RC_CCLIENT_FLEX_TRITS;
-      }
+  cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+  trytes_out[NUM_TRYTES_HASH] = '\0';
+  HASH_STACK_FOREACH(stack, iter) {
+    size_t trits_count = flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH);
+    if (trits_count != 0) {
+      cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
+    } else {
+      return RC_CCLIENT_FLEX_TRITS;
     }
   }
   return RC_OK;
