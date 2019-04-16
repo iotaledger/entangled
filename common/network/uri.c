@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "common/network/network.h"
-#include "common/network/uri_parser.h"
+#include "common/network/uri.h"
 
 bool uri_parse(char const *const uri, char *const scheme, size_t const scheme_len, char *const host,
                size_t const host_len, uint16_t *const port) {

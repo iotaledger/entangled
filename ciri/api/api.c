@@ -9,6 +9,7 @@
 
 #include "ciri/api/api.h"
 #include "common/helpers/pow.h"
+#include "common/network/uri.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
@@ -25,7 +26,7 @@ static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **
                  api->core->consensus.milestone_tracker.milestone_start_index;
 
   if (invalid) {
-    *error = error_res_new(API_INVALID_SUBTANGLE);
+    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
   }
 
   return invalid;
@@ -37,22 +38,23 @@ static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **
 
 retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_t const *const req,
                                  add_neighbors_res_t *const res, error_res_t **const error) {
-  char **uri;
-  neighbor_t neighbor;
   retcode_t ret = RC_OK;
+  neighbor_t neighbor;
 
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
   res->added_neighbors = 0;
-  for (uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+
+  URIS_FOREACH(req->uris, uri) {
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
+      *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;
     }
-    log_info(logger_id, "Adding neighbor %s\n", *uri);
     rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
     if (neighbors_add(&api->core->node.neighbors, &neighbor) == RC_OK) {
+      log_info(logger_id, "Added neighbor %s\n", *uri);
       res->added_neighbors++;
     } else {
       log_warning(logger_id, "Adding neighbor %s failed\n", *uri);
@@ -162,14 +164,14 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
       goto done;
     }
     if (!tx.metadata.solid) {
-      check_consistency_res_info_set(res, API_TAILS_NOT_SOLID);
+      check_consistency_res_info_set(res, API_ERROR_TAILS_NOT_SOLID);
       goto done;
     }
     if ((ret = iota_consensus_bundle_validator_validate(tangle, iter->hash, bundle, &bundle_status)) != RC_OK) {
       goto done;
     }
     if (bundle_status != BUNDLE_VALID || bundle_transactions_size(bundle) == 0) {
-      check_consistency_res_info_set(res, API_TAILS_BUNDLE_INVALID);
+      check_consistency_res_info_set(res, API_ERROR_TAILS_BUNDLE_INVALID);
       goto done;
     }
     bundle_transactions_free(&bundle);
@@ -186,7 +188,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
         break;
       }
       if (!res->state) {
-        check_consistency_res_info_set(res, API_TAILS_NOT_CONSISTENT);
+        check_consistency_res_info_set(res, API_ERROR_TAILS_NOT_CONSISTENT);
         break;
       }
     }
@@ -379,6 +381,15 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
   return RC_OK;
 }
 
+retcode_t iota_api_get_missing_transactions(iota_api_t const *const api, get_missing_transactions_res_t *const res,
+                                            error_res_t **const error) {
+  if (api == NULL || res == NULL || error == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  return requester_get_requested_transactions(&api->core->node.transaction_requester, &res->hashes);
+}
+
 retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
                                  error_res_t **const error) {
   retcode_t ret = RC_OK;
@@ -432,28 +443,11 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
 }
 
 retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error) {
-  retcode_t ret = RC_OK;
-  hash243_set_t tips = NULL;
-  hash243_set_entry_t *iter = NULL;
-  hash243_set_entry_t *tmp = NULL;
-
   if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if ((ret = tips_cache_get_tips(&api->core->node.tips, &tips)) != RC_OK) {
-    goto done;
-  }
-
-  HASH_ITER(hh, tips, iter, tmp) {
-    if ((ret = hash243_stack_push(&res->hashes, iter->hash)) != RC_OK) {
-      goto done;
-    }
-  }
-
-done:
-  hash243_set_free(&tips);
-  return ret;
+  return tips_cache_get_tips(&api->core->node.tips, &res->hashes);
 }
 
 retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tangle_t *const tangle,
@@ -529,22 +523,24 @@ retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, er
 
 retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbors_req_t const *const req,
                                     remove_neighbors_res_t *const res, error_res_t **const error) {
-  char **uri;
-  neighbor_t neighbor;
   retcode_t ret = RC_OK;
+  neighbor_t neighbor;
 
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
   res->removed_neighbors = 0;
-  for (uri = (char **)utarray_front(req->uris); uri != NULL; uri = (char **)utarray_next(req->uris, uri)) {
+
+  URIS_FOREACH(req->uris, uri) {
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
+      *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;
     }
-    log_info(logger_id, "Removing neighbor %s\n", *uri);
+
     rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
     if (neighbors_remove(&api->core->node.neighbors, &neighbor) == RC_OK) {
+      log_info(logger_id, "Removed neighbor %s\n", *uri);
       res->removed_neighbors++;
     } else {
       log_warning(logger_id, "Removing neighbor %s failed\n", *uri);

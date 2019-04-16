@@ -31,7 +31,7 @@ void test_check_consistency_invalid_subtangle_status(void) {
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
   TEST_ASSERT(error != NULL);
-  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_INVALID_SUBTANGLE);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_SUBTANGLE);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
@@ -102,7 +102,7 @@ void test_check_consistency_tail_not_solid(void) {
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
-  TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_SOLID);
+  TEST_ASSERT_EQUAL_STRING(res->info->data, API_ERROR_TAILS_NOT_SOLID);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
@@ -133,7 +133,7 @@ void test_check_consistency_invalid_bundle(void) {
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
-  TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_BUNDLE_INVALID);
+  TEST_ASSERT_EQUAL_STRING(res->info->data, API_ERROR_TAILS_BUNDLE_INVALID);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
@@ -179,7 +179,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   } else {
     TEST_ASSERT_FALSE(res->state);
     TEST_ASSERT_NOT_NULL(res->info);
-    TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_CONSISTENT);
+    TEST_ASSERT_EQUAL_STRING(res->info->data, API_ERROR_TAILS_NOT_CONSISTENT);
   }
 
   check_consistency_req_free(&req);
