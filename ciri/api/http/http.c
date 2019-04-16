@@ -245,6 +245,29 @@ done:
   return ret;
 }
 
+static inline retcode_t process_get_missing_transactions_request(iota_api_http_t *const http, char const *const payload,
+                                                                 char_buffer_t *const out) {
+  retcode_t ret = RC_OK;
+  get_missing_transactions_res_t *res = get_missing_transactions_res_new();
+  error_res_t *error = NULL;
+
+  if (res == NULL) {
+    ret = RC_OOM;
+    goto done;
+  }
+
+  if ((ret = iota_api_get_missing_transactions(http->api, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_missing_transactions_serialize_response(&http->serializer, res, out);
+  }
+
+done:
+  get_missing_transactions_res_free(&res);
+
+  return ret;
+}
+
 static inline retcode_t process_get_neighbors_request(iota_api_http_t *const http, char const *const payload,
                                                       char_buffer_t *const out) {
   retcode_t ret = RC_OK;
@@ -462,6 +485,8 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char
     return process_get_balances_request(http, payload, out);
   } else if (strcmp(command, "getInclusionStates") == 0) {
     return process_get_inclusion_states_request(http, payload, out);
+  } else if (strcmp(command, "getMissingTransactions") == 0) {
+    return process_get_missing_transactions_request(http, payload, out);
   } else if (strcmp(command, "getNeighbors") == 0) {
     return process_get_neighbors_request(http, payload, out);
   } else if (strcmp(command, "getNodeInfo") == 0) {

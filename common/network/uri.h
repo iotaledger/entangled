@@ -5,12 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_URI_PARSER_H__
-#define __COMMON_NETWORK_URI_PARSER_H__
+#ifndef __COMMON_NETWORK_URI_H__
+#define __COMMON_NETWORK_URI_H__
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#define URIS_FOREACH(uris, uri) \
+  for (char **uri = (char **)utarray_front(uris); uri != NULL; uri = (char **)utarray_next(uris, uri))
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +38,4 @@ bool uri_parse(char const *const uri, char *const scheme, size_t scheme_len, cha
 }
 #endif
 
-#endif  // __COMMON_NETWORK_URI_PARSER_H__
+#endif  // __COMMON_NETWORK_URI_H__

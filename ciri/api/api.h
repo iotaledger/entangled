@@ -14,12 +14,12 @@
 #include "ciri/core.h"
 #include "common/errors.h"
 
-#define API_TAILS_NOT_SOLID "tails are not solid (missing a referenced tx)"
-#define API_TAILS_BUNDLE_INVALID "tails are not consistent (bundle is invalid)"
-#define API_TAILS_NOT_CONSISTENT                                          \
-  "tails are not consistent (would lead to inconsistent ledger state or " \
-  "below max depth)"
-#define API_INVALID_SUBTANGLE "This operation cannot be executed: The subtangle has not been updated yet"
+#define API_ERROR_INVALID_SUBTANGLE "This operation cannot be executed: The subtangle has not been updated yet"
+#define API_ERROR_INVALID_URI_SCHEME "Invalid URI scheme"
+#define API_ERROR_TAILS_BUNDLE_INVALID "Tails are not consistent (bundle is invalid)"
+#define API_ERROR_TAILS_NOT_CONSISTENT \
+  "Tails are not consistent (would lead to inconsistent ledger state or below max depth)"
+#define API_ERROR_TAILS_NOT_SOLID "Tails are not solid (missing a referenced tx)"
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,6 +182,18 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
 retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *const tangle,
                                         get_inclusion_states_req_t const *const req,
                                         get_inclusion_states_res_t *const res, error_res_t **const error);
+
+/**
+ * Returns hashes of transactions currently missing from the node.
+ *
+ * @param api The API [in]
+ * @param res The response [out]
+ * @param error An error response [out]
+ *
+ * @return a status code
+ */
+retcode_t iota_api_get_missing_transactions(iota_api_t const *const api, get_missing_transactions_res_t *const res,
+                                            error_res_t **const error);
 
 /**
  * Returns the set of neighbors the node is connected with, as well as their activity statistics or counters.

@@ -69,6 +69,17 @@ cc_test(
 )
 
 cc_test(
+    name = "test_get_missing_transactions",
+    srcs = ["test_get_missing_transactions.c"],
+    data = [":db_file"],
+    deps = [
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_get_neighbors",
     srcs = ["test_get_neighbors.c"],
     deps = [
@@ -92,7 +103,6 @@ cc_test(
     name = "test_get_tips",
     srcs = ["test_get_tips.c"],
     deps = [
-        ":defs",
         "//ciri/api",
         "@unity",
     ],

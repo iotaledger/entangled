@@ -13,6 +13,8 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
+#define HASH_SET_ITER(set, entry, tmp) HASH_ITER(hh, set, entry, tmp)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

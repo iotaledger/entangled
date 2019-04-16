@@ -20,18 +20,21 @@ bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t const 
   }
 
   HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, entry);
+
   return entry != NULL;
 }
 
 bool hash_to_indexed_hash_set_map_find(hash_to_indexed_hash_set_map_t const *const map, flex_trit_t const *const hash,
-                                       hash_to_indexed_hash_set_entry_t const **res) {
+                                       hash_to_indexed_hash_set_entry_t **const res) {
   if (map == NULL || (*map) == NULL) {
     return false;
   }
   if (res == NULL) {
     return false;
   }
+
   HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, *res);
+
   return *res != NULL;
 }
 

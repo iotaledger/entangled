@@ -73,58 +73,63 @@ void test_tips_cache() {
   TEST_ASSERT(tips_cache_add(&cache, hashes[8]) == RC_OK);
   TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 5);
 
-  hash243_set_entry_t *iter = cache.tips;
+  {
+    hash243_set_entry_t *iter = cache.tips;
 
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[4], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[7], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[1], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[2], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[8], FLEX_TRIT_SIZE_243), 0);
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[4], FLEX_TRIT_SIZE_243);
+    iter = iter->hh.next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[7], FLEX_TRIT_SIZE_243);
+    iter = iter->hh.next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[1], FLEX_TRIT_SIZE_243);
+    iter = iter->hh.next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[2], FLEX_TRIT_SIZE_243);
+    iter = iter->hh.next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[8], FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 5);
-  TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 0);
-  TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
+    TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 5);
+    TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 0);
+    TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
 
-  TEST_ASSERT(tips_cache_set_solid(&cache, hashes[7]) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 4);
-  TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 1);
-  TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
+    TEST_ASSERT(tips_cache_set_solid(&cache, hashes[7]) == RC_OK);
+    TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 4);
+    TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 1);
+    TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
 
-  TEST_ASSERT(tips_cache_set_solid(&cache, hashes[2]) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 3);
-  TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 2);
-  TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
+    TEST_ASSERT(tips_cache_set_solid(&cache, hashes[2]) == RC_OK);
+    TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 3);
+    TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 2);
+    TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
 
-  TEST_ASSERT(tips_cache_set_solid(&cache, hashes[4]) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 2);
-  TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 3);
-  TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
+    TEST_ASSERT(tips_cache_set_solid(&cache, hashes[4]) == RC_OK);
+    TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 2);
+    TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 3);
+    TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
 
-  TEST_ASSERT(tips_cache_set_solid(&cache, hashes[4]) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 2);
-  TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 3);
-  TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
+    TEST_ASSERT(tips_cache_set_solid(&cache, hashes[4]) == RC_OK);
+    TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 2);
+    TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 3);
+    TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
+  }
 
-  hash243_set_t tips = NULL;
+  {
+    hash243_stack_t tips = NULL;
+    hash243_stack_entry_t *iter = NULL;
 
-  TEST_ASSERT(tips_cache_get_tips(&cache, &tips) == RC_OK);
-  iter = tips;
+    TEST_ASSERT(tips_cache_get_tips(&cache, &tips) == RC_OK);
+    iter = tips;
 
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[1], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[8], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[7], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[2], FLEX_TRIT_SIZE_243), 0);
-  iter = iter->hh.next;
-  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[4], FLEX_TRIT_SIZE_243), 0);
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[4], FLEX_TRIT_SIZE_243);
+    iter = iter->next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[2], FLEX_TRIT_SIZE_243);
+    iter = iter->next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[7], FLEX_TRIT_SIZE_243);
+    iter = iter->next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[8], FLEX_TRIT_SIZE_243);
+    iter = iter->next;
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[1], FLEX_TRIT_SIZE_243);
 
-  hash243_set_free(&tips);
+    hash243_stack_free(&tips);
+  }
 
   TEST_ASSERT(tips_cache_set_solid(&cache, hashes[1]) == RC_OK);
   TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 1);

@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "utils/containers/hash/hash243_set.h"
+#include "utils/containers/hash/hash243_stack.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
@@ -54,16 +55,15 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester, n
 retcode_t requester_destroy(transaction_requester_t *const transaction_requester);
 
 /**
- * Get all the requested transactions and milestones from a transaction
- * requester
+ * Gets all the requested transactions and milestones hashes from a transaction requester
  *
  * @param transaction_requester The transaction requester
- * @param transactions The set of transactions to be filled
+ * @param hashes The stack of transactions to be filled
  *
  * @return a status code
  */
 retcode_t requester_get_requested_transactions(transaction_requester_t *const transaction_requester,
-                                               hash243_set_t *const transactions);
+                                               hash243_stack_t *const hashes);
 
 /**
  * Gets the number of transactions to request from a transaction requester

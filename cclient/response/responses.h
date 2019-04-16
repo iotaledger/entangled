@@ -15,6 +15,7 @@
 #include "cclient/response/find_transactions.h"
 #include "cclient/response/get_balances.h"
 #include "cclient/response/get_inclusion_states.h"
+#include "cclient/response/get_missing_transactions.h"
 #include "cclient/response/get_neighbors.h"
 #include "cclient/response/get_node_info.h"
 #include "cclient/response/get_tips.h"
