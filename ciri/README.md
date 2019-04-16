@@ -69,7 +69,7 @@ Long option | Short option | Description | Example input
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
 `--tips-solidifier-enabled` | | Scan the current tips and attempt to mark them as solid. | `--tips-solidifier-enabled true`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
-`--http_port` | `-p` | HTTP API listen port. | `--http_port 14265`
+`--http-port` | `-p` | HTTP API listen port. | `--http-port 14265`
 `--max-find-transactions` | | The maximal number of transactions that may be returned by the 'findTransactions' API call. If the number of transactions found exceeds this number an error will be returned | `--max-find-transactions 100000`
 `--max-get-trytes` | | Maximum number of transactions that will be returned by the 'getTrytes' API call. | `--max-get-trytes 10000`
 `--remote-limit-api` | | Commands that should be ignored by API. | `--remote-limit-api "attachToTangle, addNeighbors"`
