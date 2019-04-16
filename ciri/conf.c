@@ -364,7 +364,7 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
   }
 
   if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
-    return RC_CIRI_CONF_FILE_NOT_FOUND;
+    return RC_OK;
   }
 
   if (!yaml_parser_initialize(&parser)) {

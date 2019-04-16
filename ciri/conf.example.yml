@@ -1,6 +1,5 @@
 # Please read https://github.com/iotaledger/entangled/tree/develop/ciri#configuration
-# The following configuration variables are provided with default values
-# Uncomment them and change their values if needed
+# To use this file, rename it to `conf.yml`, uncomment and change values if needed
 
 # cIRI configuration
 
@@ -24,7 +23,7 @@
 
 # API configuration
 
-# http_port: 14265
+# http-port: 14265
 # max-find-transactions: 100000
 # max-get-trytes: 10000
 

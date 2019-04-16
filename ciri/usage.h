@@ -111,7 +111,7 @@ static struct cli_argument_s {
 
     // API configuration
 
-    {"http_port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+    {"http-port", 'p', "HTTP API listen port.", REQUIRED_ARG},
     {"max-find-transactions", CONF_MAX_FIND_TRANSACTIONS,
      "The maximal number of transactions that may be returned by the "
      "'findTransactions' API call. If the number of transactions found exceeds "

@@ -1,8 +1,10 @@
+# Bazel
 bazel*
 user.bazelrc
 
-# Database
+# cIRI
 ciri/ciri.db*
+ciri/conf.yml
 
 # ignore all VisualStudioCode user settings
 .vscode/

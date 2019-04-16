@@ -21,7 +21,7 @@ cc_binary(
         "//ciri:mainnet": ["db/ciri-mainnet.db"],
         "//ciri:testnet": ["db/ciri-testnet.db"],
         "//conditions:default": ["db/ciri-mainnet.db"],
-    }) + [":conf.yml"],
+    }) + glob(["conf.yml"]),
     deps = [
         ":core",
         "//ciri/api",
