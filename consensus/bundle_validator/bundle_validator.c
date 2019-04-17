@@ -102,7 +102,12 @@ retcode_t iota_consensus_bundle_validator_validate(tangle_t const* const tangle,
     return res;
   }
 
-  // TODO update bundle status
+  if (*status != BUNDLE_INCOMPLETE) {
+    if ((res = iota_tangle_bundle_update_validity(tangle, bundle, *status))) {
+      log_error(logger_id, "Updating bundle validaty failed\n");
+      return res;
+    }
+  }
 
   return res;
 }

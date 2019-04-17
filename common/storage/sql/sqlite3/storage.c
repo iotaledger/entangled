@@ -788,7 +788,47 @@ done:
  */
 
 retcode_t iota_stor_bundle_update_validity(storage_connection_t const* const connection,
-                                           bundle_transactions_t const* const bundle, bundle_status_t const status) {}
+                                           bundle_transactions_t const* const bundle, bundle_status_t const status) {
+  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  retcode_t ret_rollback;
+  bool should_rollback_if_failed = true;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_update_validity;
+
+  if ((ret = begin_transaction(sqlite3_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, 1, (int)status) != SQLITE_OK) {
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
+  }
+
+  {
+    iota_transaction_t* tx = NULL;
+    bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
+
+    BUNDLE_FOREACH(bundle, tx) {
+      if ((ret = bind_execute_hash_do_func(&params, transaction_hash(tx))) != RC_OK) {
+        goto done;
+      }
+    }
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  if (ret != RC_OK && should_rollback_if_failed) {
+    if ((ret_rollback = rollback_transaction(sqlite3_connection->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+  if ((ret = end_transaction(sqlite3_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
+}
 
 /*
  * Milestone operations

@@ -42,6 +42,8 @@ static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
                            iota_statement_transaction_update_snapshot_index);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_update_solid_state),
                            iota_statement_transaction_update_solid_state);
+  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_update_validity),
+                           iota_statement_transaction_update_validity);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_exist),
                            iota_statement_transaction_exist);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_exist_by_hash),
@@ -102,6 +104,7 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_milestone_candidates);
   ret |= finalize_statement(connection->statements.transaction_update_snapshot_index);
   ret |= finalize_statement(connection->statements.transaction_update_solid_state);
+  ret |= finalize_statement(connection->statements.transaction_update_validity);
   ret |= finalize_statement(connection->statements.transaction_exist);
   ret |= finalize_statement(connection->statements.transaction_exist_by_hash);
   ret |= finalize_statement(connection->statements.transaction_approvers_count);
