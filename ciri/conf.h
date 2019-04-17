@@ -18,19 +18,21 @@
 
 #define DEFAULT_LOG_LEVEL LOGGER_INFO
 #define DEFAULT_DB_PATH DB_PATH
+#define DEFAULT_DB_PREVALIDATE false
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// This structure contains all configuration variables needed to operate
-// cIRI
+// This structure contains all configuration variables needed to operate cIRI
 typedef struct iota_ciri_conf_s {
+  // Path of the DB file
+  char db_path[128];
+  // Reloads milestones, state of the ledger and transactions metadata from the database
+  bool db_revalidate;
   // Valid log levels: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
-  // Path of the DB file
-  char db_path[128];
 } iota_ciri_conf_t;
 
 /**

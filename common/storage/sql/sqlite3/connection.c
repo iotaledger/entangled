@@ -61,6 +61,10 @@ static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
                            iota_statement_transaction_select_essence_and_consensus);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_select_metadata),
                            iota_statement_transaction_select_metadata);
+  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_metadata_clear),
+                           iota_statement_transaction_metadata_clear);
+  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_clear),
+                           iota_statement_milestone_clear);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_insert),
                            iota_statement_milestone_insert);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_by_hash),
@@ -106,6 +110,8 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   ret |= finalize_statement(connection->statements.transaction_select_essence_attachment_and_metadata);
   ret |= finalize_statement(connection->statements.transaction_select_essence_and_consensus);
   ret |= finalize_statement(connection->statements.transaction_select_metadata);
+  ret |= finalize_statement(connection->statements.transaction_metadata_clear);
+  ret |= finalize_statement(connection->statements.milestone_clear);
   ret |= finalize_statement(connection->statements.milestone_insert);
   ret |= finalize_statement(connection->statements.milestone_select_by_hash);
   ret |= finalize_statement(connection->statements.milestone_select_first);

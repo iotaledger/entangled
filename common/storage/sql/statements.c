@@ -97,6 +97,10 @@ char *iota_statement_transaction_find =
 // Update accordingly if `iota_statement_transaction_find` is modified
 static size_t iota_statement_transaction_find_size = 328;
 
+char *iota_statement_transaction_metadata_clear =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=0," TRANSACTION_COL_SOLID
+    "=0," TRANSACTION_COL_VALIDITY "=0";
+
 /*
  * Partial Transaction statements
  */
@@ -156,6 +160,8 @@ char *iota_statement_transaction_find_build(size_t const bundles_count, size_t c
 /*
  * Milestone statements
  */
+
+char *iota_statement_milestone_clear = "DELETE FROM " MILESTONE_TABLE_NAME;
 
 char *iota_statement_milestone_insert =
     "INSERT INTO " MILESTONE_TABLE_NAME "(" MILESTONE_COL_INDEX "," MILESTONE_COL_HASH ")VALUES(?,?)";
