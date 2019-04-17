@@ -28,7 +28,7 @@ retcode_t iota_snapshot_state_read_from_file(snapshot_t *const snapshot, char co
   retcode_t ret;
   char *buffer = NULL;
 
-  ERR_BIND_RETURN(iota_utils_read_file_into_buffer(snapshot_file, &buffer), ret);
+  ERR_BIND_GOTO(iota_utils_read_file_into_buffer(snapshot_file, &buffer), ret, cleanup);
   if (buffer) {
     ERR_BIND_GOTO(state_delta_deserialize_str(buffer, &snapshot->state), ret, cleanup);
   }
