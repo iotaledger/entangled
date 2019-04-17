@@ -185,7 +185,7 @@ size_t state_delta_serialized_str_size(state_delta_t const delta) {
 retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) {
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
-  tryte_t address_trytes[81];
+  tryte_t address_trytes[NUM_TRYTES_ADDRESS];
   char svalue[MAX_CHARS_UNIT64];
 
   HASH_ITER(hh, delta, iter, tmp) {
