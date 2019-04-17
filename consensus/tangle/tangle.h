@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "common/model/bundle.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/defs.h"
@@ -120,6 +121,13 @@ retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle);
 retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_queue_t const bundles,
                                        hash243_queue_t const addresses, hash81_queue_t const tags,
                                        hash243_queue_t const approvees, iota_stor_pack_t *const pack);
+
+/*
+ * Bundle operations
+ */
+
+retcode_t iota_tangle_bundle_update_validity(tangle_t const *const tangle, bundle_transactions_t const *const bundle,
+                                             bundle_status_t const status);
 
 /*
  * Milestone operations

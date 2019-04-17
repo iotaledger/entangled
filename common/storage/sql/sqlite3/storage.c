@@ -784,6 +784,13 @@ done:
 }
 
 /*
+ * Bundle operations
+ */
+
+retcode_t iota_stor_bundle_update_validity(storage_connection_t const* const connection,
+                                           bundle_transactions_t const* const bundle, bundle_status_t const status) {}
+
+/*
  * Milestone operations
  */
 

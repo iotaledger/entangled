@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "common/model/bundle.h"
 #include "common/storage/connection.h"
 #include "common/storage/defs.h"
 #include "common/storage/pack.h"
@@ -115,6 +116,14 @@ extern retcode_t iota_stor_transaction_find(storage_connection_t const* const co
                                             hash243_queue_t const approvees, iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_transaction_metadata_clear(storage_connection_t const* const connection);
+
+/*
+ * Bundle operations
+ */
+
+extern retcode_t iota_stor_bundle_update_validity(storage_connection_t const* const connection,
+                                                  bundle_transactions_t const* const bundle,
+                                                  bundle_status_t const status);
 
 /*
  * Milestone operations
