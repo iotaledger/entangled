@@ -64,8 +64,8 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
 retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata) {
   retcode_t ret;
   char c;
-  tryte_t curr_hash_trytes[81];
-  flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
+  tryte_t curr_address_trytes[NUM_TRYTES_ADDRESS];
+  flex_trit_t curr_address[FLEX_TRIT_SIZE_243];
   uint64_t snapshot_index;
   int offset;
   char const *ptr = str;
@@ -98,7 +98,7 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
 
   token = strtok(ptr, ";");
   while (token != NULL) {
-    strcpy(curr_hash_trytes, token);
+    strcpy(curr_address_trytes, token);
 
     if ((token = strtok(NULL, "\n")) == NULL) {
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
@@ -107,11 +107,12 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
     }
 
-    if (flex_trits_from_trytes(curr_hash, NUM_TRITS_HASH, curr_hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
+    if (flex_trits_from_trytes(curr_address, NUM_TRITS_HASH, curr_address_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
         NUM_TRYTES_HASH) {
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
     }
-    ERR_BIND_RETURN(hash_to_uint64_t_map_add(&snapshot_metadata->solid_entry_points, curr_hash, snapshot_index), ret);
+    ERR_BIND_RETURN(hash_to_uint64_t_map_add(&snapshot_metadata->solid_entry_points, curr_address, snapshot_index),
+                    ret);
     token = strtok(NULL, ";");
   }
 
