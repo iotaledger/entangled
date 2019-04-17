@@ -14,10 +14,10 @@
 
 retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                                        bundle_transactions_t* const bundle) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   broadcast_transactions_req_t* broadcast_transactions_req = NULL;
 
-  log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   broadcast_transactions_req = broadcast_transactions_req_new();
   if (!broadcast_transactions_req) {

@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_TRANSACTION_OBJECTS_H
 #define CCLIENT_API_GET_TRANSACTION_OBJECTS_H
 
@@ -15,17 +24,12 @@ extern "C" {
 #endif
 
 /**
- * Fetches the transaction objects, given an array of transaction hashes.
+ * @brief Fetches the transaction objects, given a list of transaction hashes.
  *
- * @param {iota_client_service_t} serv - client service
- * @param {hashes_t} hashes - Array of transaction hashes
- * @param {transaction_array_t} tx_objs - List of transaction objects.
- *
- * @returns {retcode_t}
- * - `INVALID_TRANSACTION_HASH`
- * - Fetch error
- *
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetTransactionObjects.ts#L35
+ * @param[in] serv client service
+ * @param[in] tx_hashes List of transaction hashes
+ * @param[out] out_tx_objs List of transaction objects
+ * @return #retcode_t
  */
 retcode_t iota_client_get_transaction_objects(iota_client_service_t const* const serv,
                                               get_trytes_req_t* const tx_hashes, transaction_array_t* out_tx_objs);
@@ -35,3 +39,5 @@ retcode_t iota_client_get_transaction_objects(iota_client_service_t const* const
 #endif
 
 #endif  // CCLIENT_API_GET_TRANSACTION_OBJECTS_H
+
+/** @} */

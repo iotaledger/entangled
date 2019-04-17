@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_ACCOUNT_DATA_H
 #define CCLIENT_API_GET_ACCOUNT_DATA_H
 
@@ -16,21 +25,16 @@ extern "C" {
 #endif
 
 /**
- * Returns an `account_data_t` object, containing account information about
- * `addresses`, `transactions` and the total balance.
+ * @brief Returns an #account_data_t object.
  *
- * @param {iota_client_service_t} serv - client service
- * @param {flex_trit_t} seed
- * @param {size_t} security - Security
- * @param {account_data_t} out_account - acount data object
+ * Returns an #account_data_t object, containing account information about <b>addresses</b>, <b>transactions</b>,
+ * <b>inputs</b> and total account balance.
  *
- * @returns {retcode_t}
- * - `INVALID_SEED`
- * - `INVALID_START_OPTION`
- * - `INVALID_START_END_OPTIONS`: Invalid combination of start & end options`
- *
- * Refer:
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetAccountData.ts#L84
+ * @param[in] serv client service
+ * @param[in] seed seed
+ * @param[in] security Security level to be used for getting addresses
+ * @param[out] out_account the result containing a unused address, used addresses, transactions, and total balance.
+ * @return #retcode_t
  */
 retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, flex_trit_t const* const seed,
                                        uint8_t security, account_data_t* out_account);
@@ -40,3 +44,5 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
 #endif
 
 #endif  // CCLIENT_API_GET_ACCOUNT_DATA_H
+
+/** @} */

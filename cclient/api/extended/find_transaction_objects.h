@@ -24,20 +24,16 @@ extern "C" {
 #endif
 
 /**
- * @brief
+ * @brief Query transaction object by addresses, tags, and approvees.
  *
- * Wrapper function for iota_client_find_transactions() and
- * iota_client_get_trytes(). Searches for transactions given a `query` object
- * with `addresses`, `tags` and `approvees` fields. Multiple query fields are
- * supported and `iota_client_find_transaction_objects()` returns intersection
- * of results.
+ * Wrapper function for #iota_client_find_transactions and #iota_client_get_trytes. Searches for transactions given a
+ * query object with <b>addresses</b>, <b>tags</b> and <b>approvees</b> fields. Multiple query fields are supported
+ * and it returns intersection of results.
  *
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createFindTransactionObjects.ts#L38
- *
- * @param serv client service
- * @param tx_queries transactions to find
- * @param out_tx_objs A list of transation objects
- * @return error code
+ * @param[in] serv client service
+ * @param[in] tx_queries transactions to query
+ * @param[out] out_tx_objs A list of transation objects
+ * @return #retcode_t
  */
 retcode_t iota_client_find_transaction_objects(iota_client_service_t const* const serv,
                                                find_transactions_req_t const* const tx_queries,
