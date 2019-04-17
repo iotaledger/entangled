@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 
   if (ciri_core.conf.db_revalidate) {
     log_info(logger_id, "Revalidating database\n");
-    if (iota_tangle_milestone_clear(&tangle) != RC_OK || iota_tangle_transaction_clear_metadata(&tangle) != RC_OK) {
+    if (iota_tangle_milestone_clear(&tangle) != RC_OK || iota_tangle_transaction_metadata_clear(&tangle) != RC_OK) {
       log_critical(logger_id, "Revalidating database failed\n");
       return EXIT_FAILURE;
     }

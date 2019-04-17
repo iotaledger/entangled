@@ -31,7 +31,7 @@ typedef struct iota_statements_s {
   void* transaction_select_essence_attachment_and_metadata;
   void* transaction_select_essence_and_consensus;
   void* transaction_select_metadata;
-  void* transaction_clear_metadata;
+  void* transaction_metadata_clear;
   void* milestone_clear;
   void* milestone_insert;
   void* milestone_select_by_hash;
@@ -67,7 +67,7 @@ extern char* iota_statement_transaction_exist_by_hash;
 extern char* iota_statement_transaction_approvers_count;
 extern char* iota_statement_transaction_count;
 extern char* iota_statement_transaction_find;
-extern char* iota_statement_transaction_clear_metadata;
+extern char* iota_statement_transaction_metadata_clear;
 
 /*
  * Partial Transaction statements
