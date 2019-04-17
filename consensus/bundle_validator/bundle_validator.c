@@ -20,7 +20,7 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static retcode_t load_bundle_transactions(tangle_t const* const tangle, flex_trit_t* const tail_hash,
+static retcode_t load_bundle_transactions(tangle_t const* const tangle, flex_trit_t const* const tail_hash,
                                           bundle_transactions_t* const bundle) {
   retcode_t res = RC_OK;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
@@ -66,21 +66,33 @@ retcode_t iota_consensus_bundle_validator_destroy() {
   return RC_OK;
 }
 
-retcode_t iota_consensus_bundle_validator_validate(tangle_t const* const tangle, flex_trit_t* const tail_hash,
+retcode_t iota_consensus_bundle_validator_validate(tangle_t const* const tangle, flex_trit_t const* const tail_hash,
                                                    bundle_transactions_t* const bundle, bundle_status_t* const status) {
   retcode_t res = RC_OK;
+  *status = BUNDLE_NOT_INITIALIZED;
 
-  if (bundle == NULL) {
-    log_error(logger_id, "Bundle is not initialized\n");
-    *status = BUNDLE_NOT_INITIALIZED;
-    return RC_CONSENSUS_NULL_BUNDLE_PTR;
+  if (tangle == NULL || tail_hash == NULL || bundle == NULL || status == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  res = load_bundle_transactions(tangle, tail_hash, bundle);
-  if (res != RC_OK || utarray_len(bundle) == 0) {
-    log_error(logger_id, "Loading transactions for tail failed\n");
-    *status = BUNDLE_TAIL_NOT_FOUND;
+  if ((res = load_bundle_transactions(tangle, tail_hash, bundle)) != RC_OK) {
+    log_error(logger_id, "Loading bundle transactions failed\n");
     return res;
   }
-  return bundle_validate(bundle, status);
+
+  if (utarray_len(bundle) == 0) {
+    *status = BUNDLE_EMPTY;
+    return RC_OK;
+  }
+
+  // TODO check if already validated
+
+  if ((res = bundle_validate(bundle, status)) != RC_OK) {
+    log_error(logger_id, "Bundle validation failed\n");
+    return res;
+  }
+
+  // TODO update bundle status
+
+  return res;
 }
