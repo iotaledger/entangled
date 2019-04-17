@@ -8,6 +8,7 @@
 #include "consensus/snapshot/state_delta.h"
 #include <inttypes.h>
 #include <stdlib.h>
+#include "common/model/transaction.h"
 #include "utils/macros.h"
 
 int64_t state_delta_sum(state_delta_t const *const state) {
@@ -178,7 +179,7 @@ size_t state_delta_serialized_str_size(state_delta_t const delta) {
   }
   // For each line we persist the address followed by a ';' delimiter,
   // followed by the value (max is IOTA_SUPPLY which is 16 digits), followed by a new line
-  return MAX_CHARS_UNIT64 + state_delta_size(delta) * (81 + 1 + 16 + 1);
+  return MAX_CHARS_UNIT64 + state_delta_size(delta) * (NUM_TRYTES_ADDRESS + 1 + 16 + 1);
 }
 
 retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) {
@@ -187,10 +188,12 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
   tryte_t address_trytes[81];
   char svalue[MAX_CHARS_UNIT64];
 
-  sprintf(str, "%" PRIu64 "\n", state_delta_size(delta));
   HASH_ITER(hh, delta, iter, tmp) {
-    flex_trits_to_trytes(&address_trytes, 81, iter->hash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
-    strncat(str, (char *)address_trytes, 81);
+    if (flex_trits_to_trytes(&address_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS) !=
+        NUM_TRITS_ADDRESS) {
+      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
+    }
+    strncat(str, (char *)address_trytes, NUM_TRYTES_ADDRESS);
     strncat(str, ";", 1);
     sprintf(svalue, "%" PRId64 "\n", iter->value);
     strcat(str, svalue);
@@ -201,47 +204,31 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
 
 retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *const delta) {
   retcode_t ret;
-  size_t num_entries, i;
   char c;
-  tryte_t curr_hash_trytes[81];
-  flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
+  tryte_t curr_address_trytes[NUM_TRYTES_ADDRESS];
+  flex_trit_t curr_address[FLEX_TRIT_SIZE_243];
   int64_t value;
   int offset;
   char const *ptr = str;
+  char *token;
 
-  if (sscanf(str, "%" PRIu64 "%n", &num_entries, &offset) != 1) {
-    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-  }
+  token = strtok(ptr, ";");
+  while (token != NULL) {
+    strcpy(curr_address_trytes, token);
 
-  ptr += offset;
-  if (sscanf(ptr, "%c%n", &c, &offset) != 1) {
-    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-  }
-  ptr += offset;
-
-  for (i = 0; i < num_entries; ++i) {
-    strncpy((char *)curr_hash_trytes, ptr, 81);
-    ptr += 81;
-    if (sscanf(ptr, "%c%n", &c, &offset) != 1) {
-      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    if ((token = strtok(NULL, "\n")) == NULL) {
+      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
+    }
+    if (sscanf(token, "%" PRId64 "", &value) != 1) {
+      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
     }
 
-    ptr += offset;
-
-    if (sscanf(ptr, "%" PRId64 "%n", &value, &offset) != 1) {
-      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    if (flex_trits_from_trytes(curr_address, NUM_TRITS_ADDRESS, curr_address_trytes, NUM_TRYTES_ADDRESS,
+                               NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
+      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
     }
-
-    ptr += offset;
-
-    if (sscanf(ptr, "%c%n", &c, &offset) != 1) {
-      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-    }
-
-    ptr += offset;
-
-    flex_trits_from_trytes(curr_hash, 243, curr_hash_trytes, 81, 81);
-    ERR_BIND_RETURN(state_delta_add(delta, curr_hash, value), ret);
+    ERR_BIND_RETURN(state_delta_add(delta, curr_address, value), ret);
+    token = strtok(NULL, ";");
   }
 
   return RC_OK;
