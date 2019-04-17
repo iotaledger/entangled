@@ -37,6 +37,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/model:transaction",
         "//common/trinary:flex_trit",
         "//utils:hash_maps",
         "//utils:macros",
@@ -82,6 +83,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/model:transaction",
         "//consensus:conf",
         "//utils:macros",
         "//utils/containers/hash:hash_uint64_t_map",
