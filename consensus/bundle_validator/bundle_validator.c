@@ -85,7 +85,17 @@ retcode_t iota_consensus_bundle_validator_validate(tangle_t const* const tangle,
     return RC_OK;
   }
 
-  // TODO check if already validated
+  {
+    DECLARE_PACK_SINGLE_TX(tx, txp, pack);
+
+    if ((res = iota_tangle_transaction_load_partial(tangle, tail_hash, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
+      log_error(logger_id, "Loading transaction metadata failed\n");
+      return res;
+    }
+    if ((*status = transaction_validity(txp)) != BUNDLE_NOT_INITIALIZED) {
+      return res;
+    }
+  }
 
   if ((res = bundle_validate(bundle, status)) != RC_OK) {
     log_error(logger_id, "Bundle validation failed\n");
