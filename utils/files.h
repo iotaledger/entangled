@@ -43,6 +43,16 @@ retcode_t iota_utils_remove_file(char const *const file_path);
  */
 retcode_t iota_utils_overwrite_file(char const *const file_path, char const *const content);
 
+/**
+ * Copies a file to a given path
+ *
+ * @param file_path The file to read
+ * @param buffer The buffer to read into
+ *
+ * @return error code
+ */
+retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer);
+
 #ifdef __cplusplus
 }
 #endif

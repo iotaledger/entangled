@@ -16,6 +16,7 @@
 #include <inttypes.h>
 #include <memory.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "utils/files.h"
 
@@ -108,4 +109,42 @@ cleanup:
   if (file) {
     fclose(file);
   }
+}
+
+retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
+  FILE *fp = fopen(file_path, "r");
+  long buffer_size;
+  size_t content_length;
+
+  if (fp != NULL) {
+    /* Go to the end of the file. */
+    if (fseek(fp, 0L, SEEK_END) == 0) {
+      /* Get the size of the file. */
+      buffer_size = ftell(fp);
+      if (buffer_size == -1) {
+        return RC_UTILS_FAILED_READ_FILE;
+      }
+
+      /* Allocate our buffer to that size. */
+      *buffer = malloc(sizeof(char) * (buffer_size + 1));
+
+      /* Go back to the start of the file. */
+      if (fseek(fp, 0L, SEEK_SET) != 0) {
+        return RC_UTILS_FAILED_READ_FILE;
+      }
+
+      /* Read the entire file into memory. */
+      content_length = fread(*buffer, sizeof(char), buffer_size, fp);
+      if (ferror(fp) != 0) {
+        return RC_UTILS_FAILED_READ_FILE;
+      } else {
+        (*buffer)[content_length++] = '\0'; /* Just to be safe. */
+      }
+    }
+    fclose(fp);
+  } else {
+    return RC_UTILS_FAILED_TO_OPEN_FILE;
+  }
+
+  return RC_OK;
 }
