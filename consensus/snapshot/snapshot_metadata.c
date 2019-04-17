@@ -7,11 +7,18 @@
 
 #include "consensus/snapshot/snapshot_metadata.h"
 #include <inttypes.h>
+#include <stdlib.h>
 #include "common/model/transaction.h"
+#include "utils/files.h"
 #include "utils/macros.h"
 
-retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metadata) {
+retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metadata, flex_trit_t const *const hash,
+                                      uint64_t index, uint64_t timestamp, hash_to_uint64_t_map_t solid_entry_points) {
+  memcpy(snapshot_metadata->hash, hash, FLEX_TRIT_SIZE_243);
+  snapshot_metadata->index = index;
+  snapshot_metadata->timestamp = timestamp;
   snapshot_metadata->solid_entry_points = NULL;
+  hash_to_uint64_t_map_copy(&solid_entry_points, &snapshot_metadata->solid_entry_points);
   return RC_OK;
 }
 
@@ -109,4 +116,21 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
   }
 
   return RC_OK;
+}
+
+retcode_t iota_snapshot_metadata_read_from_file(snapshot_metadata_t *const metadata, char const *const metadata_file) {
+  retcode_t ret;
+  char *buffer = NULL;
+
+  ERR_BIND_GOTO(iota_utils_read_file_into_buffer(metadata_file, &buffer), ret, cleanup);
+  if (buffer) {
+    ERR_BIND_GOTO(iota_snapshot_metadata_deserialize_str(buffer, metadata), ret, cleanup);
+  }
+
+cleanup:
+  if (buffer) {
+    free(buffer);
+  }
+
+  return ret;
 }

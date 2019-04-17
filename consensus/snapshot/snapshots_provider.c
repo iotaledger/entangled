@@ -10,10 +10,19 @@
 
 retcode_t iota_snapshots_provider_init(snapshots_provider_t *snapshots_provider,
                                        iota_consensus_conf_t const *const conf) {
-  retcode_t err;
-  ERR_BIND_RETURN(iota_snapshot_init(&snapshots_provider->inital_snapshot, conf), err);
-  ERR_BIND_RETURN(iota_snapshot_copy(&snapshots_provider->inital_snapshot, &snapshots_provider->latest_snapshot), err);
-  return RC_OK;
+  retcode_t ret;
+
+  ERR_BIND_GOTO(iota_snapshot_init(&snapshots_provider->inital_snapshot, conf), ret, cleanup);
+  ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_provider->inital_snapshot, &snapshots_provider->latest_snapshot), ret,
+                cleanup);
+
+cleanup:
+  if (ret) {
+    iota_snapshot_destroy(&snapshots_provider->inital_snapshot);
+    iota_snapshot_destroy(&snapshots_provider->latest_snapshot);
+  }
+
+  return ret;
 }
 
 retcode_t iota_snapshots_provider_destroy(snapshots_provider_t *const snapshots_provider) {

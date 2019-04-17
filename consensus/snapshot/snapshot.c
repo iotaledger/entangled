@@ -24,54 +24,18 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-retcode_t iota_snapshot_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file) {
-  retcode_t ret = RC_OK;
-  char *line = NULL, *delim = NULL;
-  int64_t value = 0, supply = 0;
-  size_t len = 0;
-  ssize_t rd = 0;
-  FILE *fp = NULL;
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+retcode_t iota_snapshot_state_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file) {
+  retcode_t ret;
+  char *buffer = NULL;
 
-  if ((fp = fopen(snapshot_file, "r")) == NULL) {
-    log_critical(logger_id, "Opening snapshot file failed\n");
-    ret = RC_SNAPSHOT_FILE_OPEN_FAILED;
-    goto done;
+  ERR_BIND_RETURN(iota_utils_read_file_into_buffer(snapshot_file, &buffer), ret);
+  if (buffer) {
+    ERR_BIND_GOTO(state_delta_deserialize_str(buffer, &snapshot->state), ret, cleanup);
   }
 
-  while ((rd = getline(&line, &len, fp)) > 0) {
-    line[--rd] = '\0';
-    if ((delim = strchr(line, ';')) == NULL) {
-      log_critical(logger_id, "Badly formatted snapshot file\n");
-      ret = RC_SNAPSHOT_INVALID_FILE;
-      goto done;
-    }
-    *delim = '\0';
-    value = atoll(delim + 1);
-    if (value > 0) {
-      flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t *)line, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-      if ((ret = state_delta_add(&snapshot->state, hash, value)) != RC_OK) {
-        goto done;
-      }
-      supply += value;
-    } else if (value < 0) {
-      ret = RC_SNAPSHOT_INCONSISTENT_SNAPSHOT;
-      log_critical(logger_id, "Inconsistent snapshot\n");
-      goto done;
-    }
-  }
-  if (supply != IOTA_SUPPLY) {
-    ret = RC_SNAPSHOT_INVALID_SUPPLY;
-    log_critical(logger_id, "Invalid snapshot supply: %ld\n", supply);
-    goto done;
-  }
-
-done:
-  if (line) {
-    free(line);
-  }
-  if (fp) {
-    fclose(fp);
+cleanup:
+  if (buffer) {
+    free(buffer);
   }
 
   return ret;
@@ -131,8 +95,25 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   logger_id = logger_helper_enable(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
   rw_lock_handle_init(&snapshot->rw_lock);
   snapshot->conf = conf;
-  snapshot->index = 0;
   snapshot->state = NULL;
+
+  if (!snapshot->conf->local_snapshots.local_snapshots_is_enabled ||
+      ((ret = iota_snapshot_load_local_snapshot(snapshot, conf)) != RC_OK)) {
+    ERR_BIND_RETURN(iota_snapshot_load_built_in_snapshot(snapshot, conf), ret);
+  }
+
+  return ret;
+}
+
+retcode_t iota_snapshot_load_built_in_snapshot(snapshot_t *const snapshot, iota_consensus_conf_t *const conf) {
+  retcode_t ret = RC_OK;
+
+  char snapshot_metadata_file_path[256];
+  hash_to_uint64_t_map_t solid_entry_points = NULL;
+
+  hash_to_uint64_t_map_add(&solid_entry_points, conf->genesis_hash, conf->snapshot_signature_index);
+  iota_snapshot_metadata_init(&snapshot->metadata, conf->genesis_hash, conf->snapshot_signature_index,
+                              conf->snapshot_timestamp_sec, solid_entry_points);
 
 #if defined(IOTA_MAINNET)
   if (!snapshot->conf->snapshot_signature_skip_validation) {
@@ -149,13 +130,39 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   }
 #endif
 
-  if ((ret = iota_snapshot_read_from_file(snapshot, conf->snapshot_file))) {
+  if ((ret = iota_snapshot_state_read_from_file(snapshot, conf->snapshot_file))) {
     log_critical(logger_id, "Initializing snapshot initial state failed\n");
     return ret;
   }
+
   log_info(logger_id, "Consistent snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
 
-  ERR_BIND_RETURN(iota_snapshot_metadata_init(&snapshot->metadata), ret);
+  hash_to_uint64_t_map_free(&solid_entry_points);
+
+  return ret;
+}
+
+retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_consensus_conf_t *const conf) {
+  retcode_t ret = RC_OK;
+  char file_path[256];
+
+  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
+  strcat(file_path, SNAPSHOT_STATE_EXT);
+
+  if ((ret = iota_snapshot_state_read_from_file(snapshot, file_path))) {
+    log_critical(logger_id, "Initializing snapshot initial state failed\n");
+    return ret;
+  }
+
+  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
+  strcat(file_path, SNAPSHOT_METADATA_EXT);
+
+  if (ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK) {
+    log_critical(logger_id, "Initializing snapshot metadata failed\n");
+    return ret;
+  }
+
+  log_info(logger_id, "Consistent local snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
 
   return ret;
 }
@@ -255,7 +262,16 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
   rw_lock_handle_init(&dst->rw_lock);
   dst->state = NULL;
 
-  ERR_BIND_RETURN(state_delta_copy(&src->state, &dst->state), ret);
+  ERR_BIND_GOTO(state_delta_copy(&src->state, &dst->state), ret, cleanup);
+  ERR_BIND_GOTO(iota_snapshot_metadata_init(&dst->metadata, src->metadata.hash, src->metadata.index,
+                                            src->metadata.timestamp, src->metadata.solid_entry_points),
+                ret, cleanup);
+
+cleanup:
+  if (dst->state) {
+    state_delta_destroy(&dst->state);
+  }
+
   return RC_OK;
 }
 

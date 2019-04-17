@@ -12,6 +12,8 @@
 #include "consensus/snapshot/snapshot_metadata.h"
 #include "utils/time.h"
 
+#define TEST_NULL_HASH_TRYTES "999999999999999999999999999999999999999999999999999999999999999999999999999999999"
+
 void test_snapshot_metadata_serialization() {
   snapshot_metadata_t metadata_orig, metadata_deserialized;
   size_t serialized_size;
@@ -19,12 +21,12 @@ void test_snapshot_metadata_serialization() {
   uint64_t index = 0;
   tryte_t current_address_trytes[NUM_TRYTES_ADDRESS];
   flex_trit_t current_address[FLEX_TRIT_SIZE_243];
+  flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(null_hash, NUM_TRITS_HASH, TEST_NULL_HASH_TRYTES, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
-  iota_snapshot_metadata_init(&metadata_orig);
-  iota_snapshot_metadata_init(&metadata_deserialized);
+  iota_snapshot_metadata_init(&metadata_orig, null_hash, rand(), current_timestamp_ms() / 1000, NULL);
+  iota_snapshot_metadata_init(&metadata_deserialized, null_hash, 0, 0, NULL);
 
-  metadata_orig.timestamp = current_timestamp_ms();
-  metadata_orig.index = rand();
   flex_trits_from_trytes(metadata_orig.hash, NUM_TRITS_HASH,
                            (tryte_t*)"ZZ999999999999999999999999999999999999999999999999999"
                                      "9999999999999999999999999999",

@@ -41,6 +41,26 @@ typedef struct snapshot_s {
 retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
 
 /**
+ * Initializes a snapshot
+ *
+ * @param snapshot The snapshot
+ * @param conf Consensus configuration
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_load_built_in_snapshot(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
+
+/**
+ * Initializes a snapshot
+ *
+ * @param snapshot The snapshot
+ * @param conf Consensus configuration
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
+
+/**
  * Destroys a snapshot
  *
  * @param snapshot The snapshot
@@ -136,7 +156,7 @@ void iota_snapshot_unlock(snapshot_t *const snapshot);
  *
  * @return a status code
  */
-retcode_t iota_snapshot_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file);
+retcode_t iota_snapshot_state_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file);
 
 /**
  * Writes a snapshot to file

@@ -9,6 +9,8 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include "common/model/transaction.h"
+#include "consensus/conf.h"
+#include "utils/logger_helper.h"
 #include "utils/macros.h"
 
 int64_t state_delta_sum(state_delta_t const *const state) {
@@ -211,25 +213,46 @@ retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *cons
   int offset;
   char const *ptr = str;
   char *token;
+  int64_t supply = 0;
 
   token = strtok(ptr, ";");
+  if (token == NULL) {
+    return RC_SNAPSHOT_INVALID_FILE;
+  }
+
   while (token != NULL) {
     strcpy(curr_address_trytes, token);
 
     if ((token = strtok(NULL, "\n")) == NULL) {
-      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
+      return RC_SNAPSHOT_INVALID_FILE;
     }
     if (sscanf(token, "%" PRId64 "", &value) != 1) {
-      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
+      return RC_SNAPSHOT_INVALID_FILE;
+    }
+
+    if (value > 0) {
+      supply += value;
+    } else if (value < 0) {
+      ret = RC_SNAPSHOT_INCONSISTENT_SNAPSHOT;
+      goto done;
     }
 
     if (flex_trits_from_trytes(curr_address, NUM_TRITS_ADDRESS, curr_address_trytes, NUM_TRYTES_ADDRESS,
                                NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
-      return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
+      return RC_SNAPSHOT_INVALID_FILE;
     }
     ERR_BIND_RETURN(state_delta_add(delta, curr_address, value), ret);
     token = strtok(NULL, ";");
   }
 
-  return RC_OK;
+  if (supply != IOTA_SUPPLY) {
+    ret = RC_SNAPSHOT_INVALID_SUPPLY;
+    goto done;
+  }
+
+done:
+  if (ret) {
+    state_delta_destroy(delta);
+  }
+  return ret;
 }

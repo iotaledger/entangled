@@ -31,10 +31,15 @@ typedef struct snapshot_metadata_s {
  * Initializes a snapshot metadata
  *
  * @param snapshot_metadata The snapshot metadata
+ * @param hash The hash of the transaction the snapshot is based upon (milestone)
+ * @param index The index of the transaction the snapshot is based upon (milestone)
+ * @param timestamp The timestap of the transaction the snapshot is based upon (milestone)
+ * @param solid_entry_points A map containing solid entry points, (hash to snapshot_index)
  *
  * @return a status code
  */
-retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metadata);
+retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metadata, flex_trit_t const *const hash,
+                                      uint64_t index, uint64_t timestamp, hash_to_uint64_t_map_t solid_entry_points);
 
 /**
  * Destroys a snapshot metadata
@@ -73,6 +78,16 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
  * @return a status code
  */
 retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata);
+
+/**
+ * Reads a snapshot from file
+ *
+ * @param snapshot_metadata The snapshot metadata
+ * @param snapshot_file The file with serialized metadata
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_metadata_read_from_file(snapshot_metadata_t *const snapshot, char const *const metadata_file);
 
 #ifdef __cplusplus
 }
