@@ -52,7 +52,7 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
  * @param snapshots_service The service
  * @param milestone_tracker The milestone tracker
  *
- * @return True is snapshot should be taken
+ * @return a status code
  */
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
                                                milestone_tracker_t const *const milestone_tracker);
@@ -65,12 +65,25 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
  * @param target_milestone The new "genesis"
  * @param snapshot The new snapshot
  *
- * @return True is snapshot should be taken
+ * @return a status code
  */
 retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const snapshots_service,
                                                    milestone_tracker_t const *const milestone_tracker,
                                                    iota_milestone_t const *const target_milestone,
                                                    snapshot_t *const snapshot);
+
+/**
+ * Generates snapshots metadata
+ *
+ * @param snapshots_service The service
+ * @param target_milestone The new "genesis"
+ * @param snapshot The new snapshot
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshots_service_generate_snapshot_metadata(snapshots_service_t *const snapshots_service,
+                                                            iota_milestone_t const *const target_milestone,
+                                                            snapshot_t *const snapshot);
 
 /**
  * Determines if a snapshot should be taken
@@ -79,7 +92,7 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
  * @param milestone_tracker The milestone tracker
  * @param entry_point The milestone that will use as new snapshot genesis
  *
- * @return True is snapshot should be taken
+ * @return a status code
  */
 retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *const snapshots_service,
                                                            milestone_tracker_t const *const milestone_tracker,
@@ -115,7 +128,7 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
  * @param snapshot The new snapshot
  * @param target_milestone The milestone that is the initial entry point
  *
- * @return True is snapshot should be taken
+ * @return a status code
  */
 retcode_t iota_snapshots_service_update_solid_entry_points(snapshots_service_t *const snapshots_service,
                                                            snapshot_t *const snapshot,
