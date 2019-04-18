@@ -8,8 +8,8 @@
 #ifndef __COMMON_HELPERS_POW_H__
 #define __COMMON_HELPERS_POW_H__
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #include "common/crypto/curl-p/trit.h"
