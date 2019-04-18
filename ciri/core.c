@@ -26,9 +26,9 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
     return RC_CORE_FAILED_CONSENSUS_INIT;
   }
 
-  log_info(logger_id, "Initializing node gossip components\n");
+  log_info(logger_id, "Initializing node\n");
   if (node_init(&core->node, core, tangle) != RC_OK) {
-    log_critical(logger_id, "Initializing node gossip components failed\n");
+    log_critical(logger_id, "Initializing node failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }
 
@@ -46,9 +46,9 @@ retcode_t core_start(core_t* const core, tangle_t* const tangle) {
     return RC_CORE_FAILED_CONSENSUS_START;
   }
 
-  log_info(logger_id, "Starting node gossip components\n");
+  log_info(logger_id, "Starting node\n");
   if (node_start(&core->node) != RC_OK) {
-    log_critical(logger_id, "Starting node gossip components failed\n");
+    log_critical(logger_id, "Starting node failed\n");
     return RC_CORE_FAILED_NODE_START;
   }
 
@@ -68,9 +68,9 @@ retcode_t core_stop(core_t* const core) {
 
   core->running = false;
 
-  log_info(logger_id, "Stopping node gossip components\n");
+  log_info(logger_id, "Stopping node\n");
   if (node_stop(&core->node) != RC_OK) {
-    log_error(logger_id, "Stopping node gossip components failed\n");
+    log_error(logger_id, "Stopping node failed\n");
     ret = RC_CORE_FAILED_NODE_STOP;
   }
 
@@ -92,9 +92,9 @@ retcode_t core_destroy(core_t* const core) {
     return RC_CORE_STILL_RUNNING;
   }
 
-  log_info(logger_id, "Destroying node gossip components\n");
+  log_info(logger_id, "Destroying node\n");
   if (node_destroy(&core->node) != RC_OK) {
-    log_error(logger_id, "Destroying node gossip components failed\n");
+    log_error(logger_id, "Destroying node failed\n");
     ret = RC_CORE_FAILED_NODE_DESTROY;
   }
 

@@ -55,6 +55,7 @@ http-port: 14265
 Long option | Short option | Description | Example input
 --- | --- | --- | ---
 `--db-path` | `-d` | Path to the database file. | `-d ciri/db/ciri-mainnet.db`
+`--db-revalidate` | | Reloads milestones, state of the ledger and transactions metadata from the database. | `--db-revalidate false`
 `--help` | `-h` | Displays the usage. |
 `--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
