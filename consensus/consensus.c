@@ -81,16 +81,23 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
     return ret;
   }
 
+  log_info(logger_id, "Initializing milestone service\n");
+  if ((ret = iota_milestone_service_init(&consensus->milestone_service, &consensus->conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing milestone service failed\n");
+    return ret;
+  }
+
   log_info(logger_id, "Initializing ledger validator\n");
   if ((ret = iota_consensus_ledger_validator_init(&consensus->ledger_validator, tangle, &consensus->conf,
-                                                  &consensus->milestone_tracker)) != RC_OK) {
+                                                  &consensus->milestone_tracker, &consensus->milestone_service)) !=
+      RC_OK) {
     log_critical(logger_id, "Initializing ledger validator failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Initializing local snapshots service\n");
+  log_info(logger_id, "Initializing snapshots service\n");
   if ((ret = iota_snapshots_service_init(&consensus->snapshots_service, &consensus->snapshots_provider,
-                                         &consensus->conf)) != RC_OK) {
+                                         &consensus->milestone_service, &consensus->conf)) != RC_OK) {
     log_critical(logger_id, "Initializing snapshots service failed\n");
     return ret;
   }
@@ -214,7 +221,12 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
 
   log_info(logger_id, "Destroying snapshots service\n");
   if ((ret = iota_snapshots_service_destroy(&consensus->snapshots_service)) != RC_OK) {
-    log_error(logger_id, "Destroying snapshots provider failed\n");
+    log_error(logger_id, "Destroying snapshots service failed\n");
+  }
+
+  log_info(logger_id, "Destroying milestone service\n");
+  if ((ret = iota_milestone_service_destroy(&consensus->milestone_service)) != RC_OK) {
+    log_error(logger_id, "Destroying milestone service failed\n");
   }
 
   logger_helper_release(logger_id);

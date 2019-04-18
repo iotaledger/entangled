@@ -16,6 +16,7 @@
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
+#include "consensus/milestone_service/milestone_service.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include "consensus/snapshot/snapshot.h"
@@ -36,6 +37,7 @@ typedef struct iota_consensus_s {
   local_snapshots_manager_t local_snapshots_manager;
   snapshots_service_t snapshots_service;
   snapshots_provider_t snapshots_provider;
+  milestone_service_t milestone_service;
 } iota_consensus_t;
 
 #ifdef __cplusplus

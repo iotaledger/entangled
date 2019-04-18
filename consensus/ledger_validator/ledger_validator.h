@@ -10,6 +10,7 @@
 
 #include "common/errors.h"
 #include "consensus/conf.h"
+#include "consensus/milestone_service/milestone_service.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/hash_indexed_map.h"
@@ -27,10 +28,12 @@ typedef int8_t flex_trit_t;
 typedef struct ledger_validator_s {
   iota_consensus_conf_t *conf;
   milestone_tracker_t *milestone_tracker;
+  milestone_service_t *milestone_service;
 } ledger_validator_t;
 
 retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv, tangle_t const *const tangle,
-                                               iota_consensus_conf_t *const conf, milestone_tracker_t *const mt);
+                                               iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
+                                               milestone_service_t *const milestone_service);
 
 retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
 

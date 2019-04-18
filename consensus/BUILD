@@ -34,6 +34,7 @@ cc_library(
         "//consensus/exit_probability_randomizer",
         "//consensus/exit_probability_validator",
         "//consensus/ledger_validator",
+        "//consensus/milestone_service",
         "//consensus/milestone_tracker",
         "//consensus/snapshot",
         "//consensus/snapshot:snapshots_provider",

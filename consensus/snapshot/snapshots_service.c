@@ -53,9 +53,11 @@ typedef struct check_is_solid_entry_point_do_func_params_s {
 } check_is_solid_entry_point_do_func_params_t;
 
 retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
-                                      snapshots_provider_t *const snapshots_provider, iota_consensus_conf_t *conf) {
+                                      snapshots_provider_t *const snapshots_provider,
+                                      milestone_service_t *const milestone_service, iota_consensus_conf_t *conf) {
   retcode_t ret;
   snapshots_service->snapshots_provider = snapshots_provider;
+  snapshots_service->milestone_service = milestone_service;
   snapshots_service->conf = conf;
   logger_id = logger_helper_enable(SNAPSHOTS_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
 
@@ -83,7 +85,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
 
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, milestone_tracker, &pack), ret);
+  ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, &pack), ret);
 
   if (pack.num_loaded == 0) {
     log_error(logger_id, "Target milestone was not loaded\n");
@@ -91,9 +93,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   }
 
   snapshot_t next_snapshot;
-  ERR_BIND_GOTO(
-      iota_snapshots_service_generate_snapshot(snapshots_service, milestone_tracker, &milestone, &next_snapshot), ret,
-      cleanup);
+  ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot(snapshots_service, &milestone, &next_snapshot), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, &next_snapshot), ret,
                 cleanup);
   // TODO - Implement prunning
@@ -107,15 +107,16 @@ cleanup:
 }
 
 retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *const snapshots_service,
-                                                           milestone_tracker_t const *const milestone_tracker,
                                                            iota_stor_pack_t *const entry_point) {
   retcode_t err;
   uint64_t index;
-  if (milestone_tracker->latest_milestone_index < snapshots_service->conf->local_snapshots.min_depth) {
+  if (snapshots_service->snapshots_provider->latest_snapshot.index <
+      snapshots_service->conf->local_snapshots.min_depth) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
 
-  index = milestone_tracker->latest_milestone_index - snapshots_service->conf->local_snapshots.min_depth;
+  index =
+      snapshots_service->snapshots_provider->latest_snapshot.index - snapshots_service->conf->local_snapshots.min_depth;
   if (index == 0) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
@@ -125,7 +126,6 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
 }
 
 retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const snapshots_service,
-                                                   milestone_tracker_t const *const milestone_tracker,
                                                    iota_milestone_t const *const target_milestone,
                                                    snapshot_t *const snapshot) {
   retcode_t ret;
@@ -146,7 +146,7 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   // TODO - implement rollback as well
 
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
-  ERR_BIND_GOTO(iota_snapshots_service_replay_milestones(snapshots_service, &snapshot, target_milestone->index), ret,
+  ERR_BIND_GOTO(iota_milestone_service_replay_milestones(snapshots_service, &snapshot, target_milestone->index), ret,
                 cleanup);
 
 cleanup:
@@ -163,37 +163,6 @@ retcode_t iota_snapshots_service_generate_snapshot_metadata(snapshots_service_t 
   ERR_BIND_RETURN(iota_snapshots_service_update_solid_entry_points(&snapshots_service, snapshot, target_milestone),
                   ret);
   // TODO - seen milestones
-  return RC_OK;
-}
-
-retcode_t iota_snapshots_service_replay_milestones(snapshots_service_t *const snapshots_service,
-                                                   snapshot_t *const snapshot, uint64_t index) {
-  retcode_t ret;
-  state_delta_t merged_balance_changes;
-  state_delta_t current_delta;
-  iota_milestone_t *last_applied_milestone = NULL;
-  DECLARE_PACK_SINGLE_MILESTONE(current_milestone, current_milestone_ptr, pack);
-
-  for (uint64_t current_milestone_index = snapshot->index + 1; current_milestone_index <= index;
-       ++current_milestone_index) {
-    ERR_BIND_RETURN(
-        iota_tangle_milestone_load_next(&snapshots_service->tangle, current_milestone_index, current_milestone_index),
-        ret);
-    if (pack.num_loaded == 0) {
-      log_error(logger_id, "Target milestone was not loaded\n");
-      // TODO - add to skipped milestones
-    } else {
-      ERR_BIND_RETURN(iota_tangle_state_delta_load(&snapshots_service->tangle, &current_milestone, &current_delta),
-                      ret);
-      ERR_BIND_RETURN(state_delta_apply_patch(merged_balance_changes, current_delta), ret);
-      last_applied_milestone = &current_milestone;
-    }
-  }
-
-  if (last_applied_milestone != NULL) {
-    // TODO - mutex is not need to be taken inside "iota_snapshot_apply_patch" this time
-    ERR_BIND_RETURN(iota_snapshot_apply_patch(snapshot, merged_balance_changes, last_applied_milestone->index), ret);
-  }
   return RC_OK;
 }
 

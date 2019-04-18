@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "consensus/milestone_service/milestone_service.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/tangle/tangle.h"
@@ -23,6 +24,7 @@ extern "C" {
 typedef struct snapshots_service_s {
   iota_consensus_conf_t *conf;
   snapshots_provider_t const *snapshots_provider;
+  milestone_service_t const *milestone_service;
   tangle_t tangle;
 } snapshots_service_t;
 
@@ -31,11 +33,13 @@ typedef struct snapshots_service_s {
  *
  * @param snapshots_service The service
  * @param snapshots_provider The provider
+ * @param conf The configuration
  *
  * @return a status code
  */
 retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
-                                      snapshots_provider_t *const snapshots_provider, iota_consensus_conf_t *conf);
+                                      snapshots_provider_t *const snapshots_provider,
+                                      milestone_service_t *const milestone_service, iota_consensus_conf_t *conf);
 
 /**
  * Destroys the snapshots service
@@ -61,14 +65,12 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
  * Generates a new snapshot
  *
  * @param snapshots_service The service
- * @param milestone_tracker The milestone tracker
  * @param target_milestone The new "genesis"
  * @param snapshot The new snapshot
  *
  * @return a status code
  */
 retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const snapshots_service,
-                                                   milestone_tracker_t const *const milestone_tracker,
                                                    iota_milestone_t const *const target_milestone,
                                                    snapshot_t *const snapshot);
 
@@ -95,7 +97,6 @@ retcode_t iota_snapshots_service_generate_snapshot_metadata(snapshots_service_t 
  * @return a status code
  */
 retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *const snapshots_service,
-                                                           milestone_tracker_t const *const milestone_tracker,
                                                            iota_stor_pack_t *const entry_point);
 
 /**
