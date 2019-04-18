@@ -9,3 +9,14 @@ cc_library(
         "//utils:logger_helper",
     ],
 )
+
+cc_library(
+    name = "spent_addresses_service",
+    srcs = ["spent_addresses_service.c"],
+    hdrs = ["spent_addresses_service.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//utils:logger_helper",
+    ],
+)
