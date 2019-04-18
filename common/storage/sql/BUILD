@@ -7,9 +7,17 @@ cc_library(
 )
 
 filegroup(
-    name = "schema",
+    name = "tangle-schema",
     srcs = [
-        "schema.sql",
+        "tangle-schema.sql",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "spent-addresses-schema",
+    srcs = [
+        "spent-addresses-schema.sql",
     ],
     visibility = ["//visibility:public"],
 )
