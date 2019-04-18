@@ -17,7 +17,7 @@
 #include "utils/logger_helper.h"
 
 #define DEFAULT_CONF_PATH "ciri/conf.yml"
-#define DEFAULT_DB_PATH DB_PATH
+#define DEFAULT_DB_PATH TANGLE_DB_PATH
 #define DEFAULT_DB_PREVALIDATE false
 #define DEFAULT_LOG_LEVEL LOGGER_INFO
 
