@@ -54,6 +54,11 @@ void hash_to_{TYPE}_map_free(hash_to_{TYPE}_map_t *const map) {
   hash_to_{TYPE}_map_entry_t *curr_entry = NULL;
   hash_to_{TYPE}_map_entry_t *tmp_entry = NULL;
 
+  if (map == NULL || *map == NULL){
+    return;
+  }
+
+
   HASH_ITER(hh, *map, curr_entry, tmp_entry) {
     HASH_DEL(*map, curr_entry);
     free(curr_entry);
