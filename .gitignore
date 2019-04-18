@@ -3,7 +3,7 @@ bazel*
 user.bazelrc
 
 # cIRI
-ciri/ciri.db*
+ciri/db/ciri-*
 ciri/conf.yml
 
 # ignore all VisualStudioCode user settings
