@@ -175,14 +175,17 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
                     snapshots_service->conf->local_snapshots.local_snapshots_path_base),
                 ret, cleanup);
 
+  iota_snapshot_lock_write(&snapshots_service->snapshots_provider->latest_snapshot);
+  snapshots_service->snapshots_provider->latest_snapshot.index = snapshot->index;
+  iota_snapshot_unlock(&snapshots_service->snapshots_provider->latest_snapshot);
+
   iota_snapshot_lock_write(&snapshots_service->snapshots_provider->inital_snapshot);
   ERR_BIND_GOTO(state_delta_merge_patch(&snapshots_service->snapshots_provider->inital_snapshot, &snapshot->state), ret,
                 cleanup);
 
 cleanup:
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
-
-  return RC_OK;
+  return ret;
 }
 
 static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
