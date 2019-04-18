@@ -23,7 +23,7 @@ extern "C" {
 
 typedef struct snapshots_service_s {
   iota_consensus_conf_t *conf;
-  snapshots_provider_t const *snapshots_provider;
+  snapshots_provider_t *snapshots_provider;
   milestone_service_t const *milestone_service;
   tangle_t tangle;
 } snapshots_service_t;
