@@ -190,12 +190,14 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv, tangle_t *
  */
 
 retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv, tangle_t const *const tangle,
-                                               iota_consensus_conf_t *const conf, milestone_tracker_t *const mt) {
+                                               iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
+                                               milestone_service_t *const milestone_service) {
   retcode_t ret = RC_OK;
 
   logger_id = logger_helper_enable(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->conf = conf;
   lv->milestone_tracker = mt;
+  lv->milestone_service = milestone_service;
 
   if ((ret = build_snapshot(lv, tangle, &mt->latest_solid_subtangle_milestone_index,
                             mt->latest_solid_subtangle_milestone)) != RC_OK) {
@@ -258,8 +260,11 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
           goto done;
         }
       }
-      if ((ret = iota_snapshot_apply_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
-                                           milestone->index)) != RC_OK) {
+
+      // TODO - TEST!!!!
+      if ((ret = iota_milestone_service_replay_milestones(&lv->milestone_service,
+                                                          &lv->milestone_tracker->snapshots_provider->latest_snapshot,
+                                                          milestone->index)) != RC_OK) {
         log_error(logger_id, "Applying patch failed\n");
         goto done;
       }
