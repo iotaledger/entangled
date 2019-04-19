@@ -156,6 +156,19 @@ extern retcode_t iota_stor_state_delta_store(storage_connection_t const* const c
 extern retcode_t iota_stor_state_delta_load(storage_connection_t const* const connection, uint64_t const index,
                                             state_delta_t* const delta);
 
+/*
+ * Spent address operations
+ */
+
+extern retcode_t iota_stor_spent_address_store(storage_connection_t const* const connection,
+                                               flex_trit_t const* const address);
+
+extern retcode_t iota_stor_spent_addresses_store(storage_connection_t const* const connection,
+                                                 hash243_set_t const* const addresses);
+
+extern retcode_t iota_stor_spent_address_exist(storage_connection_t const* const connection,
+                                               flex_trit_t const* const address, bool* const exist);
+
 #ifdef __cplusplus
 }
 #endif

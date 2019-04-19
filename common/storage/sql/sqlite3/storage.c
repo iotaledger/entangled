@@ -1036,3 +1036,16 @@ done:
   sqlite3_reset(sqlite_statement);
   return ret;
 }
+
+/*
+ * Spent address operations
+ */
+
+retcode_t iota_stor_spent_address_store(storage_connection_t const* const connection,
+                                        flex_trit_t const* const address) {}
+
+retcode_t iota_stor_spent_addresses_store(storage_connection_t const* const connection,
+                                          hash243_set_t const* const addresses) {}
+
+retcode_t iota_stor_spent_address_exist(storage_connection_t const* const connection, flex_trit_t const* const address,
+                                        bool* const exist) {}

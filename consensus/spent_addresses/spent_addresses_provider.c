@@ -25,13 +25,9 @@ retcode_t iota_spent_addresses_provider_destroy(spent_addresses_provider_t *cons
   return connection_destroy(&sap->connection);
 }
 
-/*
- * Spent address operations
- */
-
 retcode_t iota_spent_addresses_provider_store(spent_addresses_provider_t const *const sap,
                                               flex_trit_t const *const address) {
-  return iota_store_spent_address_store(&sap->connection, address);
+  return iota_stor_spent_address_store(&sap->connection, address);
 }
 
 retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t const *const sap,
@@ -40,6 +36,6 @@ retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t c
 }
 
 retcode_t iota_spent_addresses_provider_exist(spent_addresses_provider_t const *const sap,
-                                              flex_trit_t const *const address) {
-  return iota_stor_spent_address_exist(&sap->connection, address);
+                                              flex_trit_t const *const address, bool *const exist) {
+  return iota_stor_spent_address_exist(&sap->connection, address, exist);
 }

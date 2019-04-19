@@ -65,11 +65,12 @@ retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t c
  *
  * @param sap The spent addresses provider
  * @param address The spent address
+ * @param exist Whether the spent address exists or not
  *
  * @return a status code
  */
 retcode_t iota_spent_addresses_provider_exist(spent_addresses_provider_t const *const sap,
-                                              flex_trit_t const *const address);
+                                              flex_trit_t const *const address, bool *const exist);
 
 #ifdef __cplusplus
 }
