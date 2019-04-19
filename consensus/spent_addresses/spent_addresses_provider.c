@@ -39,3 +39,36 @@ retcode_t iota_spent_addresses_provider_exist(spent_addresses_provider_t const *
                                               flex_trit_t const *const address, bool *const exist) {
   return iota_stor_spent_address_exist(&sap->connection, address, exist);
 }
+
+retcode_t iota_spent_addresses_provider_read_file(spent_addresses_provider_t const *const sap, char const *const file) {
+  retcode_t ret = RC_OK;
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t rd = 0;
+  FILE *fp = NULL;
+  flex_trit_t address[FLEX_TRIT_SIZE_243];
+
+  if ((fp = fopen(file, "r")) == NULL) {
+    log_critical(logger_id, "Opening spent addresses file failed\n");
+    ret = RC_UTILS_FAILED_TO_OPEN_FILE;
+    goto done;
+  }
+
+  while ((rd = getline(&line, &len, fp)) > 0) {
+    line[--rd] = '\0';
+    flex_trits_from_trytes(address, HASH_LENGTH_TRIT, (tryte_t *)line, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    if ((ret = iota_spent_addresses_provider_store(sap, address)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  if (line) {
+    free(line);
+  }
+  if (fp) {
+    fclose(fp);
+  }
+
+  return ret;
+}

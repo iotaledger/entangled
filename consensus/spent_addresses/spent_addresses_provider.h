@@ -72,6 +72,16 @@ retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t c
 retcode_t iota_spent_addresses_provider_exist(spent_addresses_provider_t const *const sap,
                                               flex_trit_t const *const address, bool *const exist);
 
+/**
+ * Stores previous spent addresses read from a file
+ *
+ * @param sap The spent addresses provider
+ * @param file The file
+ *
+ * @return a status code
+ */
+retcode_t iota_spent_addresses_provider_read_file(spent_addresses_provider_t const *const sap, char const *const file);
+
 #ifdef __cplusplus
 }
 #endif

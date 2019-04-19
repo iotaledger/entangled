@@ -1,3 +1,11 @@
+filegroup(
+    name = "spent_addresses_test_file",
+    srcs = [
+        "spent_addresses_test.txt",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 genrule(
     name = "db_file",
     srcs = ["//common/storage/sql:spent-addresses-schema"],
@@ -9,7 +17,10 @@ genrule(
 cc_test(
     name = "test_spent_addresses_provider",
     srcs = ["test_spent_addresses_provider.c"],
-    data = [":db_file"],
+    data = [
+        ":db_file",
+        ":spent_addresses_test_file",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//consensus/spent_addresses:spent_addresses_provider",

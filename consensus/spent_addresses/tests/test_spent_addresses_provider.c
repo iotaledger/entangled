@@ -85,6 +85,42 @@ void test_spent_addresses_provider_batch_store() {
   }
 }
 
+void test_spent_addresses_provider_read_file() {
+  bool exist = true;
+  tryte_t address_trytes[HASH_LENGTH_TRYTE];
+  flex_trit_t address_trits[FLEX_TRIT_SIZE_243];
+
+  memset(address_trytes, '9', HASH_LENGTH_TRYTE);
+  address_trytes[0] = 'A';
+
+  for (size_t i = 0; i < 26; i++) {
+    flex_trits_from_trytes(address_trits, HASH_LENGTH_TRIT, address_trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    exist = true;
+    TEST_ASSERT(iota_spent_addresses_provider_exist(&sap, address_trits, &exist) == RC_OK);
+    TEST_ASSERT_FALSE(exist);
+    address_trytes[0]++;
+  }
+
+  TEST_ASSERT(iota_spent_addresses_provider_read_file(
+                  &sap, "consensus/spent_addresses/tests/spent_addresses_test.txt") == RC_OK);
+
+  address_trytes[0] = 'A';
+
+  for (size_t i = 0; i < 26; i++) {
+    flex_trits_from_trytes(address_trits, HASH_LENGTH_TRIT, address_trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    if (i % 2) {
+      exist = false;
+      TEST_ASSERT(iota_spent_addresses_provider_exist(&sap, address_trits, &exist) == RC_OK);
+      TEST_ASSERT_TRUE(exist);
+    } else {
+      exist = true;
+      TEST_ASSERT(iota_spent_addresses_provider_exist(&sap, address_trits, &exist) == RC_OK);
+      TEST_ASSERT_FALSE(exist);
+    }
+    address_trytes[0]++;
+  }
+}
+
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
@@ -93,6 +129,7 @@ int main(int argc, char *argv[]) {
 
   RUN_TEST(test_spent_addresses_provider_store);
   RUN_TEST(test_spent_addresses_provider_batch_store);
+  RUN_TEST(test_spent_addresses_provider_read_file);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
