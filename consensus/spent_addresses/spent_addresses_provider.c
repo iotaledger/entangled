@@ -31,7 +31,7 @@ retcode_t iota_spent_addresses_provider_store(spent_addresses_provider_t const *
 }
 
 retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t const *const sap,
-                                                    hash243_set_t const *const addresses) {
+                                                    hash243_set_t const addresses) {
   return iota_stor_spent_addresses_store(&sap->connection, addresses);
 }
 

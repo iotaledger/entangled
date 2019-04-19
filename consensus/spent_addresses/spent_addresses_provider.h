@@ -59,7 +59,7 @@ retcode_t iota_spent_addresses_provider_store(spent_addresses_provider_t const *
  * @return a status code
  */
 retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t const *const sap,
-                                                    hash243_set_t const *const addresses);
+                                                    hash243_set_t const addresses);
 /**
  * Checks if a spent address exists in a provider
  *

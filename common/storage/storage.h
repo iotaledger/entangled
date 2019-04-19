@@ -164,7 +164,7 @@ extern retcode_t iota_stor_spent_address_store(storage_connection_t const* const
                                                flex_trit_t const* const address);
 
 extern retcode_t iota_stor_spent_addresses_store(storage_connection_t const* const connection,
-                                                 hash243_set_t const* const addresses);
+                                                 hash243_set_t const addresses);
 
 extern retcode_t iota_stor_spent_address_exist(storage_connection_t const* const connection,
                                                flex_trit_t const* const address, bool* const exist);

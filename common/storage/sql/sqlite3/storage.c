@@ -72,6 +72,7 @@ retcode_t storage_destroy() {
 
 typedef struct bind_execute_hash_params_s {
   sqlite3_stmt* sqlite_statement;
+  size_t hash_index;
 } bind_execute_hash_params_t;
 
 static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* const params, flex_trit_t const* const hash);
@@ -208,9 +209,12 @@ static retcode_t update_transactions(storage_connection_t const* const connectio
     }
   }
 
-  bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
-  if ((ret = hash243_set_for_each(&hashes, (hash243_on_container_func)bind_execute_hash_do_func, &params)) != RC_OK) {
-    goto done;
+  {
+    bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement, .hash_index = 2};
+
+    if ((ret = hash243_set_for_each(&hashes, (hash243_on_container_func)bind_execute_hash_do_func, &params)) != RC_OK) {
+      goto done;
+    }
   }
 
 done:
@@ -239,7 +243,7 @@ static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* const par
     return RC_SQLITE3_FAILED_BINDING;
   }
 
-  if (column_compress_bind(params->sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+  if (column_compress_bind(params->sqlite_statement, params->hash_index, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     return RC_SQLITE3_FAILED_BINDING;
   }
 
@@ -1042,10 +1046,79 @@ done:
  */
 
 retcode_t iota_stor_spent_address_store(storage_connection_t const* const connection,
-                                        flex_trit_t const* const address) {}
+                                        flex_trit_t const* const address) {
+  retcode_t ret = RC_OK;
+  sqlite3_spent_addresses_connection_t const* sqlite3_connection =
+      (sqlite3_spent_addresses_connection_t*)connection->actual;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.spent_address_insert;
 
-retcode_t iota_stor_spent_addresses_store(storage_connection_t const* const connection,
-                                          hash243_set_t const* const addresses) {}
+  if (column_compress_bind(sqlite_statement, 1, address, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_spent_addresses_store(storage_connection_t const* const connection, hash243_set_t const addresses) {
+  retcode_t ret = RC_OK;
+  sqlite3_spent_addresses_connection_t const* sqlite3_connection =
+      (sqlite3_spent_addresses_connection_t*)connection->actual;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.spent_address_insert;
+  retcode_t ret_rollback;
+  bool should_rollback_if_failed = true;
+
+  if ((ret = begin_transaction(sqlite3_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  {
+    bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement, .hash_index = 1};
+
+    if ((ret = hash243_set_for_each(&addresses, (hash243_on_container_func)bind_execute_hash_do_func, &params)) !=
+        RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  if (ret != RC_OK && should_rollback_if_failed) {
+    if ((ret_rollback = rollback_transaction(sqlite3_connection->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+  if ((ret = end_transaction(sqlite3_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
+}
 
 retcode_t iota_stor_spent_address_exist(storage_connection_t const* const connection, flex_trit_t const* const address,
-                                        bool* const exist) {}
+                                        bool* const exist) {
+  retcode_t ret = RC_OK;
+  sqlite3_spent_addresses_connection_t const* sqlite3_connection =
+      (sqlite3_spent_addresses_connection_t*)connection->actual;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.spent_address_exist;
+
+  if (column_compress_bind(sqlite_statement, 1, address, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement_exist(sqlite_statement, exist)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
