@@ -45,6 +45,7 @@ apple_rules_dependencies()
 
 load("@rules_iota//:defs.bzl", "iota_deps")
 load("//tools:snapshot.bzl", "fetch_snapshot_files")
+load("//tools:snapshot.bzl", "fetch_previous_epochs_spent_addresses_files")
 
 iota_deps()
 
@@ -57,3 +58,5 @@ setup_initial_deps()
 load("@iota_toolchains//:defs.bzl", "setup_toolchains_repositories")
 
 setup_toolchains_repositories()
+
+fetch_previous_epochs_spent_addresses_files()
