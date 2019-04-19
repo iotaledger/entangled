@@ -130,6 +130,7 @@ typedef struct iota_transaction_fields_data_s {
 typedef struct iota_transaction_fields_metadata_s {
   uint64_t snapshot_index;
   bool solid;
+  uint8_t validity;
   uint64_t arrival_timestamp;
 } iota_transaction_fields_metadata_t;
 
@@ -188,8 +189,10 @@ typedef enum _field_mask_data {
 typedef enum _field_mask_metadata {
   MASK_METADATA_SNAPSHOT_INDEX = (1u << 0),
   MASK_METADATA_SOLID = (1u << 1),
-  MASK_METADATA_ARRIVAL_TIMESTAMP = (1u << 2),
-  MASK_METADATA_ALL = MASK_METADATA_SNAPSHOT_INDEX | MASK_METADATA_SOLID | MASK_METADATA_ARRIVAL_TIMESTAMP
+  MASK_METADATA_VALIDITY = (1u << 2),
+  MASK_METADATA_ARRIVAL_TIMESTAMP = (1u << 3),
+  MASK_METADATA_ALL =
+      MASK_METADATA_SNAPSHOT_INDEX | MASK_METADATA_SOLID | MASK_METADATA_VALIDITY | MASK_METADATA_ARRIVAL_TIMESTAMP
 } field_mask_metadata_e;
 
 /***********************************************************************************************************
@@ -424,6 +427,17 @@ static inline bool transaction_solid(iota_transaction_t const *const transaction
 static inline void transaction_set_solid(iota_transaction_t *const transaction, bool const state) {
   transaction->metadata.solid = state;
   transaction->loaded_columns_mask.metadata |= MASK_METADATA_SOLID;
+}
+
+// Get the transaction validity
+static inline uint8_t transaction_validity(iota_transaction_t const *const transaction) {
+  assert(transaction->loaded_columns_mask.metadata & MASK_METADATA_VALIDITY);
+  return transaction->metadata.validity;
+}
+// Set the transaction validity
+static inline void transaction_set_validity(iota_transaction_t *const transaction, uint8_t const validity) {
+  transaction->metadata.validity = validity;
+  transaction->loaded_columns_mask.metadata |= MASK_METADATA_VALIDITY;
 }
 
 // Get the transaction arrival timestamp

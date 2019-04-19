@@ -13,6 +13,10 @@
 typedef enum cli_arg_value_e {
   CONF_START = 1000,
 
+  // cIRI configuration
+
+  CONF_DB_REVALIDATE,
+
   // Gossip configuration
 
   CONF_MWM,
@@ -63,6 +67,8 @@ static struct cli_argument_s {
     // cIRI configuration
 
     {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
+    {"db-revalidate", CONF_DB_REVALIDATE,
+     "Reloads milestones, state of the ledger and transactions metadata from the database.", REQUIRED_ARG},
     {"help", 'h', "Displays this usage.", NO_ARG},
     {"log-level", 'l',
      "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
@@ -111,7 +117,7 @@ static struct cli_argument_s {
 
     // API configuration
 
-    {"http_port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+    {"http-port", 'p', "HTTP API listen port.", REQUIRED_ARG},
     {"max-find-transactions", CONF_MAX_FIND_TRANSACTIONS,
      "The maximal number of transactions that may be returned by the "
      "'findTransactions' API call. If the number of transactions found exceeds "

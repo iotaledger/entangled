@@ -29,7 +29,16 @@ cIRI is built and run through [bazel](https://www.bazel.build/).
 ```
 $ git clone https://github.com/iotaledger/entangled.git
 $ cd entangled
-$ bazel run --define network=mainnet|testnet -- ciri <optional flags>
+```
+If you want to run a mainnet node
+```
+$ sqlite3 ciri/db/ciri-mainnet.db < common/storage/sql/schema.sql # only the first time
+$ bazel run -c opt --define network=mainnet -- ciri # optional flags
+```
+If you want to run a testnet node
+```
+$ sqlite3 ciri/db/ciri-testnet.db < common/storage/sql/schema.sql # only the first time
+$ bazel run -c opt --define network=testnet -- ciri # optional flags
 ```
 
 *First build can take some time due to dependencies downloading.*
@@ -40,12 +49,14 @@ $ bazel run --define network=mainnet|testnet -- ciri <optional flags>
 
 cIRI configuration file is a [YAML](http://yaml.org/) file with path `ciri/conf.yml`.
 
-Example file:
+An example file `ciri/conf.example.yml` is provided; you can rename it, uncomment and change values of options you want to use.
+
+Example syntax:
 
 ```yaml
 log-level: debug
 neighbors: "udp://148.148.148.148:14265"
-port: 14265
+http-port: 14265
 ```
 
 ### Command Line Interface
@@ -53,6 +64,7 @@ port: 14265
 Long option | Short option | Description | Example input
 --- | --- | --- | ---
 `--db-path` | `-d` | Path to the database file. | `-d ciri/db/ciri-mainnet.db`
+`--db-revalidate` | | Reloads milestones, state of the ledger and transactions metadata from the database. | `--db-revalidate false`
 `--help` | `-h` | Displays the usage. |
 `--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
@@ -67,7 +79,7 @@ Long option | Short option | Description | Example input
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
 `--tips-solidifier-enabled` | | Scan the current tips and attempt to mark them as solid. | `--tips-solidifier-enabled true`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
-`--http_port` | `-p` | HTTP API listen port. | `--http_port 14265`
+`--http-port` | `-p` | HTTP API listen port. | `--http-port 14265`
 `--max-find-transactions` | | The maximal number of transactions that may be returned by the 'findTransactions' API call. If the number of transactions found exceeds this number an error will be returned | `--max-find-transactions 100000`
 `--max-get-trytes` | | Maximum number of transactions that will be returned by the 'getTrytes' API call. | `--max-get-trytes 10000`
 `--remote-limit-api` | | Commands that should be ignored by API. | `--remote-limit-api "attachToTangle, addNeighbors"`

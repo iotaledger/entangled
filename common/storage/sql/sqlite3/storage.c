@@ -136,7 +136,7 @@ static retcode_t execute_statement_load_hashes(sqlite3_stmt* const sqlite_statem
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_HASH);
 }
 
-static retcode_t execute_statement_store_update(sqlite3_stmt* const sqlite_statement) {
+static retcode_t execute_statement(sqlite3_stmt* const sqlite_statement) {
   int rc = sqlite3_step(sqlite_statement);
   if (rc != SQLITE_OK && rc != SQLITE_DONE) {
     return RC_SQLITE3_FAILED_STEP;
@@ -224,7 +224,7 @@ static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* const par
     return RC_SQLITE3_FAILED_BINDING;
   }
 
-  return execute_statement_store_update(params->sqlite_statement);
+  return execute_statement(params->sqlite_statement);
 }
 
 /*
@@ -299,6 +299,8 @@ static void select_transactions_populate_from_row_essence_and_metadata(sqlite3_s
   tx->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 7));
   transaction_set_solid(tx, sqlite3_column_int(statement, 8));
+  transaction_set_validity(tx, sqlite3_column_int(statement, 9));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 10));
 }
 
 static void select_transactions_populate_from_row_essence_attachment_and_metadata(sqlite3_stmt* const statement,
@@ -326,7 +328,8 @@ static void select_transactions_populate_from_row_essence_attachment_and_metadat
   tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 14));
   transaction_set_solid(tx, sqlite3_column_int(statement, 15));
-  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 16));
+  transaction_set_validity(tx, sqlite3_column_int(statement, 16));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 17));
 }
 
 static void select_transactions_populate_from_row_essence_and_consensus(sqlite3_stmt* const statement,
@@ -349,7 +352,8 @@ static void select_transactions_populate_from_row_metadata(sqlite3_stmt* const s
                                                            iota_transaction_t* const tx) {
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
-  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 2));
+  transaction_set_validity(tx, sqlite3_column_int(statement, 2));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 3));
 }
 
 retcode_t iota_stor_transaction_count(storage_connection_t const* const connection, size_t* const count) {
@@ -397,7 +401,7 @@ retcode_t iota_stor_transaction_store(storage_connection_t const* const connecti
     goto done;
   }
 
-  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
     goto done;
   }
 
@@ -611,7 +615,7 @@ retcode_t iota_stor_transaction_update_solid_state(storage_connection_t const* c
     goto done;
   }
 
-  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
     goto done;
   }
 
@@ -646,7 +650,7 @@ retcode_t iota_stor_transaction_update_snapshot_index(storage_connection_t const
     goto done;
   }
 
-  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
     goto done;
   }
 
@@ -799,6 +803,20 @@ done:
   return ret;
 }
 
+retcode_t iota_stor_transaction_metadata_clear(storage_connection_t const* const connection) {
+  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_metadata_clear;
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
 /*
  * Milestone operations
  */
@@ -811,6 +829,20 @@ static retcode_t execute_statement_load_milestones(sqlite3_stmt* const sqlite_st
 static void select_milestones_populate_from_row(sqlite3_stmt* const statement, iota_milestone_t* const milestone) {
   milestone->index = sqlite3_column_int64(statement, 0);
   column_decompress_load(statement, 1, milestone->hash, FLEX_TRIT_SIZE_243);
+}
+
+retcode_t iota_stor_milestone_clear(storage_connection_t const* const connection) {
+  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_clear;
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
 }
 
 retcode_t iota_stor_milestone_store(storage_connection_t const* const connection,
@@ -826,7 +858,7 @@ retcode_t iota_stor_milestone_store(storage_connection_t const* const connection
     goto done;
   }
 
-  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
     goto done;
   }
 
@@ -959,7 +991,7 @@ retcode_t iota_stor_state_delta_store(storage_connection_t const* const connecti
     goto done;
   }
 
-  if ((ret = execute_statement_store_update(sqlite_statement))) {
+  if ((ret = execute_statement(sqlite_statement))) {
     goto done;
   }
 

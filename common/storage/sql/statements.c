@@ -97,6 +97,10 @@ char *iota_statement_transaction_find =
 // Update accordingly if `iota_statement_transaction_find` is modified
 static size_t iota_statement_transaction_find_size = 328;
 
+char *iota_statement_transaction_metadata_clear =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=0," TRANSACTION_COL_SOLID
+    "=0," TRANSACTION_COL_VALIDITY "=0";
+
 /*
  * Partial Transaction statements
  */
@@ -104,8 +108,8 @@ static size_t iota_statement_transaction_find_size = 328;
 char *iota_statement_transaction_select_essence_and_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
-    "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID
-    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+    "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
+    "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
 char *iota_statement_transaction_select_essence_attachment_and_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
@@ -113,8 +117,8 @@ char *iota_statement_transaction_select_essence_attachment_and_metadata =
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_TRUNK "," TRANSACTION_COL_BRANCH
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE "," TRANSACTION_COL_TAG
-    "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_ARRIVAL_TIME
-    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+    "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
+    "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
 char *iota_statement_transaction_select_essence_and_consensus =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
@@ -123,8 +127,8 @@ char *iota_statement_transaction_select_essence_and_consensus =
     "=?";
 
 char *iota_statement_transaction_select_metadata =
-    "SELECT " TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_ARRIVAL_TIME
-    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+    "SELECT " TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
+    "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
 /*
  * Transaction statement builders
@@ -156,6 +160,8 @@ char *iota_statement_transaction_find_build(size_t const bundles_count, size_t c
 /*
  * Milestone statements
  */
+
+char *iota_statement_milestone_clear = "DELETE FROM " MILESTONE_TABLE_NAME;
 
 char *iota_statement_milestone_insert =
     "INSERT INTO " MILESTONE_TABLE_NAME "(" MILESTONE_COL_INDEX "," MILESTONE_COL_HASH ")VALUES(?,?)";
