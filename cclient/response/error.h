@@ -16,6 +16,7 @@ extern "C" {
 
 typedef struct error_res_s {
   char_buffer_t* error;
+  uint16_t status_code;
 } error_res_t;
 
 error_res_t* error_res_new(char const* const error);

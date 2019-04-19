@@ -7,7 +7,7 @@
 
 #include "cclient/response/error.h"
 
-error_res_t* error_res_new(char const* const error) {
+error_res_t* error_res_new(char const* const error, uint16_t const status_code) {
   error_res_t* res = (error_res_t*)malloc(sizeof(error_res_t));
 
   if (res) {
@@ -17,6 +17,8 @@ error_res_t* error_res_new(char const* const error) {
       return NULL;
     }
     char_buffer_set(res->error, error);
+
+    res->status_code = status_code;
   }
 
   return res;
