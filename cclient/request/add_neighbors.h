@@ -24,50 +24,54 @@ extern "C" {
 #endif
 
 /**
- * @brief Structure of add_neighbors request
+ * @brief The data structure of the add neighbors request.
+ *
+ * The URI format:
+ *  - tcp://IPADDRESS:PORT
+ *  - udp://IPADDRESS:PORT
  *
  */
 typedef struct add_neighbors_req_s {
-  UT_array* uris; /**< An URI array */
+  UT_array* uris; /**< List of neighbor URIs for adding */
 } add_neighbors_req_t;
 
 /**
- * @brief new add_neighbors_req_t objects
+ * @brief New the add neighbors request object.
  *
- * @return add_neighbors_req_t*
+ * @return A pointer to the request object.
  */
 add_neighbors_req_t* add_neighbors_req_new();
 
 /**
- * @brief free add_neighbors_req_t
+ * @brief Free the add neighbors request.
  *
- * @param req add_neighbors_req_t object
+ * @param[in] req The request object.
  */
 void add_neighbors_req_free(add_neighbors_req_t** req);
 
 /**
- * @brief add an URI string to request
+ * @brief Add an URI string to the request.
  *
- * @param req request object
- * @param uri An URI string
- * @return An error code
+ * @param[in] req The request object.
+ * @param[in] uri An URI string. see \ref add_neighbors_req_t.uris
+ * @return #retcode_t
  */
 retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, const char* uri);
 
 /**
- * @brief return an URI string in the request list
+ * @brief Get an URI string from the URI list.
  *
- * @param req request object
- * @param idx index of URI
- * @return string
+ * @param[in] req The request object
+ * @param[in] idx The index of URI list.
+ * @return A string of URI. see \ref add_neighbors_req_t.uris
  */
 const char* add_neighbors_req_uris_at(add_neighbors_req_t* req, size_t idx);
 
 /**
- * @brief URI number in the request list
+ * @brief The size of URI list
  *
- * @param req request object
- * @return size_t
+ * @param[in] req request object
+ * @return The number of URI elements in the list.
  */
 size_t add_neighbors_req_uris_len(add_neighbors_req_t* req);
 
