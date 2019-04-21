@@ -30,6 +30,7 @@ void test_snapshot_metadata_serialization() {
   state_delta_deserialize_str(buffer, &delta_deserialized);
   TEST_ASSERT(state_delta_equal(snapshot.state, delta_deserialized));
   state_delta_destroy(&snapshot.state);
+  state_delta_destroy(&delta_deserialized);
   free(buffer);
 }
 

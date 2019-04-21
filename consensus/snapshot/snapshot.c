@@ -132,10 +132,12 @@ retcode_t iota_snapshot_load_built_in_snapshot(snapshot_t *const snapshot, iota_
 
   if ((ret = iota_snapshot_state_read_from_file(snapshot, conf->snapshot_file))) {
     log_critical(logger_id, "Initializing snapshot initial state failed\n");
-    return ret;
+    goto cleanup;
   }
 
   log_info(logger_id, "Consistent snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
+
+cleanup:
 
   hash_to_uint64_t_map_free(&solid_entry_points);
 
