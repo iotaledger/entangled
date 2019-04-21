@@ -19,7 +19,7 @@ void test_snapshot_metadata_serialization() {
   size_t serialized_size;
   char *buffer;
   uint64_t index = 0;
-  tryte_t current_address_trytes[NUM_TRYTES_ADDRESS];
+  tryte_t current_address_trytes[NUM_TRYTES_ADDRESS + 1];
   flex_trit_t current_address[FLEX_TRIT_SIZE_243];
   flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(null_hash, NUM_TRITS_HASH, TEST_NULL_HASH_TRYTES, NUM_TRYTES_HASH, NUM_TRYTES_HASH);

@@ -37,11 +37,16 @@ size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *con
 
 retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const snapshot_metadata, char *const str) {
   hash_to_uint64_t_map_entry_t *iter = NULL, *tmp = NULL;
-  tryte_t hash_trytes[NUM_TRYTES_HASH];
+
+  // TODO - figure out why ASAN complains about overflow in snprintf
+  tryte_t hash_trytes[NUM_TRYTES_HASH * 2];
   char svalue[MAX_CHARS_UNIT64];
 
-  flex_trits_to_trytes(&hash_trytes, NUM_TRYTES_ADDRESS, snapshot_metadata->hash, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  snprintf(str, NUM_TRYTES_ADDRESS + 1, "%s", hash_trytes);
+  if (flex_trits_to_trytes(&hash_trytes, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
+      NUM_TRITS_HASH) {
+    return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
+  }
+  snprintf(str, NUM_TRYTES_HASH + 1, "%s", hash_trytes);
   strcat(str, "\n");
   sprintf(svalue, "%" PRIu64 "\n", snapshot_metadata->index);
   strcat(str, svalue);
@@ -51,7 +56,7 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
     if (flex_trits_to_trytes(&hash_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
         NUM_TRITS_HASH) {
-      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+      return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
     }
     strncat(str, hash_trytes, NUM_TRYTES_ADDRESS);
     strcat(str, ";");
@@ -98,7 +103,7 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
 
   token = strtok(ptr, ";");
   while (token != NULL) {
-    strcpy(curr_address_trytes, token);
+    strncpy(curr_address_trytes, token, NUM_TRYTES_ADDRESS);
 
     if ((token = strtok(NULL, "\n")) == NULL) {
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;

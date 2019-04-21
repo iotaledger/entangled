@@ -205,7 +205,7 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
 }
 
 retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *const delta) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   char c;
   tryte_t curr_address_trytes[NUM_TRYTES_ADDRESS];
   flex_trit_t curr_address[FLEX_TRIT_SIZE_243];
@@ -221,11 +221,12 @@ retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *cons
   }
 
   while (token != NULL) {
-    strcpy(curr_address_trytes, token);
+    strncpy(curr_address_trytes, token, NUM_TRYTES_ADDRESS);
 
     if ((token = strtok(NULL, "\n")) == NULL) {
       return RC_SNAPSHOT_INVALID_FILE;
     }
+
     if (sscanf(token, "%" PRId64 "", &value) != 1) {
       return RC_SNAPSHOT_INVALID_FILE;
     }

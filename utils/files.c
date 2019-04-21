@@ -21,16 +21,22 @@
 #include "utils/files.h"
 
 retcode_t iota_utils_copy_file(const char *to, const char *from) {
+  retcode_t ret = RC_OK;
   int fd_to, fd_from;
   char buf[4096];
   ssize_t nread;
   int saved_errno;
 
   fd_from = open(from, O_RDONLY);
-  if (fd_from < 0) return -1;
+  if (fd_from < 0) {
+    return RC_UTILS_FAILED_OPEN_SRC_FILE;
+  }
 
   fd_to = open(to, O_WRONLY | O_CREAT, 0666);
-  if (fd_to < 0) goto out_error;
+  if (fd_to < 0) {
+    ret = RC_UTILS_FAILED_OPEN_CREATE_DST_FILE;
+    goto out_error;
+  }
 
   while (nread = read(fd_from, buf, sizeof buf), nread > 0) {
     char *out_ptr = buf;
@@ -43,6 +49,7 @@ retcode_t iota_utils_copy_file(const char *to, const char *from) {
         nread -= nwritten;
         out_ptr += nwritten;
       } else if (errno != EINTR) {
+        ret = RC_UTILS_FAILED_TO_COPY_FILE;
         goto out_error;
       }
     } while (nread > 0);
@@ -51,10 +58,10 @@ retcode_t iota_utils_copy_file(const char *to, const char *from) {
   if (nread == 0) {
     if (close(fd_to) < 0) {
       fd_to = -1;
+      ret = RC_UTILS_FAILED_CLOSE_FILE;
       goto out_error;
     }
     close(fd_from);
-
     return RC_OK;
   }
 
@@ -65,7 +72,7 @@ out_error:
   if (fd_to >= 0) close(fd_to);
 
   errno = saved_errno;
-  return RC_UTILS_FAILED_TO_COPY_FILE;
+  return ret;
 }
 
 retcode_t iota_utils_remove_file(const char *file_path) {
@@ -109,6 +116,7 @@ cleanup:
   if (file) {
     fclose(file);
   }
+  return RC_OK;
 }
 
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
