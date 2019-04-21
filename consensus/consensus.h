@@ -16,6 +16,7 @@
 #include "consensus/milestone/milestone_tracker.h"
 #include "consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include "consensus/snapshot/snapshot.h"
+#include "consensus/spent_addresses/spent_addresses_service.h"
 #include "consensus/tip_selection/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/tip_selection/entry_point_selector/entry_point_selector.h"
 #include "consensus/tip_selection/exit_probability_randomizer/exit_probability_randomizer.h"
@@ -37,6 +38,7 @@ typedef struct iota_consensus_s {
   local_snapshots_manager_t local_snapshots_manager;
   snapshots_service_t snapshots_service;
   snapshots_provider_t snapshots_provider;
+  spent_addresses_service_t spent_addresses_service;
   milestone_service_t milestone_service;
 } iota_consensus_t;
 

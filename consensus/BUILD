@@ -36,6 +36,7 @@ cc_library(
         "//consensus/snapshot:snapshots_provider",
         "//consensus/snapshot:snapshots_service",
         "//consensus/snapshot/local_snapshots:local_snapshots_manager",
+        "//consensus/spent_addresses:spent_addresses_service",
         "//consensus/tangle",
         "//consensus/tip_selection:tip_selector",
         "//consensus/tip_selection/cw_rating_calculator",
