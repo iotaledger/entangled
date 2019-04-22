@@ -19,20 +19,10 @@ retcode_t iota_milestone_service_init(milestone_service_t *const milestone_servi
   milestone_service->conf = conf;
   logger_id = logger_helper_enable(MILESTONE_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
 
-  connection_config_t db_conf = {.db_path = milestone_service->conf->db_path};
-
-  if (strcmp(db_conf.db_path, "") != 0) {
-    ERR_BIND_RETURN(iota_tangle_init(&milestone_service->tangle, &db_conf), ret);
-  }
-
   return RC_OK;
 }
 
 retcode_t iota_milestone_service_destroy(milestone_service_t *const milestone_service) {
-  if (iota_tangle_destroy(&milestone_service->tangle) != RC_OK) {
-    log_critical(logger_id, "Destroying tangle connection failed\n");
-  }
-
   logger_helper_release(logger_id);
   return RC_OK;
 }

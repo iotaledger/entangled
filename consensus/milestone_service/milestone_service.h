@@ -20,7 +20,6 @@ extern "C" {
 #endif
 
 typedef struct milestone_service_s {
-  tangle_t tangle;
   iota_consensus_conf_t *conf;
 } milestone_service_t;
 
