@@ -19,6 +19,7 @@ cc_test(
         "//consensus/milestone_service",
         "//consensus/milestone_tracker",
         "//consensus/snapshot:snapshots_provider",
+        "//consensus/snapshot:snapshots_service",
         "//consensus/test_utils",
         "//consensus/transaction_solidifier",
         "@unity",

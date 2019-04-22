@@ -22,6 +22,7 @@
 #include "consensus/milestone_service/milestone_service.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshots_provider.h"
+#include "consensus/snapshot/snapshots_service.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
@@ -56,6 +57,7 @@ static milestone_service_t milestone_service;
 static ledger_validator_t lv;
 static milestone_tracker_t mt;
 static snapshots_provider_t snapshots_provider;
+static snapshots_service_t snapshots_service;
 static transaction_solidifier_t transaction_solidifier;
 
 void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
@@ -72,6 +74,7 @@ static void init_test_structs() {
   conf.last_milestone = 0;
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;
+  conf.local_snapshots.min_depth = 1;
 
   for (size_t i = 0; i < NUM_TRITS_HASH; ++i) {
     flex_trits_set_at(conf.genesis_hash, NUM_TRITS_HASH, i, 0);
@@ -80,6 +83,7 @@ static void init_test_structs() {
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&transaction_solidifier, &conf, NULL, NULL) == RC_OK);
   TEST_ASSERT(iota_snapshots_provider_init(&snapshots_provider, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &transaction_solidifier) == RC_OK);
+  TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &mt, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &conf) == RC_OK);
 }
 
@@ -89,6 +93,7 @@ static void destroy_test_structs() {
   iota_consensus_ledger_validator_destroy(&lv);
   iota_consensus_transaction_solidifier_destroy(&transaction_solidifier);
   iota_snapshots_provider_destroy(&snapshots_provider);
+  iota_snapshots_service_destroy(&snapshots_service);
 }
 
 void test_replay_two_milestones() {
@@ -173,6 +178,8 @@ void test_replay_two_milestones() {
   mt.latest_milestone_index = milestone.index;
   TEST_ASSERT_EQUAL_INT(update_latest_solid_subtangle_milestone(&mt, &tangle), RC_OK);
   TEST_ASSERT_EQUAL_INT64(snapshots_provider.latest_snapshot.index, 2);
+
+  // TEST_ASSERT(iota_snapshots_service_take_snapshot(&snapshots_service,&mt) == RC_OK);
 
   bundle_transactions_free(&bundle_1);
   bundle_transactions_free(&bundle_2);

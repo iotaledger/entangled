@@ -77,6 +77,8 @@ static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
                            iota_statement_milestone_select_last);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_next),
                            iota_statement_milestone_select_next);
+  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_previous),
+                           iota_statement_milestone_select_previous);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_exist),
                            iota_statement_milestone_exist);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_exist_by_hash),
@@ -120,6 +122,7 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   ret |= finalize_statement(connection->statements.milestone_select_first);
   ret |= finalize_statement(connection->statements.milestone_select_last);
   ret |= finalize_statement(connection->statements.milestone_select_next);
+  ret |= finalize_statement(connection->statements.milestone_select_previous);
   ret |= finalize_statement(connection->statements.milestone_exist);
   ret |= finalize_statement(connection->statements.milestone_exist_by_hash);
   ret |= finalize_statement(connection->statements.state_delta_store);
