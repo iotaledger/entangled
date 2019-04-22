@@ -358,10 +358,21 @@ tryte_t const* const BUNDLE_OF_2_TRUNK_TX =
     "99999999999999999999999999999999999999999999999999999999RRPFLWHSFWFLIOWHEN"
     "IPCTOKOHD";
 
-retcode_t iota_test_utils_bundle_create_simple_transfer(flex_trit_t const *const branch, flex_trit_t const *const trunk,
-                                                        bundle_transactions_t *bundle, uint64_t sk_index,
-                                                        flex_trit_t const *const to_address,
-                                                        flex_trit_t const *const seed, int64_t value);
+/**
+ * Creates a bundle with transactions
+ *
+ * @param branch The Branch transaction's hash to attach to
+ * @param trunk The Trunk transaction's hash to attach to
+ * @param bundle The bundle to populate
+ * @param seed The seed for the input address
+ * @param sk_index The secret key index
+ * @param to_address The output address
+ * @param value The value to transfer, value of 0 would mean 2 transactions without value
+ * @return a status code
+ */
+retcode_t iota_test_utils_bundle_create_transfer(flex_trit_t const *const branch, flex_trit_t const *const trunk,
+                                                 bundle_transactions_t *bundle, flex_trit_t const *const seed,
+                                                 uint64_t sk_index, flex_trit_t const *const to_address, int64_t value);
 
 #ifdef __cplusplus
 }
