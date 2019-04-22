@@ -125,17 +125,17 @@ void test_replay_two_milestones() {
   iota_stor_pack_t pack;
   hash_pack_init(&pack, 2);
 
-  iota_test_utils_bundle_create_simple_transfer(conf.genesis_hash, conf.genesis_hash, bundle_1, 0, conf.genesis_hash,
-                                                seed, 100);
+  iota_test_utils_bundle_create_transfer(conf.genesis_hash, conf.genesis_hash, bundle_1, seed, 0, conf.genesis_hash,
+                                         100);
 
   BUNDLE_FOREACH(bundle_1, tx_iter) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx_iter) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx_iter, true) == RC_OK);
   }
 
-  iota_test_utils_bundle_create_simple_transfer(transaction_hash(bundle_at(bundle_1, 0)),
-                                                transaction_hash(bundle_at(bundle_1, 0)), bundle_milestone_1, 0,
-                                                conf.genesis_hash, seed, 0);
+  iota_test_utils_bundle_create_transfer(transaction_hash(bundle_at(bundle_1, 0)),
+                                         transaction_hash(bundle_at(bundle_1, 0)), bundle_milestone_1, seed, 0,
+                                         conf.genesis_hash, 0);
 
   milestone.index = initial_milestone_index;
   memcpy(milestone.hash, transaction_hash(bundle_at(bundle_milestone_1, 0)), FLEX_TRIT_SIZE_243);
@@ -149,9 +149,9 @@ void test_replay_two_milestones() {
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx_iter, true) == RC_OK);
   }
 
-  iota_test_utils_bundle_create_simple_transfer(transaction_hash(bundle_at(bundle_milestone_1, 0)),
-                                                transaction_hash(bundle_at(bundle_milestone_1, 0)), bundle_milestone_2,
-                                                0, conf.genesis_hash, seed, 0);
+  iota_test_utils_bundle_create_transfer(transaction_hash(bundle_at(bundle_milestone_1, 0)),
+                                         transaction_hash(bundle_at(bundle_milestone_1, 0)), bundle_milestone_2, seed,
+                                         0, conf.genesis_hash, 0);
 
   milestone.index++;
   memcpy(milestone.hash, transaction_hash(bundle_at(bundle_milestone_2, 0)), FLEX_TRIT_SIZE_243);
