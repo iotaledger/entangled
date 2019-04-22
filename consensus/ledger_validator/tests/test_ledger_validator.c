@@ -189,6 +189,71 @@ void test_replay_two_milestones() {
   destroy_test_structs();
 }
 
+void test_replay_several_milestones() {
+  iota_milestone_t milestone;
+
+  iota_transaction_t *txs[2];
+  iota_transaction_t *tx_iter;
+  iota_transaction_t milestone_transaction;
+  flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
+
+  transaction_reset(&milestone_transaction);
+  size_t i;
+  size_t num_milestones = 10;
+
+  flex_trit_t seed[FLEX_TRIT_SIZE_243];
+  flex_trit_t milestone_hash[FLEX_TRIT_SIZE_243];
+  bundle_transactions_t *bundle = NULL;
+
+  bool exist;
+  TEST_ASSERT(iota_tangle_milestone_exist(&tangle, NULL, &exist) == RC_OK);
+
+  TEST_ASSERT(!exist);
+
+  init_test_structs();
+
+  flex_trits_from_trytes(seed, NUM_TRITS_HASH, TEST_SEED, NUM_TRITS_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(milestone_hash, NUM_TRITS_HASH, TEST_MILESTONE_HASH, NUM_TRITS_HASH, NUM_TRYTES_HASH);
+
+  iota_stor_pack_t pack;
+  hash_pack_init(&pack, 2);
+
+  memcpy(curr_hash, conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  milestone.index = 0;
+
+  for (i = 0; i < num_milestones * 2; ++i) {
+    bundle_transactions_new(&bundle);
+    iota_test_utils_bundle_create_transfer(curr_hash, curr_hash, bundle, seed, 0, conf.genesis_hash, i % 2 ? 0 : 1000);
+    if (i % 2) {
+      // milestone bundle
+      memcpy(milestone.hash, transaction_hash(bundle_at(bundle, 0)), FLEX_TRIT_SIZE_243);
+      milestone.index++;
+      TEST_ASSERT(iota_tangle_milestone_store(&tangle, &milestone) == RC_OK);
+    }
+
+    BUNDLE_FOREACH(bundle, tx_iter) {
+      TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx_iter) == RC_OK);
+      TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx_iter, true) == RC_OK);
+    }
+    memcpy(curr_hash, transaction_hash(bundle_at(bundle, 0)), FLEX_TRIT_SIZE_243);
+    bundle_transactions_free(&bundle);
+  }
+
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &conf, &mt, &milestone_service) == RC_OK);
+
+  TEST_ASSERT_EQUAL_INT(snapshots_provider.latest_snapshot.index, 0);
+
+  mt.running = true;
+  mt.latest_milestone_index = milestone.index;
+  TEST_ASSERT_EQUAL_INT(update_latest_solid_subtangle_milestone(&mt, &tangle), RC_OK);
+  TEST_ASSERT_EQUAL_INT64(snapshots_provider.latest_snapshot.index, num_milestones);
+
+  // TEST_ASSERT(iota_snapshots_service_take_snapshot(&snapshots_service,&mt) == RC_OK);
+
+  hash_pack_free(&pack);
+  destroy_test_structs();
+}
+
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
@@ -208,6 +273,7 @@ int main(int argc, char *argv[]) {
   iota_consensus_conf_init(&conf);
 
   RUN_TEST(test_replay_two_milestones);
+  RUN_TEST(test_replay_several_milestones);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
