@@ -358,7 +358,10 @@ tryte_t const* const BUNDLE_OF_2_TRUNK_TX =
     "99999999999999999999999999999999999999999999999999999999RRPFLWHSFWFLIOWHEN"
     "IPCTOKOHD";
 
-void populate_bundle_of_transactions(tangle_t *const tangle, bundle_transactions_t *bundle, size_t num_of_trnasactions);
+retcode_t iota_test_utils_bundle_create_simple_transfer(flex_trit_t const *const branch, flex_trit_t const *const trunk,
+                                                        bundle_transactions_t *bundle, uint64_t sk_index,
+                                                        flex_trit_t const *const to_address,
+                                                        flex_trit_t const *const seed, int64_t value);
 
 #ifdef __cplusplus
 }

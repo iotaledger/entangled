@@ -53,7 +53,7 @@ retcode_t iota_milestone_service_destroy(milestone_service_t *const milestone_se
  *
  * @return a status code
  */
-retcode_t iota_milestone_service_replay_milestones(milestone_service_t *const milestone_service,
+retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, milestone_service_t *const milestone_service,
                                                    snapshot_t *const snapshot, uint64_t index);
 
 #ifdef __cplusplus

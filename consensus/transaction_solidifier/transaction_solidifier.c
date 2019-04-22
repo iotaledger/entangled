@@ -184,6 +184,9 @@ retcode_t iota_consensus_transaction_solidifier_destroy(transaction_solidifier_t
     return RC_STILL_RUNNING;
   }
 
+  if (ts->newly_set_solid_transactions) {
+    hash243_set_free(&ts->newly_set_solid_transactions);
+  }
   ts->transaction_requester = NULL;
   ts->newly_set_solid_transactions = NULL;
   ts->conf = NULL;
@@ -209,7 +212,9 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
     return hash243_set_add(params->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
     params->is_solid = false;
-    return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
+    if (ts->transaction_requester) {  // Might be null for tests
+      return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
+    }
   }
 
   return RC_OK;
@@ -227,6 +232,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
     log_error(logger_id, "No transactions were loaded for the provided hash\n");
     return ret;
   }
+
   if (transaction_solid(curr_tx)) {
     *is_solid = true;
     return RC_OK;

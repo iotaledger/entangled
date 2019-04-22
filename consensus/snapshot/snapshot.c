@@ -25,7 +25,7 @@ static logger_id_t logger_id;
  */
 
 retcode_t iota_snapshot_state_read_from_file(snapshot_t *const snapshot, char const *const snapshot_file) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   char *buffer = NULL;
 
   ERR_BIND_GOTO(iota_utils_read_file_into_buffer(snapshot_file, &buffer), ret, cleanup);
@@ -51,7 +51,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
 
   state_size = state_delta_serialized_str_size(snapshot->state);
   char *buffer;
-  if ((buffer = (byte_t *)calloc(state_size, sizeof(char))) == NULL) {
+  if ((buffer = (char *)calloc(state_size, sizeof(char))) == NULL) {
     return RC_STORAGE_OOM;
   }
 
@@ -66,7 +66,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
 
-  if ((buffer = (byte_t *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
+  if ((buffer = (char *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
     return RC_STORAGE_OOM;
   }
 
@@ -96,6 +96,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   rw_lock_handle_init(&snapshot->rw_lock);
   snapshot->conf = conf;
   snapshot->state = NULL;
+  snapshot->index = 0;
 
   if (!snapshot->conf->local_snapshots.local_snapshots_is_enabled ||
       ((ret = iota_snapshot_load_local_snapshot(snapshot, conf)) != RC_OK)) {
@@ -159,7 +160,7 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
   strcat(file_path, SNAPSHOT_METADATA_EXT);
 
-  if (ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK) {
+  if ((ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK)) {
     log_critical(logger_id, "Initializing snapshot metadata failed\n");
     return ret;
   }
@@ -270,7 +271,7 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
                 ret, cleanup);
 
 cleanup:
-  if (dst->state) {
+  if (ret != RC_OK && dst->state) {
     state_delta_destroy(&dst->state);
   }
 

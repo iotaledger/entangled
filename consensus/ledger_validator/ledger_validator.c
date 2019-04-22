@@ -6,6 +6,7 @@
  */
 
 #include <inttypes.h>
+#include <stdlib.h>
 
 #include "common/model/milestone.h"
 #include "consensus/bundle_validator/bundle_validator.h"
@@ -261,10 +262,9 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
         }
       }
 
-      // TODO - TEST!!!!
-      if ((ret = iota_milestone_service_replay_milestones(&lv->milestone_service,
+      if ((ret = iota_milestone_service_replay_milestones(tangle, &lv->milestone_service,
                                                           &lv->milestone_tracker->snapshots_provider->latest_snapshot,
-                                                          milestone->index)) != RC_OK) {
+                                                          milestone->index - 1)) != RC_OK) {
         log_error(logger_id, "Applying patch failed\n");
         goto done;
       }
