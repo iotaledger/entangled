@@ -22,11 +22,17 @@ cc_library(
 
 cc_library(
     name = "bundle",
+    srcs = ["bundle.c"],
     hdrs = ["bundle.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/helpers:digest",
+        "//common/helpers:pow",
+        "//common/helpers:sign",
         "//common/model:bundle",
         "//consensus/tangle",
+        "//utils:macros",
+        "//utils:time",
     ],
 )

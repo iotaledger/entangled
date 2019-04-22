@@ -116,6 +116,8 @@ retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const m
                                                     iota_milestone_t* const candidate,
                                                     milestone_status_t* const milestone_status);
 
+retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt, tangle_t* const tangle);
+
 #ifdef __cplusplus
 }
 #endif

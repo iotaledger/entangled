@@ -146,8 +146,9 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   // TODO - implement rollback as well
 
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
-  ERR_BIND_GOTO(iota_milestone_service_replay_milestones(snapshots_service, &snapshot, target_milestone->index), ret,
-                cleanup);
+  ERR_BIND_GOTO(iota_milestone_service_replay_milestones(&snapshots_service->tangle, snapshots_service, &snapshot,
+                                                         target_milestone->index),
+                ret, cleanup);
 
 cleanup:
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);

@@ -224,7 +224,7 @@ static void* milestone_validator(void* arg) {
   return NULL;
 }
 
-static retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt, tangle_t* const tangle) {
+retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt, tangle_t* const tangle) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
   bool has_snapshot = false;
@@ -241,6 +241,7 @@ static retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* co
   while (pack.num_loaded != 0 && milestone.index <= mt->latest_milestone_index && mt->running) {
     has_snapshot = false;
     is_solid = false;
+
     if (milestone.index > mt->latest_solid_subtangle_milestone_index) {
       if ((ret = iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, tangle,
                                                                       milestone.hash, true, &is_solid)) != RC_OK) {
@@ -249,6 +250,7 @@ static retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* co
       if (!is_solid) {
         break;
       }
+
       if ((ret = iota_consensus_ledger_validator_update_snapshot(mt->ledger_validator, tangle, &milestone,
                                                                  &has_snapshot)) != RC_OK) {
         log_error(logger_id, "Updating snapshot failed\n");
