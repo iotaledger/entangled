@@ -33,6 +33,8 @@ retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
 {TYPE} const value);
 bool hash_to_{TYPE}_map_contains(hash_to_{TYPE}_map_t const *const map,
         flex_trit_t const *const hash);
+bool hash_to_{TYPE}_map_remove(hash_to_{TYPE}_map_t *const map,
+        flex_trit_t const *const hash);
 bool hash_to_{TYPE}_map_find(hash_to_{TYPE}_map_t const *const map,
         flex_trit_t const *const hash,
 hash_to_{TYPE}_map_entry_t ** const res);

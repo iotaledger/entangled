@@ -93,6 +93,8 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   }
 
   snapshot_t next_snapshot;
+  next_snapshot.state = NULL;
+  next_snapshot.metadata.solid_entry_points = NULL;
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot(snapshots_service, &milestone, &next_snapshot), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, &next_snapshot), ret,
                 cleanup);
@@ -175,14 +177,13 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
                     snapshots_service->conf->local_snapshots.local_snapshots_path_base),
                 ret, cleanup);
 
-  iota_snapshot_lock_write(&snapshots_service->snapshots_provider->latest_snapshot);
+  /*iota_snapshot_lock_write(&snapshots_service->snapshots_provider->latest_snapshot);
   snapshots_service->snapshots_provider->latest_snapshot.index = snapshot->index;
-  iota_snapshot_unlock(&snapshots_service->snapshots_provider->latest_snapshot);
+  iota_snapshot_unlock(&snapshots_service->snapshots_provider->latest_snapshot);*/
 
   iota_snapshot_lock_write(&snapshots_service->snapshots_provider->inital_snapshot);
-  ERR_BIND_GOTO(
-      state_delta_merge_patch(&snapshots_service->snapshots_provider->inital_snapshot.state, &snapshot->state), ret,
-      cleanup);
+
+  ERR_BIND_GOTO(iota_snapshot_copy(snapshot, &snapshots_service->snapshots_provider->inital_snapshot), ret, cleanup);
 
 cleanup:
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
@@ -325,6 +326,8 @@ retcode_t iota_snapshots_service_update_solid_entry_points(snapshots_service_t *
                                                            iota_milestone_t const *const target_milestone) {
   retcode_t ret;
   hash_to_uint64_t_map_t *solid_entry_points = &snapshot->metadata.solid_entry_points;
+
+  hash_to_uint64_t_map_remove(solid_entry_points, snapshots_service->conf->genesis_hash);
 
   ERR_BIND_GOTO(
       hash_to_uint64_t_map_add(solid_entry_points, snapshots_service->conf->genesis_hash, target_milestone->index), ret,

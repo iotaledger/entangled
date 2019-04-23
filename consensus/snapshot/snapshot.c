@@ -57,10 +57,10 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
 
   metadata_size = iota_snapshot_metadata_serialized_str_size(&snapshot->metadata);
 
-  strcat(state_path, snapshot_file_base);
+  strcpy(state_path, snapshot_file_base);
   strcat(state_path, SNAPSHOT_STATE_EXT);
 
-  strcat(metadata_path, snapshot_file_base);
+  strcpy(metadata_path, snapshot_file_base);
   strcat(metadata_path, SNAPSHOT_METADATA_EXT);
 
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
@@ -255,15 +255,17 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
 
 retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst) {
   retcode_t ret;
-  dst->index = src->index;
-  dst->conf = src->conf;
 
   if (dst == NULL || src == NULL) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
+  dst->index = src->index;
+  dst->conf = src->conf;
+
   rw_lock_handle_init(&dst->rw_lock);
-  dst->state = NULL;
+
+  ERR_BIND_GOTO(iota_snapshot_metadata_destroy(&dst->metadata), ret, cleanup);
 
   ERR_BIND_GOTO(state_delta_copy(&src->state, &dst->state), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_metadata_init(&dst->metadata, src->metadata.hash, src->metadata.index,

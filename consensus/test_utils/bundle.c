@@ -21,6 +21,7 @@ retcode_t iota_test_utils_bundle_create_transfer(flex_trit_t const *const branch
   iota_transaction_t *tx_iter;
   flex_trit_t *sig = NULL;
   flex_trit_t *inp_address = NULL;
+  flex_trit_t *out_address = NULL;
   flex_trit_t txflex[FLEX_TRIT_SIZE_8019];
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   flex_trit_t *curr_hash;
@@ -30,6 +31,7 @@ retcode_t iota_test_utils_bundle_create_transfer(flex_trit_t const *const branch
   transaction_reset(&tx);
 
   inp_address = iota_sign_address_gen_flex_trits(seed, sk_index, 1);
+  out_address = iota_sign_address_gen_flex_trits(seed, sk_index + 1, 1);
   transaction_set_value(&tx, -value);
   transaction_set_current_index(&tx, 0);
   transaction_set_address(&tx, inp_address);
@@ -42,7 +44,7 @@ retcode_t iota_test_utils_bundle_create_transfer(flex_trit_t const *const branch
 
   transaction_set_value(&tx, value);
   transaction_set_current_index(&tx, 1);
-  transaction_set_address(&tx, to_address);
+  transaction_set_address(&tx, out_address);
   transaction_set_last_index(&tx, 1);
 
   bundle_transactions_add(bundle, &tx);
@@ -71,6 +73,10 @@ cleanup:
   }
   if (inp_address) {
     free(inp_address);
+  }
+
+  if (out_address) {
+    free(out_address);
   }
 
   return ret;
