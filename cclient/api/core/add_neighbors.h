@@ -26,19 +26,20 @@ extern "C" {
 #endif
 
 /**
- * @brief
+ * @brief Add a list of neighbors to the IRI node.
  *
- * Add a list of neighbors to iri node. It should be noted that this is only
- * temporary, and the added neighbors will be removed from your set of neighbors
- * after you relaunch IRI.
+ * Assumes <b>addNeighbors</b> command is availiable on the node. It should be noted that this is only temporary, and
+ * the added neighbors will be removed from your set of neighbors after you relaunch IRI.
  *
- * @param service client service
- * @param req Request containing list of neighbors to add
- * @param res Response containing a number of neighbor
- * @return
- *  - `#RC_OK`
- *  - `#RC_CCLIENT_OOM`
- *  - `#RC_ERROR`
+ * The URI format:
+ *
+ * - udp://IPADDRESS:PORT
+ * - tcp://IPADDRESS:PORT
+ *
+ * @param[in] service client service
+ * @param[in] req A list of URIs.
+ * @param[out] res Number of neighbors that were added.
+ * @return #retcode_t
  */
 retcode_t iota_client_add_neighbors(const iota_client_service_t* const service, const add_neighbors_req_t* const req,
                                     add_neighbors_res_t* res);

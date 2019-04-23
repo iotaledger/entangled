@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_TIPS_H
 #define CCLIENT_API_GET_TIPS_H
 
@@ -16,14 +25,11 @@ extern "C" {
 #endif
 
 /**
- * Returns the list of tips.
+ * @brief Returns a list of tips (transactions not referenced by other transactions).
  *
- * https://iota.readme.io/reference#gettips
- *
- * @param service IRI node end point.
- * @param res Response containing the tips
- *
- * @return error value.
+ * @param[in] service
+ * @param[out] res
+ * @return #retcode_t
  */
 retcode_t iota_client_get_tips(const iota_client_service_t* const service, get_tips_res_t* res);
 
@@ -32,3 +38,5 @@ retcode_t iota_client_get_tips(const iota_client_service_t* const service, get_t
 #endif
 
 #endif  // CCLIENT_API_GET_TIPS_H
+
+/** @} */
