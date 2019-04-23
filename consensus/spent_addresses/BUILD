@@ -29,6 +29,7 @@ cc_library(
     deps = [
         ":spent_addresses_provider",
         "//common:errors",
+        "//consensus:conf",
         "//utils:logger_helper",
     ],
 )

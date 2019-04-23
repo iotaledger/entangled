@@ -112,7 +112,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   }
 
   log_info(logger_id, "Initializing spent addresses service\n");
-  if ((ret = iota_spent_addresses_service_init(&consensus->spent_addresses_service)) != RC_OK) {
+  if ((ret = iota_spent_addresses_service_init(&consensus->spent_addresses_service, &consensus->conf)) != RC_OK) {
     log_critical(logger_id, "Initializing spent addresses service failed\n");
     return ret;
   }
