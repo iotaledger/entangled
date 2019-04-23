@@ -359,20 +359,20 @@ tryte_t const* const BUNDLE_OF_2_TRUNK_TX =
     "IPCTOKOHD";
 
 /**
- * Creates a bundle with transactions
+ * Creates a bundle with transactions, if value is > 0, then the tokens
+ * are sent to the next pk of the sent seed
  *
  * @param branch The Branch transaction's hash to attach to
  * @param trunk The Trunk transaction's hash to attach to
  * @param bundle The bundle to populate
  * @param seed The seed for the input address
  * @param sk_index The secret key index
- * @param to_address The output address
  * @param value The value to transfer, value of 0 would mean 2 transactions without value
  * @return a status code
  */
 retcode_t iota_test_utils_bundle_create_transfer(flex_trit_t const *const branch, flex_trit_t const *const trunk,
                                                  bundle_transactions_t *bundle, flex_trit_t const *const seed,
-                                                 uint64_t sk_index, flex_trit_t const *const to_address, int64_t value);
+                                                 uint64_t sk_index, int64_t value);
 
 #ifdef __cplusplus
 }

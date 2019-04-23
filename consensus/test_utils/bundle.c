@@ -14,8 +14,7 @@
 
 retcode_t iota_test_utils_bundle_create_transfer(flex_trit_t const *const branch, flex_trit_t const *const trunk,
                                                  bundle_transactions_t *bundle, flex_trit_t const *const seed,
-                                                 uint64_t sk_index, flex_trit_t const *const to_address,
-                                                 int64_t value) {
+                                                 uint64_t sk_index, int64_t value) {
   retcode_t ret;
   iota_transaction_t tx;
   iota_transaction_t *tx_iter;
