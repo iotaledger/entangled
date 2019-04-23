@@ -146,11 +146,9 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash, iota_stor_pack_t *p
         goto done;
       }
       while (tx_bundle != NULL) {
-        if (transaction_value(tx_bundle) != 0) {
-          if ((ret = state_delta_add_or_sum(params->state, transaction_address(tx_bundle),
-                                            transaction_value(tx_bundle))) != RC_OK) {
-            goto done;
-          }
+        if ((ret = state_delta_add_or_sum(params->state, transaction_address(tx_bundle),
+                                          transaction_value(tx_bundle))) != RC_OK) {
+          goto done;
         }
         tx_bundle = (iota_transaction_t *)utarray_next(bundle, tx_bundle);
       }

@@ -29,6 +29,9 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *
   state_delta_find(*state, hash, entry);
   if (entry) {
     entry->value += value;
+    if (entry->value == 0) {
+      state_delta_remove(state, hash);
+    }
   } else {
     if ((ret = state_delta_add(state, hash, value)) != RC_OK) {
       return ret;
@@ -85,8 +88,10 @@ retcode_t state_delta_apply_patch(state_delta_t *const state, state_delta_t cons
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *patch, iter, tmp) {
-    if ((ret = state_delta_add_or_sum(state, iter->hash, iter->value)) != RC_OK) {
-      return ret;
+    if (iter->value != 0) {
+      if ((ret = state_delta_add_or_sum(state, iter->hash, iter->value)) != RC_OK) {
+        return ret;
+      }
     }
   }
 
