@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_PROMOTE_TRANSACTION_H
 #define CCLIENT_API_PROMOTE_TRANSACTION_H
 
@@ -16,21 +25,18 @@ extern "C" {
 #endif
 
 /**
- * Attempts to promote a transaction using a provided bundle and, if successful,
- * returns the promoting Transactions.
+ * @brief Promotes a transaction by adding zero-value spam transactions on top of it.
  *
- * @param {iota_client_service_t} serv - client service
- * @param {trit_array_p} tail_hash
- * @param {int} depth
- * @param {int} minWeightMagnitude
- * @param {hashes_t} transfers
+ * Attempts to promote a transaction using a provided bundle and, if successful, returns the promoting Transactions.
+ * This will effectively double the chances of the transaction to be picked, and this approved.
  *
- * @returns {retcode_t}
- * - `INCONSISTENT SUBTANGLE`: In this case promotion has no effect and
- * reatchment is required.
- * - Fetch error
- *
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPromoteTransaction.ts#L51
+ * @param[in] serv client service
+ * @param[in] tail_hash Tail transaction hash.
+ * @param[in] depth The depth as which Random Walk starts, <b>3</b> is a typicall value used by wallets.
+ * @param[in] mwm Mininum number of trailing zeros in transaction hash, <b>14</b> for mainnet and <b>9</b> for testnet.
+ * @param[in] bundle The bundle for promotion
+ * @param[out] out_bundle List of transactions made with the attached transaction trytes.
+ * @return #retcode_t
  */
 retcode_t iota_client_promote_transaction(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                                           int const depth, int const mwm, bundle_transactions_t* const bundle,
@@ -41,3 +47,5 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
 #endif
 
 #endif  // CCLIENT_API_PROMOTE_TRANSACTION_H
+
+/** @} */

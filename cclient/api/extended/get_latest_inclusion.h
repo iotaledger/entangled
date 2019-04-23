@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_LATEST_INCLUSION_H
 #define CCLIENT_API_GET_LATEST_INCLUSION_H
 
@@ -15,19 +24,15 @@ extern "C" {
 #endif
 
 /**
- * Fetches inclusion states of given transactions and a list of tips,
- * by calling iota_client_get_inclusion_status` on
- * `latest_solid_subtangle_milestione`.
+ * @brief Gets inclusion states.
  *
- * @param {iota_client_service_t} serv - client service
- * @param {hash243_queue_t} transactions - List of transactions hashes
- * @param {get_inclusion_states_res_t} out_states - List of inclusion states
+ * Fetches inclusion states of given transactions and a list of tips, by calling #iota_client_get_inclusion_states and
+ * using <b>latestSolidSubtangleMilestone</b> as the tip.
  *
- * @returns {retcode_t}
- * - `INVALID_HASH`: Invalid transaction hash
- * - Fetch error
- *
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetLatestInclusion.ts#L34
+ * @param[in] serv client service
+ * @param[in] transactions List of transaction hashes
+ * @param[out] out_states List of inclusion states
+ * @return #retcode_t
  */
 retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const serv, hash243_queue_t const transactions,
                                            get_inclusion_states_res_t* out_states);
@@ -37,3 +42,5 @@ retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const se
 #endif
 
 #endif  // CCLIENT_API_GET_LATEST_INCLUSION_H
+
+/** @} */

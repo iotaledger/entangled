@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_EXTENDED_INIT_H
 #define CCLIENT_API_EXTENDED_INIT_H
 
@@ -12,7 +21,16 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Init client extended APIs
+ *
+ */
 void iota_client_extended_init();
+
+/**
+ * @brief Destroy client extended APIs
+ *
+ */
 void iota_client_extended_destroy();
 
 #ifdef __cplusplus
@@ -20,3 +38,5 @@ void iota_client_extended_destroy();
 #endif
 
 #endif  // CCLIENT_API_EXTENDED_INIT_H
+
+/** @} */
