@@ -6,9 +6,33 @@
  */
 
  /**
- * @defgroup cclient_core Core API
+ * @defgroup cclient_core CClient Core API
  * @ingroup cclient
- * @brief Core API implementations. 
+ * @brief CClient Core API implementations.
  *
- * The Core API is a basic API set that comuncate with the IRI node. 
+ * The Core API is a basic API set that communicate with the IRI node.
+ * see <a href="https://docs.iota.org/docs/iri/0.1/references/api-reference" target="_blank"><b>IRI API reference</b></a>
+ *
+ * Must call `#iota_client_core_init` for initialization and `#iota_client_core_destroy` for cleanup the Core APIs.
+ *
+ * CClient Core APIs:
+ * - #iota_client_core_init
+ * - #iota_client_core_destroy
+ * - #logger_init_client_core
+ * - #logger_destroy_client_core
+ * - #iota_client_add_neighbors
+ * - #iota_client_attach_to_tangle
+ * - #iota_client_broadcast_transactions
+ * - #iota_client_check_consistency
+ * - #iota_client_find_transactions
+ * - #iota_client_get_balances
+ * - #iota_client_get_inclusion_states
+ * - #iota_client_get_neighbors
+ * - #iota_client_get_node_info
+ * - #iota_client_get_tips
+ * - #iota_client_get_transactions_to_approve
+ * - #iota_client_get_trytes
+ * - #iota_client_remove_neighbors
+ * - #iota_client_store_transactions
+ *
  */

@@ -143,6 +143,15 @@ retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle) {
 }
 
 /*
+ * Bundle operations
+ */
+
+retcode_t iota_tangle_bundle_update_validity(tangle_t const *const tangle, bundle_transactions_t const *const bundle,
+                                             bundle_status_t const status) {
+  return iota_stor_bundle_update_validity(&tangle->connection, bundle, status);
+}
+
+/*
  * Milestone operations
  */
 

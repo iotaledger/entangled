@@ -12,7 +12,7 @@
 
 retcode_t traverse_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                           bundle_transactions_t* const bundle, hash8019_array_p trytes) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   get_trytes_req_t* get_trytes_req = NULL;
   get_trytes_res_t* get_trytes_res = NULL;
   iota_transaction_t tx = {};
@@ -21,7 +21,7 @@ retcode_t traverse_bundle(iota_client_service_t const* const serv, flex_trit_t c
   int64_t current_index = 0, last_index = 0, next_index = 0;
   bool is_tail = true;
 
-  log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   get_trytes_req = get_trytes_req_new();
   if (!get_trytes_req) {
     ret_code = RC_CCLIENT_OOM;

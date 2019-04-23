@@ -26,14 +26,16 @@ extern "C" {
 #endif
 
 /**
- * @brief Returns an list of `input_t` with a total balance field.
+ * @brief Gets inputs by generating address and fetching balances.
  *
- * @param serv client service
- * @param seed a seed for the address generator
- * @param addr_opt the security level and key indices
- * @param threshold Minimum amount of balance required
- * @param out_inputs the result of inputs
- * @return retcode_t error code
+ * Create an #inputs_t object contaning a list of #input_t and total balance.
+ *
+ * @param[in] serv client service
+ * @param[in] seed A seed for address generator
+ * @param[in] addr_opt address information
+ * @param[in] threshold Minimum balance required
+ * @param[out] out_inputs Inputs object containing a list of #input_t and total balance
+ * @return #retcode_t
  */
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_trit_t const* const seed,
                                  address_opt_t const addr_opt, uint64_t const threshold, inputs_t* const out_inputs);

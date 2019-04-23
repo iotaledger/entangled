@@ -11,4 +11,28 @@
  * @brief Extended API implementations. 
  *
  * The Extended API is a API set that is commonly used in an applications.
+ *
+ * You need to include `cclient/api/core/core_api.h` and `cclient/api/extended/extended_api.h` in header file and call `#iota_client_extended_init` for initialization and `#iota_client_extended_destroy` for cleanup extended APIs.
+ *
+ * CClient Extended APIs:
+ * - #iota_client_extended_init
+ * - #iota_client_extended_destroy
+ * - #logger_init_client_extended
+ * - #logger_destroy_client_extended
+ * - #iota_client_find_transaction_objects
+ * - #iota_client_get_account_data
+ * - #iota_client_get_bundle
+ * - #iota_client_get_inputs
+ * - #iota_client_get_latest_inclusion
+ * - #iota_client_get_new_address
+ * - #iota_client_get_transaction_objects
+ * - #iota_client_is_promotable
+ * - #iota_client_prepare_transfers
+ * - #iota_client_promote_transaction
+ * - #iota_client_replay_bundle
+ * - #iota_client_send_transfer
+ * - #iota_client_send_trytes
+ * - #iota_client_store_and_broadcast
+ * - #iota_client_traverse_bundle
+ *
  */

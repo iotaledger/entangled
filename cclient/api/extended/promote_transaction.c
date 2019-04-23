@@ -15,7 +15,7 @@
 retcode_t iota_client_promote_transaction(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                                           int const depth, int const mwm, bundle_transactions_t* const bundle,
                                           bundle_transactions_t* const out_bundle) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   iota_transaction_t spam_transaction;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   get_transactions_to_approve_req_t* gtta_req = NULL;
@@ -26,11 +26,11 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
   check_consistency_req_t* consistency_req = NULL;
   check_consistency_res_t* consistency_res = NULL;
   flex_trit_t flex_tx[FLEX_TRIT_SIZE_8019] = {};
-  log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  ret_code = bundle_validator(bundle, &bundle_status);
+  ret_code = bundle_validate(bundle, &bundle_status);
   if (ret_code != RC_OK) {
-    log_error(client_extended_logger_id, "%s bundle_validator error code: %d", __func__, bundle_status);
+    log_error(client_extended_logger_id, "%s bundle_validate error code: %d", __func__, bundle_status);
     goto done;
   }
 

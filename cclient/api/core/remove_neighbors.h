@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_REMOVE_NEIGHBORS_H
 #define CCLIENT_API_REMOVE_NEIGHBORS_H
 
@@ -17,17 +26,20 @@ extern "C" {
 #endif
 
 /**
- * Removes a list of neighbors from your iri node. This is only temporary, and
- * if you have your neighbors added via the command line, they will be retained
- * after you restart your node.
+ * @brief Removes a list of neighbors from the connected IRI node.
  *
- * https://iota.readme.io/reference#removeneighbors
-
- * @param service IRI node end point.
- * @param req Request containing list of neighbors to remove.
- * @param res Response containing a number of neighbor
+ * Assumes <b>removeNeighbors<b/> command is available on the node. This method has temporary effect until your IRI node
+ * relaunches.
  *
- * @return error value.
+ * The URI format:
+ *
+ * - udp://IPADDRESS:PORT
+ * - tcp://IPADDRESS:PORT
+ *
+ * @param[in] service client service
+ * @param[in] req List of URIs that you want to remove from the node.
+ * @param[out] res Number of neighbors that were removed.
+ * @return #retcode_t
  */
 retcode_t iota_client_remove_neighbors(const iota_client_service_t* const service,
                                        const remove_neighbors_req_t* const req, remove_neighbors_res_t* res);
@@ -37,3 +49,5 @@ retcode_t iota_client_remove_neighbors(const iota_client_service_t* const servic
 #endif
 
 #endif  // CCLIENT_API_REMOVE_NEIGHBORS_H
+
+/** @} */

@@ -18,9 +18,9 @@ cc_binary(
     srcs = ["main.c"],
     copts = ["-DLOGGER_ENABLE"],
     data = select({
-        "//ciri:mainnet": ["db/ciri-mainnet.db"],
-        "//ciri:testnet": ["db/ciri-testnet.db"],
-        "//conditions:default": ["db/ciri-mainnet.db"],
+        "//ciri:mainnet": glob(["db/ciri-mainnet.db"]),
+        "//ciri:testnet": glob(["db/ciri-testnet.db"]),
+        "//conditions:default": glob(["db/ciri-mainnet.db"]),
     }) + glob(["conf.yml"]),
     deps = [
         ":core",

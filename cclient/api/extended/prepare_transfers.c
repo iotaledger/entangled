@@ -10,7 +10,7 @@
 
 retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv, transfer_t** const transfers,
                                         uint32_t const num_transfer, bundle_transactions_t* out_bundle) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   iota_transaction_t TX = {};
   iota_transaction_t* tx = NULL;
   transfer_iterator_t* transfer_iterator = NULL;

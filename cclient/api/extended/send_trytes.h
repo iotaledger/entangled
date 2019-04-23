@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_SEND_TRYTES_H
 #define CCLIENT_API_SEND_TRYTES_H
 
@@ -15,24 +24,18 @@ extern "C" {
 #endif
 
 /**
- * [Attaches to tanlge]{@link #module_core.attachToTangle}, [stores]{@link
- * #module_core.storeTransactions} and [broadcasts]{@link
- * #module_core.broadcastTransactions} a list of transaction trytes.
+ * @brief Wrapper function: Runs #iota_client_attach_to_tangle and #iota_client_store_and_broadcast
  *
- * @param {iota_client_service_t} serv - client service
- * @param {hash8019_array_p} trytes - List of trytes to attach, store &
- * broadcast
- * @param {uint32_t} depth - Depth
- * @param {uint32_t} mwm - Min weight magnitude
- * @param {flex_trit_t} reference - Optional reference hash
- * @param {bool} local_pow - apply local PoW
- * @param {transaction_array_t} out_transactions - Returns list of attached
- * transactions
- *
- * @return {retcode_t}
- * - Fetch error, if connected to network
- *
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTrytes.ts#L38
+ * @param[in] serv client service
+ * @param[in] trytes List of trytes to attach, store and broadcast
+ * @param[in] depth The depth at which Random Walk starts. <b>3</b> is typically used by wallets, meaning that RW starts
+ * 3 milestones back.
+ * @param[in] mwm Minimum number of trailing zeros in transaction hash. This is used to search for a valid <b>nonce</b>.
+ * Currently it is <b>14</b> on mainnet & spamnet and <b>9</b> on most other testnets.
+ * @param[in] reference Optional, hash of transaction to start Random-Walk from.
+ * @param[in] local_pow If <b>true</b> do local Proof-of-Work, otherwise do remote.
+ * @param[out] out_transactions the transaction objects were sent to IRI node.
+ * @return #retcode_t
  */
 retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8019_array_p const trytes,
                                   uint32_t const depth, uint32_t const mwm, flex_trit_t const* const reference,
@@ -43,3 +46,5 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
 #endif
 
 #endif  // CCLIENT_API_SEND_TRYTES_H
+
+/** @} */

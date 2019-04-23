@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_extended
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_STORE_AND_BROADCAST_H
 #define CCLIENT_API_STORE_AND_BROADCAST_H
 
@@ -17,25 +26,15 @@ extern "C" {
 #endif
 
 /**
- * Stores and broadcasts a list of _attached_ transaction trytes by calling
- * iota_client_store_transactions() and iota_client_broadcast_transactions().
+ * @brief Stores and broadcasts a list of <b>attached transaction trytes</b>.
  *
- * Note: Persist the transaction trytes in local storage **before** calling this
- * command, to ensure that reattachment is possible, until your bundle has been
- * included.
+ * <b>Note:</b> Persist the transaction trytes in local storage <I>before</I> calling this command, to ensure that
+ * reattachment is possible, until your bundle has been included. Any transactions stored with this command will
+ * eventually be erased, as a result of a snapshot.
  *
- * Any transactions stored with this command will eventaully be erased, as a
- * result of a snapshot.
- *
- * @param {store_transactions_req_t} trytes - Attached transaction trytes
- * @param {hashes_t} out_trytes - Attached transaction trytes
- *
- * @return {retcode_t}
- * @fulfil {Trytes[]} Attached transaction trytes
- * - `INVALID_ATTACHED_TRYTES`: Invalid attached trytes
- * - Fetch error
- *
- * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createStoreAndBroadcast.ts#L28
+ * @param[in] serv client service
+ * @param[out] trytes List of transaction trytes.
+ * @return #retcode_t
  */
 retcode_t iota_client_store_and_broadcast(iota_client_service_t const* const serv,
                                           store_transactions_req_t const* const trytes);
@@ -45,3 +44,5 @@ retcode_t iota_client_store_and_broadcast(iota_client_service_t const* const ser
 #endif
 
 #endif  // CCLIENT_API_STORE_AND_BROADCAST_H
+
+/** @} */

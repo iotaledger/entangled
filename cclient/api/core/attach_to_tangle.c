@@ -13,7 +13,7 @@
 
 retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const service,
                                        const attach_to_tangle_req_t* const req, attach_to_tangle_res_t* res) {
-  retcode_t result = RC_OK;
+  retcode_t result = RC_ERROR;
   char_buffer_t* res_buff = NULL;
   char_buffer_t* req_buff = NULL;
   bundle_transactions_t* bundle = NULL;
