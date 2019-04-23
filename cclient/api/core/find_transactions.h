@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_FIND_TRANSACTIONS_H
 #define CCLIENT_API_FIND_TRANSACTIONS_H
 
@@ -17,20 +26,14 @@ extern "C" {
 #endif
 
 /**
- * Find the transactions which attach the specified input and return. All input
- * values are lists (in req), for which a list of return values (transaction
- * hashes) in the same order is returned for all individual elements. The input
- * fields can either be bundles, addresses, tags or approvees. Using multiple of
- * these input fields returns the intersection of the values.
+ * @brief Searches transactions.
  *
- * https://iota.readme.io/reference#findtransactions
+ * It allows to search transactions by <b>addresses, tags, and approvees</b>
  *
- * @param service IRI node end point.
- * @param req - Request containing all elements by which transactions should be
- * sought.
- * @param res Response containing found transactions
- *
- * @return error value.
+ * @param[in] service client service
+ * @param[in] req The query objects
+ * @param[out] res Transaction hashes
+ * @return #retcode_t
  */
 retcode_t iota_client_find_transactions(iota_client_service_t const* const service,
                                         find_transactions_req_t const* const req, find_transactions_res_t* const res);
@@ -40,3 +43,5 @@ retcode_t iota_client_find_transactions(iota_client_service_t const* const servi
 #endif
 
 #endif  // CCLIENT_API_FIND_TRANSACTIONS_H
+
+/** @} */

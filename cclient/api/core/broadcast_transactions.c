@@ -10,10 +10,10 @@
 
 retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const service,
                                              broadcast_transactions_req_t* req) {
-  retcode_t result = RC_OK;
+  retcode_t result = RC_ERROR;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
-  log_info(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
     result = RC_CCLIENT_OOM;

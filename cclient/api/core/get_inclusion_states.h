@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_INCLUSION_STATES_H
 #define CCLIENT_API_GET_INCLUSION_STATES_H
 
@@ -17,21 +26,22 @@ extern "C" {
 #endif
 
 /**
- * Get the inclusion states of a set of transactions. This is for determining if
- * a transaction was accepted and confirmed by the network or not. You can
- * search for multiple tips (and thus, milestones) to get past inclusion states
- * of transactions. This API call simply returns a list of boolean values in the
- * same order as the transaction list you submitted, thus you get a true/false
- * whether a transaction is confirmed or not.
+ * @brief Fetches inclusion states of given list of transactions.
  *
- * https://iota.readme.io/reference#getinclusionstates
+ * <p>
+ * Get the inclusion states of a set of transactions. This is for determining if a transaction was accepted and
+ * confirmed by the network or not. You can search for multiple tips (and thus, milestones) to get past inclusion states
+ * of transactions.
+ * </p>
+ * <p>
+ * This API call returns a list of boolean values in the same order as the submitted transactions. Boolean values will
+ * be <b>true</b> for confirmed transactions, otherwise <b>false</b>.
+ * </p>
  *
- * @param service IRI node end point.
- * @param req Request containing transactions to which we are searching for
- * inclusion state for.
- * @param res Response containing the corresponding inclusion states
- *
- * @return error value.
+ * @param[in] service client service
+ * @param[in] req Transactions and Tips that you want to search for the inclusion state.
+ * @param[out] res A list of inclusion state.
+ * @return #retcode_t
  */
 retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const service,
                                            get_inclusion_states_req_t* const req, get_inclusion_states_res_t* res);
@@ -41,3 +51,5 @@ retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const se
 #endif
 
 #endif  // CCLIENT_API_GET_INCLUSION_STATES_H
+
+/** @} */
