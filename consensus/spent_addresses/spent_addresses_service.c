@@ -22,17 +22,15 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
   retcode_t ret = RC_OK;
   spent_addresses_provider_t sap;
   connection_config_t db_conf = {.db_path = sas->conf->spent_addresses_db_path};
-  char *files[] = {"external/previous_epochs_spent_addresses_1/file/downloaded",
-                   "external/previous_epochs_spent_addresses_2/file/downloaded",
-                   "external/previous_epochs_spent_addresses_3/file/downloaded", NULL};
+  char *spent_addresses_files[] = {SPENT_ADDRESSES_FILES, NULL};
 
   if ((ret = iota_spent_addresses_provider_init(&sap, &db_conf)) != RC_OK) {
     log_error(logger_id, "Initializing spent addresses database connection failed\n");
     return ret;
   }
 
-  for (size_t i = 0; files[i]; i++) {
-    if ((ret = iota_spent_addresses_provider_read_file(&sap, files[i])) != RC_OK) {
+  for (size_t i = 0; spent_addresses_files[i]; i++) {
+    if ((ret = iota_spent_addresses_provider_read_file(&sap, spent_addresses_files[i])) != RC_OK) {
       break;
     }
   }

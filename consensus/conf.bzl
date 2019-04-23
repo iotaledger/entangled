@@ -3,6 +3,7 @@ CONSENSUS_MAINNET_VARIABLES = [
     "SNAPSHOT_CONF_FILE='\"external/snapshot_conf_mainnet/file/downloaded\"'",
     "SNAPSHOT_SIG_FILE='\"external/snapshot_sig_mainnet/file/downloaded\"'",
     "SNAPSHOT_FILE='\"external/snapshot_mainnet/file/downloaded\"'",
+    "SPENT_ADDRESSES_FILES='\"external/previous_epochs_spent_addresses_1/file/downloaded\",\"external/previous_epochs_spent_addresses_2/file/downloaded\",\"external/previous_epochs_spent_addresses_3/file/downloaded\"'",
     "COORDINATOR_ADDRESS='\"EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9\"'",
     "COORDINATOR_DEPTH=23",
     "MWM=14",

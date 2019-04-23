@@ -21,6 +21,7 @@ typedef struct spent_addresses_service_s {
 
 /**
  * Initializes a spent addresses service
+ * Reads previous spent addresses from files
  *
  * @param sas The spent addresses service
  * @param conf Consensus configuration
