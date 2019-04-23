@@ -7,15 +7,15 @@
 
 #include "feature.h"
 
-char* const feature_str[FEATURES_NUM] = {"snapshotPruning",  "dnsRefresher",      "testnet",
-                                         "zeroMessageQueue", "tipSolidification", "RemotePOW"};
+char* const features_name[NODE_FEATURES_NUM] = {"snapshotPruning",  "dnsRefresher",      "testnet",
+                                                "zeroMessageQueue", "tipSolidification", "RemotePOW"};
 
-void features_set(uint8_t features, UT_array* feature_ut) {
-  node_info_mask_feature_t elt = (1u << 0);
+void node_features_set(uint8_t const features, UT_array* const feature_array) {
+  node_feature_t elt = (1u << 0);
 
-  for (int i = 0; i < FEATURES_NUM; i++) {
+  for (int i = 0; i < NODE_FEATURES_NUM; i++) {
     if (features & elt) {
-      utarray_push_back(feature_ut, &feature_str[i]);
+      utarray_push_back(feature_array, &features_name[i]);
     }
 
     elt <<= 1;
