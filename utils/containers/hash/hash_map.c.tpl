@@ -12,16 +12,20 @@ retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
                                   flex_trit_t const *const hash,
                                   {TYPE} value) {
   hash_to_{TYPE}_map_entry_t *map_entry = NULL;
-  map_entry = (hash_to_{TYPE}_map_entry_t *)malloc(
-      sizeof(hash_to_{TYPE}_map_entry_t));
+  
+  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, map_entry);
+  if (map_entry == NULL){
+    map_entry = (hash_to_{TYPE}_map_entry_t *)malloc(
+    sizeof(hash_to_{TYPE}_map_entry_t));
 
-  if (map_entry == NULL) {
-    return RC_OOM;
+    if (map_entry == NULL) {
+      return RC_OOM;
+    }
+
+    memcpy(map_entry->hash, hash, FLEX_TRIT_SIZE_243);
+    map_entry->value = value;
+    HASH_ADD(hh, *map, hash, FLEX_TRIT_SIZE_243, map_entry);
   }
-
-  memcpy(map_entry->hash, hash, FLEX_TRIT_SIZE_243);
-  map_entry->value = value;
-  HASH_ADD(hh, *map, hash, FLEX_TRIT_SIZE_243, map_entry);
   return RC_OK;
 }
 
