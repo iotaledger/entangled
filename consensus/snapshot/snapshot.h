@@ -41,6 +41,16 @@ typedef struct snapshot_s {
 retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
 
 /**
+ * Resets a snapshot
+ *
+ * @param snapshot The snapshot
+ * @param conf Consensus configuration
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
+
+/**
  * Initializes a snapshot
  *
  * @param snapshot The snapshot

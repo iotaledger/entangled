@@ -6,6 +6,7 @@
  */
 
 #include "consensus/snapshot/snapshots_service.h"
+#include <stdlib.h>
 #include "consensus/utils/tangle_traversals.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
@@ -106,7 +107,7 @@ cleanup:
 
   iota_snapshot_destroy(&next_snapshot);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *const snapshots_service,
@@ -148,6 +149,7 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
 
   // TODO - implement rollback as well
 
+  ERR_BIND_GOTO(iota_snapshot_reset(snapshot, snapshots_service->conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
   ERR_BIND_GOTO(iota_milestone_service_replay_milestones(&snapshots_service->tangle, snapshots_service, snapshot,
                                                          target_milestone->index),

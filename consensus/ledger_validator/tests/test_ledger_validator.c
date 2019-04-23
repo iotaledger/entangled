@@ -76,7 +76,7 @@ static void init_test_structs() {
   conf.last_milestone = 0;
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;
-  conf.local_snapshots.min_depth = 1;
+  conf.local_snapshots.min_depth = 2;
   strcpy(conf.local_snapshots.local_snapshots_path_base, debug_mode ? "local_snapshot" : local_snapshot_path_base);
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
@@ -155,6 +155,8 @@ void test_replay_several_milestones() {
   TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_subtangle_milestone(&mt, &tangle));
   TEST_ASSERT_EQUAL_INT64(num_milestones, snapshots_provider.latest_snapshot.index);
   TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &mt));
+  TEST_ASSERT_EQUAL_INT64(snapshots_provider.latest_snapshot.index - conf.local_snapshots.min_depth - 1,
+                          snapshots_provider.inital_snapshot.metadata.index);
 
   for (i = 0; i < num_milestones * 2; ++i) {
     bundle_transactions_new(&bundle);
@@ -176,6 +178,8 @@ void test_replay_several_milestones() {
   TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_subtangle_milestone(&mt, &tangle));
   TEST_ASSERT_EQUAL_INT64(num_milestones * 2, snapshots_provider.latest_snapshot.index);
   TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &mt));
+  TEST_ASSERT_EQUAL_INT64(snapshots_provider.inital_snapshot.metadata.index,
+                          (num_milestones * 2 - conf.local_snapshots.min_depth - 1));
 
   hash_pack_free(&pack);
   destroy_test_structs();
