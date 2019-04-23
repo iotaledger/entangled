@@ -33,7 +33,7 @@ typedef struct get_trytes_req_s {
 } get_trytes_req_t;
 
 /**
- * @brief New a get tyrtes request object.
+ * @brief Allocates a get trytes request object.
  *
  * @return A pointer to the request object.
  */

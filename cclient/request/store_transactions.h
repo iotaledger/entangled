@@ -32,7 +32,7 @@ typedef struct store_transactions_req_s {
 } store_transactions_req_t;
 
 /**
- * @brief New a store transactions request.
+ * @brief Allocates a store transactions request.
  *
  * @return A pointer to the request object.
  */

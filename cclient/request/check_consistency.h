@@ -35,7 +35,7 @@ typedef struct check_consistency_req_s {
 } check_consistency_req_t;
 
 /**
- * @brief New a check consistency request object.
+ * @brief Allocates a check consistency request object.
  *
  * @return A pointer of the request object.
  */

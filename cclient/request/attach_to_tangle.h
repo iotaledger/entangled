@@ -33,7 +33,7 @@ typedef struct {
    */
   hash8019_array_p trytes;
   /**
-   * Min Weight Magnitude,Proof of Work intensity. The value for mannet is 14 and for others is 9.
+   * Min Weight Magnitude,Proof of Work intensity. The value for mainnet is 14 and for others is 9.
    */
   uint8_t mwm;
   /**
@@ -47,7 +47,7 @@ typedef struct {
 } attach_to_tangle_req_t;
 
 /**
- * @brief New an attach to tangle request.
+ * @brief Allocates an attach to tangle request.
  *
  * @return A pointer to the request object.
  */
@@ -66,12 +66,12 @@ void attach_to_tangle_req_free(attach_to_tangle_req_t** req);
  * @param[in] req The request object.
  * @param[in] trunk Trunk transaction hash.
  * @param[in] branch Branch transaction hash.
- * @param[in] mwm Minumu Weight Magnitude for Proof-of-Work.
+ * @param[in] mwm Minimum Weight Magnitude for Proof-of-Work.
  */
 void attach_to_tangle_req_init(attach_to_tangle_req_t* req, flex_trit_t const* const trunk,
                                flex_trit_t const* const branch, uint8_t mwm);
 /**
- * @brief Set transaction tyrtes to the request object.
+ * @brief Set transaction trytes to the request object.
  *
  * @param[in] req The request object.
  * @param[in] raw_trytes A transaction trytes.
@@ -82,7 +82,7 @@ retcode_t attach_to_tangle_req_trytes_add(attach_to_tangle_req_t* req, flex_trit
 /**
  * @brief Get transaction trytes by index.
  *
- * @param[in] req The attache to tangle request object.
+ * @param[in] req The attach to tangle request object.
  * @param[in] index The index of transaction trytes list.
  * @return Null on failed, otherwise return a pointer of flex_trit_t.
  */

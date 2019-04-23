@@ -41,7 +41,7 @@ typedef struct {
 } get_inclusion_states_req_t;
 
 /**
- * @brief New a get inclusion states request object.
+ * @brief Allocates a get inclusion states request object.
  *
  * @return A pointer to the request.
  */

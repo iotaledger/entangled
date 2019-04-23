@@ -36,7 +36,7 @@ typedef struct remove_neighbors_req_s {
 } remove_neighbors_req_t;
 
 /**
- * @brief New a remove neighbors requst object.
+ * @brief Allocates a remove neighbors request object.
  *
  * @return A pointer to the request object.
  */

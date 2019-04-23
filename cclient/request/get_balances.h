@@ -46,7 +46,7 @@ typedef struct {
 } get_balances_req_t;
 
 /**
- * @brief New a get balances request object.
+ * @brief Allocates a get balances request object.
  *
  * @return A pointer to the request.
  */

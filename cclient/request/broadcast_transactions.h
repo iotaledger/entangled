@@ -32,7 +32,7 @@ typedef struct broadcast_transactions_req_s {
 } broadcast_transactions_req_t;
 
 /**
- * @brief New broadcast transactions request
+ * @brief Allocates broadcast transactions request
  *
  * @return A pointer to broadcast transactions request object.
  */
@@ -46,7 +46,7 @@ broadcast_transactions_req_t* broadcast_transactions_req_new();
 void broadcast_transactions_req_free(broadcast_transactions_req_t** const req);
 
 /**
- * @brief Add a transaction trtyes to the request object.
+ * @brief Add a transaction trytes to the request object.
  *
  * @param[in] req The request object.
  * @param[in] raw_trytes A transaction trytes.

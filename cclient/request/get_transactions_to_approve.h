@@ -37,7 +37,7 @@ typedef struct get_transactions_to_approve_req_s {
 } get_transactions_to_approve_req_t;
 
 /**
- * @brief New a get transactions to approve request object.
+ * @brief Allocates a get transactions to approve request object.
  *
  * @return A pointer to the request.
  */

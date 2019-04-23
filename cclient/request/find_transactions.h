@@ -54,7 +54,7 @@ typedef struct find_transactions_req_s {
 } find_transactions_req_t;
 
 /**
- * @brief New a find transactions request object.
+ * @brief Allocates a find transactions request object.
  *
  * @return A pointer to a request object.
  */

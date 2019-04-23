@@ -36,7 +36,7 @@ typedef struct add_neighbors_req_s {
 } add_neighbors_req_t;
 
 /**
- * @brief New the add neighbors request object.
+ * @brief Allocates the add neighbors request object.
  *
  * @return A pointer to the request object.
  */
