@@ -86,7 +86,7 @@ retcode_t iota_utils_remove_file(const char *file_path) {
 }
 
 retcode_t iota_utils_overwrite_file(char const *const file_path, char const *const content) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   FILE *file;
   char file_path_backup[256];
   bool file_already_exist = false;
@@ -116,7 +116,7 @@ cleanup:
   if (file) {
     fclose(file);
   }
-  return RC_OK;
+  return ret;
 }
 
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {

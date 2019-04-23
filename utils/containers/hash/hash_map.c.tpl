@@ -37,6 +37,24 @@ bool hash_to_{TYPE}_map_contains(hash_to_{TYPE}_map_t const *const map,
   return entry != NULL;
 }
 
+bool hash_to_{TYPE}_map_remove(hash_to_{TYPE}_map_t *const map,
+        flex_trit_t const *const hash){
+  hash_to_{TYPE}_map_entry_t *entry = NULL;
+
+  if (map == NULL || *map == NULL) {
+    return false;
+  }
+
+  HASH_FIND(hh, *map, hash,FLEX_TRIT_SIZE_243, entry);
+
+  if (entry != NULL){
+    HASH_DEL(*map, entry);
+    free(entry);
+  }
+
+  return entry != NULL;
+}
+
 bool hash_to_{TYPE}_map_find(hash_to_{TYPE}_map_t const *const map,
                               flex_trit_t const *const hash,
                               hash_to_{TYPE}_map_entry_t ** const res) {
