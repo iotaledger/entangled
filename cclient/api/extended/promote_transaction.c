@@ -28,9 +28,9 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
   flex_trit_t flex_tx[FLEX_TRIT_SIZE_8019] = {};
   log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  ret_code = bundle_validator(bundle, &bundle_status);
+  ret_code = bundle_validate(bundle, &bundle_status);
   if (ret_code != RC_OK) {
-    log_error(client_extended_logger_id, "%s bundle_validator error code: %d", __func__, bundle_status);
+    log_error(client_extended_logger_id, "%s bundle_validate error code: %d", __func__, bundle_status);
     goto done;
   }
 
