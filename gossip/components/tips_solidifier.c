@@ -32,7 +32,7 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
   bool is_solid = false;
   size_t approvers_count = 0;
   flex_trit_t tip[FLEX_TRIT_SIZE_243];
-  connection_config_t db_conf = {.db_path = tips_solidifier->conf->db_path};
+  connection_config_t db_conf = {.db_path = tips_solidifier->conf->tangle_db_path};
   tangle_t tangle;
 
   if (tips_solidifier == NULL) {

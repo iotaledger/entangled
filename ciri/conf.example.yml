@@ -3,9 +3,9 @@
 
 # cIRI configuration
 
-# db-path: ciri/db/ciri-mainnet.db
-# db-revalidate: false
 # log-level: info
+# tangle-db-path: ciri/db/tangle-mainnet.db
+# tangle-db-revalidate: false
 
 # Gossip configuration
 

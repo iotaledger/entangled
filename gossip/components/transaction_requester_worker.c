@@ -26,7 +26,7 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-  connection_config_t db_conf = {.db_path = transaction_requester->node->conf.db_path};
+  connection_config_t db_conf = {.db_path = transaction_requester->node->conf.tangle_db_path};
   tangle_t tangle;
 
   if (transaction_requester == NULL) {

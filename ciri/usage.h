@@ -15,7 +15,8 @@ typedef enum cli_arg_value_e {
 
   // cIRI configuration
 
-  CONF_DB_REVALIDATE,
+  CONF_TANGLE_DB_PATH,
+  CONF_TANGLE_DB_REVALIDATE,
 
   // Gossip configuration
 
@@ -76,15 +77,15 @@ static struct cli_argument_s {
     // cIRI configuration
 
     {"config", 'c', "Path to the configuration file.", REQUIRED_ARG},
-    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
-    {"db-revalidate", CONF_DB_REVALIDATE,
-     "Reloads milestones, state of the ledger and transactions metadata from the database.", REQUIRED_ARG},
     {"help", 'h', "Displays this usage.", NO_ARG},
     {"log-level", 'l',
      "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
      REQUIRED_ARG},
+    {"tangle-db-path", CONF_TANGLE_DB_PATH, "Path to the tangle database file.", REQUIRED_ARG},
+    {"tangle-db-revalidate", CONF_TANGLE_DB_REVALIDATE,
+     "Reloads milestones, state of the ledger and transactions metadata from the tangle database.", REQUIRED_ARG},
 
     // Gossip configuration
 

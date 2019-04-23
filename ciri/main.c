@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  db_conf.db_path = ciri_core.conf.db_path;
+  db_conf.db_path = ciri_core.conf.tangle_db_path;
   logger_output_level_set(stdout, ciri_core.conf.log_level);
 
   log_info(logger_id, "Welcome to %s v%s\n", CIRI_NAME, CIRI_VERSION);
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  if (ciri_core.conf.db_revalidate) {
+  if (ciri_core.conf.tangle_db_revalidate) {
     log_info(logger_id, "Revalidating database\n");
     if (iota_tangle_milestone_clear(&tangle) != RC_OK || iota_tangle_transaction_metadata_clear(&tangle) != RC_OK) {
       log_critical(logger_id, "Revalidating database failed\n");

@@ -25,8 +25,6 @@ extern "C" {
 // This structure contains all configuration variables needed to operate the
 // IOTA API
 typedef struct iota_api_conf_s {
-  // Path of the DB file
-  char db_path[128];
   // HTTP API listen port
   uint16_t http_port;
   // The maximal number of transactions that may be returned by the
@@ -38,6 +36,8 @@ typedef struct iota_api_conf_s {
   size_t max_get_trytes;
   // Commands that should be ignored by API
   char* remote_limit_api[API_ENDPOINTS_NUM + 1];
+  // Path of the tangle database file
+  char tangle_db_path[128];
 } iota_api_conf_t;
 
 /**

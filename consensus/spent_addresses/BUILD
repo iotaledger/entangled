@@ -27,6 +27,7 @@ cc_library(
     hdrs = ["spent_addresses_service.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":spent_addresses_provider",
         "//common:errors",
         "//utils:logger_helper",
     ],

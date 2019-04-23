@@ -55,8 +55,6 @@ typedef struct iota_consensus_conf_s {
   uint8_t coordinator_security_level;
   // The signature type used in coordinator signatures
   sponge_type_t coordinator_signature_type;
-  // Path of the DB file
-  char db_path[128];
   // The hash of the genesis transaction
   flex_trit_t genesis_hash[FLEX_TRIT_SIZE_243];
   // The index of the last milestone issued by the corrdinator before the
@@ -85,6 +83,8 @@ typedef struct iota_consensus_conf_s {
   uint64_t snapshot_timestamp_sec;
   // local snapshots configuration
   iota_consensus_local_snapshots_conf_t local_snapshots;
+  // Path of the tangle database file
+  char tangle_db_path[128];
 } iota_consensus_conf_t;
 
 /**

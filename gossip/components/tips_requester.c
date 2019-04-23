@@ -26,7 +26,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   neighbor_t *iter = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
-  connection_config_t db_conf = {.db_path = tips_requester->node->conf.db_path};
+  connection_config_t db_conf = {.db_path = tips_requester->node->conf.tangle_db_path};
   tangle_t tangle;
 
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];

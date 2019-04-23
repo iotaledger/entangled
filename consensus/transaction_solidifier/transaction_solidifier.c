@@ -95,7 +95,7 @@ done:
 
 static void *spawn_solid_transactions_propagation(void *arg) {
   transaction_solidifier_t *ts = (transaction_solidifier_t *)arg;
-  connection_config_t db_conf = {.db_path = ts->conf->db_path};
+  connection_config_t db_conf = {.db_path = ts->conf->tangle_db_path};
   tangle_t tangle;
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {

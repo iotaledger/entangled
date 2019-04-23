@@ -162,7 +162,7 @@ static void* milestone_validator(void* arg) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   flex_trit_t* peek = NULL;
   milestone_status_t milestone_status;
-  connection_config_t db_conf = {.db_path = mt->conf->db_path};
+  connection_config_t db_conf = {.db_path = mt->conf->tangle_db_path};
   tangle_t tangle;
 
   if (mt == NULL) {
@@ -277,7 +277,7 @@ retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt,
 static void* milestone_solidifier(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   uint64_t previous_solid_subtangle_latest_milestone_index = 0;
-  connection_config_t db_conf = {.db_path = mt->conf->db_path};
+  connection_config_t db_conf = {.db_path = mt->conf->tangle_db_path};
   tangle_t tangle;
 
   if (mt == NULL) {

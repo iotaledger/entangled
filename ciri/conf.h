@@ -29,13 +29,13 @@ extern "C" {
 typedef struct iota_ciri_conf_s {
   // Path to the configuration file
   char conf_path[128];
-  // Path to the database file
-  char db_path[128];
-  // Reloads milestones, state of the ledger and transactions metadata from the database
-  bool db_revalidate;
   // Valid log levels: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
+  // Path of the tangle database file
+  char tangle_db_path[128];
+  // Reloads milestones, state of the ledger and transactions metadata from the tangle database
+  bool tangle_db_revalidate;
 } iota_ciri_conf_t;
 
 /**
