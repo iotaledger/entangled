@@ -15,6 +15,7 @@ typedef enum cli_arg_value_e {
 
   // cIRI configuration
 
+  CONF_SPENT_ADDRESSES_DB_PATH,
   CONF_TANGLE_DB_PATH,
   CONF_TANGLE_DB_REVALIDATE,
 
@@ -82,6 +83,8 @@ static struct cli_argument_s {
      "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
+     REQUIRED_ARG},
+    {"spent-addresses-db-path", CONF_SPENT_ADDRESSES_DB_PATH, "Path to the spent addresses database file.",
      REQUIRED_ARG},
     {"tangle-db-path", CONF_TANGLE_DB_PATH, "Path to the tangle database file.", REQUIRED_ARG},
     {"tangle-db-revalidate", CONF_TANGLE_DB_REVALIDATE,

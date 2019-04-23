@@ -85,6 +85,7 @@ Long option | Short option | Description | Example input
 `--config` | `-c` | Path to the configuration file. | `--config ciri/conf.yml`
 `--help` | `-h` | Displays the usage. |
 `--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
+`--spent-addresses-db-path` | | Path to the spent addresses database file. | `--spent-addresses-db-path ciri/db/spent-addresses-mainnet.db`
 `--tangle-db-path` | | Path to the tangle database file. | `--tangle-db-path ciri/db/tangle-mainnet.db`
 `--tangle-db-revalidate` | | Reloads milestones, state of the ledger and transactions metadata from the tangle database. | `--tangle-db-revalidate false`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`

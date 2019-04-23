@@ -4,6 +4,7 @@
 # cIRI configuration
 
 # log-level: info
+# spent-addresses-db-path: ciri/db/spent-addresses-mainnet.db
 # tangle-db-path: ciri/db/tangle-mainnet.db
 # tangle-db-revalidate: false
 
