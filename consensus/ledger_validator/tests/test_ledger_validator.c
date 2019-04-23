@@ -156,6 +156,27 @@ void test_replay_several_milestones() {
   TEST_ASSERT_EQUAL_INT64(num_milestones, snapshots_provider.latest_snapshot.index);
   TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &mt));
 
+  for (i = 0; i < num_milestones * 2; ++i) {
+    bundle_transactions_new(&bundle);
+    iota_test_utils_bundle_create_transfer(curr_hash, curr_hash, bundle, seed, i % 2 ? sk_index : sk_index++,
+                                           i % 2 ? 0 : 1000);
+    if (i % 2) {
+      // milestone bundle
+      memcpy(milestone.hash, transaction_hash(bundle_at(bundle, 0)), FLEX_TRIT_SIZE_243);
+      milestone.index++;
+      TEST_ASSERT(iota_tangle_milestone_store(&tangle, &milestone) == RC_OK);
+    }
+
+    BUNDLE_FOREACH(bundle, tx_iter) { TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx_iter) == RC_OK); }
+    memcpy(curr_hash, transaction_hash(bundle_at(bundle, 0)), FLEX_TRIT_SIZE_243);
+    bundle_transactions_free(&bundle);
+  }
+
+  mt.latest_milestone_index = milestone.index;
+  TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_subtangle_milestone(&mt, &tangle));
+  TEST_ASSERT_EQUAL_INT64(num_milestones * 2, snapshots_provider.latest_snapshot.index);
+  TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &mt));
+
   hash_pack_free(&pack);
   destroy_test_structs();
 }
