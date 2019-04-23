@@ -11,10 +11,10 @@
 retcode_t iota_client_get_transactions_to_approve(const iota_client_service_t* const service,
                                                   const get_transactions_to_approve_req_t* const req,
                                                   get_transactions_to_approve_res_t* res) {
-  retcode_t result = RC_OK;
+  retcode_t result = RC_ERROR;
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
-  log_info(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
     result = RC_CCLIENT_OOM;

@@ -29,7 +29,16 @@ cIRI is built and run through [bazel](https://www.bazel.build/).
 ```
 $ git clone https://github.com/iotaledger/entangled.git
 $ cd entangled
-$ bazel run --define network=mainnet|testnet -- ciri <optional flags>
+```
+If you want to run a mainnet node
+```
+$ sqlite3 ciri/db/ciri-mainnet.db < common/storage/sql/schema.sql # only the first time
+$ bazel run -c opt --define network=mainnet -- ciri # optional flags
+```
+If you want to run a testnet node
+```
+$ sqlite3 ciri/db/ciri-testnet.db < common/storage/sql/schema.sql # only the first time
+$ bazel run -c opt --define network=testnet -- ciri # optional flags
 ```
 
 *First build can take some time due to dependencies downloading.*
