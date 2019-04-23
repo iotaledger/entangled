@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_TRYTES_H
 #define CCLIENT_API_GET_TRYTES_H
 
@@ -17,18 +26,15 @@ extern "C" {
 #endif
 
 /**
- * Returns the raw transaction data (trytes) of a specific transaction. These
- * trytes can then be easily converted into the actual transaction object. See
- * utility functions for more details.
+ * @brief Fetches transaction trytes by a given list of transaction hashes.
  *
- * https://iota.readme.io/reference#gettrytes
+ * The transaction trytes can be converted into transaction object(#iota_transaction_t) by calling
+ * #transaction_deserialize_from_trits or #transaction_deserialize.
  *
- * @param service IRI node end point.
- * @param req Request containing hashes of transactions to which trytes are
- * to be retrieved
- * @param res Response containing trytes of specific transactions
- *
- * @return error value.
+ * @param[in] service client service
+ * @param[in] req Transaction hashes
+ * @param[out] res Transaction trytes
+ * @return #retcode_t
  */
 retcode_t iota_client_get_trytes(const iota_client_service_t* const service, get_trytes_req_t* const req,
                                  get_trytes_res_t* res);
@@ -38,3 +44,5 @@ retcode_t iota_client_get_trytes(const iota_client_service_t* const service, get
 #endif
 
 #endif  // CCLIENT_API_GET_TRYTES_H
+
+/** @} */

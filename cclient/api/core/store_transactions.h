@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_STORE_TRANSACTIONS_H
 #define CCLIENT_API_STORE_TRANSACTIONS_H
 
@@ -26,6 +35,16 @@ extern "C" {
  *
  * @return The error value.
  */
+
+/**
+ * @brief Store transactions in an IRI node's local storage.
+ *
+ * The trytes must be validated by #iota_client_attach_to_tangle
+ *
+ * @param[in] service client service
+ * @param[in] req List of transaction trytes
+ * @return #retcode_t
+ */
 retcode_t iota_client_store_transactions(const iota_client_service_t* const service,
                                          store_transactions_req_t const* const req);
 
@@ -34,3 +53,5 @@ retcode_t iota_client_store_transactions(const iota_client_service_t* const serv
 #endif
 
 #endif  // CCLIENT_API_STORE_TRANSACTIONS_H
+
+/** @} */
