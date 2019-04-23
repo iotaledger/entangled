@@ -75,10 +75,7 @@ static void init_test_structs() {
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;
   conf.local_snapshots.min_depth = 1;
-
-  for (size_t i = 0; i < NUM_TRITS_HASH; ++i) {
-    flex_trits_set_at(conf.genesis_hash, NUM_TRITS_HASH, i, 0);
-  }
+  memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&transaction_solidifier, &conf, NULL, NULL) == RC_OK);
   TEST_ASSERT(iota_snapshots_provider_init(&snapshots_provider, &conf) == RC_OK);
@@ -247,8 +244,7 @@ void test_replay_several_milestones() {
   mt.latest_milestone_index = milestone.index;
   TEST_ASSERT_EQUAL_INT(update_latest_solid_subtangle_milestone(&mt, &tangle), RC_OK);
   TEST_ASSERT_EQUAL_INT64(snapshots_provider.latest_snapshot.index, num_milestones);
-
-  // TEST_ASSERT(iota_snapshots_service_take_snapshot(&snapshots_service,&mt) == RC_OK);
+  TEST_ASSERT(iota_snapshots_service_take_snapshot(&snapshots_service, &mt) == RC_OK);
 
   hash_pack_free(&pack);
   destroy_test_structs();
