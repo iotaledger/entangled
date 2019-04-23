@@ -22,13 +22,13 @@ extern "C" {
 #endif
 
 /**
- * @brief init client extended APIs
+ * @brief Init client extended APIs
  *
  */
 void iota_client_extended_init();
 
 /**
- * @brief destory client extended APIs
+ * @brief Destroy client extended APIs
  *
  */
 void iota_client_extended_destroy();

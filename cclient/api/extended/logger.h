@@ -36,7 +36,7 @@ extern logger_id_t client_extended_logger_id;
 void logger_init_client_extended();
 
 /**
- * @brief Destory extended API logger
+ * @brief Destroy extended API logger
  *
  */
 void logger_destroy_client_extended();
