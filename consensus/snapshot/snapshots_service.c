@@ -8,6 +8,7 @@
 #include "consensus/snapshot/snapshots_service.h"
 #include "consensus/utils/tangle_traversals.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define SNAPSHOTS_SERVICE_LOGGER_ID "snapshots_service"
 
@@ -163,6 +164,9 @@ retcode_t iota_snapshots_service_generate_snapshot_metadata(snapshots_service_t 
                                                             iota_milestone_t const *const target_milestone,
                                                             snapshot_t *const snapshot) {
   retcode_t ret;
+  snapshot->metadata.index = target_milestone->index;
+  memcpy(snapshot->metadata.hash, target_milestone->hash, FLEX_TRIT_SIZE_243);
+  snapshot->metadata.timestamp = current_timestamp_ms();
   ERR_BIND_RETURN(iota_snapshots_service_update_solid_entry_points(snapshots_service, snapshot, target_milestone), ret);
   // TODO - seen milestones
   return RC_OK;
