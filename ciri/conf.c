@@ -160,6 +160,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
 
   switch (key) {
     // cIRI configuration
+    case CONF_DB_REVALIDATE:  // --db-revalidate
+      ret = get_true_false(value, &ciri_conf->db_revalidate);
+      break;
     case 'd':  // --db-path
       if (strlen(value) == 0) {
         return RC_CIRI_CONF_INVALID_ARGUMENT;
@@ -333,6 +336,7 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
   strncpy(consensus_conf->db_path, DEFAULT_DB_PATH, sizeof(consensus_conf->db_path));
   strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
   strncpy(api_conf->db_path, DEFAULT_DB_PATH, sizeof(api_conf->db_path));
+  ciri_conf->db_revalidate = DEFAULT_DB_PREVALIDATE;
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;

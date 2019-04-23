@@ -16,16 +16,9 @@ void iota_usage() {
   while (cli_arguments_g[i].desc) {
     fprintf(stderr, "--%-34s ", cli_arguments_g[i].name);
     if (cli_arguments_g[i].val < CONF_START) {
-      fprintf(stderr, "(-%c) ", cli_arguments_g[i].val);
+      fprintf(stderr, "(-%c)", cli_arguments_g[i].val);
     } else {
-      fprintf(stderr, "     ");
-    }
-    if (cli_arguments_g[i].has_arg == REQUIRED_ARG) {
-      fprintf(stderr, " arg ");
-    } else if (cli_arguments_g[i].has_arg == OPTIONAL_ARG) {
-      fprintf(stderr, "[arg]");
-    } else {
-      fprintf(stderr, "     ");
+      fprintf(stderr, "    ");
     }
     fprintf(stderr, " %s", cli_arguments_g[i].desc);
     fprintf(stderr, "\n");

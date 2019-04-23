@@ -101,6 +101,8 @@ retcode_t iota_tangle_transactions_update_solid_state(tangle_t const *const tang
 retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                   size_t *const count);
 
+retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle);
+
 /**
  * Find the transactions which match the specified input. The input fields can
  * either be bundles, addresses, tags or approvees. Using multiple of these
@@ -122,6 +124,8 @@ retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_que
 /*
  * Milestone operations
  */
+
+retcode_t iota_tangle_milestone_clear(tangle_t const *const tangle);
 
 retcode_t iota_tangle_milestone_store(tangle_t const *const tangle, iota_milestone_t const *const data_in);
 

@@ -138,9 +138,17 @@ retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_que
   return iota_stor_transaction_find(&tangle->connection, bundles, addresses, tags, approvees, pack);
 }
 
+retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle) {
+  return iota_stor_transaction_metadata_clear(&tangle->connection);
+}
+
 /*
  * Milestone operations
  */
+
+retcode_t iota_tangle_milestone_clear(tangle_t const *const tangle) {
+  return iota_stor_milestone_clear(&tangle->connection);
+}
 
 retcode_t iota_tangle_milestone_store(tangle_t const *const tangle, iota_milestone_t const *const data_in) {
   return iota_stor_milestone_store(&tangle->connection, data_in);
