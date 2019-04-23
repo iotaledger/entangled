@@ -12,12 +12,12 @@
 
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                                     int const depth, int const mwm, bundle_transactions_t* const bundle) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   iota_transaction_t* curr_tx = NULL;
   flex_trit_t flex_tx[FLEX_TRIT_SIZE_8019] = {};
   hash8019_array_p trytes = hash8019_array_new();
-  log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (trytes) {
     // get bundle
     ret_code = iota_client_get_bundle(serv, tail_hash, bundle, &bundle_status);

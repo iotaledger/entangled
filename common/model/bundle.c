@@ -15,7 +15,7 @@ static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
 
 /**
  * Validate signatures in a bundle,
- * it's a private method called by bundle_validator()
+ * it's a private method called by bundle_validate()
  *
  * @param {bundle_transactions_t} bundle - the bundle with transactions.
  * @param {trit_t} normalized_bundle - the bundle hash
@@ -136,7 +136,7 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
   }
 }
 
-retcode_t bundle_validator(bundle_transactions_t *const bundle, bundle_status_t *const status) {
+retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *const status) {
   retcode_t res = RC_OK;
   iota_transaction_t *curr_tx = NULL;
   int64_t index = 0, last_index = 0;

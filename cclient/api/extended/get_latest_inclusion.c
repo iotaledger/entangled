@@ -12,11 +12,11 @@
 
 retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const serv, hash243_queue_t const transactions,
                                            get_inclusion_states_res_t* out_states) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   get_inclusion_states_req_t* inclusion_req = NULL;
   get_node_info_res_t* node_info = get_node_info_res_new();
 
-  log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (!node_info) {
     ret_code = RC_CCLIENT_OOM;
     log_error(client_extended_logger_id, "%s create node info request failed: %s\n", __func__,

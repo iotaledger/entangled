@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_GET_NODE_INFO_H
 #define CCLIENT_API_GET_NODE_INFO_H
 
@@ -16,16 +25,12 @@ extern "C" {
 #endif
 
 /**
- * Returns information about your node.
+ * @brief Returns information about connected node.
  *
- * https://iota.readme.io/reference#getnodeinfo
- *
- * @param service IRI node end point.
- * @param res Response containing the node's info
- *
- * @return error value.
+ * @param[in] service client service
+ * @param[out] res node information
+ * @return #retcode_t
  */
-
 retcode_t iota_client_get_node_info(const iota_client_service_t* const service, get_node_info_res_t* res);
 
 #ifdef __cplusplus
@@ -33,3 +38,5 @@ retcode_t iota_client_get_node_info(const iota_client_service_t* const service, 
 #endif
 
 #endif  // CCLIENT_API_GET_NODE_INFO_H
+
+/** @} */

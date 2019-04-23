@@ -39,15 +39,3 @@ void get_node_info_res_free(get_node_info_res_t** res) {
   free(*res);
   *res = NULL;
 }
-
-retcode_t get_node_info_res_features_add(get_node_info_res_t* res, char const* feature) {
-  if (!res->features) {
-    utarray_new(res->features, &ut_str_icd);
-  }
-  if (!res->features) {
-    return RC_OOM;
-  }
-
-  utarray_push_back(res->features, &feature);
-  return RC_OK;
-}

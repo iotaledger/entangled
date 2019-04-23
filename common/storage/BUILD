@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/model:bundle",
         "//common/trinary:trit_array",
         "//consensus/snapshot:state_delta",
         "//utils:hash_maps",

@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/model:bundle",
         "//common/model:transaction",
         "//common/storage/sql/sqlite3:sqlite3_storage",
         "//common/trinary:trit_array",

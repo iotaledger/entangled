@@ -37,6 +37,19 @@ android_ndk_repository(
     api_level = 19,
 )
 
+git_repository(
+    name = "build_bazel_rules_apple",
+    remote = "https://github.com/bazelbuild/rules_apple.git",
+    tag = "0.13.0",
+)
+
+load(
+    "@build_bazel_rules_apple//apple:repositories.bzl",
+    "apple_rules_dependencies",
+)
+
+apple_rules_dependencies()
+
 load("@rules_iota//:defs.bzl", "iota_deps")
 load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
 load("//tools:snapshot.bzl", "fetch_snapshot_files")

@@ -135,11 +135,11 @@ typedef struct iota_transaction_fields_metadata_s {
 } iota_transaction_fields_metadata_t;
 
 typedef struct field_mask_s {
-  int16_t essence;
-  int16_t attachment;
-  int16_t consensus;
-  int16_t data;
-  int16_t metadata;
+  uint8_t essence;
+  uint8_t attachment;
+  uint8_t consensus;
+  uint8_t data;
+  uint8_t metadata;
 } field_mask_t;
 
 typedef struct iota_transaction_s {
@@ -151,7 +151,7 @@ typedef struct iota_transaction_s {
   field_mask_t loaded_columns_mask;
 } iota_transaction_t;
 
-typedef enum _field_mask_essence {
+typedef enum field_mask_essence_e {
   MASK_ESSENCE_ADDRESS = (1u << 0),
   MASK_ESSENCE_VALUE = (1u << 1),
   MASK_ESSENCE_OBSOLETE_TAG = (1u << 2),
@@ -161,9 +161,9 @@ typedef enum _field_mask_essence {
   MASK_ESSENCE_BUNDLE = (1u << 6),
   MASK_ESSENCE_ALL = MASK_ESSENCE_ADDRESS | MASK_ESSENCE_VALUE | MASK_ESSENCE_OBSOLETE_TAG | MASK_ESSENCE_TIMESTAMP |
                      MASK_ESSENCE_CURRENT_INDEX | MASK_ESSENCE_LAST_INDEX | MASK_ESSENCE_BUNDLE
-} field_mask_essence_e;
+} field_mask_essence_t;
 
-typedef enum _field_mask_attachment {
+typedef enum field_mask_attachment_e {
   MASK_ATTACHMENT_TRUNK = (1u << 0),
   MASK_ATTACHMENT_BRANCH = (1u << 1),
   MASK_ATTACHMENT_TIMESTAMP = (1u << 2),
@@ -174,26 +174,26 @@ typedef enum _field_mask_attachment {
   MASK_ATTACHMENT_ALL = MASK_ATTACHMENT_TRUNK | MASK_ATTACHMENT_BRANCH | MASK_ATTACHMENT_TIMESTAMP |
                         MASK_ATTACHMENT_TIMESTAMP_LOWER | MASK_ATTACHMENT_TIMESTAMP_UPPER | MASK_ATTACHMENT_NONCE |
                         MASK_ATTACHMENT_TAG
-} field_mask_attachment_e;
+} field_mask_attachment_t;
 
-typedef enum _field_mask_consensus {
+typedef enum field_mask_consensus_e {
   MASK_CONSENSUS_HASH = (1u << 0),
   MASK_CONSENSUS_ALL = MASK_CONSENSUS_HASH
-} field_mask_consensus_e;
+} field_mask_consensus_t;
 
-typedef enum _field_mask_data {
+typedef enum field_mask_data_e {
   MASK_DATA_SIG_OR_MSG = (1u << 0),
   MASK_DATA_ALL = MASK_DATA_SIG_OR_MSG
-} field_mask_data_e;
+} field_mask_data_t;
 
-typedef enum _field_mask_metadata {
+typedef enum field_mask_metadata_e {
   MASK_METADATA_SNAPSHOT_INDEX = (1u << 0),
   MASK_METADATA_SOLID = (1u << 1),
   MASK_METADATA_VALIDITY = (1u << 2),
   MASK_METADATA_ARRIVAL_TIMESTAMP = (1u << 3),
   MASK_METADATA_ALL =
       MASK_METADATA_SNAPSHOT_INDEX | MASK_METADATA_SOLID | MASK_METADATA_VALIDITY | MASK_METADATA_ARRIVAL_TIMESTAMP
-} field_mask_metadata_e;
+} field_mask_metadata_t;
 
 /***********************************************************************************************************
  * Accessors
