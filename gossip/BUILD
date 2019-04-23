@@ -82,17 +82,9 @@ cc_library(
 )
 
 cc_library(
-    name = "feature",
-    srcs = ["feature.c"],
-    hdrs = ["feature.h"],
-    deps = ["@com_github_uthash//:uthash"],
-)
-
-cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
-        ":feature",
         ":neighbor_shared",
         ":tips_cache",
         "//gossip/components:broadcaster_shared",
