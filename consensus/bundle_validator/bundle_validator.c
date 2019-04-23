@@ -93,7 +93,7 @@ retcode_t iota_consensus_bundle_validator_validate(tangle_t const* const tangle,
       return res;
     }
     if ((*status = transaction_validity(txp)) != BUNDLE_NOT_INITIALIZED) {
-      return res;
+      return RC_OK;
     }
   }
 
