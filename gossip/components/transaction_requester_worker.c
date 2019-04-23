@@ -26,16 +26,19 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-  connection_config_t db_conf = {.db_path = transaction_requester->node->conf.tangle_db_path};
   tangle_t tangle;
 
   if (transaction_requester == NULL) {
     return NULL;
   }
 
-  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(logger_id, "Initializing tangle connection failed\n");
-    return NULL;
+  {
+    connection_config_t db_conf = {.db_path = transaction_requester->node->conf.tangle_db_path};
+
+    if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+      log_critical(logger_id, "Initializing tangle connection failed\n");
+      return NULL;
+    }
   }
 
   lock_handle_t lock_cond;
