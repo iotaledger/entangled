@@ -88,6 +88,19 @@ cleanup:
 retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
 
+  ERR_BIND_RETURN(iota_snapshot_reset(snapshot, conf), ret);
+
+  if (!snapshot->conf->local_snapshots.local_snapshots_is_enabled ||
+      ((ret = iota_snapshot_load_local_snapshot(snapshot, conf)) != RC_OK)) {
+    ERR_BIND_RETURN(iota_snapshot_load_built_in_snapshot(snapshot, conf), ret);
+  }
+
+  return ret;
+}
+
+retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t *const conf) {
+  retcode_t ret = RC_OK;
+
   if (snapshot == NULL) {
     return RC_NULL_PARAM;
   }
@@ -97,12 +110,6 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   snapshot->conf = conf;
   snapshot->state = NULL;
   snapshot->index = 0;
-
-  if (!snapshot->conf->local_snapshots.local_snapshots_is_enabled ||
-      ((ret = iota_snapshot_load_local_snapshot(snapshot, conf)) != RC_OK)) {
-    ERR_BIND_RETURN(iota_snapshot_load_built_in_snapshot(snapshot, conf), ret);
-  }
-
   return ret;
 }
 
@@ -262,8 +269,6 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
 
   dst->index = src->index;
   dst->conf = src->conf;
-
-  rw_lock_handle_init(&dst->rw_lock);
 
   ERR_BIND_GOTO(iota_snapshot_metadata_destroy(&dst->metadata), ret, cleanup);
 
