@@ -16,6 +16,7 @@ get_node_info_res_t* get_node_info_res_new() {
     memset(res->latest_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(res->latest_solid_subtangle_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(res->coordinator_address, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    utarray_new(res->features, &ut_str_icd);
   }
   return res;
 }
@@ -31,6 +32,10 @@ void get_node_info_res_free(get_node_info_res_t** res) {
   if ((*res)->app_version) {
     char_buffer_free((*res)->app_version);
   }
+  if ((*res)->features) {
+    utarray_free((*res)->features);
+  }
+
   free(*res);
   *res = NULL;
 }

@@ -24,7 +24,7 @@ extern "C" {
 typedef enum bundle_status_e {
   BUNDLE_NOT_INITIALIZED = 0,
   BUNDLE_VALID,
-  BUNDLE_TAIL_NOT_FOUND,
+  BUNDLE_EMPTY,
   BUNDLE_INCOMPLETE,
   BUNDLE_INVALID_TX,
   BUNDLE_INVALID_INPUT_ADDRESS,
@@ -50,7 +50,7 @@ static inline size_t bundle_transactions_size(bundle_transactions_t const *const
 
 void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl, flex_trit_t *out);
 void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
-retcode_t bundle_validator(bundle_transactions_t *const bundle, bundle_status_t *const status);
+retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *const status);
 
 void bundle_reset_indexes(bundle_transactions_t *const bundle);
 

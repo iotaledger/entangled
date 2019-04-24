@@ -32,6 +32,7 @@ extern "C" {
 typedef struct iota_api_s {
   iota_api_conf_t conf;
   core_t *core;
+  uint8_t features;
 } iota_api_t;
 
 /**

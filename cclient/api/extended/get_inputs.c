@@ -12,13 +12,13 @@
 
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_trit_t const* const seed,
                                  address_opt_t const addr_opt, uint64_t const threshold, inputs_t* const out_inputs) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   hash243_queue_entry_t* q_iter = NULL;
   size_t counter = 0;
   get_balances_req_t* balances_req = get_balances_req_new();
   get_balances_res_t* balances_res = get_balances_res_new();
 
-  log_info(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (!balances_req || !balances_res) {
     ret_code = RC_CCLIENT_OOM;
     log_error(client_extended_logger_id, "%s create get balances request or response object failed: %s\n", __func__,

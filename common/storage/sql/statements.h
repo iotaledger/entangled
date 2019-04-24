@@ -23,6 +23,7 @@ typedef struct iota_statements_s {
   void* transaction_select_hashes_of_milestone_candidates;
   void* transaction_update_snapshot_index;
   void* transaction_update_solid_state;
+  void* transaction_update_validity;
   void* transaction_exist;
   void* transaction_exist_by_hash;
   void* transaction_approvers_count;
@@ -62,6 +63,7 @@ extern char* iota_statement_transaction_select_hashes_of_approvers_before_date;
 extern char* iota_statement_transaction_select_hashes_of_milestone_candidates;
 extern char* iota_statement_transaction_update_snapshot_index;
 extern char* iota_statement_transaction_update_solid_state;
+extern char* iota_statement_transaction_update_validity;
 extern char* iota_statement_transaction_exist;
 extern char* iota_statement_transaction_exist_by_hash;
 extern char* iota_statement_transaction_approvers_count;

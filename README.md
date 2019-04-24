@@ -22,7 +22,7 @@ Component|Description
 bazel test //...
 ```
 
-## Developing Entangled 
+## Developing Entangled
 - Be sure to run `./hooks/autohook.sh install` after initial checkout!
 - Pass `-c dbg` for building with debug symbols.
 

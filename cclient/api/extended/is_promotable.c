@@ -14,7 +14,7 @@
 
 retcode_t iota_client_is_promotable(iota_client_service_t const* const serv, flex_trit_t const* const tail_tx,
                                     bool* out_promotable) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   check_consistency_req_t* consistency_req = NULL;
   check_consistency_res_t* consistency_res = NULL;
   get_trytes_res_t* out_trytes = NULL;

@@ -14,6 +14,7 @@ cc_library(
     }),
     deps = [
         ":conf",
+        ":feature",
         "//cclient/request:requests",
         "//cclient/response:responses",
         "//ciri:core",
@@ -28,4 +29,11 @@ cc_library(
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     deps = ["//common:errors"],
+)
+
+cc_library(
+    name = "feature",
+    srcs = ["feature.c"],
+    hdrs = ["feature.h"],
+    deps = ["@com_github_uthash//:uthash"],
 )
