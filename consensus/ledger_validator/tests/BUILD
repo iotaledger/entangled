@@ -22,6 +22,7 @@ cc_test(
         "//consensus/snapshot:snapshots_service",
         "//consensus/test_utils",
         "//consensus/transaction_solidifier",
+        "//utils/containers/hash:hash_uint64_t_map",
         "@unity",
     ],
 )
