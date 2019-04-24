@@ -103,3 +103,58 @@ retcode_t iota_spent_addresses_service_destroy(spent_addresses_service_t *const 
 
   return RC_OK;
 }
+
+retcode_t iota_spent_addresses_service_was_address_spent_from(spent_addresses_service_t const *const sas,
+                                                              spent_addresses_provider_t const *const sap,
+                                                              tangle_t const *const tangle,
+                                                              flex_trit_t const *const address, bool *const spent) {
+  retcode_t ret = RC_OK;
+  iota_stor_pack_t pack;
+  DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
+
+  if (sas == NULL || sap == NULL || tangle == NULL || address == NULL || spent == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  *spent = false;
+
+  if (memcmp(address, sas->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0 ||
+      memcmp(address, sas->conf->coordinator_address, FLEX_TRIT_SIZE_243) == 0) {
+    return RC_OK;
+  }
+
+  if ((ret = iota_spent_addresses_provider_exist(sap, address, spent)) != RC_OK) {
+    return ret;
+  }
+
+  if (*spent) {
+    return RC_OK;
+  }
+
+  hash_pack_init(&pack, 8);
+
+  if ((ret = iota_tangle_transaction_load_hashes_by_address(tangle, address, &pack)) != RC_OK) {
+    goto done;
+  }
+
+  // TODO: If the hash set returned contains more than 100 000 entries, it likely will not be a spent address.
+  // To avoid unnecessary overhead while processing, the loop will return false
+
+  for (size_t i = 0; i < pack.num_loaded; ++i) {
+    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, ((flex_trit_t **)(pack.models))[i],
+                                            &tx_pack)) != RC_OK) {
+      goto done;
+    }
+    if ((ret = iota_spent_addresses_service_was_tx_spent_from(tangle, txp, spent)) != RC_OK) {
+      goto done;
+    }
+    if (*spent) {
+      goto done;
+    }
+  }
+
+done:
+  hash_pack_free(&pack);
+
+  return ret;
+}
