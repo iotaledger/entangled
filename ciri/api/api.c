@@ -589,7 +589,11 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
     if (transaction_current_index(&tx) == 0 &&
         memcmp(transaction_address(&tx), api->core->consensus.milestone_tracker.conf->coordinator_address,
                FLEX_TRIT_SIZE_243) == 0) {
-      ret = iota_milestone_tracker_add_candidate(&api->core->consensus.milestone_tracker, transaction_hash(&tx));
+      if (!hash_to_uint64_t_map_contains(
+              &api->core->consensus.snapshots_provider.inital_snapshot.metadata.solid_entry_points,
+              transaction_hash(&tx))) {
+        ret = iota_milestone_tracker_add_candidate(&api->core->consensus.milestone_tracker, transaction_hash(&tx));
+      }
     }
     // TODO store metadata: arrival_time, status, sender (#407)
   }

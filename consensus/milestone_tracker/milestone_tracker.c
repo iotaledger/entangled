@@ -346,6 +346,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, pack);
   iota_stor_pack_t hash_pack;
+  flex_trit_t* curr_hash;
 
   if (mt == NULL) {
     return RC_NULL_PARAM;
@@ -371,7 +372,11 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
   log_info(logger_id, "Loaded %d milestone candidates\n", hash_pack.num_loaded);
 
   for (size_t i = 0; i < hash_pack.num_loaded; i++) {
-    iota_milestone_tracker_add_candidate(mt, ((flex_trit_t**)hash_pack.models)[i]);
+    curr_hash = ((flex_trit_t*)hash_pack.models)[i];
+    if (!hash_to_uint64_t_map_contains(&mt->snapshots_provider->inital_snapshot.metadata.solid_entry_points,
+                                       curr_hash)) {
+      iota_milestone_tracker_add_candidate(mt, curr_hash);
+    }
   }
   hash_pack_free(&hash_pack);
 
