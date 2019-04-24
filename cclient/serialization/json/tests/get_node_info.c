@@ -40,6 +40,7 @@ static void test_deserialize_get_node_info_response(void) {
         "\"time\":" STR(TEST_INFO_TIME) ","
         "\"tips\":" STR(TEST_INFO_TIPS) ","
         "\"transactionsToRequest\":" STR(TEST_INFO_TRANSACTIONS_TO_REQUEST) ","
+        "\"features\":[\"" TEST_INFO_FEATURE_SNAPSHOTPRUNING "\",\"" TEST_INFO_FEATURE_TESTNET "\"],"
         "\"coordinatorAddress\":\"" TEST_81_TRYTES_3 "\""
       "}";
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
@@ -65,6 +66,9 @@ static void test_deserialize_get_node_info_response(void) {
   TEST_ASSERT_EQUAL_UINT64(TEST_INFO_TIME, node_info->time);
   TEST_ASSERT_EQUAL_UINT32(TEST_INFO_TIPS, node_info->tips);
   TEST_ASSERT_EQUAL_UINT32(TEST_INFO_TRANSACTIONS_TO_REQUEST, node_info->transactions_to_request);
+
+  TEST_ASSERT_EQUAL_STRING(TEST_INFO_FEATURE_SNAPSHOTPRUNING, get_node_info_res_features_at(node_info, 0));
+  TEST_ASSERT_EQUAL_STRING(TEST_INFO_FEATURE_TESTNET, get_node_info_res_features_at(node_info, 1));
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, get_node_info_res_coordinator_address(node_info), FLEX_TRIT_SIZE_243);
