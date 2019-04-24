@@ -39,6 +39,7 @@ typedef struct check_solidity_do_func_params_s {
   bool is_milestone;
   bool is_solid;
   hash243_set_t *solid_transactions_candidates;
+  hash243_set_t *solid_entry_points;
 } check_solidity_do_func_params_t;
 
 static retcode_t propagate_solid_transactions(transaction_solidifier_t *const ts, tangle_t *const tangle) {
@@ -132,11 +133,13 @@ static void *spawn_solid_transactions_propagation(void *arg) {
 retcode_t iota_consensus_transaction_solidifier_init(transaction_solidifier_t *const ts,
                                                      iota_consensus_conf_t *const conf,
                                                      transaction_requester_t *const transaction_requester,
+                                                     snapshots_provider_t const *const snapshots_provider,
                                                      tips_cache_t *const tips) {
   ts->conf = conf;
   ts->transaction_requester = transaction_requester;
   ts->running = false;
   ts->newly_set_solid_transactions = NULL;
+  ts->snapshots_provider = snapshots_provider;
   ts->tips = tips;
   lock_handle_init(&ts->lock);
   cond_handle_init(&ts->cond);
@@ -207,7 +210,8 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
   tangle_t *tangle = params->tangle;
 
   // Transaction is not marked solid, but it is a candidate
-  if (pack->num_loaded == 1 && !(transaction_solid((iota_transaction_t *)pack->models[0]))) {
+  if (pack->num_loaded == 1 && !((transaction_solid((iota_transaction_t *)pack->models[0])) ||
+                                 hash243_set_contains(params->solid_entry_points, hash))) {
     *should_branch = true;
     return hash243_set_add(params->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
@@ -226,6 +230,8 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
   hash243_set_t solid_transactions_candidates = NULL;
+  hash243_set_t analyzed_hashes = NULL;
+  hash243_set_t solid_entry_points_hashes = NULL;
 
   ret = iota_tangle_transaction_load_partial(tangle, hash, &pack, PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
   if (ret != RC_OK) {
@@ -238,14 +244,17 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
     return RC_OK;
   }
 
+  iota_snapshot_solid_entry_points_set(&ts->snapshots_provider->inital_snapshot, &analyzed_hashes);
+  hash243_set_append(&analyzed_hashes, &solid_entry_points_hashes);
   check_solidity_do_func_params_t params = {.ts = ts,
                                             .tangle = tangle,
                                             .is_milestone = is_milestone,
                                             .is_solid = true,
-                                            .solid_transactions_candidates = &solid_transactions_candidates};
+                                            .solid_transactions_candidates = &solid_transactions_candidates,
+                                            .solid_entry_points = &solid_entry_points_hashes};
 
-  if ((ret = tangle_traversal_dfs_to_past(tangle, check_solidity_do_func, hash, ts->conf->genesis_hash, NULL,
-                                          &params)) != RC_OK) {
+  if ((ret = tangle_traversal_dfs_to_past(tangle, check_solidity_do_func, hash, ts->conf->genesis_hash,
+                                          &analyzed_hashes, &params)) != RC_OK) {
     *is_solid = false;
     goto done;
   }
@@ -263,6 +272,8 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
 
 done:
   hash243_set_free(&solid_transactions_candidates);
+  hash243_set_free(&analyzed_hashes);
+  hash243_set_free(&solid_entry_points_hashes);
   return ret;
 }
 
@@ -274,6 +285,10 @@ static retcode_t check_transaction_and_update_solid_state(transaction_solidifier
   DECLARE_PACK_SINGLE_TX(transaction_s, transaction, pack);
 
   *is_new_solid = false;
+
+  if (hash_to_uint64_t_map_contains(&ts->snapshots_provider->inital_snapshot.metadata.solid_entry_points, hash)) {
+    return RC_OK;
+  }
 
   ret = iota_tangle_transaction_load_partial(tangle, hash, &pack, PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
   if (ret != RC_OK || pack.num_loaded == 0) {
@@ -309,6 +324,11 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts, 
                                             flex_trit_t *const approvee, bool *solid) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+
+  if (hash_to_uint64_t_map_contains(&ts->snapshots_provider->inital_snapshot.metadata.solid_entry_points, approvee)) {
+    *solid = true;
+    return RC_OK;
+  }
 
   if ((ret = iota_tangle_transaction_load_partial(tangle, approvee, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
     log_error(logger_id,

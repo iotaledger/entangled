@@ -84,8 +84,9 @@ static void init_test_structs() {
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   flex_trits_from_trytes(g_seed, NUM_TRITS_HASH, (tryte_t *)TEST_SEED, NUM_TRITS_HASH, NUM_TRYTES_HASH);
 
-  TEST_ASSERT(iota_consensus_transaction_solidifier_init(&transaction_solidifier, &conf, NULL, NULL) == RC_OK);
   TEST_ASSERT(iota_snapshots_provider_init(&snapshots_provider, &conf) == RC_OK);
+  TEST_ASSERT(iota_consensus_transaction_solidifier_init(&transaction_solidifier, &conf, NULL, &snapshots_provider,
+                                                         NULL) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &transaction_solidifier) == RC_OK);
   TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &mt, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &conf) == RC_OK);

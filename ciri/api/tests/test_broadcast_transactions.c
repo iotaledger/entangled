@@ -10,6 +10,7 @@
 #include "ciri/api/api.h"
 #include "ciri/api/tests/defs.h"
 #include "consensus/conf.h"
+#include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 #include "gossip/node.h"
@@ -98,7 +99,10 @@ int main(void) {
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;
   api.core->consensus.conf.mwm = 1;
-  iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator, &api.core->consensus.conf);
+
+  iota_snapshots_provider_init(&api.core->consensus.snapshots_provider, &api.core->consensus.conf);
+  iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator,
+                                            &api.core->consensus.snapshots_provider, &api.core->consensus.conf);
 
   RUN_TEST(test_broadcast_transactions_empty);
   RUN_TEST(test_broadcast_transactions_invalid_tx);
