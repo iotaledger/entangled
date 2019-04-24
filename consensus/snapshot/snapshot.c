@@ -255,11 +255,15 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
   }
 
   rw_lock_handle_wrlock(&snapshot->rw_lock);
-  ret = state_delta_apply_patch(&snapshot->state, patch);
-  snapshot->index = index;
+  ret = iota_snapshot_apply_patch_no_lock(snapshot, patch, index);
   rw_lock_handle_unlock(&snapshot->rw_lock);
 
   return ret;
+}
+
+retcode_t iota_snapshot_apply_patch_no_lock(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index) {
+  snapshot->index = index;
+  return state_delta_apply_patch(&snapshot->state, patch);
 }
 
 retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst) {

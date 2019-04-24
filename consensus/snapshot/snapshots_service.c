@@ -99,10 +99,12 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   next_snapshot.state = NULL;
   next_snapshot.metadata.solid_entry_points = NULL;
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot(snapshots_service, &milestone, &next_snapshot), ret, cleanup);
-  ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, &next_snapshot), ret,
-                cleanup);
-  // TODO - Implement prunning
-  ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(snapshots_service, &next_snapshot), ret, cleanup);
+  if (next_snapshot.index > snapshots_service->snapshots_provider->inital_snapshot.index) {
+    ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, &next_snapshot), ret,
+                  cleanup);
+    // TODO - Implement prunning
+    ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(snapshots_service, &next_snapshot), ret, cleanup);
+  }
 
 cleanup:
 
@@ -147,8 +149,6 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
     goto cleanup;
   }
-
-  // TODO - implement rollback as well
 
   ERR_BIND_GOTO(iota_snapshot_reset(snapshot, snapshots_service->conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);

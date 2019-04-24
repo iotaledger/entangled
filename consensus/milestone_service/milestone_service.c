@@ -6,6 +6,7 @@
  */
 
 #include "consensus/milestone_service/milestone_service.h"
+#include <inttypes.h>
 #include <stdlib.h>
 #include "common/model/milestone.h"
 #include "utils/logger_helper.h"
@@ -39,8 +40,8 @@ retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, miles
     hash_pack_reset(&pack);
     ERR_BIND_GOTO(iota_tangle_milestone_load_next(tangle, current_milestone_index, &pack), ret, cleanup);
     if (pack.num_loaded == 0) {
-      log_error(logger_id, "Target milestone was not loaded\n");
-      // TODO - add to skipped milestones
+      log_warning(logger_id, "Target milestone was not loaded\n");
+      break;
     } else {
       ERR_BIND_GOTO(iota_tangle_state_delta_load(tangle, current_milestone.index, &current_delta), ret, cleanup);
       if (current_delta != NULL) {
@@ -53,9 +54,9 @@ retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, miles
   }
 
   if (last_applied_milestone != NULL) {
-    // TODO - mutex is not need to be taken inside "iota_snapshot_apply_patch" this time
-    ERR_BIND_GOTO(iota_snapshot_apply_patch(snapshot, &merged_balance_changes, last_applied_milestone->index), ret,
-                  cleanup);
+    log_info(logger_id, "Target milestone index: % " PRIu64 "\n", last_applied_milestone->index);
+    ERR_BIND_GOTO(iota_snapshot_apply_patch_no_lock(snapshot, &merged_balance_changes, last_applied_milestone->index),
+                  ret, cleanup);
   }
 
 cleanup:
