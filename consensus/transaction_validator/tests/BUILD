@@ -5,6 +5,7 @@ cc_test(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//consensus/snapshot:snapshots_provider",
         "//consensus/test_utils",
         "//consensus/transaction_validator",
         "@unity",
