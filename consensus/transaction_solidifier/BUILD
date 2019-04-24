@@ -7,6 +7,7 @@ cc_library(
         "//common:errors",
         "//common/model:transaction",
         "//consensus:conf",
+        "//consensus/snapshot:snapshots_provider",
         "//consensus/tangle",
         "//consensus/utils:tangle_traversals",
         "//gossip:tips_cache",

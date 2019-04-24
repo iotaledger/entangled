@@ -189,6 +189,16 @@ retcode_t iota_snapshot_state_read_from_file(snapshot_t *const snapshot, char co
  */
 retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file_base);
 
+/**
+ * Gets solid entry points
+ *
+ * @param snapshot The snapshot
+ * @param keys The snapshot solid entry points hashes
+ *
+ * @return void
+ */
+void iota_snapshot_solid_entry_points_set(snapshot_t const *const snapshot, hash243_set_t *const keys);
+
 #ifdef __cplusplus
 }
 #endif
