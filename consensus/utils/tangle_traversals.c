@@ -95,12 +95,13 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
     curr_tx_hash = hash243_stack_peek(non_analyzed_hashes);
 
     if (!hash243_set_contains(analyzed_hashes, curr_tx_hash)) {
+      hash_pack_reset(&transaction_pack);
       if ((ret = iota_tangle_transaction_load_partial(tangle, curr_tx_hash, &transaction_pack,
                                                       PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
         break;
       }
 
-      if ((ret = func(curr_tx_hash, &hashes_pack, data, &should_branch, &should_stop)) != RC_OK) {
+      if ((ret = func(curr_tx_hash, &transaction_pack, data, &should_branch, &should_stop)) != RC_OK) {
         break;
       }
 
