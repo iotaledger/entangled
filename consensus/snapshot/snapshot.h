@@ -122,6 +122,17 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot, state_delta_t *
 retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index);
 
 /**
+ * Applies a patch to a snapshot state without taking a lock
+ *
+ * @param snapshot The snapshot
+ * @param patch The patch
+ * @param index A new index for the snapshot
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_apply_patch_no_lock(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index);
+
+/**
  * Coppies a snapshot struct
  *
  * @param src The source snapshot
