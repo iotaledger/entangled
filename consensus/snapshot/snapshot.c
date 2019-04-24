@@ -110,6 +110,8 @@ retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t 
   snapshot->conf = conf;
   snapshot->state = NULL;
   snapshot->index = 0;
+  iota_snapshot_metadata_reset(&snapshot->metadata);
+
   return ret;
 }
 
@@ -271,7 +273,7 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
   dst->conf = src->conf;
 
   ERR_BIND_GOTO(iota_snapshot_metadata_destroy(&dst->metadata), ret, cleanup);
-
+  state_delta_destroy(&dst->state);
   ERR_BIND_GOTO(state_delta_copy(&src->state, &dst->state), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_metadata_init(&dst->metadata, src->metadata.hash, src->metadata.index,
                                             src->metadata.timestamp, src->metadata.solid_entry_points),

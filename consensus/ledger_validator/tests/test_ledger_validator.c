@@ -27,13 +27,14 @@
 #include "consensus/test_utils/tangle.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utarray.h"
+#include "utils/containers/hash/hash_uint64_t_map.h"
 #include "utils/macros.h"
 #include "utils/time.h"
 
 #define TEST_SEED "THISISASEEDFORMILESTONESERVICETESTWHICHSHOULDNOTBEUSEDWITHREALTOKENSBUTONLYFORTEA"
 
 #define TEST_MILESTONE_HASH "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-#define TEST_NUM_SNAPSHOTS 3
+#define TEST_NUM_SNAPSHOTS 4
 
 static tangle_t tangle;
 static connection_config_t config;
@@ -121,6 +122,17 @@ void test_util_create_bundle(flex_trit_t *const curr_branch_trunk_hash, iota_mil
   }
 }
 
+void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *const rhs) {
+  // TODO - serialize index
+  // TEST_ASSERT_EQUAL_INT64(lhs->index, rhs->index);
+  TEST_ASSERT(state_delta_equal(lhs->state, rhs->state));
+
+  TEST_ASSERT_EQUAL_MEMORY(lhs->metadata.hash, rhs->metadata.hash, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_INT64(lhs->metadata.index, rhs->metadata.index);
+  TEST_ASSERT_EQUAL_INT64(lhs->metadata.timestamp, rhs->metadata.timestamp);
+  TEST_ASSERT(hash_to_uint64_t_map_equal(lhs->metadata.solid_entry_points, rhs->metadata.solid_entry_points));
+}
+
 void test_replay_several_milestones() {
   iota_milestone_t milestone;
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
@@ -157,6 +169,11 @@ void test_replay_several_milestones() {
     TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &mt));
     TEST_ASSERT_EQUAL_INT64(snapshots_provider.inital_snapshot.metadata.index,
                             (num_milestones * (i + 1) - conf.local_snapshots.min_depth - 1));
+    snapshot_t tmp;
+    conf.local_snapshots.local_snapshots_is_enabled = true;
+    TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshot_init(&tmp, &conf));
+    test_snapshots_equal(&snapshots_provider.inital_snapshot, &tmp);
+    iota_snapshot_destroy(&tmp);
   }
 
   destroy_test_structs();

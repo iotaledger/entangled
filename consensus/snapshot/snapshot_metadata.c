@@ -22,6 +22,12 @@ retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metada
   return RC_OK;
 }
 
+void iota_snapshot_metadata_reset(snapshot_metadata_t *const snapshot_metadata) {
+  snapshot_metadata->index = 0;
+  snapshot_metadata->timestamp = 0;
+  snapshot_metadata->solid_entry_points = NULL;
+}
+
 retcode_t iota_snapshot_metadata_destroy(snapshot_metadata_t *const snapshot_metadata) {
   hash_to_uint64_t_map_free(&snapshot_metadata->solid_entry_points);
   return RC_OK;

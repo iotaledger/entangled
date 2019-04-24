@@ -42,6 +42,14 @@ retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metada
                                       uint64_t index, uint64_t timestamp, hash_to_uint64_t_map_t solid_entry_points);
 
 /**
+ * Resets a snapshot metadata
+ *
+ * @param snapshot_metadata The snapshot metadata
+ * @return void
+ */
+void iota_snapshot_metadata_reset(snapshot_metadata_t *const snapshot_metadata);
+
+/**
  * Destroys a snapshot metadata
  *
  * @param snapshot_metadata The snapshot metadata
