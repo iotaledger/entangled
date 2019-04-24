@@ -66,7 +66,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
 
-  if ((buffer = (char *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
+  if (metadata_size > state_size && (buffer = (char *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
     return RC_STORAGE_OOM;
   }
 
