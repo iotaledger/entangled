@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup response
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_RESPONSE_GET_NEIGHBORS_H
 #define CCLIENT_RESPONSE_GET_NEIGHBORS_H
 
@@ -14,60 +23,121 @@
 extern "C" {
 #endif
 
+/**
+ * @brief The data structure of the neighbor object.
+ *
+ */
 typedef struct {
   /**
-   * URI of your peer.
+   * address and port number of your peer.
    */
   char_buffer_t* address;
   /**
-   * The total number of transactions which includes sent, stale, etc.
+   * Number of all transactions(Invalid, valid and already-seen) this neighbor sent to you.
    */
   uint32_t all_trans_num;
   /**
-   *
+   * Number of random tips this neighbor requested from your node.
    */
   uint32_t random_trans_req_num;
   /**
-   * Number of newly transmitted transactions.
+   * Number of new transactions received from this neighbor. New transactions are transactions that you have not yet
+   * stored when this neighbor sends it to you.
    */
   uint32_t new_trans_num;
   /**
-   * Invalid transactions your peer has sent you. These are transactions with
-   * invalid signatures or overall schema.
+   * Number of invalid transactions this neighbor sent to you. These are transactions with invalid signatures or overall
+   * schema.
    */
   uint32_t invalid_trans_num;
   /**
-   * The number of stale transactions
+   * Stale transactions this neighbor has sent you. These are transactions with a timestamp older than your latest
+   * snapshot.
    */
   uint32_t stale_trans_num;
   /**
-   * The number of sent transactions.
+   * Amount of transactions send through this neighbor.
+   * Number of all new transactions you get from other neighbors and forward to this neighbor. (You forward all new
+   * transactions from one neighbor to all other neighbors) So the number is exactly the sum of all new transactions
+   * from your neighbors except this neighbor.
    */
   uint32_t sent_trans_num;
   /**
-   * Connection type of client. It could be TCP, etc.
+   * The method type this neighbor is using to connect (TCP / UDP).
    */
   char_buffer_t* connection_type;
 
 } neighbor_info_t;
 
+/**
+ * @brief The data structure of get neighbor response.
+ *
+ */
 typedef UT_array get_neighbors_res_t;
 
-void neighbor_info_t_copy(void* _dst, const void* _src);
-void neighbor_info_t_dtor(void* _elt);
-
+/**
+ * @brief Allocates a get neighbors response object.
+ *
+ * @return A pointer to the response object.
+ */
 get_neighbors_res_t* get_neighbors_res_new();
-void get_neighbors_res_free(get_neighbors_res_t* nbors);
-static inline size_t get_neighbors_res_num(get_neighbors_res_t* nbors) { return utarray_len(nbors); }
-neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors, int index);
-void get_neighbors_res_dump(get_neighbors_res_t* nbors);
-retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors, char const* const addr, uint32_t all_trans_num,
+
+/**
+ * @brief Frees a get neighbors response.
+ *
+ * @param[in] res The response object.
+ */
+void get_neighbors_res_free(get_neighbors_res_t* res);
+
+/**
+ * @brief Gets the number of neighbors in the response.
+ *
+ * @param[in] res The response object.
+ * @return The number of neighbors.
+ */
+static inline size_t get_neighbors_res_num(get_neighbors_res_t* res) { return utarray_len(res); }
+
+/**
+ * @brief Gets a neighbor object by index.
+ *
+ * @param[in] res The response object.
+ * @param[in] index An index of the neighbor list.
+ * @return A pointer to a neighbor object.
+ */
+neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, int index);
+
+/**
+ * @brief Adds a neighbor to the response.
+ *
+ * @param[in] res The response object.
+ * @param[in] addr The string of an address.
+ * @param[in] all_trans_num The value of \ref neighbor_info_t.all_trans_num
+ * @param[in] random_trans_req_num The value of \ref neighbor_info_t.random_trans_req_num
+ * @param[in] new_trans_num The value of \ref neighbor_info_t.new_trans_num
+ * @param[in] invalid_trans_num The value of \ref neighbor_info_t.invalid_trans_num
+ * @param[in] stale_trans_num The value of \ref neighbor_info_t.stale_trans_num
+ * @param[in] sent_trans_num The value of \ref neighbor_info_t.sent_trans_num
+ * @param[in] connection_type A string of <b>TCP</b> or <b>UDP</b>.
+ * @return #retcode_t
+ */
+retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* res, char const* const addr, uint32_t all_trans_num,
                                          uint32_t random_trans_req_num, uint32_t new_trans_num,
                                          uint32_t invalid_trans_num, uint32_t stale_trans_num, uint32_t sent_trans_num,
                                          char const* const connection_type);
+
+#ifndef DOXYGEN_SKIP_THIS
+/**
+ * @brief Dumps neighbor info through stdout.
+ *
+ * @param[in] res The response object.
+ */
+void get_neighbors_res_dump(get_neighbors_res_t* res);
+#endif /* DOXYGEN_SKIP_THIS */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif  // CCLIENT_RESPONSE_GET_NEIGHBORS_H
+
+/** @} */
