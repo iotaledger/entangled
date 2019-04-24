@@ -13,6 +13,7 @@
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
+#include "consensus/snapshot/snapshots_provider.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,6 +24,7 @@ extern "C" {
  */
 typedef struct transaction_validator_s {
   iota_consensus_conf_t *conf;
+  snapshots_provider_t *snapshots_provider;
 } transaction_validator_t;
 
 /**
@@ -34,6 +36,7 @@ typedef struct transaction_validator_s {
  * @return a status code
  */
 retcode_t iota_consensus_transaction_validator_init(transaction_validator_t *const tv,
+                                                    snapshots_provider_t const *const snapshots_provider,
                                                     iota_consensus_conf_t *const conf);
 
 /**
