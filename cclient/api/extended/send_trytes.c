@@ -56,18 +56,12 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
   hash_array_free(attach_req->trytes);
   attach_req->trytes = trytes;
 
-  get_transactions_to_approve_req_free(&tx_approve_req);
-  get_transactions_to_approve_res_free(&tx_approve_res);
-
   // attach to tangle
   ret_code = iota_client_attach_to_tangle(local_pow ? NULL : serv, attach_req, attach_res);
   if (ret_code) {
     log_error(client_extended_logger_id, "sending attach to tangle failed: %s\n", error_2_string(ret_code));
     goto done;
   }
-
-  attach_req->trytes = NULL;
-  attach_to_tangle_req_free(&attach_req);
 
   // store and broadcast
   ret_code = iota_client_store_and_broadcast(serv, (store_transactions_req_t*)attach_res);
