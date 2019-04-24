@@ -44,15 +44,17 @@ size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *con
 retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const snapshot_metadata, char *const str) {
   hash_to_uint64_t_map_entry_t *iter = NULL, *tmp = NULL;
 
-  // TODO - figure out why ASAN complains about overflow in snprintf
-  tryte_t hash_trytes[NUM_TRYTES_HASH * 3];
+  tryte_t hash_trytes[NUM_TRYTES_HASH + 1];
   char svalue[MAX_CHARS_UNIT64];
 
-  if (flex_trits_to_trytes(&hash_trytes, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
+  if (flex_trits_to_trytes(hash_trytes, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
       NUM_TRITS_HASH) {
     return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
   }
-  snprintf(str, NUM_TRYTES_HASH + 1, "%s", hash_trytes);
+
+  hash_trytes[NUM_TRYTES_HASH] = '\0';
+
+  snprintf(str, NUM_TRYTES_HASH + 1, "%s\n", (char *)hash_trytes);
   strcat(str, "\n");
   sprintf(svalue, "%" PRIu64 "\n", snapshot_metadata->index);
   strcat(str, svalue);
