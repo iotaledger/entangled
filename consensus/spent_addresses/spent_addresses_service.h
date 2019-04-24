@@ -10,6 +10,8 @@
 
 #include "common/errors.h"
 #include "consensus/conf.h"
+#include "consensus/spent_addresses/spent_addresses_provider.h"
+#include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
 extern "C" {

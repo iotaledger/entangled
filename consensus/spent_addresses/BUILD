@@ -30,6 +30,8 @@ cc_library(
         ":spent_addresses_provider",
         "//common:errors",
         "//consensus:conf",
+        "//consensus/bundle_validator",
+        "//consensus/tangle",
         "//utils:logger_helper",
     ],
 )

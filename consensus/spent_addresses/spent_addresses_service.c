@@ -6,6 +6,7 @@
  */
 
 #include "consensus/spent_addresses/spent_addresses_service.h"
+#include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/spent_addresses/spent_addresses_provider.h"
 #include "utils/logger_helper.h"
 
@@ -42,6 +43,41 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
   return ret;
 }
 #endif
+
+static retcode_t iota_spent_addresses_service_was_tx_spent_from(tangle_t const *const tangle,
+                                                                iota_transaction_t const *const tx, bool *const spent) {
+  retcode_t ret = RC_OK;
+
+  if (transaction_value(tx) < 0) {
+    bundle_transactions_t *bundle = NULL;
+    bundle_status_t status = BUNDLE_NOT_INITIALIZED;
+    flex_trit_t tail[FLEX_TRIT_SIZE_243];
+
+    // Transaction is confirmed
+    if (transaction_snapshot_index(tx) != 0) {
+      *spent = true;
+      return RC_OK;
+    }
+
+    // Transaction is pending
+    if ((ret = iota_tangle_find_tail(tangle, transaction_hash(tx), tail, spent)) != RC_OK) {
+      return ret;
+    }
+    if (*spent) {
+      bundle_transactions_new(&bundle);
+      ret = iota_consensus_bundle_validator_validate(tangle, tail, bundle, &status);
+      bundle_transactions_free(&bundle);
+      // TODO: What if the bundle is invalid but signature is still OK ?
+      *spent = (status == BUNDLE_VALID);
+    }
+    // TODO: What if incomplete bundle ?
+
+  } else {
+    *spent = false;
+  }
+
+  return ret;
+}
 
 /*
  * Public functions
