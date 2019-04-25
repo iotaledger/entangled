@@ -1,5 +1,6 @@
 cc_test(
     name = "test_ledger_validator",
+    timeout = "moderate",
     srcs = [
         "test_ledger_validator.c",
     ],
