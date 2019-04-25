@@ -79,7 +79,7 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
   char c;
   tryte_t curr_address_trytes[NUM_TRYTES_ADDRESS];
   flex_trit_t curr_address[FLEX_TRIT_SIZE_243];
-  tryte_t curr_hash_trytes[NUM_TRYTES_ADDRESS];
+  tryte_t curr_hash_trytes[NUM_TRYTES_ADDRESS + 1];
   uint64_t snapshot_index;
   int offset;
   char const *ptr = str;
