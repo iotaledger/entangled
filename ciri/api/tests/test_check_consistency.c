@@ -220,7 +220,7 @@ int main(void) {
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);
 
-  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index++;
+  api.core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.metadata.index++;
 
   RUN_TEST(test_check_consistency_missing_tail);
   RUN_TEST(test_check_consistency_not_tail);
