@@ -25,7 +25,7 @@ void test_get_inclusion_states_serialize_request(void) {
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(hash243_queue_push(&get_is->transactions, trits_243) == RC_OK);
 
-  serializer.vtable.get_inclusion_states_serialize_request(&serializer, get_is, serializer_out);
+  serializer.vtable.get_inclusion_states_serialize_request(get_is, serializer_out);
   // test request with no tips
   TEST_ASSERT_EQUAL_STRING(json_text_no_tips, serializer_out->data);
 
@@ -33,7 +33,7 @@ void test_get_inclusion_states_serialize_request(void) {
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(hash243_queue_push(&get_is->tips, trits_243) == RC_OK);
 
-  serializer.vtable.get_inclusion_states_serialize_request(&serializer, get_is, serializer_out);
+  serializer.vtable.get_inclusion_states_serialize_request(get_is, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -53,14 +53,14 @@ void test_get_inclusion_states_deserialize_request(void) {
   get_inclusion_states_req_t* deserialize_get_is = get_inclusion_states_req_new();
 
   // test request with no tips
-  serializer.vtable.get_inclusion_states_deserialize_request(&serializer, json_text_no_tips, deserialize_get_is);
+  serializer.vtable.get_inclusion_states_deserialize_request(json_text_no_tips, deserialize_get_is);
   req_transaction = hash243_queue_at(&deserialize_get_is->transactions, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(hash243_queue_count(deserialize_get_is->tips) == 0);
 
   // test request with tips
-  serializer.vtable.get_inclusion_states_deserialize_request(&serializer, json_text, deserialize_get_is);
+  serializer.vtable.get_inclusion_states_deserialize_request(json_text, deserialize_get_is);
   req_transaction = hash243_queue_at(&deserialize_get_is->transactions, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
@@ -81,7 +81,7 @@ void test_get_inclusion_states_serialize_response(void) {
 
   TEST_ASSERT(get_inclusion_states_res_states_add(get_is, true) == RC_OK);
   TEST_ASSERT(get_inclusion_states_res_states_add(get_is, false) == RC_OK);
-  serializer.vtable.get_inclusion_states_serialize_response(&serializer, get_is, serializer_out);
+  serializer.vtable.get_inclusion_states_serialize_response(get_is, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -95,7 +95,7 @@ void test_get_inclusion_states_deserialize_response(void) {
   char const* json_text = "{\"states\": [true,false]}";
   get_inclusion_states_res_t* deserialize_get_is = get_inclusion_states_res_new();
 
-  serializer.vtable.get_inclusion_states_deserialize_response(&serializer, json_text, deserialize_get_is);
+  serializer.vtable.get_inclusion_states_deserialize_response(json_text, deserialize_get_is);
   TEST_ASSERT_TRUE(get_inclusion_states_res_states_at(deserialize_get_is, 0) == true);
   TEST_ASSERT_TRUE(get_inclusion_states_res_states_at(deserialize_get_is, 1) == false);
   TEST_ASSERT_TRUE(get_inclusion_states_res_states_at(deserialize_get_is, 2) == false);

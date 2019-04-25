@@ -25,7 +25,7 @@ void test_get_transactions_to_approve_serialize_request(void) {
 
   get_transactions_to_approve_req_set_depth(get_tx_approve, TEST_TRANSACTION_TO_APPROVE_DEPTH);
 
-  serializer.vtable.get_transactions_to_approve_serialize_request(&serializer, get_tx_approve, serializer_out);
+  serializer.vtable.get_transactions_to_approve_serialize_request(get_tx_approve, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
@@ -43,7 +43,7 @@ void test_get_transactions_to_approve_serialize_request_no_reference(void) {
 
   get_transactions_to_approve_req_set_depth(get_tx_approve, TEST_TRANSACTION_TO_APPROVE_DEPTH);
 
-  serializer.vtable.get_transactions_to_approve_serialize_request(&serializer, get_tx_approve, serializer_out);
+  serializer.vtable.get_transactions_to_approve_serialize_request(get_tx_approve, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
@@ -62,7 +62,7 @@ void test_get_transactions_to_approve_deserialize_request(void) {
 
   get_transactions_to_approve_req_t* req = get_transactions_to_approve_req_new();
 
-  serializer.vtable.get_transactions_to_approve_deserialize_request(&serializer, json_text, req);
+  serializer.vtable.get_transactions_to_approve_deserialize_request(json_text, req);
   TEST_ASSERT_EQUAL_UINT32(TEST_TRANSACTION_TO_APPROVE_DEPTH, req->depth);
 
   TEST_ASSERT_EQUAL_MEMORY(hash, req->reference, FLEX_TRIT_SIZE_243);
@@ -76,7 +76,7 @@ void test_get_transactions_to_approve_deserialize_request_no_reference(void) {
   char const* json_text =
       "{\"command\":\"getTransactionsToApprove\",\"depth\":" STR(TEST_TRANSACTION_TO_APPROVE_DEPTH) "}";
   get_transactions_to_approve_req_t* req = get_transactions_to_approve_req_new();
-  serializer.vtable.get_transactions_to_approve_deserialize_request(&serializer, json_text, req);
+  serializer.vtable.get_transactions_to_approve_deserialize_request(json_text, req);
   TEST_ASSERT_EQUAL_UINT32(TEST_TRANSACTION_TO_APPROVE_DEPTH, req->depth);
 
   get_transactions_to_approve_req_free(&req);
@@ -103,7 +103,7 @@ void test_get_transactions_to_approve_serialize_response(void) {
                                      NUM_TRYTES_HASH));
   get_transactions_to_approve_res_set_branch(res, tx_hash);
 
-  serializer.vtable.get_transactions_to_approve_serialize_response(&serializer, res, serializer_out);
+  serializer.vtable.get_transactions_to_approve_serialize_response(res, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
@@ -121,8 +121,7 @@ void test_get_transactions_to_approve_deserialize_response(void) {
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
 
   get_transactions_to_approve_res_t* deserialize_get_tx_approve = get_transactions_to_approve_res_new();
-  serializer.vtable.get_transactions_to_approve_deserialize_response(&serializer, json_text,
-                                                                     deserialize_get_tx_approve);
+  serializer.vtable.get_transactions_to_approve_deserialize_response(json_text, deserialize_get_tx_approve);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, deserialize_get_tx_approve->trunk, FLEX_TRIT_SIZE_243);

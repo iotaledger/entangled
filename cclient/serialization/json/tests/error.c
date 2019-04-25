@@ -15,7 +15,7 @@ static void test_response(void) {
 
   init_json_serializer(&serializer);
 
-  serializer.vtable.error_serialize_response(&serializer, res, serializer_out);
+  serializer.vtable.error_serialize_response(res, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json, serializer_out->data);
 
   char_buffer_free(serializer_out);

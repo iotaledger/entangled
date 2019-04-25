@@ -9,8 +9,7 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_find_transactions_serialize_request(serializer_t const* const s,
-                                                   find_transactions_req_t const* const obj, char_buffer_t* out) {
+retcode_t json_find_transactions_serialize_request(find_transactions_req_t const* const obj, char_buffer_t* out) {
   retcode_t ret = RC_OK;
   char const* json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -66,8 +65,7 @@ end:
   return ret;
 }
 
-retcode_t json_find_transactions_deserialize_request(serializer_t const* const s, char const* const obj,
-                                                     find_transactions_req_t* out) {
+retcode_t json_find_transactions_deserialize_request(char const* const obj, find_transactions_req_t* out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -114,8 +112,7 @@ end:
   return ret;
 }
 
-retcode_t json_find_transactions_serialize_response(serializer_t const* const s,
-                                                    find_transactions_res_t const* const obj, char_buffer_t* out) {
+retcode_t json_find_transactions_serialize_response(find_transactions_res_t const* const obj, char_buffer_t* out) {
   retcode_t ret = RC_OK;
   char const* json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -143,8 +140,7 @@ end:
   return ret;
 }
 
-retcode_t json_find_transactions_deserialize_response(serializer_t const* const s, char const* const obj,
-                                                      find_transactions_res_t* out) {
+retcode_t json_find_transactions_deserialize_response(char const* const obj, find_transactions_res_t* out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;

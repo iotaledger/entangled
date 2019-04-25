@@ -9,8 +9,7 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_inclusion_states_serialize_request(serializer_t const *const s,
-                                                      get_inclusion_states_req_t const *const req, char_buffer_t *out) {
+retcode_t json_get_inclusion_states_serialize_request(get_inclusion_states_req_t const *const req, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -43,8 +42,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_inclusion_states_deserialize_request(serializer_t const *const s, char const *const obj,
-                                                        get_inclusion_states_req_t *const req) {
+retcode_t json_get_inclusion_states_deserialize_request(char const *const obj, get_inclusion_states_req_t *const req) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
@@ -66,8 +64,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_inclusion_states_serialize_response(serializer_t const *const s,
-                                                       get_inclusion_states_res_t const *const res,
+retcode_t json_get_inclusion_states_serialize_response(get_inclusion_states_res_t const *const res,
                                                        char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
@@ -95,8 +92,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_inclusion_states_deserialize_response(serializer_t const *const s, char const *const obj,
-                                                         get_inclusion_states_res_t *const res) {
+retcode_t json_get_inclusion_states_deserialize_response(char const *const obj, get_inclusion_states_res_t *const res) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;

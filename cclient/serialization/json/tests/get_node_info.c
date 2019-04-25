@@ -14,7 +14,7 @@ static void test_serialize_get_node_info_request(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
 
-  serializer.vtable.get_node_info_serialize_request(&serializer, serializer_out);
+  serializer.vtable.get_node_info_serialize_request(serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -46,7 +46,7 @@ static void test_deserialize_get_node_info_response(void) {
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   get_node_info_res_t* node_info = get_node_info_res_new();
 
-  serializer.vtable.get_node_info_deserialize_response(&serializer, json_text, node_info);
+  serializer.vtable.get_node_info_deserialize_response(json_text, node_info);
 
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_NAME, get_node_info_res_app_name(node_info));
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_VERSION, get_node_info_res_app_version(node_info));
@@ -73,7 +73,7 @@ static void test_deserialize_get_node_info_response(void) {
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, get_node_info_res_coordinator_address(node_info), FLEX_TRIT_SIZE_243);
 
-  serializer.vtable.get_node_info_serialize_response(&serializer, node_info, serializer_out);
+  serializer.vtable.get_node_info_serialize_response(node_info, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   get_node_info_res_free(&node_info);
