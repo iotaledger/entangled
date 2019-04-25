@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "utils/files.h"
 
 #define API_ENDPOINTS_NUM 16
 
@@ -37,7 +38,7 @@ typedef struct iota_api_conf_s {
   // Commands that should be ignored by API
   char* remote_limit_api[API_ENDPOINTS_NUM + 1];
   // Path of the tangle database file
-  char tangle_db_path[128];
+  char tangle_db_path[FILE_PATH_SIZE];
 } iota_api_conf_t;
 
 /**

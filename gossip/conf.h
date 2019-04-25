@@ -13,6 +13,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/trit_byte.h"
+#include "utils/files.h"
 
 #define DEFAULT_MWN MWM
 #define DEFAULT_NEIGHBORS NULL
@@ -69,7 +70,7 @@ typedef struct iota_gossip_conf_s {
   // Size of the requester queue
   size_t requester_queue_size;
   // Path of the tangle database file
-  char tangle_db_path[128];
+  char tangle_db_path[FILE_PATH_SIZE];
   // Scan the current tips and attempt to mark them as solid
   bool tips_solidifier_enabled;
 } iota_gossip_conf_t;

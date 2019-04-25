@@ -34,9 +34,9 @@ typedef struct iota_ciri_conf_s {
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
   // Path of the spent addresses database file
-  char spent_addresses_db_path[128];
+  char spent_addresses_db_path[FILE_PATH_SIZE];
   // Path of the tangle database file
-  char tangle_db_path[128];
+  char tangle_db_path[FILE_PATH_SIZE];
   // Reloads milestones, state of the ledger and transactions metadata from the tangle database
   bool tangle_db_revalidate;
 } iota_ciri_conf_t;

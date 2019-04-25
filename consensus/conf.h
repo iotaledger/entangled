@@ -12,6 +12,7 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "consensus/snapshot/local_snapshots/conf.h"
+#include "utils/files.h"
 
 #define IOTA_SUPPLY 2779530283277761LL
 
@@ -66,13 +67,13 @@ typedef struct iota_consensus_conf_s {
   // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
   // Path of the snapshot configuration file
-  char snapshot_conf_file[128];
+  char snapshot_conf_file[FILE_PATH_SIZE];
   // Path to the file that contains the state of the ledger at the last snapshot
-  char snapshot_file[128];
+  char snapshot_file[FILE_PATH_SIZE];
   // Depth of the snapshot signature
   uint64_t snapshot_signature_depth;
   // Path to the file that contains a signature for the snapshot file
-  char snapshot_signature_file[128];
+  char snapshot_signature_file[FILE_PATH_SIZE];
   // Index of the snapshot signature
   uint64_t snapshot_signature_index;
   // Public key of the snapshot signature
@@ -84,9 +85,9 @@ typedef struct iota_consensus_conf_s {
   // local snapshots configuration
   iota_consensus_local_snapshots_conf_t local_snapshots;
   // Path of the spent addresses database file
-  char spent_addresses_db_path[128];
+  char spent_addresses_db_path[FILE_PATH_SIZE];
   // Path of the tangle database file
-  char tangle_db_path[128];
+  char tangle_db_path[FILE_PATH_SIZE];
 } iota_consensus_conf_t;
 
 /**

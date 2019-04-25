@@ -28,7 +28,10 @@ cc_library(
     name = "conf",
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
-    deps = ["//common:errors"],
+    deps = [
+        "//common:errors",
+        "//utils:files",
+    ],
 )
 
 cc_library(

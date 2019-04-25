@@ -16,6 +16,7 @@ cc_library(
         "//common/crypto/sponge",
         "//common/trinary:flex_trit",
         "//consensus/snapshot/local_snapshots:conf",
+        "//utils:files",
         "//utils:logger_helper",
         "@cJSON",
     ],
