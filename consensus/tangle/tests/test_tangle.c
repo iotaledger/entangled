@@ -42,7 +42,42 @@ void test_find_tail(void) {
     TEST_ASSERT_EQUAL_MEMORY(expected_tail, tail, FLEX_TRIT_SIZE_243);
   }
 
+  transactions_free(txs, 4);
+}
+
+void test_find_tail_unknown_tx(void) {
+  iota_transaction_t *txs[4];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t tail[FLEX_TRIT_SIZE_243];
+  tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                                        TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  bool found = true;
+
+  transactions_deserialize(txs_trytes, txs, 4, true);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
+
   memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_tangle_find_tail(&tangle, hash, tail, &found) == RC_OK);
+  TEST_ASSERT_FALSE(found);
+
+  transactions_free(txs, 4);
+}
+
+void test_find_tail_broken_link(void) {
+  iota_transaction_t *txs[4];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t tail[FLEX_TRIT_SIZE_243];
+  tryte_t broken_link[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  memcpy(broken_link, TX_2_OF_4_VALUE_BUNDLE_TRYTES, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  broken_link[0] = '9';
+  tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, broken_link, TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                                        TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  bool found = true;
+
+  transactions_deserialize(txs_trytes, txs, 4, true);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
+
+  flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_4_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   TEST_ASSERT(iota_tangle_find_tail(&tangle, hash, tail, &found) == RC_OK);
   TEST_ASSERT_FALSE(found);
 
@@ -56,6 +91,8 @@ int main(void) {
   config.db_path = test_db_path;
 
   RUN_TEST(test_find_tail);
+  RUN_TEST(test_find_tail_unknown_tx);
+  RUN_TEST(test_find_tail_broken_link);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
