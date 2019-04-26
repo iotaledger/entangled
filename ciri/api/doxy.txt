@@ -6,8 +6,6 @@
  */
 
  /**
- * @defgroup ciri cIRI 
- * @brief IOTA Reference Implementation in C language.
- *
- * TODO
+ * @defgroup ciri_api cIRI API
+ * @brief The IOTA API implementation
  */
