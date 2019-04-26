@@ -28,11 +28,11 @@ static void test_store_transactions_serialize_request(void) {
 
   TEST_ASSERT(store_transactions_req_trytes_add(req, tx_trits) == RC_OK);
 
-  ret = serializer.vtable.store_transactions_serialize_request(&serializer, req, serializer_out);
+  ret = serializer.vtable.store_transactions_serialize_request(req, serializer_out);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
-  ret = serializer.vtable.store_transactions_deserialize_request(&serializer, serializer_out->data, req_de);
+  ret = serializer.vtable.store_transactions_deserialize_request(serializer_out->data, req_de);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
 
   TEST_ASSERT_EQUAL_INT(hash_array_len(req->trytes), hash_array_len(req_de->trytes));

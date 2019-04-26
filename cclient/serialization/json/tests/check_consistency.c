@@ -30,11 +30,11 @@ static void test_request(void) {
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(check_consistency_req_tails_add(req, trits_243) == RC_OK);
 
-  serializer.vtable.check_consistency_serialize_request(&serializer, req, serializer_out);
+  serializer.vtable.check_consistency_serialize_request(req, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
-  serializer.vtable.check_consistency_deserialize_request(&serializer, serializer_out->data, req_de);
+  serializer.vtable.check_consistency_deserialize_request(serializer_out->data, req_de);
 
   TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->tails), hash243_queue_count(req_de->tails));
   TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(&req->tails, 0), hash243_queue_at(&req_de->tails, 0), FLEX_TRIT_SIZE_243);
@@ -54,11 +54,11 @@ static void test_response(void) {
   check_consistency_res_t* res = check_consistency_res_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  serializer.vtable.check_consistency_deserialize_response(&serializer, json_true, res);
+  serializer.vtable.check_consistency_deserialize_response(json_true, res);
   TEST_ASSERT_TRUE(res->state == true);
   TEST_ASSERT_NULL(res->info);
 
-  serializer.vtable.check_consistency_serialize_response(&serializer, res, serializer_out);
+  serializer.vtable.check_consistency_serialize_response(res, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_true, serializer_out->data);
 
   char_buffer_free(serializer_out);
@@ -67,12 +67,12 @@ static void test_response(void) {
   check_consistency_res_free(&res);
   res = check_consistency_res_new();
 
-  serializer.vtable.check_consistency_deserialize_response(&serializer, json_false, res);
+  serializer.vtable.check_consistency_deserialize_response(json_false, res);
   TEST_ASSERT_TRUE(res->state == false);
   TEST_ASSERT_NOT_NULL(res->info);
   TEST_ASSERT_EQUAL_STRING(CONSISTENCY_INFO, res->info->data);
 
-  serializer.vtable.check_consistency_serialize_response(&serializer, res, serializer_out);
+  serializer.vtable.check_consistency_serialize_response(res, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_false, serializer_out->data);
 
   check_consistency_res_free(&res);

@@ -40,11 +40,11 @@ static void test_request(void) {
 
   attach_req->mwm = TEST_MWM;
 
-  serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req, serializer_out);
+  serializer.vtable.attach_to_tangle_serialize_request(attach_req, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
-  serializer.vtable.attach_to_tangle_deserialize_request(&serializer, serializer_out->data, attach_req_de);
+  serializer.vtable.attach_to_tangle_deserialize_request(serializer_out->data, attach_req_de);
 
   TEST_ASSERT_EQUAL_INT(TEST_MWM, attach_req_de->mwm);
   TEST_ASSERT_EQUAL_MEMORY(attach_req->trunk, attach_req_de->trunk, FLEX_TRIT_SIZE_243);
@@ -73,7 +73,7 @@ static void test_response(void) {
   attach_to_tangle_res_t* attach_res = attach_to_tangle_res_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  ret = serializer.vtable.attach_to_tangle_deserialize_response(&serializer, json_text, attach_res);
+  ret = serializer.vtable.attach_to_tangle_deserialize_response(json_text, attach_res);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
 
   tmp_hash = attach_to_tangle_res_trytes_at(attach_res, 0);
@@ -89,7 +89,7 @@ static void test_response(void) {
   tmp_hash = attach_to_tangle_res_trytes_at(attach_res, 3);
   TEST_ASSERT_NULL(tmp_hash);
 
-  ret = serializer.vtable.attach_to_tangle_serialize_response(&serializer, attach_res, serializer_out);
+  ret = serializer.vtable.attach_to_tangle_serialize_response(attach_res, serializer_out);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);

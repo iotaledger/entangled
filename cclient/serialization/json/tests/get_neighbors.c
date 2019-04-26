@@ -14,7 +14,7 @@ void test_get_neighbors_serialize_request(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
 
-  serializer.vtable.get_neighbors_serialize_request(&serializer, serializer_out);
+  serializer.vtable.get_neighbors_serialize_request(serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -57,7 +57,7 @@ void test_get_neighbors_serialize_response(void) {
       TEST_NEIGHBORS_NUMINVALIDTX2, TEST_NEIGHBORS_NUMSTALETX2, TEST_NEIGHBORS_NUMSENTTX2, TEST_NEIGHBORS_CONNNECTION2);
   TEST_ASSERT_EQUAL_INT8(RC_OK, ret);
 
-  serializer.vtable.get_neighbors_serialize_response(&serializer, res, out);
+  serializer.vtable.get_neighbors_serialize_response(res, out);
 
   TEST_ASSERT_EQUAL_STRING(TEST_JSON_TEXT, out->data);
 
@@ -89,7 +89,7 @@ void test_get_neighbors_deserialize_response(void) {
 
   get_neighbors_res_t* nbors = get_neighbors_res_new();
 
-  serializer.vtable.get_neighbors_deserialize_response(&serializer, json_text, nbors);
+  serializer.vtable.get_neighbors_deserialize_response(json_text, nbors);
 
   neighbor_info_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
   TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBORS_NEIGHBOR1, nb->address->data);
