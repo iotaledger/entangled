@@ -24,7 +24,7 @@ static char const *transactions_to_request = "transactionsToRequest";
 static char const *features = "features";
 static char const *coordinator_address = "coordinatorAddress";
 
-retcode_t json_get_node_info_serialize_request(serializer_t const *const s, char_buffer_t *out) {
+retcode_t json_get_node_info_serialize_request(char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *req_text = "{\"command\":\"getNodeInfo\"}";
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -32,8 +32,7 @@ retcode_t json_get_node_info_serialize_request(serializer_t const *const s, char
   return ret;
 }
 
-retcode_t json_get_node_info_serialize_response(serializer_t const *const s, get_node_info_res_t const *const obj,
-                                                char_buffer_t *out) {
+retcode_t json_get_node_info_serialize_response(get_node_info_res_t const *const obj, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -89,8 +88,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_node_info_deserialize_response(serializer_t const *const s, char const *const obj,
-                                                  get_node_info_res_t *out) {
+retcode_t json_get_node_info_deserialize_response(char const *const obj, get_node_info_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;

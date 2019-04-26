@@ -14,7 +14,7 @@ void test_get_tips_serialize_request(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
 
-  serializer.vtable.get_tips_serialize_request(&serializer, serializer_out);
+  serializer.vtable.get_tips_serialize_request(serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -45,7 +45,7 @@ void test_get_tips_serialize_response(void) {
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
 
-  serializer.vtable.get_tips_serialize_response(&serializer, res, out);
+  serializer.vtable.get_tips_serialize_response(res, out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, out->data);
 
@@ -68,7 +68,7 @@ void test_get_tips_deserialize_response(void) {
 
   get_tips_res_t* tips_res = get_tips_res_new();
 
-  serializer.vtable.get_tips_deserialize_response(&serializer, json_text, tips_res);
+  serializer.vtable.get_tips_deserialize_response(json_text, tips_res);
 
   hash243_stack_entry_t* hashes = tips_res->hashes;
 

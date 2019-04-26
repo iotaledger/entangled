@@ -19,7 +19,7 @@ retcode_t iota_client_find_transactions(iota_client_service_t const* const servi
     result = RC_CCLIENT_OOM;
     goto done;
   }
-  result = service->serializer.vtable.find_transactions_serialize_request(&service->serializer, req, req_buff);
+  result = service->serializer.vtable.find_transactions_serialize_request(req, req_buff);
   if (result != RC_OK) {
     goto done;
   }
@@ -30,7 +30,7 @@ retcode_t iota_client_find_transactions(iota_client_service_t const* const servi
     goto done;
   }
 
-  result = service->serializer.vtable.find_transactions_deserialize_response(&service->serializer, res_buff->data, res);
+  result = service->serializer.vtable.find_transactions_deserialize_response(res_buff->data, res);
 
 done:
   char_buffer_free(req_buff);

@@ -17,7 +17,7 @@ extern "C" {
 #include "cclient/response/error.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_error_serialize_response(serializer_t const *const s, error_res_t *const obj, char_buffer_t *out);
+retcode_t json_error_serialize_response(error_res_t *const obj, char_buffer_t *out);
 
 #ifdef __cplusplus
 }

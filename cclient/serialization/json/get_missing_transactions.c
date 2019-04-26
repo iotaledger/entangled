@@ -9,8 +9,7 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_missing_transactions_serialize_response(serializer_t const *const s,
-                                                           get_missing_transactions_res_t const *const res,
+retcode_t json_get_missing_transactions_serialize_response(get_missing_transactions_res_t const *const res,
                                                            char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
