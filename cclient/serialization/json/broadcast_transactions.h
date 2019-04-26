@@ -17,10 +17,9 @@ extern "C" {
 #include "cclient/request/broadcast_transactions.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_broadcast_transactions_serialize_request(const serializer_t *const s,
-                                                        broadcast_transactions_req_t *const req, char_buffer_t *out);
+retcode_t json_broadcast_transactions_serialize_request(broadcast_transactions_req_t *const req, char_buffer_t *out);
 
-retcode_t json_broadcast_transactions_deserialize_request(const serializer_t *const s, const char *const obj,
+retcode_t json_broadcast_transactions_deserialize_request(const char *const obj,
                                                           broadcast_transactions_req_t *const out);
 
 #ifdef __cplusplus

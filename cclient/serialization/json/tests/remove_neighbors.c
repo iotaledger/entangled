@@ -17,7 +17,7 @@ void test_remove_neighbors_serialize_request(void) {
   remove_neighbors_req_add(req, TEST_NEIGHBOR1);
   remove_neighbors_req_add(req, TEST_NEIGHBOR2);
 
-  serializer.vtable.remove_neighbors_serialize_request(&serializer, req, serializer_out);
+  serializer.vtable.remove_neighbors_serialize_request(req, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -33,7 +33,7 @@ void test_remove_neighbors_deserialize_request(void) {
   remove_neighbors_req_t* req = remove_neighbors_req_new();
   remove_neighbors_req_add(req, TEST_NEIGHBOR1);
   remove_neighbors_req_add(req, TEST_NEIGHBOR2);
-  serializer.vtable.remove_neighbors_deserialize_request(&serializer, json_text, req);
+  serializer.vtable.remove_neighbors_deserialize_request(json_text, req);
 
   TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBOR1, remove_neighbors_req_uris_at(req, 0));
   TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBOR2, remove_neighbors_req_uris_at(req, 1));
@@ -51,7 +51,7 @@ void test_remove_neighbors_serialize_response(void) {
 
   res->removed_neighbors = REMOVE_NEIGHBORS_RES;
 
-  serializer.vtable.remove_neighbors_serialize_response(&serializer, res, serializer_out);
+  serializer.vtable.remove_neighbors_serialize_response(res, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -66,7 +66,7 @@ void test_remove_neighbors_deserialize_response(void) {
 
   remove_neighbors_res_t* res = remove_neighbors_res_new();
 
-  serializer.vtable.remove_neighbors_deserialize_response(&serializer, json_text, res);
+  serializer.vtable.remove_neighbors_deserialize_response(json_text, res);
 
   TEST_ASSERT_EQUAL_INT(REMOVE_NEIGHBORS_RES, res->removed_neighbors);
 

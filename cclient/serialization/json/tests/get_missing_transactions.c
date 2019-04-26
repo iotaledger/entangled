@@ -31,7 +31,7 @@ void test_get_missing_transactions_serialize_response(void) {
                                      NUM_TRYTES_HASH));
   TEST_ASSERT(get_missing_transactions_res_hashes_add(res, trits_243) == RC_OK);
 
-  serializer.vtable.get_missing_transactions_serialize_response(&serializer, res, out);
+  serializer.vtable.get_missing_transactions_serialize_response(res, out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, out->data);
 

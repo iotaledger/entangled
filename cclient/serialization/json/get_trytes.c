@@ -9,8 +9,7 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_trytes_serialize_request(const serializer_t *const s, get_trytes_req_t const *const req,
-                                            char_buffer_t *out) {
+retcode_t json_get_trytes_serialize_request(get_trytes_req_t const *const req, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
 
@@ -39,8 +38,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_trytes_deserialize_request(serializer_t const *const s, char const *const obj,
-                                              get_trytes_req_t *const req) {
+retcode_t json_get_trytes_deserialize_request(char const *const obj, get_trytes_req_t *const req) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
@@ -54,8 +52,7 @@ retcode_t json_get_trytes_deserialize_request(serializer_t const *const s, char 
   return ret;
 }
 
-retcode_t json_get_trytes_serialize_response(serializer_t const *const s, get_trytes_res_t const *const res,
-                                             char_buffer_t *out) {
+retcode_t json_get_trytes_serialize_response(get_trytes_res_t const *const res, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
 
@@ -82,8 +79,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_trytes_deserialize_response(const serializer_t *const s, char const *const obj,
-                                               get_trytes_res_t *const res) {
+retcode_t json_get_trytes_deserialize_response(char const *const obj, get_trytes_res_t *const res) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;

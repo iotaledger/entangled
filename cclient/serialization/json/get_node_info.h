@@ -17,11 +17,9 @@ extern "C" {
 #include "cclient/response/get_node_info.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_get_node_info_serialize_request(serializer_t const* const s, char_buffer_t* out);
-retcode_t json_get_node_info_serialize_response(serializer_t const* const s, get_node_info_res_t const* const obj,
-                                                char_buffer_t* out);
-retcode_t json_get_node_info_deserialize_response(serializer_t const* const s, char const* const obj,
-                                                  get_node_info_res_t* const res);
+retcode_t json_get_node_info_serialize_request(char_buffer_t* out);
+retcode_t json_get_node_info_serialize_response(get_node_info_res_t const* const obj, char_buffer_t* out);
+retcode_t json_get_node_info_deserialize_response(char const* const obj, get_node_info_res_t* const res);
 
 #ifdef __cplusplus
 }

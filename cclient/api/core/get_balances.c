@@ -20,7 +20,7 @@ retcode_t iota_client_get_balances(iota_client_service_t const* const service, g
     goto done;
   }
 
-  result = service->serializer.vtable.get_balances_serialize_request(&service->serializer, req, req_buff);
+  result = service->serializer.vtable.get_balances_serialize_request(req, req_buff);
   if (result != RC_OK) {
     goto done;
   }
@@ -31,7 +31,7 @@ retcode_t iota_client_get_balances(iota_client_service_t const* const service, g
     goto done;
   }
 
-  result = service->serializer.vtable.get_balances_deserialize_response(&service->serializer, res_buff->data, res);
+  result = service->serializer.vtable.get_balances_deserialize_response(res_buff->data, res);
 
 done:
   char_buffer_free(req_buff);
