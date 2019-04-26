@@ -17,12 +17,12 @@ static void test_request(void) {
   TEST_ASSERT(add_neighbors_req_uris_add(req, TEST_NEIGHBOR1) == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, TEST_NEIGHBOR2) == RC_OK);
 
-  serializer.vtable.add_neighbors_serialize_request(&serializer, req, serializer_out);
+  serializer.vtable.add_neighbors_serialize_request(req, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
   add_neighbors_req_free(&req);
 
   req = add_neighbors_req_new();
-  serializer.vtable.add_neighbors_deserialize_request(&serializer, serializer_out->data, req);
+  serializer.vtable.add_neighbors_deserialize_request(serializer_out->data, req);
 
   TEST_ASSERT_EQUAL_INT(2, add_neighbors_req_uris_len(req));
   TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBOR1, add_neighbors_req_uris_at(req, 0));
@@ -40,10 +40,10 @@ static void test_response(void) {
   add_neighbors_res_t* res = add_neighbors_res_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  serializer.vtable.add_neighbors_deserialize_response(&serializer, json_text, res);
+  serializer.vtable.add_neighbors_deserialize_response(json_text, res);
   TEST_ASSERT_EQUAL_INT(ADD_NEIGHBORS_RES, res->added_neighbors);
 
-  serializer.vtable.add_neighbors_serialize_response(&serializer, res, serializer_out);
+  serializer.vtable.add_neighbors_serialize_response(res, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 

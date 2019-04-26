@@ -61,7 +61,7 @@ retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const servic
       goto done;
     }
 
-    result = service->serializer.vtable.attach_to_tangle_serialize_request(&service->serializer, req, req_buff);
+    result = service->serializer.vtable.attach_to_tangle_serialize_request(req, req_buff);
     if (result != RC_OK) {
       goto done;
     }
@@ -72,8 +72,7 @@ retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const servic
       goto done;
     }
 
-    result =
-        service->serializer.vtable.attach_to_tangle_deserialize_response(&service->serializer, res_buff->data, res);
+    result = service->serializer.vtable.attach_to_tangle_deserialize_response(res_buff->data, res);
   }
 
 done:

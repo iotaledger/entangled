@@ -28,11 +28,11 @@ static void test_request(void) {
 
   broadcast_transactions_req_trytes_add(req, tx_trits);
 
-  ret = serializer.vtable.broadcast_transactions_serialize_request(&serializer, req, serializer_out);
+  ret = serializer.vtable.broadcast_transactions_serialize_request(req, serializer_out);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
-  ret = serializer.vtable.broadcast_transactions_deserialize_request(&serializer, serializer_out->data, req_de);
+  ret = serializer.vtable.broadcast_transactions_deserialize_request(serializer_out->data, req_de);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
 
   TEST_ASSERT_EQUAL_INT(hash_array_len(req->trytes), hash_array_len(req_de->trytes));

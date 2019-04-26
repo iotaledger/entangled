@@ -19,7 +19,7 @@ retcode_t iota_client_store_transactions(const iota_client_service_t* const serv
     result = RC_CCLIENT_OOM;
     goto done;
   }
-  result = service->serializer.vtable.store_transactions_serialize_request(&service->serializer, req, req_buff);
+  result = service->serializer.vtable.store_transactions_serialize_request(req, req_buff);
   if (result != RC_OK) {
     goto done;
   }
