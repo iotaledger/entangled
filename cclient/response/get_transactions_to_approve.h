@@ -8,7 +8,7 @@
 #ifndef CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 #define CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 
-#include "cclient/types/types.h"
+#include "utils/types.h"
 
 #ifdef __cplusplus
 extern "C" {

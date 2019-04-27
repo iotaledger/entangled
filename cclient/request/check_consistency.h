@@ -17,7 +17,7 @@
 #ifndef CCLIENT_REQUEST_CHECK_CONSISTENCY_H
 #define CCLIENT_REQUEST_CHECK_CONSISTENCY_H
 
-#include "cclient/types/types.h"
+#include "utils/types.h"
 
 #ifdef __cplusplus
 extern "C" {

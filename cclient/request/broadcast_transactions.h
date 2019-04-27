@@ -17,7 +17,7 @@
 #ifndef CCLIENT_REQUEST_BROADCAST_TRANSACTIONS_H
 #define CCLIENT_REQUEST_BROADCAST_TRANSACTIONS_H
 
-#include "cclient/types/types.h"
+#include "utils/types.h"
 
 #ifdef __cplusplus
 extern "C" {

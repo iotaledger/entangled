@@ -17,7 +17,7 @@
 #ifndef CCLIENT_REQUEST_GET_TRYTES_H
 #define CCLIENT_REQUEST_GET_TRYTES_H
 
-#include "cclient/types/types.h"
+#include "utils/types.h"
 
 #ifdef __cplusplus
 extern "C" {

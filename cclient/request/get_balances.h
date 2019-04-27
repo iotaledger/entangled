@@ -17,7 +17,7 @@
 #ifndef CCLIENT_REQUEST_GET_BALANCES_H
 #define CCLIENT_REQUEST_GET_BALANCES_H
 
-#include "cclient/types/types.h"
+#include "utils/types.h"
 
 #ifdef __cplusplus
 extern "C" {

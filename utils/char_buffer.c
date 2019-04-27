@@ -5,18 +5,18 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "cclient/types/types.h"
+#include "utils/char_buffer.h"
 
-#define TYPES_LOGGER_ID "cclient/types"
+#define TYPES_LOGGER_ID "utils/char_buffer"
 
 static logger_id_t logger_id;
 
-void logger_init_types() {
+void logger_init_char_buffer() {
   logger_id = logger_helper_enable(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__, TYPES_LOGGER_ID);
 }
 
-void logger_destroy_types() {
+void logger_destroy_char_buffer() {
   log_info(logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__, TYPES_LOGGER_ID);
   logger_helper_release(logger_id);
 }

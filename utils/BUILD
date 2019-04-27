@@ -91,3 +91,38 @@ cc_library(
     hdrs = ["memset_safe.h"],
     deps = ["//common:errors"],
 )
+
+cc_library(
+    name = "types",
+    hdrs = ["types.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":char_buffer",
+        "//common:errors",
+        "//common/model:transaction",
+        "//common/trinary:trit_array",
+        "//common/trinary:tryte",
+        "//utils:logger_helper",
+        "//utils/containers/hash:hash243_queue",
+        "//utils/containers/hash:hash243_stack",
+        "//utils/containers/hash:hash8019_queue",
+        "//utils/containers/hash:hash8019_stack",
+        "//utils/containers/hash:hash81_queue",
+        "//utils/containers/hash:hash_array",
+    ],
+)
+
+cc_library(
+    name = "char_buffer",
+    srcs = [
+        "char_buffer.c",
+    ],
+    hdrs = [
+        "char_buffer.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//utils:logger_helper",
+    ],
+)

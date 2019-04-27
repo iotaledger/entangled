@@ -18,8 +18,8 @@ extern "C" {
 #include "cJSON.h"
 #include "utarray.h"
 
-#include "cclient/types/types.h"
 #include "common/errors.h"
+#include "utils/types.h"
 
 #define JSON_CHECK_ERROR(OBJ, ITEM, LOGGER)                                                               \
   do {                                                                                                    \
