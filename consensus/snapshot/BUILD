@@ -50,7 +50,6 @@ cc_library(
     name = "snapshots_provider",
     srcs = [
         "snapshots_provider.c",
-        "snapshots_provider.h",
     ],
     hdrs = ["snapshots_provider.h"],
     visibility = ["//visibility:public"],
@@ -63,8 +62,8 @@ cc_library(
     name = "snapshots_service",
     srcs = [
         "snapshots_service.c",
-        "snapshots_service.h",
     ],
+    hdrs = ["snapshots_service.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":snapshots_provider",
