@@ -57,6 +57,11 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
     cache->miss++;
   }
 
+  if ((cache->miss + cache->hit) % 1000 == 0) {
+    fprintf(stderr, "miss/hit %llu/%llu (%f%%)\n", cache->miss, cache->hit,
+            ((double)(cache->hit * 100.0)) / ((double)cache->miss + (double)cache->hit));
+  }
+
   rw_lock_handle_unlock(&cache->lock);
 
   return ret;
