@@ -12,8 +12,8 @@
 #include <stdint.h>
 
 #include "common/errors.h"
-#include "consensus/milestone_service/milestone_service.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_service.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/tangle/tangle.h"
 

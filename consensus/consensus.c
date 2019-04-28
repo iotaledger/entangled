@@ -129,8 +129,8 @@ retcode_t iota_consensus_start(iota_consensus_t *const consensus, tangle_t *cons
     return ret;
   }
 
-  log_info(logger_id, "Starting local snapshots manager\n");
   if (consensus->conf.local_snapshots.local_snapshots_is_enabled) {
+    log_info(logger_id, "Starting local snapshots manager\n");
     if ((ret = iota_local_snapshots_manager_start(&consensus->local_snapshots_manager)) != RC_OK) {
       log_critical(logger_id, "Starting local snapshots manager failed\n");
       return ret;

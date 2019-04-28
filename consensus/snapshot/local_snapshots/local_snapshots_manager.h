@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #include "consensus/conf.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/snapshot/snapshots_service.h"
 #include "consensus/tangle/tangle.h"

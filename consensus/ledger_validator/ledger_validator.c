@@ -11,7 +11,7 @@
 #include "common/model/milestone.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/utils/tangle_traversals.h"
 #include "utils/logger_helper.h"

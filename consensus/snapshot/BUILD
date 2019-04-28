@@ -70,8 +70,8 @@ cc_library(
         ":snapshots_provider",
         "//common:errors",
         "//consensus:conf",
-        "//consensus/milestone_service",
-        "//consensus/milestone_tracker",
+        "//consensus/milestone:milestone_service",
+        "//consensus/milestone:milestone_tracker",
         "//consensus/tangle",
     ],
 )

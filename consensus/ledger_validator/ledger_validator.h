@@ -10,7 +10,7 @@
 
 #include "common/errors.h"
 #include "consensus/conf.h"
-#include "consensus/milestone_service/milestone_service.h"
+#include "consensus/milestone/milestone_service.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/hash_indexed_map.h"

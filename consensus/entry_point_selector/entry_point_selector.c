@@ -9,7 +9,7 @@
 
 #include "common/model/milestone.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"

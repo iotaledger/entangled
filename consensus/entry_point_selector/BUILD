@@ -5,7 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//consensus/milestone_tracker",
+        "//consensus/milestone:milestone_tracker",
         "//utils:macros",
     ],
 )

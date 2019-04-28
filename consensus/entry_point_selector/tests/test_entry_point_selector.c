@@ -11,7 +11,7 @@
 #include "common/model/milestone.h"
 #include "common/model/tests/defs.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/test_utils/tangle.h"
 #include "utils/files.h"
