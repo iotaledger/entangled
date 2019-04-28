@@ -123,7 +123,7 @@ void test_util_create_bundle(flex_trit_t *const curr_branch_trunk_hash, iota_mil
   }
 }
 
-void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *const rhs) {
+static void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *const rhs) {
   // TODO - serialize index
   // TEST_ASSERT_EQUAL_INT64(lhs->index, rhs->index);
   TEST_ASSERT(state_delta_equal(lhs->state, rhs->state));
@@ -134,7 +134,7 @@ void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *const r
   TEST_ASSERT(hash_to_uint64_t_map_equal(lhs->metadata.solid_entry_points, rhs->metadata.solid_entry_points));
 }
 
-void test_replay_several_milestones() {
+static void test_replay_several_milestones() {
   iota_milestone_t milestone;
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
   size_t num_milestones = 10;
