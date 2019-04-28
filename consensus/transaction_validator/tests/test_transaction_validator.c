@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
   RUN_TEST(transaction_invalid_timestamp_too_futuristic);
   RUN_TEST(transaction_invalid_timestamp_too_old);
 
-  iota_snapshot_destroy(&snapshots_provider);
+  iota_snapshots_provider_destroy(&snapshots_provider);
 
   return UNITY_END();
 }

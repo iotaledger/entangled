@@ -55,7 +55,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t
     goto done;
   }
 
-  rw_lock_handle_rdlock(&tip_selector->milestone_tracker->snapshots_provider->latest_snapshot.rw_lock);
+  iota_snapshot_read_lock(&tip_selector->milestone_tracker->snapshots_provider->latest_snapshot);
 
   if ((ret = iota_consensus_entry_point_selector_get_entry_point(tip_selector->entry_point_selector, tangle, depth,
                                                                  ep_p)) != RC_OK) {
@@ -108,7 +108,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t
   }
 
 done:
-  rw_lock_handle_unlock(&tip_selector->milestone_tracker->snapshots_provider->latest_snapshot.rw_lock);
+  iota_snapshot_unlock(&tip_selector->milestone_tracker->snapshots_provider->latest_snapshot.rw_lock);
   cw_calc_result_destroy(&rating_results);
   hash243_stack_free(&tips_stack);
   if ((ret = iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator)) != RC_OK) {
