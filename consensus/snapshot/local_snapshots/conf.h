@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-// This structure contains all configuration variables needed to operate the
-// IOTA consensus
 typedef struct iota_consensus_local_snapshots_conf_s {
   bool local_snapshots_is_enabled;
   bool prunning_is_enabled;
