@@ -51,7 +51,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
 retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
 
 /**
- * Initializes a snapshot
+ * Builds a snapshot from a snapshot file
  *
  * @param snapshot The snapshot
  * @param conf Consensus configuration
@@ -61,7 +61,7 @@ retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t 
 retcode_t iota_snapshot_load_built_in_snapshot(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
 
 /**
- * Initializes a snapshot
+ * Loads snapshot from the local snapshot file
  *
  * @param snapshot The snapshot
  * @param conf Consensus configuration
