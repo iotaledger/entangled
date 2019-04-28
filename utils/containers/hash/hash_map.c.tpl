@@ -12,7 +12,7 @@ retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
                                   flex_trit_t const *const hash,
                                   {TYPE} value) {
   hash_to_{TYPE}_map_entry_t *map_entry = NULL;
-  
+
   HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, map_entry);
   if (map_entry == NULL){
     map_entry = (hash_to_{TYPE}_map_entry_t *)malloc(
