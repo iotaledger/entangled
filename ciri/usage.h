@@ -20,11 +20,13 @@ typedef enum cli_arg_value_e {
   // Gossip configuration
 
   CONF_MWM,
+  CONF_P_DROP_CACHE_ENTRY,
   CONF_P_PROPAGATE_REQUEST,
   CONF_P_REMOVE_REQUEST,
   CONF_P_REPLY_RANDOM_TIP,
   CONF_P_SELECT_MILESTONE,
   CONF_P_SEND_MILESTONE,
+  CONF_RECENT_SEEN_BYTES_CACHE_SIZE,
   CONF_REQUESTER_QUEUE_SIZE,
   CONF_TIPS_CACHE_SIZE,
   CONF_TIPS_SOLIDIFIER_ENABLED,
@@ -83,6 +85,9 @@ static struct cli_argument_s {
      "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
+    {"p-drop-cache-entry", CONF_P_DROP_CACHE_ENTRY,
+     "Probability of dropping recently seen transactions out of the network cache. Value must be in [0,1].",
+     REQUIRED_ARG},
     {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
      "Probability of propagating the request of a transaction to a neighbor "
      "node if it can't be found. This should be low since we don't want to "
@@ -106,6 +111,8 @@ static struct cli_argument_s {
      "random transaction to send to a neighbor. Value must be in [0,1].",
      REQUIRED_ARG},
     {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE, "Size of the transaction requester queue.", REQUIRED_ARG},
+    {"recent-seen-bytes-cache-size", CONF_RECENT_SEEN_BYTES_CACHE_SIZE,
+     "The number of entries to keep in the network cache.", REQUIRED_ARG},
     {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
     {"tips-cache-size", CONF_TIPS_CACHE_SIZE,
      "Size of the tips cache. Also bounds the number of tips returned by "

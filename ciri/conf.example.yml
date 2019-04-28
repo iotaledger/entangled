@@ -11,11 +11,13 @@
 
 # mwm: 14
 # neighbors: "udp://127.0.0.1:14600 tcp://127.0.0.1:15600"
+# p-drop-cache-entry: 0.02
 # p-propagate-request: 0.01
 # p-remove-request: 0.01
 # p-reply-random-tip: 0.66
 # p-select-milestone: 0.7
 # p-send-milestone: 0.02
+# recent-seen-bytes-cache-size: 1500
 # requester-queue-size: 10000
 # tcp-receiver-port: 15600
 # tips-cache-size: 5000

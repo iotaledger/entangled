@@ -122,8 +122,8 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing recent seen bytes cache\n");
-  // TODO conf
-  if ((ret = recent_seen_bytes_cache_init(&node->recent_seen_bytes, 1000, 0.25)) != RC_OK) {
+  if ((ret = recent_seen_bytes_cache_init(&node->recent_seen_bytes, node->conf.recent_seen_bytes_cache_size,
+                                          node->conf.p_drop_cache_entry)) != RC_OK) {
     log_error(logger_id, "Initializing recent seen bytes cache failed\n");
     return ret;
   }
