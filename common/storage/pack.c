@@ -23,13 +23,13 @@ retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
   pack->capacity *= resize_factor;
   pack->models = realloc(pack->models, sizeof(flex_trit_t *) * pack->capacity);
   if (pack->models == NULL) {
-    return RC_STORAGE_OOM;
+    return RC_OOM;
   }
 
   for (int i = 0; i < pack->capacity; ++i) {
     pack->models[i] = malloc(FLEX_TRIT_SIZE_243);
     if (pack->models[i] == NULL) {
-      return RC_STORAGE_OOM;
+      return RC_OOM;
     }
   }
 
@@ -42,13 +42,13 @@ retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size) {
   pack->insufficient_capacity = false;
   pack->models = malloc(sizeof(flex_trit_t *) * pack->capacity);
   if (pack->models == NULL) {
-    return RC_STORAGE_OOM;
+    return RC_OOM;
   }
 
   for (int i = 0; i < pack->capacity; ++i) {
     pack->models[i] = malloc(FLEX_TRIT_SIZE_243);
     if (pack->models[i] == NULL) {
-      return RC_STORAGE_OOM;
+      return RC_OOM;
     }
   }
 

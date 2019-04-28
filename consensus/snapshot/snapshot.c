@@ -80,7 +80,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
   retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
-    return RC_SNAPSHOT_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   logger_id = logger_helper_enable(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
@@ -117,7 +117,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
   retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
-    return RC_SNAPSHOT_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   state_delta_destroy(&snapshot->state);
@@ -141,12 +141,8 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot, flex_trit_t *con
   retcode_t ret = RC_OK;
   state_delta_entry_t *entry = NULL;
 
-  if (snapshot == NULL) {
-    return RC_SNAPSHOT_NULL_SELF;
-  } else if (hash == NULL) {
-    return RC_SNAPSHOT_NULL_HASH;
-  } else if (balance == NULL) {
-    return RC_SNAPSHOT_NULL_BALANCE;
+  if (snapshot == NULL || hash == NULL || balance == NULL) {
+    return RC_NULL_PARAM;
   }
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
@@ -166,7 +162,7 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot, state_delta_t *
   retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
-    return RC_SNAPSHOT_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   HASH_CLEAR(hh, *patch);
@@ -182,7 +178,7 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
   int64_t sum = 0;
 
   if (snapshot == NULL) {
-    return RC_SNAPSHOT_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   if ((sum = state_delta_sum(patch)) != 0) {

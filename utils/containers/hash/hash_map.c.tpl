@@ -16,7 +16,7 @@ retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
       sizeof(hash_to_{TYPE}_map_entry_t));
 
   if (map_entry == NULL) {
-    return RC_UTILS_OOM;
+    return RC_OOM;
   }
 
   memcpy(map_entry->hash, hash, FLEX_TRIT_SIZE_243);

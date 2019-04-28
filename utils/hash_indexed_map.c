@@ -44,7 +44,7 @@ retcode_t hash_to_indexed_hash_set_map_add_new_set(hash_to_indexed_hash_set_map_
                                                    size_t const index) {
   *new_set_entry = (hash_to_indexed_hash_set_entry_t *)malloc(sizeof(hash_to_indexed_hash_set_entry_t));
   if (*new_set_entry == NULL) {
-    return RC_UTILS_OOM;
+    return RC_OOM;
   }
 
   (*new_set_entry)->approvers = NULL;
