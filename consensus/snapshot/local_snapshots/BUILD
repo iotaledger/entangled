@@ -27,8 +27,8 @@ cc_library(
     name = "local_snapshots_manager",
     srcs = [
         "local_snapshots_manager.c",
-        "local_snapshots_manager.h",
     ],
+    hdrs = ["local_snapshots_manager.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":shared_local_snapshots",
