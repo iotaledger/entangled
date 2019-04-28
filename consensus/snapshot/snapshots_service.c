@@ -137,8 +137,8 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
                                                    snapshot_t *const snapshot) {
   retcode_t ret;
 
-  iota_snapshot_lock_read(&snapshots_service->snapshots_provider->inital_snapshot);
-  iota_snapshot_lock_read(&snapshots_service->snapshots_provider->latest_snapshot);
+  iota_snapshot_read_lock(&snapshots_service->snapshots_provider->inital_snapshot);
+  iota_snapshot_read_lock(&snapshots_service->snapshots_provider->latest_snapshot);
 
   if (target_milestone->index > snapshots_service->snapshots_provider->latest_snapshot.index) {
     log_error(logger_id, "Target milestone is not solid\n");
@@ -188,7 +188,7 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
   snapshots_service->snapshots_provider->latest_snapshot.index = snapshot->index;
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->latest_snapshot);*/
 
-  iota_snapshot_lock_write(&snapshots_service->snapshots_provider->inital_snapshot);
+  iota_snapshot_write_lock(&snapshots_service->snapshots_provider->inital_snapshot);
 
   ERR_BIND_GOTO(iota_snapshot_copy(snapshot, &snapshots_service->snapshots_provider->inital_snapshot), ret, cleanup);
 

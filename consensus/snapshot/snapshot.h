@@ -149,7 +149,7 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
  *
  * @return void
  */
-static inline void iota_snapshot_lock_write(snapshot_t *const snapshot) { rw_lock_handle_wrlock(&snapshot->rw_lock); }
+static inline void iota_snapshot_write_lock(snapshot_t *const snapshot) { rw_lock_handle_wrlock(&snapshot->rw_lock); }
 
 /**
  * Locks snapshot for read
@@ -158,7 +158,7 @@ static inline void iota_snapshot_lock_write(snapshot_t *const snapshot) { rw_loc
  *
  * @return void
  */
-static inline void iota_snapshot_lock_read(snapshot_t *const snapshot) { rw_lock_handle_rdlock(&snapshot->rw_lock); }
+static inline void iota_snapshot_read_lock(snapshot_t *const snapshot) { rw_lock_handle_rdlock(&snapshot->rw_lock); }
 
 /**
  * Unlocks snapshot

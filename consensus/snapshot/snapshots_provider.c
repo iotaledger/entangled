@@ -37,7 +37,7 @@ retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshots_provider_t *c
                                                          snapshot_t const *const snapshot,
                                                          char const *const file_path_base) {
   retcode_t ret;
-  iota_snapshot_lock_read(snapshot);
+  iota_snapshot_read_lock(snapshot);
 
   ERR_BIND_GOTO(iota_snapshot_write_to_file(snapshot, file_path_base), ret, cleanup);
 
