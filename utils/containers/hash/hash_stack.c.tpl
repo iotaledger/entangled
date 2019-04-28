@@ -13,7 +13,7 @@ retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t * const stack, flex_trit_t co
   hash{SIZE}_stack_entry_t *entry = NULL;
 
   if ((entry = (hash{SIZE}_stack_entry_t *)malloc(sizeof(hash{SIZE}_stack_entry_t))) == NULL) {
-    return RC_UTILS_OOM;
+    return RC_OOM;
   }
 
   memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});

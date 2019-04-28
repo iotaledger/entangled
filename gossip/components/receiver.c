@@ -16,10 +16,8 @@
 static logger_id_t logger_id;
 
 retcode_t receiver_init(receiver_state_t *const state, node_t *const node, uint16_t tcp_port, uint16_t udp_port) {
-  if (state == NULL) {
-    return RC_RECEIVER_COMPONENT_NULL_STATE;
-  } else if (node == NULL) {
-    return RC_RECEIVER_COMPONENT_NULL_NODE;
+  if (state == NULL || node == NULL) {
+    return RC_NULL_PARAM;
   }
 
   logger_id = logger_helper_enable(RECEIVER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
@@ -43,7 +41,7 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node, uint1
 
 retcode_t receiver_start(receiver_state_t *const state) {
   if (state == NULL) {
-    return RC_RECEIVER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   state->running = true;
@@ -52,7 +50,7 @@ retcode_t receiver_start(receiver_state_t *const state) {
     if (thread_handle_create(&state->tcp_service.thread, (thread_routine_t)receiver_service_start,
                              &state->tcp_service) != 0) {
       log_critical(logger_id, "Spawning TCP receiver thread failed\n");
-      return RC_RECEIVER_COMPONENT_FAILED_THREAD_SPAWN;
+      return RC_FAILED_THREAD_SPAWN;
     }
   }
   if (state->udp_service.port != 0) {
@@ -60,7 +58,7 @@ retcode_t receiver_start(receiver_state_t *const state) {
     if (thread_handle_create(&state->udp_service.thread, (thread_routine_t)receiver_service_start,
                              &state->udp_service) != 0) {
       log_critical(logger_id, "Spawning UDP receiver thread failed\n");
-      return RC_RECEIVER_COMPONENT_FAILED_THREAD_SPAWN;
+      return RC_FAILED_THREAD_SPAWN;
     }
   }
   return RC_OK;
@@ -70,7 +68,7 @@ retcode_t receiver_stop(receiver_state_t *const state) {
   retcode_t ret = RC_OK;
 
   if (state == NULL) {
-    return RC_RECEIVER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   } else if (state->running == false) {
     return RC_OK;
   }
@@ -79,21 +77,21 @@ retcode_t receiver_stop(receiver_state_t *const state) {
   log_info(logger_id, "Shutting down TCP receiver thread\n");
   if (receiver_service_stop(&state->tcp_service) == false || thread_handle_join(state->tcp_service.thread, NULL) != 0) {
     log_error(logger_id, "Shutting down TCP receiver thread failed\n");
-    ret = RC_RECEIVER_COMPONENT_FAILED_THREAD_JOIN;
+    ret = RC_FAILED_THREAD_JOIN;
   }
   log_info(logger_id, "Shutting down UDP receiver thread\n");
   if (receiver_service_stop(&state->udp_service) == false || thread_handle_join(state->udp_service.thread, NULL) != 0) {
     log_error(logger_id, "Shutting down UDP receiver thread failed\n");
-    ret = RC_RECEIVER_COMPONENT_FAILED_THREAD_JOIN;
+    ret = RC_FAILED_THREAD_JOIN;
   }
   return ret;
 }
 
 retcode_t receiver_destroy(receiver_state_t *const state) {
   if (state == NULL) {
-    return RC_RECEIVER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   } else if (state->running) {
-    return RC_RECEIVER_COMPONENT_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   logger_helper_release(logger_id);
