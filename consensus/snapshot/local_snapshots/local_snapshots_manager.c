@@ -94,9 +94,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
   cond_handle_init(&lsm->cond_local_snapshots);
 
   connection_config_t db_conf = {.db_path = lsm->conf->db_path};
-  if (strcmp(db_conf.db_path, "") != 0) {
-    ERR_BIND_RETURN(iota_tangle_init(&lsm->tangle, &db_conf), err);
-  }
+  ERR_BIND_RETURN(iota_tangle_init(&lsm->tangle, &db_conf), err);
 
   return RC_OK;
 }
