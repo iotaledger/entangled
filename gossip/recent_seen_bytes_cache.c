@@ -16,8 +16,8 @@ retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, s
 
   cache->capacity = capacity;
   cache->drop_rate = drop_rate;
-  cache->miss_count = 0;
-  cache->hit_count = 0;
+  cache->miss = 0;
+  cache->hit = 0;
   rw_lock_handle_init(&cache->lock);
 
   return uint64_t_to_flex_trit_t_map_init(&cache->map, sizeof(uint64_t), FLEX_TRIT_SIZE_243);
@@ -28,10 +28,9 @@ retcode_t recent_seen_bytes_cache_destroy(recent_seen_bytes_cache_t *const cache
     return RC_NULL_PARAM;
   }
 
-  uint64_t_to_flex_trit_t_map_free(&cache->map);
   rw_lock_handle_destroy(&cache->lock);
 
-  return RC_OK;
+  return uint64_t_to_flex_trit_t_map_free(&cache->map);
 }
 
 retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, uint64_t const digest,
@@ -47,11 +46,15 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
 
   if ((*found = uint64_t_to_flex_trit_t_map_find(&cache->map, &digest, &entry))) {
     if (rand_handle_probability() < cache->drop_rate) {
-      ret = uint64_t_to_flex_trit_t_map_remove(&cache->map, &digest);
+      ret = uint64_t_to_flex_trit_t_map_remove_entry(&cache->map, entry);
       *found = false;
+      cache->miss++;
     } else {
       memcpy(hash, entry->value, FLEX_TRIT_SIZE_243);
+      cache->hit++;
     }
+  } else {
+    cache->miss++;
   }
 
   rw_lock_handle_unlock(&cache->lock);
