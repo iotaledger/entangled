@@ -19,10 +19,9 @@ extern "C" {
 #endif
 
 typedef struct snapshots_provider_s {
-  // This snapshot is an entry point and it's always updated with the last snapshot after its being persisted
+  // This snapshot is an entry point and it's always updated with the last snapshot after being persisted
   snapshot_t inital_snapshot;
   snapshot_t latest_snapshot;
-  iota_consensus_conf_t conf;
 } snapshots_provider_t;
 
 /**
