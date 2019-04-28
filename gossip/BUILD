@@ -87,7 +87,7 @@ cc_library(
     srcs = ["recent_seen_bytes_cache.c"],
     hdrs = ["recent_seen_bytes_cache.h"],
     deps = [
-        ":conf",
+        ":iota_packet",
         ":uint64_t_to_flex_trit_t_map",
         "//common:errors",
         "//common/trinary:flex_trit",
