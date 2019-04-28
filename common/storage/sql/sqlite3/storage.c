@@ -934,8 +934,7 @@ retcode_t iota_stor_milestone_load_next(storage_connection_t const* const connec
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_by_index;
 
-  if ((sqlite3_bind_int(sqlite_statement, 1, index) != SQLITE_OK) ||
-      (sqlite3_bind_int(sqlite_statement, 2, 1) != SQLITE_OK)) {
+  if (sqlite3_bind_int(sqlite_statement, 1, index + 1) != SQLITE_OK) {
     ret = RC_SQLITE3_FAILED_BINDING;
     goto done;
   }
@@ -955,8 +954,7 @@ retcode_t iota_stor_milestone_load_previous(storage_connection_t const* const co
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_by_index;
 
-  if ((sqlite3_bind_int(sqlite_statement, 1, index) != SQLITE_OK) ||
-      (sqlite3_bind_int(sqlite_statement, 2, -1) != SQLITE_OK)) {
+  if (sqlite3_bind_int(sqlite_statement, 1, index - 1) != SQLITE_OK) {
     ret = RC_SQLITE3_FAILED_BINDING;
     goto done;
   }
