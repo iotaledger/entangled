@@ -259,7 +259,7 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
     return RC_API_GET_BALANCES_INVALID_THRESHOLD;
   }
 
-  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.rw_lock);
+  iota_snapshot_read_lock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
 
   res->milestone_index =
       iota_snapshot_get_index(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
@@ -340,7 +340,7 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
   }
 
 done:
-  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.rw_lock);
+  iota_snapshot_unlock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
   if (tips != req->tips) {
     hash243_queue_free(&tips);
   }
