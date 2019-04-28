@@ -66,9 +66,7 @@ retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
 
   connection_config_t db_conf = {.db_path = snapshots_service->conf->db_path};
 
-  if (strcmp(db_conf.db_path, "") != 0) {
-    ERR_BIND_RETURN(iota_tangle_init(&snapshots_service->tangle, &db_conf), ret);
-  }
+  ERR_BIND_RETURN(iota_tangle_init(&snapshots_service->tangle, &db_conf), ret);
 
   return RC_OK;
 }

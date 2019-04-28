@@ -178,6 +178,9 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
 
   conf->coordinator_max_milestone_index = 1 << conf->coordinator_depth;
 
+  ERR_BIND_GOTO(iota_consensus_local_snapshots_conf_init(&conf->local_snapshots), ret, cleanup);
+
+cleanup:
   logger_helper_release(logger_id);
 
   return ret;
