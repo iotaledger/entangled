@@ -33,8 +33,7 @@ retcode_t iota_snapshots_provider_destroy(snapshots_provider_t *const snapshots_
   return RC_OK;
 }
 
-retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshots_provider_t *const snapshots_provider,
-                                                         snapshot_t const *const snapshot,
+retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshot_t const *const snapshot,
                                                          char const *const file_path_base) {
   retcode_t ret;
   iota_snapshot_read_lock(snapshot);
