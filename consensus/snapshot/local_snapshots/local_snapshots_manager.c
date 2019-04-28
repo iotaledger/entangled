@@ -77,7 +77,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
                                             iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt) {
   retcode_t err;
   if (lsm == NULL) {
-    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   if (mt == NULL) {
@@ -104,7 +104,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
   retcode_t err;
   if (lsm == NULL) {
-    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   lsm->running = true;
@@ -115,7 +115,7 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
   log_info(logger_id, "Spawning local snapshots manager thread\n");
   if (thread_handle_create(&lsm->local_snapshots_thread, (thread_routine_t)local_snapshots_manager_routine, lsm) != 0) {
     log_critical(logger_id, "Spawning local snapshots manager thread failed\n");
-    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_FAILED_THREAD_SPAWN;
+    return RC_FAILED_THREAD_SPAWN;
   }
 
   return RC_OK;
@@ -125,7 +125,7 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   retcode_t ret = RC_OK;
 
   if (lsm == NULL) {
-    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
+    return RC_NULL_PARAM;
   } else if (lsm->running == false) {
     return RC_OK;
   }
@@ -135,7 +135,7 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   log_info(logger_id, "Shutting down local snapshots manager thread\n");
   if (thread_handle_join(lsm->local_snapshots_thread, NULL) != 0) {
     log_error(logger_id, "Shutting down local snapshots manager thread failed\n");
-    ret = RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_FAILED_THREAD_JOIN;
+    ret = RC_FAILED_THREAD_JOIN;
   }
 
   return ret;
@@ -145,9 +145,9 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
   retcode_t ret = RC_OK;
 
   if (lsm == NULL) {
-    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
+    return RC_NULL_PARAM;
   } else if (lsm->running) {
-    return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   if (iota_tangle_destroy(&lsm->tangle) != RC_OK) {
