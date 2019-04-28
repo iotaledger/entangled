@@ -19,7 +19,6 @@ extern "C" {
 #endif
 
 typedef struct snapshot_metadata_s {
-  // Maps a transaction's hash to it's snapshot index
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   uint64_t index;
   uint64_t timestamp;
