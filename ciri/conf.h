@@ -13,7 +13,6 @@
 #include "ciri/api/conf.h"
 #include "common/errors.h"
 #include "consensus/conf.h"
-#include "consensus/snapshot/local_snapshots/conf.h"
 #include "gossip/conf.h"
 #include "utils/logger_helper.h"
 
