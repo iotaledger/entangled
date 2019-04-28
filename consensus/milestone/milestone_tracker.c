@@ -13,7 +13,7 @@
 #include "common/trinary/trit_long.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"

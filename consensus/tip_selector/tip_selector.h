@@ -19,7 +19,7 @@
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 

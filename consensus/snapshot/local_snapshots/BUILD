@@ -16,7 +16,7 @@ cc_library(
         ":conf",
         "//common:errors",
         "//consensus:conf",
-        "//consensus/milestone_tracker",
+        "//consensus/milestone:milestone_tracker",
         "//utils/handles:cond",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",

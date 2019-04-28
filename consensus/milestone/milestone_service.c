@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/milestone_service/milestone_service.h"
+#include "consensus/milestone/milestone_service.h"
 #include <inttypes.h>
 #include <stdlib.h>
 #include "common/model/milestone.h"

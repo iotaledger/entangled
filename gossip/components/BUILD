@@ -42,7 +42,7 @@ cc_library(
         ":processor_shared",
         "//common/crypto/curl-p:ptrit",
         "//common/trinary:trit_ptrit",
-        "//consensus/milestone_tracker",
+        "//consensus/milestone:milestone_tracker",
         "//consensus/transaction_solidifier",
         "//gossip:neighbor",
         "//gossip:node_shared",
