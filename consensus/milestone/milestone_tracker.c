@@ -451,6 +451,11 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, fl
     return RC_NULL_PARAM;
   }
 
+  // If the milestone is in the solid entry points map, that means it was already validated
+  if (hash_to_uint64_t_map_contains(&mt->snapshots_provider->inital_snapshot.metadata.solid_entry_points, hash)) {
+    return RC_OK;
+  }
+
   rw_lock_handle_wrlock(&mt->candidates_lock);
   ret = hash243_queue_push(&mt->candidates, hash);
   rw_lock_handle_unlock(&mt->candidates_lock);
