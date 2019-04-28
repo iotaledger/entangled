@@ -180,8 +180,7 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
   retcode_t ret;
 
   ERR_BIND_GOTO(iota_snapshots_provider_write_snapshot_to_file(
-                    snapshots_service->snapshots_provider, snapshot,
-                    snapshots_service->conf->local_snapshots.local_snapshots_path_base),
+                    snapshot, snapshots_service->conf->local_snapshots.local_snapshots_path_base),
                 ret, cleanup);
 
   /*iota_snapshot_lock_write(&snapshots_service->snapshots_provider->latest_snapshot);
