@@ -319,16 +319,16 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_LOCAL_SNAPSHOTS_ENABLED:
       ret = get_true_false(value, &consensus_conf->local_snapshots.local_snapshots_is_enabled);
       break;
-    case CONF_PRUNNING_ENABLED:
+    case CONF_LOCAL_SNAPSHOTS_PRUNNING_ENABLED:
       ret = get_true_false(value, &consensus_conf->local_snapshots.prunning_is_enabled);
       break;
-    case CONF_TRANSACTIONS_GROWTH_THRESHOLD:
+    case CONF_LOCAL_SNAPSHOTS_TRANSACTIONS_GROWTH_THRESHOLD:
       consensus_conf->local_snapshots.transactions_growth_threshold = atoi(value);
       break;
-    case CONF_LOCAL_SNAPSHOT_MIN_DEPTH:
+    case CONF_LOCAL_SNAPSHOTS_MIN_DEPTH:
       consensus_conf->local_snapshots.min_depth = atoi(value);
       break;
-    case CONF_LOCAL_SNAPSHOT_PATH_BASE:
+    case CONF_LOCAL_SNAPSHOTS_PATH_BASE:
       strncpy(consensus_conf->local_snapshots.local_snapshots_path_base, value,
               sizeof(consensus_conf->local_snapshots.local_snapshots_path_base));
       break;
