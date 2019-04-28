@@ -182,7 +182,7 @@ char *iota_statement_milestone_select_last =
     " DESC LIMIT 1";
 
 char *iota_statement_milestone_select_by_index = "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
-                                                 " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=(?+?)";
+                                                 " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=?";
 
 char *iota_statement_milestone_exist =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
