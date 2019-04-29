@@ -129,6 +129,9 @@ retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_que
 retcode_t iota_tangle_bundle_update_validity(tangle_t const *const tangle, bundle_transactions_t const *const bundle,
                                              bundle_status_t const status);
 
+retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t const *const tail_hash,
+                                  bundle_transactions_t *const bundle);
+
 /*
  * Milestone operations
  */
