@@ -203,19 +203,24 @@ size_t state_delta_serialized_str_size(state_delta_t const delta) {
 
 retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) {
   state_delta_entry_t *iter = NULL, *tmp = NULL;
-
   tryte_t address_trytes[NUM_TRYTES_ADDRESS];
   char svalue[MAX_CHARS_UINT64];
+  uint32_t offset = 0;
+  uint32_t value_len;
 
   HASH_ITER(hh, delta, iter, tmp) {
     if (flex_trits_to_trytes(&address_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS) !=
         NUM_TRITS_ADDRESS) {
       return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
     }
-    strncat(str, (char *)address_trytes, NUM_TRYTES_ADDRESS);
-    strncat(str, ";", 1);
+    memcpy(str + offset, (char *)address_trytes, NUM_TRYTES_ADDRESS);
+    offset += NUM_TRYTES_ADDRESS;
+    memcpy(str + offset, ";", 1);
+    offset += 1;
     sprintf(svalue, "%" PRId64 "\n", iter->value);
-    strcat(str, svalue);
+    value_len = strlen(svalue);
+    memcpy(str + offset, svalue, value_len);
+    offset += value_len;
   }
 
   return RC_OK;
