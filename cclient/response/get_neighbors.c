@@ -33,13 +33,13 @@ get_neighbors_res_t* get_neighbors_res_new() {
   return nbors;
 }
 
-void get_neighbors_res_free(get_neighbors_res_t* nbors) { utarray_free(nbors); }
+void get_neighbors_res_free(get_neighbors_res_t* res) { utarray_free(res); }
 
-retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors, char const* const addr, uint32_t all_trans_num,
+retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* res, char const* const addr, uint32_t all_trans_num,
                                          uint32_t random_trans_req_num, uint32_t new_trans_num,
                                          uint32_t invalid_trans_num, uint32_t stale_trans_num, uint32_t sent_trans_num,
                                          char const* const connection_type) {
-  if (!nbors) {
+  if (!res) {
     return RC_NULL_PARAM;
   }
 
@@ -57,17 +57,17 @@ retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors, char const*
   char_buffer_set(nb.address, addr);
   char_buffer_set(nb.connection_type, connection_type);
 
-  utarray_push_back(nbors, &nb);
+  utarray_push_back(res, &nb);
   return RC_OK;
 }
 
-neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors, int index) {
-  if (!nbors) {
+neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, int index) {
+  if (!res) {
     return NULL;
   }
-  if (utarray_len(nbors) > index) {
+  if (utarray_len(res) > index) {
     neighbor_info_t* p = NULL;
-    p = (neighbor_info_t*)utarray_eltptr(nbors, index);
+    p = (neighbor_info_t*)utarray_eltptr(res, index);
     if (p) {
       return p;
     }
@@ -75,10 +75,10 @@ neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors, int i
   return NULL;
 }
 
-void get_neighbors_res_dump(get_neighbors_res_t* nbors) {
-  printf("neighbors %d\n", utarray_len(nbors));
+void get_neighbors_res_dump(get_neighbors_res_t* res) {
+  printf("neighbors %d\n", utarray_len(res));
   neighbor_info_t* nb = NULL;
-  for (nb = (neighbor_info_t*)utarray_front(nbors); nb != NULL; nb = (neighbor_info_t*)utarray_next(nbors, nb)) {
+  for (nb = (neighbor_info_t*)utarray_front(res); nb != NULL; nb = (neighbor_info_t*)utarray_next(res, nb)) {
     printf("index at %p\n", nb);
 
     printf(

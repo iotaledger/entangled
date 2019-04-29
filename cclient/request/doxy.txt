@@ -7,7 +7,7 @@
 
  /**
  * @defgroup request Requests
- * @brief The request object provides read/write methods to the request.
+ * @brief The request objects provide read/write methods for the API requests.
  *
  * Request data structures:
  * - #add_neighbors_req_t
