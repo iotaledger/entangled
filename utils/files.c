@@ -122,7 +122,7 @@ cleanup:
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
   FILE *fp = fopen(file_path, "r");
   long buffer_size;
-  size_t content_length;
+  size_t offset = 0;
 
   if (fp != NULL) {
     /* Go to the end of the file. */
@@ -142,12 +142,14 @@ retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **c
       }
 
       /* Read the entire file into memory. */
-      content_length = fread(*buffer, sizeof(char), buffer_size, fp);
-      if (ferror(fp) != 0) {
-        return RC_UTILS_FAILED_READ_FILE;
-      } else {
-        (*buffer)[content_length++] = '\0'; /* Just to be safe. */
+      while (offset < buffer_size) {
+        offset += fread(*(buffer + offset), sizeof(char), buffer_size, fp);
+        if (ferror(fp) != 0) {
+          return RC_UTILS_FAILED_READ_FILE;
+        }
       }
+
+      (*buffer)[offset++] = '\0'; /* Just to be safe. */
     }
     fclose(fp);
   } else {
