@@ -34,23 +34,21 @@ static logger_id_t logger_id;
  * @param tangle A tangle
  * @param neighbor The neighbor that sent the packet
  * @param packet The packet from which to process transaction bytes
- * @param curl_hash The CurlP81 hash of the transaction
+ * @param hash The transaction hash
  *
  * @return a status code
  */
 static retcode_t process_transaction_bytes(processor_t const *const processor, tangle_t *const tangle,
                                            neighbor_t *const neighbor, iota_packet_t const *const packet,
-                                           flex_trit_t const *const curl_hash) {
+                                           flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   bool exists = false;
   iota_transaction_t transaction = {.metadata.snapshot_index = 0, .metadata.solid = 0, .loaded_columns_mask = 0};
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
-  if (processor == NULL || neighbor == NULL || packet == NULL || curl_hash == NULL) {
+  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
-
-  // TODO Check if transaction hash is cached
 
   // Retreives the transaction from the packet
   if (flex_trits_from_bytes(transaction_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
@@ -68,7 +66,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
     ret = RC_PROCESSOR_INVALID_TRANSACTION;
     goto failure;
   }
-  transaction_set_hash(&transaction, curl_hash);
+  transaction_set_hash(&transaction, hash);
 
   // Validates the transaction
   if (!iota_consensus_transaction_validate(processor->transaction_validator, &transaction)) {
@@ -76,10 +74,8 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
     goto failure;
   }
 
-  // TODO Add transaction hash to cache
-
   // Checks if the transaction is already persisted
-  if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, curl_hash, &exists)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, hash, &exists)) != RC_OK) {
     log_warning(logger_id, "Checking if transaction exists failed\n");
     goto failure;
   }
@@ -177,7 +173,8 @@ static retcode_t process_request_bytes(processor_t const *const processor, neigh
  * @return a status code
  */
 static retcode_t process_packet(processor_t const *const processor, tangle_t *const tangle,
-                                iota_packet_t const *const packet, flex_trit_t const *const hash) {
+                                iota_packet_t const *const packet, flex_trit_t const *const hash, bool const cached,
+                                uint64_t const digest) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
   char *protocol = NULL;
@@ -196,10 +193,13 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
               neighbor->endpoint.port);
     neighbor->nbr_all_txs++;
 
-    log_debug(logger_id, "Processing transaction bytes\n");
-    if ((ret = process_transaction_bytes(processor, tangle, neighbor, packet, hash)) != RC_OK) {
-      log_warning(logger_id, "Processing transaction bytes failed\n");
-      goto done;
+    if (!cached) {
+      log_debug(logger_id, "Processing transaction bytes\n");
+      if ((ret = process_transaction_bytes(processor, tangle, neighbor, packet, hash)) != RC_OK) {
+        log_warning(logger_id, "Processing transaction bytes failed\n");
+        goto done;
+      }
+      recent_seen_bytes_cache_put(&processor->node->recent_seen_bytes, digest, hash);
     }
 
     log_debug(logger_id, "Processing request bytes\n");
@@ -217,6 +217,11 @@ done:
   rw_lock_handle_unlock(&processor->node->neighbors_lock);
   return ret;
 }
+
+typedef struct packet_digest_s {
+  iota_packet_t packet;
+  uint64_t digest;
+} packet_digest_t;
 
 /**
  * Continuously looks for a packet from a processor packet queue and process it.
@@ -240,7 +245,7 @@ static void *processor_routine(processor_t *const processor) {
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
   iota_packet_t *packet_ptr = NULL;
-  iota_packet_t *packets = (iota_packet_t *)calloc(PACKET_MAX, sizeof(iota_packet_t));
+  packet_digest_t *packets = (packet_digest_t *)calloc(PACKET_MAX, sizeof(packet_digest_t));
 
   trit_t *tx = (trit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
   trit_t *hash = (trit_t *)calloc(HASH_LENGTH_TRIT, sizeof(trit_t));
@@ -251,6 +256,8 @@ static void *processor_routine(processor_t *const processor) {
   ptrit_t *txs_acc = (ptrit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(ptrit_t));
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
+  uint64_t digest = 0;
+  bool digest_found = false;
 
   lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
@@ -262,16 +269,26 @@ static void *processor_routine(processor_t *const processor) {
     }
 
     rw_lock_handle_wrlock(&processor->lock);
-    for (packet_cnt = 0; packet_cnt < PACKET_MAX; packet_cnt++) {
+    packet_cnt = 0;
+    while (packet_cnt < PACKET_MAX) {
       packet_ptr = iota_packet_queue_peek(processor->queue);
       if (packet_ptr == NULL) {
-        goto process_packets;
+        break;
       }
-      packets[packet_cnt] = *packet_ptr;
+      recent_seen_bytes_cache_hash(packet_ptr->content, &digest);
+      recent_seen_bytes_cache_get(&processor->node->recent_seen_bytes, digest, flex_hash, &digest_found);
+      if (digest_found) {
+        if (process_packet(processor, &tangle, packet_ptr, flex_hash, true, digest) != RC_OK) {
+          log_warning(logger_id, "Processing packet failed\n");
+        }
+      } else {
+        packets[packet_cnt].packet = *packet_ptr;
+        packets[packet_cnt].digest = digest;
+        packet_cnt++;
+      }
       iota_packet_queue_pop(&processor->queue);
     }
 
-  process_packets:
     rw_lock_handle_unlock(&processor->lock);
 
     if (packet_cnt == 0) {
@@ -283,7 +300,7 @@ static void *processor_routine(processor_t *const processor) {
     memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(packets[j].content, PACKET_TX_SIZE, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
+      bytes_to_trits(packets[j].packet.content, PACKET_TX_SIZE, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
     }
 
@@ -294,7 +311,7 @@ static void *processor_routine(processor_t *const processor) {
       ptrits_to_trits(txs_acc, hash, j, HASH_LENGTH_TRIT);
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
-      if (process_packet(processor, &tangle, &packets[j], flex_hash) != RC_OK) {
+      if (process_packet(processor, &tangle, &packets[j].packet, flex_hash, false, packets[j].digest) != RC_OK) {
         log_warning(logger_id, "Processing packet failed\n");
       }
     }
