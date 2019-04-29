@@ -36,16 +36,16 @@ retcode_t iota_snapshot_metadata_destroy(snapshot_metadata_t *const snapshot_met
 size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *const snapshot_metadata) {
   // hash, index, timestamps, solid entries map size, each are followed by new line character
   // each solid entry point map entry is two fields delimited by ';' and ended with a new line character
-  return FLEX_TRIT_SIZE_243 + 1 + MAX_CHARS_UNIT64 + 1 + MAX_CHARS_UNIT64 + 1 + MAX_CHARS_UNIT64 + 1 +
+  return FLEX_TRIT_SIZE_243 + 1 + MAX_CHARS_UINT64 + 1 + MAX_CHARS_UINT64 + 1 + MAX_CHARS_UINT64 + 1 +
          hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points) *
-             (MAX_CHARS_UNIT64 + 1 + FLEX_TRIT_SIZE_243 + 1);
+             (MAX_CHARS_UINT64 + 1 + FLEX_TRIT_SIZE_243 + 1);
 }
 
 retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const snapshot_metadata, char *const str) {
   hash_to_uint64_t_map_entry_t *iter = NULL, *tmp = NULL;
 
   tryte_t hash_trytes[NUM_TRYTES_HASH + 1];
-  char svalue[MAX_CHARS_UNIT64];
+  char svalue[MAX_CHARS_UINT64];
 
   if (flex_trits_to_trytes(hash_trytes, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
       NUM_TRITS_HASH) {

@@ -27,12 +27,19 @@ static void *local_snapshots_manager_routine(void *arg) {
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
+  tangle_t tangle;
+  connection_config_t db_conf = {.db_path = lsm->conf->db_path};
+  if (err = iota_tangle_init(&tangle, &db_conf)) {
+    log_critical(logger_id, "Failed in initializing db\n");
+    return NULL;
+  }
+
   while (lsm->running) {
-    if (iota_local_snapshots_manager_should_take_snapshot(lsm)) {
+    if (iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, lsm->mt);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
-        if (iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count) != RC_OK) {
+        if (iota_tangle_transaction_count(&tangle, &lsm->last_snapshot_transactions_count) != RC_OK) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
         }
@@ -52,13 +59,17 @@ cleanup:
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(logger_id, "Destroying tangle connection failed\n");
+  }
 
   return NULL;
 }
 
-bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm) {
+bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm,
+                                                       tangle_t const *const tangle) {
   size_t new_transactions_count;
-  if (iota_tangle_transaction_count(&lsm->tangle, &new_transactions_count) != RC_OK) {
+  if (iota_tangle_transaction_count(tangle, &new_transactions_count) != RC_OK) {
     log_critical(logger_id, "Failed in querying db size\n");
     return false;
   }
@@ -93,9 +104,6 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  connection_config_t db_conf = {.db_path = lsm->conf->db_path};
-  ERR_BIND_RETURN(iota_tangle_init(&lsm->tangle, &db_conf), err);
-
   return RC_OK;
 }
 
@@ -106,8 +114,6 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
   }
 
   lsm->running = true;
-
-  ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count), err);
 
   cond_handle_signal(&lsm->cond_local_snapshots);
   log_info(logger_id, "Spawning local snapshots manager thread\n");
@@ -146,10 +152,6 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
     return RC_NULL_PARAM;
   } else if (lsm->running) {
     return RC_STILL_RUNNING;
-  }
-
-  if (iota_tangle_destroy(&lsm->tangle) != RC_OK) {
-    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   cond_handle_destroy(&lsm->cond_local_snapshots);

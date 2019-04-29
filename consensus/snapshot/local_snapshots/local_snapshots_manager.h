@@ -34,8 +34,6 @@ typedef struct local_snapshots_manager_s {
   snapshots_provider_t const *snapshots_provider;
   snapshots_service_t *snapshots_service;
 
-  // Muteable data
-  tangle_t tangle;
   size_t last_snapshot_transactions_count;
 } local_snapshots_manager_t;
 
@@ -82,10 +80,12 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
  * Determines if a snapshot should be taken
  *
  * @param lsm The local snapshots manager
+ * @param tangle The Tangle
  *
  * @return True is snapshot should be taken
  */
-bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm);
+bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm,
+                                                       tangle_t const *const tangle);
 
 #ifdef __cplusplus
 }
