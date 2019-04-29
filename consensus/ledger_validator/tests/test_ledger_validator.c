@@ -80,6 +80,7 @@ static void init_test_structs() {
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;
   conf.local_snapshots.min_depth = 2;
+  conf.snapshot_signature_index = 0;
   strcpy(conf.local_snapshots.local_snapshots_path_base, debug_mode ? "local_snapshot" : local_snapshot_path_base);
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   flex_trits_from_trytes(g_seed, NUM_TRITS_HASH, (tryte_t *)TEST_SEED, NUM_TRITS_HASH, NUM_TRYTES_HASH);
@@ -149,6 +150,8 @@ static void test_replay_several_milestones() {
 
   init_test_structs();
 
+  TEST_ASSERT_EQUAL_INT(snapshots_provider.latest_snapshot.metadata.index, 0);
+
   flex_trits_from_trytes(milestone_hash, NUM_TRITS_HASH, (tryte_t *)TEST_MILESTONE_HASH, NUM_TRITS_HASH,
                          NUM_TRYTES_HASH);
 
@@ -157,7 +160,7 @@ static void test_replay_several_milestones() {
 
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &conf, &mt, &milestone_service) == RC_OK);
 
-  TEST_ASSERT_EQUAL_INT(snapshots_provider.latest_snapshot.index, 0);
+  TEST_ASSERT_EQUAL_INT(snapshots_provider.latest_snapshot.metadata.index, 0);
 
   mt.running = true;
 
@@ -166,7 +169,7 @@ static void test_replay_several_milestones() {
 
     mt.latest_milestone_index = milestone.index;
     TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_subtangle_milestone(&mt, &tangle));
-    TEST_ASSERT_EQUAL_INT64(num_milestones * (i + 1), snapshots_provider.latest_snapshot.index);
+    TEST_ASSERT_EQUAL_INT64(num_milestones * (i + 1), snapshots_provider.latest_snapshot.metadata.index);
     TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &mt));
     TEST_ASSERT_EQUAL_INT64(snapshots_provider.inital_snapshot.metadata.index,
                             (num_milestones * (i + 1) - conf.local_snapshots.min_depth - 1));

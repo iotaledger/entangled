@@ -97,7 +97,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   next_snapshot.state = NULL;
   next_snapshot.metadata.solid_entry_points = NULL;
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot(snapshots_service, &milestone, &next_snapshot), ret, cleanup);
-  if (next_snapshot.index > snapshots_service->snapshots_provider->inital_snapshot.index) {
+  if (next_snapshot.metadata.index > snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
     ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, &next_snapshot), ret,
                   cleanup);
     // TODO - Implement prunning
@@ -115,13 +115,13 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
                                                            iota_stor_pack_t *const entry_point) {
   retcode_t err;
   uint64_t index;
-  if (snapshots_service->snapshots_provider->latest_snapshot.index <
+  if (snapshots_service->snapshots_provider->latest_snapshot.metadata.index <
       snapshots_service->conf->local_snapshots.min_depth) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
 
-  index =
-      snapshots_service->snapshots_provider->latest_snapshot.index - snapshots_service->conf->local_snapshots.min_depth;
+  index = snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
+          snapshots_service->conf->local_snapshots.min_depth;
   if (index == 0) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
@@ -138,11 +138,11 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   iota_snapshot_read_lock(&snapshots_service->snapshots_provider->inital_snapshot);
   iota_snapshot_read_lock(&snapshots_service->snapshots_provider->latest_snapshot);
 
-  if (target_milestone->index > snapshots_service->snapshots_provider->latest_snapshot.index) {
+  if (target_milestone->index > snapshots_service->snapshots_provider->latest_snapshot.metadata.index) {
     log_error(logger_id, "Target milestone is not solid\n");
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_NOT_SOLID;
     goto cleanup;
-  } else if (target_milestone->index < snapshots_service->snapshots_provider->inital_snapshot.index) {
+  } else if (target_milestone->index < snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
     log_error(logger_id, "Target milestone is too old\n");
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
     goto cleanup;
@@ -316,7 +316,7 @@ static retcode_t iota_snapshots_service_update_new_solid_entry_points(
   prev_milestone = *target_milestone;
   uint64_t index = prev_milestone.index;
 
-  while (index > initial_snapshot->index) {
+  while (index > initial_snapshot->metadata.index) {
     hash_pack_reset(&tx_pack);
     ret = iota_tangle_transaction_load(&snapshots_service->tangle, TRANSACTION_FIELD_HASH, target_milestone->hash,
                                        &tx_pack);
