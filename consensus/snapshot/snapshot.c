@@ -52,7 +52,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   state_size = state_delta_serialized_str_size(snapshot->state);
   char *buffer;
   if ((buffer = (char *)calloc(state_size, sizeof(char))) == NULL) {
-    return RC_STORAGE_OOM;
+    return RC_OOM;
   }
 
   metadata_size = iota_snapshot_metadata_serialized_str_size(&snapshot->metadata);
@@ -67,7 +67,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
 
   if (metadata_size > state_size && (buffer = (char *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
-    return RC_STORAGE_OOM;
+    return RC_OOM;
   }
 
   ERR_BIND_GOTO(iota_snapshot_metadata_serialize_str(&snapshot->metadata, buffer), ret, cleanup);
@@ -269,7 +269,7 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
   retcode_t ret;
 
   if (dst == NULL || src == NULL) {
-    return RC_SNAPSHOT_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   dst->conf = src->conf;
