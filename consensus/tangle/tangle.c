@@ -165,7 +165,7 @@ retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t cons
   }
 
   if (pack.num_loaded == 0) {
-    // TODO
+    return RC_TANGLE_TAIL_NOT_FOUND;
   }
 
   if ((curr_index = transaction_current_index(curr_tx)) != 0) {
