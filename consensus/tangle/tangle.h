@@ -162,6 +162,16 @@ retcode_t iota_tangle_state_delta_load(tangle_t const *const tangle, uint64_t co
  * Utilities
  */
 
+/**
+ *  Finds the tail of the associated bundle of a transaction hash
+ *
+ * @param tangle The tangle
+ * @param tx_hash The transaction hash
+ * @param tail The tail hash
+ * @param found_tail Whether a tail has been found or not
+ *
+ * @return a status code
+ */
 retcode_t iota_tangle_find_tail(tangle_t const *const tangle, flex_trit_t const *const tx_hash, flex_trit_t *const tail,
                                 bool *const found_tail);
 

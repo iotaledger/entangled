@@ -192,55 +192,47 @@ retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle, flex_trit_t 
 retcode_t iota_tangle_find_tail(tangle_t const *const tangle, flex_trit_t const *const tx_hash, flex_trit_t *const tail,
                                 bool *const found_tail) {
   retcode_t res = RC_OK;
-  iota_transaction_t next_tx_s;
-  iota_transaction_t *next_tx = &next_tx_s;
-  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  bool found_approver = false;
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, tx_pack);
+  flex_trit_t *approver_hash = NULL;
+  bool found_approver = true;
+  iota_stor_pack_t hash_pack;
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, curr_tx_pack);
+  DECLARE_PACK_SINGLE_TX(next_tx_s, next_tx, next_tx_pack);
 
   *found_tail = false;
 
-  res = iota_tangle_transaction_load_partial(tangle, tx_hash, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
-  if (res != RC_OK || tx_pack.num_loaded == 0) {
+  res = iota_tangle_transaction_load_partial(tangle, tx_hash, &curr_tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
+  if (res != RC_OK || curr_tx_pack.num_loaded == 0) {
     return res;
   }
 
-  uint32_t index = transaction_current_index(curr_tx);
-  memcpy(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243);
-
-  iota_stor_pack_t hash_pack;
-  if ((res = hash_pack_init(&hash_pack, 10)) != RC_OK) {
+  if ((res = hash_pack_init(&hash_pack, 8)) != RC_OK) {
     return res;
   }
 
-  while (res == RC_OK && index > 0 && memcmp(transaction_bundle(curr_tx), bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+  for (uint32_t index = transaction_current_index(curr_tx); found_approver && index-- > 0;) {
+    found_approver = false;
+    approver_hash = NULL;
     hash_pack_reset(&hash_pack);
+
     if ((res = iota_tangle_transaction_load_hashes_of_approvers(tangle, transaction_hash(curr_tx), &hash_pack, 0)) !=
         RC_OK) {
       break;
     }
 
-    --index;
-    uint32_t approver_idx = 0;
-    found_approver = false;
-    while (approver_idx < hash_pack.num_loaded) {
-      flex_trit_t *approver_hash = (flex_trit_t *)hash_pack.models[approver_idx];
-      tx_pack.models = (void **)(&next_tx);
-      hash_pack_reset(&tx_pack);
-      res = iota_tangle_transaction_load_partial(tangle, approver_hash, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
-      if (res != RC_OK || tx_pack.num_loaded == 0) {
+    for (uint32_t approver_index = 0; approver_index < hash_pack.num_loaded; ++approver_index) {
+      approver_hash = (flex_trit_t *)hash_pack.models[approver_index];
+      hash_pack_reset(&next_tx_pack);
+      res = iota_tangle_transaction_load_partial(tangle, approver_hash, &next_tx_pack,
+                                                 PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
+      if (res != RC_OK || next_tx_pack.num_loaded == 0) {
         break;
       }
       if (transaction_current_index(next_tx) == index &&
-          memcmp(transaction_bundle(next_tx), bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+          memcmp(transaction_bundle(next_tx), transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243) == 0) {
         curr_tx = next_tx;
         found_approver = true;
         break;
       }
-    }
-
-    if (!found_approver) {
-      break;
     }
   }
 
