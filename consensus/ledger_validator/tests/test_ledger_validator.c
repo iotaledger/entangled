@@ -102,8 +102,8 @@ static void destroy_test_structs() {
   iota_snapshots_service_destroy(&snapshots_service);
 }
 
-void test_util_create_bundle(flex_trit_t *const curr_branch_trunk_hash, iota_milestone_t *const milestone,
-                             size_t num_milestones, uint64_t *sk_index) {
+static void test_util_create_bundle(flex_trit_t *const curr_branch_trunk_hash, iota_milestone_t *const milestone,
+                                    size_t num_milestones, uint64_t *sk_index) {
   bundle_transactions_t *bundle = NULL;
   iota_transaction_t *tx_iter;
 
