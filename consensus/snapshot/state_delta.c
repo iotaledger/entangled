@@ -26,6 +26,10 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *
   retcode_t ret = RC_OK;
   state_delta_entry_t *entry = NULL;
 
+  if (value == 0) {
+    return RC_OK;
+  }
+
   state_delta_find(*state, hash, entry);
   if (entry) {
     entry->value += value;
@@ -44,6 +48,10 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *
 retcode_t state_delta_sum_if_present(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value) {
   state_delta_entry_t *entry = NULL;
 
+  if (value == 0) {
+    return RC_OK;
+  }
+
   state_delta_find(*state, hash, entry);
   if (entry) {
     entry->value += value;
@@ -58,7 +66,11 @@ retcode_t state_delta_add_or_replace(state_delta_t *const state, flex_trit_t con
 
   state_delta_find(*state, hash, entry);
   if (entry) {
-    entry->value = value;
+    if (value == 0) {
+      state_delta_remove(state, hash);
+    } else {
+      entry->value = value;
+    }
   } else {
     if ((ret = state_delta_add(state, hash, value)) != RC_OK) {
       return ret;
