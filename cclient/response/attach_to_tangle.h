@@ -68,14 +68,14 @@ flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res, int ind
  * @brief Gets the size of the transaction list.
  *
  * @param[in] res The response object.
- * @return The size of list.
+ * @return The size of the list.
  */
 size_t attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res);
 
 /**
  * @brief Frees an attach to tangle response object.
  *
- * @param[in] hashes the response object.
+ * @param[in] res the response object.
  */
 void attach_to_tangle_res_free(attach_to_tangle_res_t** res);
 

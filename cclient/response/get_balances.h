@@ -72,7 +72,7 @@ static inline retcode_t get_balances_res_reference_add(get_balances_res_t* const
  * @brief Gets a reference hash by index.
  *
  * @param[in] res The response object.
- * @param[in] index A index of reference list.
+ * @param[in] index An index of reference list.
  * @return A pointer to a reference hash. NULL if index is invalid.
  */
 static inline flex_trit_t* get_balances_res_reference_get(get_balances_res_t* const res, size_t index) {
@@ -91,7 +91,7 @@ size_t get_balances_res_balances_num(get_balances_res_t const* const res);
  * @brief Gets a balance value by index.
  *
  * @param[in] res The response object.
- * @param[in] index A index of the balance list.
+ * @param[in] index An index of the balance list.
  * @return The balance to the corresponding index.
  */
 uint64_t get_balances_res_balances_at(get_balances_res_t const* const res, int const index);

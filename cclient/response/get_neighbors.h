@@ -56,10 +56,8 @@ typedef struct {
    */
   uint32_t stale_trans_num;
   /**
-   * Amount of transactions send through this neighbor.
-   * Number of all new transactions you get from other neighbors and forward to this neighbor. (You forward all new
-   * transactions from one neighbor to all other neighbors) So the number is exactly the sum of all new transactions
-   * from your neighbors except this neighbor.
+   * Amount of transactions sent through this neighbor.
+   * Number of all transactions you get from other neighbors and forward to this neighbor.
    */
   uint32_t sent_trans_num;
   /**
