@@ -216,9 +216,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
     return hash243_set_add(params->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
     params->is_solid = false;
-    if (ts->transaction_requester) {  // Might be null for tests
-      return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
-    }
+    return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
   }
 
   return RC_OK;
