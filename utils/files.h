@@ -25,7 +25,7 @@ extern "C" {
 retcode_t iota_utils_copy_file(char const *const to, char const *const from);
 
 /**
- * Removes an exiting file
+ * Removes an existing file
  *
  * @param file_path The path of the file
  *
@@ -44,7 +44,7 @@ retcode_t iota_utils_remove_file(char const *const file_path);
 retcode_t iota_utils_overwrite_file(char const *const file_path, char const *const content);
 
 /**
- * Copies a file to a given path
+ * Reads a file content into buffer
  *
  * @param file_path The file to read
  * @param buffer The buffer to read into
