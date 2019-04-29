@@ -1,5 +1,6 @@
 cc_test(
     name = "test_transaction_validator",
+    timeout = "moderate",
     srcs = [
         "test_transaction_validator.c",
     ],
