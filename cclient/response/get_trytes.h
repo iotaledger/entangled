@@ -64,7 +64,7 @@ static inline retcode_t get_trytes_res_trytes_add(get_trytes_res_t* const res, f
  * @brief Gets a raw transaction by index.
  *
  * @param[in] res The response object.
- * @param[in] index A index of the transaction list.
+ * @param[in] index An index of the transaction list.
  * @return A pointer to a raw transaction hash.
  */
 static inline flex_trit_t* get_trytes_res_trytes_get(get_trytes_res_t* const res, size_t index) {
