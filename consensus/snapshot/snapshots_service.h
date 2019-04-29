@@ -33,6 +33,7 @@ typedef struct snapshots_service_s {
  *
  * @param snapshots_service The service
  * @param snapshots_provider The provider
+ * @param milestone_service The milestone service
  * @param conf The configuration
  *
  * @return a status code
@@ -88,28 +89,15 @@ retcode_t iota_snapshots_service_generate_snapshot_metadata(snapshots_service_t 
                                                             snapshot_t *const snapshot);
 
 /**
- * Determines if a snapshot should be taken
+ * Determines snapshot's new entry point (milestone)
  *
  * @param snapshots_service The service
- * @param milestone_tracker The milestone tracker
  * @param entry_point The milestone that will use as new snapshot genesis
  *
  * @return a status code
  */
 retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *const snapshots_service,
                                                            iota_stor_pack_t *const entry_point);
-
-/**
- * Applies a patch to a snapshot state
- *
- * @param snapshots_service The service
- * @param snapshot The initial snapshot to forward with changes
- * @param index The last milestone in the new snapshot
- *
- * @return a status code
- */
-retcode_t iota_snapshots_service_replay_milestones(snapshots_service_t *const snapshots_service,
-                                                   snapshot_t *const snapshot, uint64_t index);
 
 /**
  * Persist a snapshot
