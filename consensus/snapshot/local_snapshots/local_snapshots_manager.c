@@ -115,7 +115,6 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
 
   lsm->running = true;
 
-  cond_handle_signal(&lsm->cond_local_snapshots);
   log_info(logger_id, "Spawning local snapshots manager thread\n");
   if (thread_handle_create(&lsm->local_snapshots_thread, (thread_routine_t)local_snapshots_manager_routine, lsm) != 0) {
     log_critical(logger_id, "Spawning local snapshots manager thread failed\n");
@@ -135,7 +134,7 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   }
 
   lsm->running = false;
-
+  cond_handle_signal(&lsm->cond_local_snapshots);
   log_info(logger_id, "Shutting down local snapshots manager thread\n");
   if (thread_handle_join(lsm->local_snapshots_thread, NULL) != 0) {
     log_error(logger_id, "Shutting down local snapshots manager thread failed\n");
