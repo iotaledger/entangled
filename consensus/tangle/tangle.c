@@ -169,7 +169,7 @@ retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t cons
   }
 
   if ((curr_index = transaction_current_index(curr_tx)) != 0) {
-    // TODO
+    return RC_TANGLE_NOT_A_TAIL;
   }
 
   last_index = transaction_last_index(curr_tx);

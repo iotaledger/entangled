@@ -138,6 +138,29 @@ void test_bundle_load_unknown_tx(void) {
   transactions_free(txs, 4);
 }
 
+void test_bundle_load_not_a_tail(void) {
+  iota_transaction_t *txs[4];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                                        TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  bundle_transactions_t *bundle;
+
+  transactions_deserialize(txs_trytes, txs, 4, true);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
+
+  flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_3_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+
+  bundle_transactions_new(&bundle);
+
+  TEST_ASSERT(iota_tangle_bundle_load(&tangle, hash, bundle) == RC_TANGLE_NOT_A_TAIL);
+
+  TEST_ASSERT_EQUAL_INT(bundle_transactions_size(bundle), 0);
+
+  bundle_transactions_free(&bundle);
+
+  transactions_free(txs, 4);
+}
+
 int main(void) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
@@ -150,6 +173,7 @@ int main(void) {
 
   RUN_TEST(test_bundle_load);
   RUN_TEST(test_bundle_load_unknown_tx);
+  RUN_TEST(test_bundle_load_not_a_tail);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
