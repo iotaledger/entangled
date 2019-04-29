@@ -7,6 +7,22 @@
 
  /**
  * @defgroup response Responses
- * @brief The Tangle response object implementations. 
+ * @brief The response objects provide read/write methods for the API responses.
+ *
+ * Response data structures:
+ * - #add_neighbors_res_t
+ * - #attach_to_tangle_res_t
+ * - #check_consistency_res_t
+ * - #error_res_t
+ * - #find_transactions_res_t
+ * - #get_balances_res_t
+ * - #get_inclusion_states_res_t
+ * - #get_missing_transactions_res_t
+ * - #get_neighbors_res_t
+ * - #get_node_info_res_t
+ * - #get_tips_res_t
+ * - #get_transactions_to_approve_res_t
+ * - #get_trytes_res_t
+ * - #remove_neighbors_res_t
  *
  */

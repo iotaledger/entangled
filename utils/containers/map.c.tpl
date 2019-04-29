@@ -26,11 +26,11 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *c
       sizeof({KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t));
 
   if (map_entry == NULL) {
-    return RC_UTILS_OOM;
+    return RC_OOM;
   }
 
   if ((map_entry->key = ({KEY_TYPE}*)malloc(map->key_size)) == NULL) {
-    return RC_UTILS_OOM;
+    return RC_OOM;
   }
 
   memcpy(map_entry->key, key, map->key_size);

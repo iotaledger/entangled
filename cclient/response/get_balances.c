@@ -7,6 +7,8 @@
 
 #include "cclient/response/get_balances.h"
 
+static const UT_icd ut_uint64_icd = {sizeof(uint64_t), NULL, NULL, NULL};
+
 get_balances_res_t* get_balances_res_new() {
   get_balances_res_t* res = (get_balances_res_t*)malloc(sizeof(get_balances_res_t));
   if (res) {

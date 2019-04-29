@@ -35,7 +35,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   }
 
   if ((content = (char *)malloc(len + 1)) == NULL) {
-    ret = RC_SNAPSHOT_OOM;
+    ret = RC_OOM;
     goto done;
   }
 

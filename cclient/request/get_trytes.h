@@ -61,7 +61,7 @@ static inline retcode_t get_trytes_req_hash_add(get_trytes_req_t* const req, fle
  * @brief Get a transaction hash by index.
  *
  * @param[in] req The request object.
- * @param[in] index A index of transaction list.
+ * @param[in] index An index of transaction list.
  * @return A pointer to a transaction hash.
  */
 static inline flex_trit_t* get_trytes_req_hash_get(get_trytes_req_t* const req, size_t index) {

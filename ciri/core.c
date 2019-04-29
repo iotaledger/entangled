@@ -14,7 +14,7 @@ static logger_id_t logger_id;
 
 retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   if (core == NULL) {
-    return RC_CORE_NULL_CORE;
+    return RC_NULL_PARAM;
   }
 
   logger_id = logger_helper_enable(CORE_LOGGER_ID, LOGGER_DEBUG, true);
@@ -37,7 +37,7 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
 
 retcode_t core_start(core_t* const core, tangle_t* const tangle) {
   if (core == NULL) {
-    return RC_CORE_NULL_CORE;
+    return RC_NULL_PARAM;
   }
 
   log_info(logger_id, "Starting consensus\n");
@@ -61,7 +61,7 @@ retcode_t core_stop(core_t* const core) {
   retcode_t ret = RC_OK;
 
   if (core == NULL) {
-    return RC_CORE_NULL_CORE;
+    return RC_NULL_PARAM;
   } else if (core->running == false) {
     return RC_OK;
   }
@@ -87,9 +87,9 @@ retcode_t core_destroy(core_t* const core) {
   retcode_t ret = RC_OK;
 
   if (core == NULL) {
-    return RC_CORE_NULL_CORE;
+    return RC_NULL_PARAM;
   } else if (core->running) {
-    return RC_CORE_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   log_info(logger_id, "Destroying node\n");

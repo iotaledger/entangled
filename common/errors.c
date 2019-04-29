@@ -17,7 +17,6 @@ const char* error_2_string(retcode_t err) {
       return STR_NULL_PARAM;
 
     // Storage SQLite3 Module
-    case RC_STORAGE_OOM:
     case RC_SQLITE3_FAILED_OPEN_DB:
     case RC_SQLITE3_FAILED_INSERT_DB:
     case RC_SQLITE3_FAILED_CREATE_INDEX_DB:
@@ -34,7 +33,6 @@ const char* error_2_string(retcode_t err) {
     // Storage SQL Module
     case RC_SQL_FAILED_WRITE_STATEMENT:
     // Core Module
-    case RC_CORE_NULL_CORE:
     case RC_CORE_FAILED_DATABASE_INIT:
     case RC_CORE_FAILED_DATABASE_DESTROY:
     case RC_CORE_FAILED_NODE_INIT:
@@ -47,10 +45,7 @@ const char* error_2_string(retcode_t err) {
     case RC_CORE_FAILED_API_DESTROY:
     case RC_CORE_FAILED_SNAPSHOT_INIT:
     case RC_CORE_FAILED_SNAPSHOT_DESTROY:
-    case RC_CORE_STILL_RUNNING:
     // Node Module
-    case RC_NODE_NULL_NODE:
-    case RC_NODE_NULL_CORE:
     case RC_NODE_FAILED_NEIGHBORS_INIT:
     case RC_NODE_FAILED_NEIGHBORS_DESTROY:
     case RC_NODE_FAILED_BROADCASTER_INIT:
@@ -65,7 +60,6 @@ const char* error_2_string(retcode_t err) {
     case RC_NODE_FAILED_RESPONDER_START:
     case RC_NODE_FAILED_RESPONDER_STOP:
     case RC_NODE_FAILED_RESPONDER_DESTROY:
-    case RC_NODE_STILL_RUNNING:
     case RC_NODE_FAILED_RECEIVER_STOP:
     case RC_NODE_FAILED_RECEIVER_DESTROY:
     case RC_NODE_FAILED_RESPONDER_INIT:
@@ -125,7 +119,6 @@ const char* error_2_string(retcode_t err) {
     case RC_CONSENSUS_NOT_IMPLEMENTED:
     case RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB:
     case RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS:
-    case RC_CONSENSUS_OOM:
     case RC_CONSENSUS_NULL_PTR:
     case RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT:
     // Utils module
@@ -157,20 +150,11 @@ const char* error_2_string(retcode_t err) {
 
     // Broadcaster module
     case RC_BROADCASTER_FAILED_PUSH_QUEUE:
-    case RC_BROADCASTER_STILL_RUNNING:
     // Processor component module
     case RC_PROCESSOR_INVALID_TRANSACTION:
     // Receiver component module
-    case RC_RECEIVER_COMPONENT_NULL_STATE:
-    case RC_RECEIVER_COMPONENT_NULL_NODE:
-    case RC_RECEIVER_COMPONENT_FAILED_THREAD_SPAWN:
-    case RC_RECEIVER_COMPONENT_FAILED_THREAD_JOIN:
-    case RC_RECEIVER_COMPONENT_STILL_RUNNING:
     case RC_RECEIVER_COMPONENT_INVALID_PROCESSOR:
     // Requester component module
-    case RC_REQUESTER_COMPONENT_NULL_STATE:
-    case RC_REQUESTER_COMPONENT_NULL_TANGLE:
-    case RC_REQUESTER_COMPONENT_NULL_HASH:
     case RC_REQUESTER_COMPONENT_FAILED_INIT_LIST:
     case RC_REQUESTER_COMPONENT_FAILED_DESTROY_LIST:
     case RC_REQUESTER_COMPONENT_FAILED_ADD_LIST:
@@ -180,18 +164,12 @@ const char* error_2_string(retcode_t err) {
     case RC_RESPONDER_COMPONENT_FAILED_REQ_PROCESSING:
     case RC_RESPONDER_COMPONENT_INVALID_TX:
     // Conf Module
-    case RC_CIRI_CONF_NULL_CONF:
     case RC_CIRI_CONF_INVALID_ARGUMENT:
     // Snapshot Module
-    case RC_SNAPSHOT_NULL_SELF:
-    case RC_SNAPSHOT_NULL_STATE:
-    case RC_SNAPSHOT_NULL_HASH:
-    case RC_SNAPSHOT_NULL_BALANCE:
     case RC_SNAPSHOT_FILE_NOT_FOUND:
     case RC_SNAPSHOT_INVALID_FILE:
     case RC_SNAPSHOT_INVALID_SUPPLY:
     case RC_SNAPSHOT_INCONSISTENT_SNAPSHOT:
-    case RC_SNAPSHOT_OOM:
     case RC_SNAPSHOT_INCONSISTENT_PATCH:
     case RC_SNAPSHOT_BALANCE_NOT_FOUND:
       return "String not defined.";

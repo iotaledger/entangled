@@ -990,7 +990,7 @@ retcode_t iota_stor_state_delta_store(storage_connection_t const* const connecti
 
   size = state_delta_serialized_size(delta);
   if ((bytes = (byte_t*)calloc(size, sizeof(byte_t))) == NULL) {
-    ret = RC_STORAGE_OOM;
+    ret = RC_OOM;
     goto done;
   }
 
