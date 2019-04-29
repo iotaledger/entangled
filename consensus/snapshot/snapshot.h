@@ -132,7 +132,7 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
 retcode_t iota_snapshot_apply_patch_no_lock(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index);
 
 /**
- * Coppies a snapshot struct
+ * Copies a snapshot struct
  *
  * @param src The source snapshot
  * @param dst The destination snapshot
@@ -189,7 +189,7 @@ retcode_t iota_snapshot_state_read_from_file(snapshot_t *const snapshot, char co
 retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char const *const snapshot_file_base);
 
 /**
- * Gets solid entry points
+ * Sets solid entry points
  *
  * @param snapshot The snapshot
  * @param keys The snapshot solid entry points hashes
