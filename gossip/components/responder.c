@@ -99,13 +99,18 @@ static retcode_t respond_to_request(responder_t const *const responder, tangle_t
     // If a transaction or a random tip was found, sends it back to the neighbor
     iota_transaction_t *transaction = ((iota_transaction_t **)(pack->models))[0];
     flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+    byte_t transaction_bytes[PACKET_TX_SIZE];
+    uint64_t digest = 0;
 
     transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);
+    flex_trits_to_bytes(transaction_bytes, NUM_TRITS_SERIALIZED_TRANSACTION, transaction_flex_trits,
+                        NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
+    recent_seen_bytes_cache_hash(transaction_bytes, &digest);
+    recent_seen_bytes_cache_put(&responder->node->recent_seen_bytes, digest, hash);
     if ((ret = neighbor_send(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
       log_warning(logger_id, "Sending transaction failed\n");
       return ret;
     }
-    // TODO Add transaction to cache
   } else {
     // If a transaction was requested but not found, requests it
     if (!flex_trits_are_null(hash, FLEX_TRIT_SIZE_243) &&
