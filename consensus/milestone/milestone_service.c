@@ -36,7 +36,8 @@ retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, miles
   iota_milestone_t *last_applied_milestone = NULL;
   DECLARE_PACK_SINGLE_MILESTONE(current_milestone, current_milestone_ptr, pack);
 
-  for (uint64_t current_milestone_index = snapshot->index; current_milestone_index < index; ++current_milestone_index) {
+  for (uint64_t current_milestone_index = snapshot->metadata.index; current_milestone_index < index;
+       ++current_milestone_index) {
     hash_pack_reset(&pack);
     ERR_BIND_GOTO(iota_tangle_milestone_load_next(tangle, current_milestone_index, &pack), ret, cleanup);
     if (pack.num_loaded == 0) {

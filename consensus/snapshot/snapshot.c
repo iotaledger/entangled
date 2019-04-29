@@ -109,7 +109,6 @@ retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t 
   rw_lock_handle_init(&snapshot->rw_lock);
   snapshot->conf = conf;
   snapshot->state = NULL;
-  snapshot->index = 0;
   iota_snapshot_metadata_reset(&snapshot->metadata);
 
   return ret;
@@ -199,7 +198,7 @@ uint64_t iota_snapshot_get_index(snapshot_t *const snapshot) {
   uint64_t index;
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-  index = snapshot->index;
+  index = snapshot->metadata.index;
   rw_lock_handle_unlock(&snapshot->rw_lock);
 
   return index;
@@ -262,7 +261,7 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *c
 }
 
 retcode_t iota_snapshot_apply_patch_no_lock(snapshot_t *const snapshot, state_delta_t *const patch, uint64_t index) {
-  snapshot->index = index;
+  snapshot->metadata.index = index;
   return state_delta_apply_patch(&snapshot->state, patch);
 }
 
@@ -273,7 +272,6 @@ retcode_t iota_snapshot_copy(snapshot_t const *const src, snapshot_t *const dst)
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  dst->index = src->index;
   dst->conf = src->conf;
 
   ERR_BIND_GOTO(iota_snapshot_metadata_destroy(&dst->metadata), ret, cleanup);

@@ -25,7 +25,6 @@ extern "C" {
 typedef struct snapshot_s {
   iota_consensus_conf_t *conf;
   rw_lock_handle_t rw_lock;
-  uint64_t index;
   state_delta_t state;
   snapshot_metadata_t metadata;
 } snapshot_t;

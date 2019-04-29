@@ -61,7 +61,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &consensus_conf) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &consensus_conf, &mt, &milestone_service) == RC_OK);
   // We want to avoid unnecessary validation
-  mt.snapshots_provider->latest_snapshot.index = 99999999999;
+  mt.snapshots_provider->latest_snapshot.metadata.index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(&consensus_conf, &mt, &lv, epv) == RC_OK);
 }

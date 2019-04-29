@@ -137,13 +137,14 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
   return RC_OK;
 }
 
-retcode_t iota_snapshot_metadata_read_from_file(snapshot_metadata_t *const metadata, char const *const metadata_file) {
+retcode_t iota_snapshot_metadata_read_from_file(snapshot_metadata_t *const snapshot_metadata,
+                                                char const *const metadata_file) {
   retcode_t ret;
   char *buffer = NULL;
 
   ERR_BIND_GOTO(iota_utils_read_file_into_buffer(metadata_file, &buffer), ret, cleanup);
   if (buffer) {
-    ERR_BIND_GOTO(iota_snapshot_metadata_deserialize_str(buffer, metadata), ret, cleanup);
+    ERR_BIND_GOTO(iota_snapshot_metadata_deserialize_str(buffer, snapshot_metadata), ret, cleanup);
   }
 
 cleanup:
