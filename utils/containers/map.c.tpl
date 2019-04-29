@@ -36,7 +36,7 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *c
   }
 
   if ((map_entry->value = ({VALUE_TYPE}*)malloc(map->value_size)) == NULL) {
-    return RC_UTILS_OOM;
+    return RC_OOM;
   }
 
   memcpy(map_entry->key, key, map->key_size);
