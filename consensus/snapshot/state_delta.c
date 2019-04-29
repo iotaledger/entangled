@@ -186,14 +186,14 @@ size_t state_delta_serialized_str_size(state_delta_t const delta) {
   }
   // For each line we persist the address followed by a ';' delimiter,
   // followed by the value (max is IOTA_SUPPLY which is 16 digits), followed by a new line
-  return MAX_CHARS_UNIT64 + state_delta_size(delta) * (NUM_TRYTES_ADDRESS + 1 + 16 + 1);
+  return MAX_CHARS_UINT64 + state_delta_size(delta) * (NUM_TRYTES_ADDRESS + 1 + 16 + 1);
 }
 
 retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) {
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
   tryte_t address_trytes[NUM_TRYTES_ADDRESS];
-  char svalue[MAX_CHARS_UNIT64];
+  char svalue[MAX_CHARS_UINT64];
 
   HASH_ITER(hh, delta, iter, tmp) {
     if (flex_trits_to_trytes(&address_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS) !=
