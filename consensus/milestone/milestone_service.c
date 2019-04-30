@@ -47,9 +47,9 @@ retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, miles
       if (current_delta != NULL) {
         ERR_BIND_GOTO(state_delta_apply_patch(&merged_balance_changes, &current_delta), ret, cleanup);
         last_applied_milestone = &current_milestone;
+        state_delta_destroy(&current_delta);
+        current_delta = NULL;
       }
-      state_delta_destroy(&current_delta);
-      current_delta = NULL;
     }
   }
 

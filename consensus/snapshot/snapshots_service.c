@@ -6,6 +6,7 @@
  */
 
 #include "consensus/snapshot/snapshots_service.h"
+#include <inttypes.h>
 #include <stdlib.h>
 #include "consensus/utils/tangle_traversals.h"
 #include "utils/logger_helper.h"
@@ -115,6 +116,7 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
                                                            iota_stor_pack_t *const entry_point) {
   retcode_t err;
   uint64_t index;
+
   if (snapshots_service->snapshots_provider->latest_snapshot.metadata.index <
       snapshots_service->conf->local_snapshots.min_depth) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
@@ -125,6 +127,7 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
   if (index == 0) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
+
   ERR_BIND_RETURN(iota_tangle_milestone_load_previous(&snapshots_service->tangle, index, entry_point), err);
 
   return RC_OK;
@@ -142,7 +145,7 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
     log_error(logger_id, "Target milestone is not solid\n");
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_NOT_SOLID;
     goto cleanup;
-  } else if (target_milestone->index < snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
+  } else if (target_milestone->index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
     log_error(logger_id, "Target milestone is too old\n");
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
     goto cleanup;
