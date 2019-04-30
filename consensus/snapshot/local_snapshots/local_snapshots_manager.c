@@ -21,7 +21,6 @@ static void *local_snapshots_manager_routine(void *arg) {
   local_snapshots_manager_t *lsm = (local_snapshots_manager_t *)arg;
   lock_handle_t lock_cond;
   retcode_t err;
-  size_t transactions_count;
   size_t exponential_delay_factor = 1;
 
   lock_handle_init(&lock_cond);
@@ -87,7 +86,6 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
                                             snapshots_service_t *const snapshots_service,
                                             iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt) {
-  retcode_t err;
   if (lsm == NULL || mt == NULL || snapshots_service == NULL) {
     return RC_NULL_PARAM;
   }
@@ -105,7 +103,6 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
-  retcode_t err;
   if (lsm == NULL) {
     return RC_NULL_PARAM;
   }

@@ -49,7 +49,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
-  
+
   // Retreives the transaction from the packet
   if (flex_trits_from_bytes(transaction_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
                             NUM_TRITS_SERIALIZED_TRANSACTION,
