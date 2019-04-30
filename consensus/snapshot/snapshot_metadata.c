@@ -67,7 +67,7 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   offset += value_len;
 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
-    if (flex_trits_to_trytes(&hash_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
+    if (flex_trits_to_trytes(hash_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
         NUM_TRITS_HASH) {
       return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
     }
