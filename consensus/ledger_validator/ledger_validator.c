@@ -260,7 +260,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
         }
       }
 
-      if ((ret = iota_milestone_service_replay_milestones(tangle, &lv->milestone_service,
+      if ((ret = iota_milestone_service_replay_milestones(tangle, lv->milestone_service,
                                                           &lv->milestone_tracker->snapshots_provider->latest_snapshot,
                                                           milestone->index)) != RC_OK) {
         log_error(logger_id, "Replaying milestones failed\n");
