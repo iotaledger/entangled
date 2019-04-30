@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load(":conf.bzl", "GOSSIP_MAINNET_VARIABLES")
 load(":conf.bzl", "GOSSIP_TESTNET_VARIABLES")
+load("//utils/containers:map_generator.bzl", "map_generate")
 
 cc_library(
     name = "conf",
@@ -82,10 +83,34 @@ cc_library(
 )
 
 cc_library(
+    name = "recent_seen_bytes_cache",
+    srcs = ["recent_seen_bytes_cache.c"],
+    hdrs = ["recent_seen_bytes_cache.h"],
+    deps = [
+        ":iota_packet",
+        ":uint64_t_to_flex_trit_t_map",
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "//utils/handles:rand",
+        "//utils/handles:rw_lock",
+        "@xxhash",
+    ],
+)
+
+map_generate(
+    additional_deps = ["//common/trinary:flex_trit"],
+    additional_include_path = "common/trinary/flex_trit.h",
+    key_type = "uint64_t",
+    parent_directory = "gossip",
+    value_type = "flex_trit_t",
+)
+
+cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
         ":neighbor_shared",
+        ":recent_seen_bytes_cache",
         ":tips_cache",
         "//gossip/components:broadcaster_shared",
         "//gossip/components:processor_shared",

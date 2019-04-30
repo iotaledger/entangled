@@ -18,6 +18,7 @@
 #include "gossip/components/transaction_requester.h"
 #include "gossip/components/transaction_requester_worker.h"
 #include "gossip/neighbor.h"
+#include "gossip/recent_seen_bytes_cache.h"
 #include "gossip/tips_cache.h"
 #include "utils/handles/rw_lock.h"
 
@@ -42,6 +43,7 @@ typedef struct node_s {
   neighbor_t* neighbors;
   rw_lock_handle_t neighbors_lock;
   tips_cache_t tips;
+  recent_seen_bytes_cache_t recent_seen_bytes;
 } iota_node_t;
 
 /**

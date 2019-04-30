@@ -8,19 +8,21 @@
 #include "{PARENT_DIRECTORY}/{KEY_TYPE}_to_{VALUE_TYPE}_map.h"
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
-                                              size_t key_size) {
+                                              size_t const key_size, size_t const value_size) {
   map->key_size = key_size;
+  map->value_size = value_size;
   map->map = NULL;
+
   return RC_OK;
 }
 
-retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map) {
+size_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map) {
   return HASH_COUNT(map->map);
 }
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
                                              {KEY_TYPE} const *const key,
-                                             {VALUE_TYPE} const value) {
+                                             {VALUE_TYPE} const *const value) {
   {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *map_entry = NULL;
   map_entry = ({KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *)malloc(
       sizeof({KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t));
@@ -33,8 +35,12 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *c
     return RC_OOM;
   }
 
+  if ((map_entry->value = ({VALUE_TYPE}*)malloc(map->value_size)) == NULL) {
+    return RC_OOM;
+  }
+
   memcpy(map_entry->key, key, map->key_size);
-  memcpy(&map_entry->value, &value, sizeof({VALUE_TYPE}));
+  memcpy(map_entry->value, value, map->value_size);
   HASH_ADD_KEYPTR(hh, map->map, map_entry->key, map->key_size, map_entry);
 
   return RC_OK;
@@ -74,6 +80,7 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *
 
   HASH_ITER(hh, map->map, curr_entry, tmp_entry) {
     free(curr_entry->key);
+    free(curr_entry->value);
     HASH_DEL(map->map, curr_entry);
     free(curr_entry);
   }
@@ -110,11 +117,19 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *con
 
   HASH_FIND(hh, map->map, key,map->key_size, entry);
 
-  if (entry != NULL){
+  {KEY_TYPE}_to_{VALUE_TYPE}_map_remove_entry(map, entry);
+
+  return entry != NULL;
+}
+
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_remove_entry({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+                                      {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *const entry) {
+  if (entry != NULL) {
     free(entry->key);
+    free(entry->value);
     HASH_DEL(map->map, entry);
     free(entry);
   }
 
-  return entry != NULL;
+  return RC_OK;
 }

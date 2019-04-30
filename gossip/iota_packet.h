@@ -16,6 +16,9 @@
 #include "common/trinary/flex_trit.h"
 #include "gossip/conf.h"
 
+#define PACKET_TX_SIZE 1604
+#define PACKET_SIZE (PACKET_TX_SIZE + REQUEST_HASH_SIZE)
+
 /**
  * The IOTA gossip protocol exchange packet that contains:
  * - A transaction encoded in bytes
