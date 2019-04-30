@@ -49,6 +49,8 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   char state_path[128];
   char metadata_path[128];
 
+  log_info(logger_id, "Writing snapshot file\n");
+
   state_size = state_delta_serialized_str_size(snapshot->state);
   char *buffer;
   if ((buffer = (char *)calloc(state_size, sizeof(char))) == NULL) {
