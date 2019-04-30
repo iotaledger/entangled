@@ -23,26 +23,25 @@
 extern "C" {
 #endif
 
-// response is a number of neighbors.
 /**
- * @brief Structure of add_neighbors response
+ * @brief The data structure of add neighbors response
  *
  */
 typedef struct add_neighbors_res_s {
-  int added_neighbors; /**< numbers of neighbors */
+  int added_neighbors; /**< Numbers of neighbors on this connected node*/
 } add_neighbors_res_t;
 
 /**
- * @brief New a add_neighbors response object
+ * @brief Allocates an add neighbors response object
  *
- * @return add_neighbors_res_t*
+ * @return A pointer to the response object.
  */
 add_neighbors_res_t* add_neighbors_res_new();
 
 /**
- * @brief Free a add_neighbors response object
+ * @brief Frees an add neighbors response object
  *
- * @param res response object
+ * @param[in] res a response object.
  */
 void add_neighbors_res_free(add_neighbors_res_t** res);
 
