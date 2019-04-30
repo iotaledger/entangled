@@ -76,22 +76,19 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
 
   if (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
        lsm->conf->local_snapshots.transactions_growth_threshold) &&
-      (lsm->snapshots_provider->latest_snapshot.metadata.index -
-       lsm->snapshots_provider->inital_snapshot.metadata.index) > lsm->conf->local_snapshots.min_depth) {
+      (lsm->snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
+       lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index) >
+          lsm->conf->local_snapshots.min_depth) {
     return true;
   }
   return false;
 }
 
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
-                                            snapshots_provider_t *const snapshots_provider,
+                                            snapshots_service_t *const snapshots_service,
                                             iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt) {
   retcode_t err;
-  if (lsm == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if (mt == NULL) {
+  if (lsm == NULL || mt == NULL || snapshots_service == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -100,7 +97,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
   lsm->running = false;
   lsm->conf = conf;
   lsm->mt = mt;
-  lsm->snapshots_provider = snapshots_provider;
+  lsm->snapshots_service = snapshots_service;
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
