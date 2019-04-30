@@ -108,7 +108,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t
   }
 
 done:
-  iota_snapshot_unlock(&tip_selector->milestone_tracker->snapshots_provider->latest_snapshot.rw_lock);
+  iota_snapshot_unlock(&tip_selector->milestone_tracker->snapshots_provider->latest_snapshot);
   cw_calc_result_destroy(&rating_results);
   hash243_stack_free(&tips_stack);
   if ((ret = iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator)) != RC_OK) {
