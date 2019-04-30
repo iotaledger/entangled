@@ -150,9 +150,10 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
 
   ERR_BIND_GOTO(iota_snapshot_reset(snapshot, snapshots_service->conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
-  ERR_BIND_GOTO(iota_milestone_service_replay_milestones(&snapshots_service->tangle, snapshots_service, snapshot,
-                                                         target_milestone->index),
-                ret, cleanup);
+  ERR_BIND_GOTO(
+      iota_milestone_service_replay_milestones(&snapshots_service->tangle, snapshots_service->milestone_service,
+                                               snapshot, target_milestone->index),
+      ret, cleanup);
 
 cleanup:
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
@@ -181,8 +182,8 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
                     snapshot, snapshots_service->conf->local_snapshots.local_snapshots_path_base),
                 ret, cleanup);
 
-  /*iota_snapshot_lock_write(&snapshots_service->snapshots_provider->latest_snapshot);
-  snapshots_service->snapshots_provider->latest_snapshot.index = snapshot->index;
+  /*iota_snapshot_write_lock(&snapshots_service->snapshots_provider->latest_snapshot);
+  snapshots_service->snapshots_provider->latest_snapshot.metadata.index = snapshot->metadata.index;
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->latest_snapshot);*/
 
   iota_snapshot_write_lock(&snapshots_service->snapshots_provider->inital_snapshot);
