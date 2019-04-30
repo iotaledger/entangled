@@ -333,7 +333,7 @@ retcode_t json_array_to_hash243_queue(cJSON const* const obj, char const* const 
   return ret_code;
 }
 
-retcode_t json_array_to_hash243_stack(cJSON const* const obj, char const* const obj_name, hash243_stack_t* queue) {
+retcode_t json_array_to_hash243_stack(cJSON const* const obj, char const* const obj_name, hash243_stack_t* stack) {
   retcode_t ret_code = RC_OK;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
@@ -343,7 +343,7 @@ retcode_t json_array_to_hash243_stack(cJSON const* const obj, char const* const 
       if (current_obj->valuestring != NULL) {
         flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)current_obj->valuestring, NUM_TRYTES_HASH,
                                NUM_TRYTES_HASH);
-        ret_code = hash243_stack_push(queue, hash);
+        ret_code = hash243_stack_push(stack, hash);
         if (ret_code) {
           return ret_code;
         }
@@ -448,6 +448,7 @@ retcode_t flex_trits_to_json_string(cJSON* const json_obj, char const* const key
   }
   return RC_OK;
 }
+
 retcode_t json_string_hash_to_flex_trits(cJSON const* const json_obj, char const* const key, flex_trit_t* hash) {
   retcode_t ret = RC_OK;
   size_t trit_len = 0;

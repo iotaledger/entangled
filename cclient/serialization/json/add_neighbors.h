@@ -28,38 +28,38 @@ extern "C" {
 #include "cclient/serialization/serializer.h"
 
 /**
- * @brief add_neighbors request object to JSON string
+ * @brief Converts an add neighbors request object to a JSON string.
  *
- * @param obj add_neighbors request object
- * @param out JSON string
- * @return error code
+ * @param[in] obj An add neighbors request object.
+ * @param[out] out A JSON string.
+ * @return #retcode_t
  */
 retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t* const obj, char_buffer_t* out);
 
 /**
- * @brief add_neighbors response object to JSON string
+ * @brief Converts an add neighbors response object to a JSON string
  *
- * @param obj add_neighbors response object
- * @param out JSON string
- * @return error code
+ * @param[in] obj An add neighbors response object.
+ * @param[out] out A JSON string.
+ * @return #retcode_t
  */
 retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t* const obj, char_buffer_t* out);
 
 /**
- * @brief JSON string to add_neighbors request object
+ * @brief Converts a JSON string to an add neighbors request.
  *
- * @param obj JSON string
- * @param out add_neighbors request object
- * @return error code
+ * @param[in] obj A JSON string.
+ * @param[out] out An add neighbors request object.
+ * @return #retcode_t
  */
 retcode_t json_add_neighbors_deserialize_request(const char* const obj, add_neighbors_req_t* out);
 
 /**
- * @brief JSON string to add_neighbors response object
+ * @brief Converts a JSON string to an add neighbors response.
  *
- * @param obj JSON string
- * @param out add_neighbors response object
- * @return error code
+ * @param[in] obj A JSON string.
+ * @param[out] out An add neighbors response object.
+ * @return #retcode_t
  */
 retcode_t json_add_neighbors_deserialize_response(const char* const obj, add_neighbors_res_t* out);
 
