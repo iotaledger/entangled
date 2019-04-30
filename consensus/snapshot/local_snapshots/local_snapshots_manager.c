@@ -29,7 +29,7 @@ static void *local_snapshots_manager_routine(void *arg) {
 
   tangle_t tangle;
   connection_config_t db_conf = {.db_path = lsm->conf->db_path};
-  if (err = iota_tangle_init(&tangle, &db_conf)) {
+  if ((err = iota_tangle_init(&tangle, &db_conf))) {
     log_critical(logger_id, "Failed in initializing db\n");
     return NULL;
   }
