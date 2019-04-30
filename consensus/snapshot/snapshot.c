@@ -125,7 +125,6 @@ retcode_t iota_snapshot_reset(snapshot_t *const snapshot, iota_consensus_conf_t 
 retcode_t iota_snapshot_load_built_in_snapshot(snapshot_t *const snapshot, iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
 
-  char snapshot_metadata_file_path[256];
   hash_to_uint64_t_map_t solid_entry_points = NULL;
 
   hash_to_uint64_t_map_add(&solid_entry_points, conf->genesis_hash, conf->snapshot_signature_index);
