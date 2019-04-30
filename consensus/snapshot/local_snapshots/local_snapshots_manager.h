@@ -30,10 +30,7 @@ typedef struct local_snapshots_manager_s {
   thread_handle_t local_snapshots_thread;
   cond_handle_t cond_local_snapshots;
   milestone_tracker_t const *mt;
-
-  snapshots_provider_t const *snapshots_provider;
   snapshots_service_t *snapshots_service;
-
   size_t last_snapshot_transactions_count;
 } local_snapshots_manager_t;
 
@@ -42,11 +39,13 @@ typedef struct local_snapshots_manager_s {
  *
  * @param lsm The local snapshots manager
  * @param conf Consensus configuration
+ * @param snapshots_service The snapshots service
+ * @param mt The milestones tracker
  *
  * @return a status code
  */
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
-                                            snapshots_provider_t *const snapshots_provider,
+                                            snapshots_service_t *const snapshots_service,
                                             iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt);
 
 /**
