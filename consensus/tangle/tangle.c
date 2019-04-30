@@ -151,6 +151,44 @@ retcode_t iota_tangle_bundle_update_validity(tangle_t const *const tangle, bundl
   return iota_stor_bundle_update_validity(&tangle->connection, bundle, status);
 }
 
+retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t const *const tail_hash,
+                                  bundle_transactions_t *const bundle) {
+  retcode_t res = RC_OK;
+  uint64_t curr_index = 0;
+  uint64_t last_index = 0;
+  flex_trit_t *curr_trunk = NULL;
+  flex_trit_t *bundle_hash = NULL;
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+
+  if ((res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tail_hash, &pack)) != RC_OK) {
+    return res;
+  }
+
+  if (pack.num_loaded == 0) {
+    return RC_TANGLE_TAIL_NOT_FOUND;
+  }
+
+  if ((curr_index = transaction_current_index(curr_tx)) != 0) {
+    return RC_TANGLE_NOT_A_TAIL;
+  }
+
+  last_index = transaction_last_index(curr_tx);
+  bundle_hash = transaction_bundle(curr_tx);
+
+  while (pack.num_loaded != 0 && curr_index <= last_index &&
+         memcmp(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243) == 0) {
+    bundle_transactions_add(bundle, curr_tx);
+    curr_trunk = transaction_trunk(curr_tx);
+    hash_pack_reset(&pack);
+    if ((res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, curr_trunk, &pack)) != RC_OK) {
+      return res;
+    }
+    curr_index++;
+  }
+
+  return res;
+}
+
 /*
  * Milestone operations
  */
