@@ -241,7 +241,7 @@ retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *cons
   }
 
   while (token != NULL) {
-    strncpy(curr_address_trytes, token, NUM_TRYTES_ADDRESS);
+    strncpy((char *)curr_address_trytes, token, NUM_TRYTES_ADDRESS);
 
     if ((token = strtok(NULL, "\n")) == NULL) {
       return RC_SNAPSHOT_INVALID_FILE;
