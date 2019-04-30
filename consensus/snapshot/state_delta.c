@@ -228,11 +228,9 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
 
 retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *const delta) {
   retcode_t ret = RC_OK;
-  char c;
   tryte_t curr_address_trytes[NUM_TRYTES_ADDRESS];
   flex_trit_t curr_address[FLEX_TRIT_SIZE_243];
   int64_t value;
-  int offset;
   char const *ptr = str;
   char *token;
   int64_t supply = 0;

@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "utils/files.h"
+#include "utils/logger_helper.h"
 
 retcode_t iota_utils_copy_file(const char *to, const char *from) {
   retcode_t ret = RC_OK;

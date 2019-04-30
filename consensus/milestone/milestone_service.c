@@ -16,7 +16,6 @@
 static logger_id_t logger_id;
 
 retcode_t iota_milestone_service_init(milestone_service_t *const milestone_service, iota_consensus_conf_t *conf) {
-  retcode_t ret;
   milestone_service->conf = conf;
   logger_id = logger_helper_enable(MILESTONE_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
 

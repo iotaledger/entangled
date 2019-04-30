@@ -52,6 +52,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   state_size = state_delta_serialized_str_size(snapshot->state);
   char *buffer;
   if ((buffer = (char *)calloc(state_size, sizeof(char))) == NULL) {
+    log_critical(logger_id, "Failed in allocating buffer for snapshot file\n");
     return RC_OOM;
   }
 
@@ -67,6 +68,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
 
   if (metadata_size > state_size && (buffer = (char *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
+    log_critical(logger_id, "Failed in reallocating buffer for snapshot file\n");
     return RC_OOM;
   }
 
@@ -76,6 +78,10 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
 cleanup:
   if (buffer) {
     free(buffer);
+  }
+
+  if (ret) {
+    log_critical(logger_id, "Failed in writing snapshot file with error code: %s\n", ret);
   }
 
   return ret;
