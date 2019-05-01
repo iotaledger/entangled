@@ -27,8 +27,8 @@ retcode_t tangle_traversal_dfs_to_past(tangle_t const *const tangle, tangle_trav
     return ret;
   }
 
-  bool should_branch;
-  bool should_stop;
+  bool should_branch = true;
+  bool should_stop = false;
 
   while (non_analyzed_hashes != NULL) {
     memcpy(hash, hash243_stack_peek(non_analyzed_hashes), FLEX_TRIT_SIZE_243);
