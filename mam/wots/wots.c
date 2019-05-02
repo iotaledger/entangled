@@ -72,13 +72,7 @@ static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
  * Public functions
  */
 
-void mam_wots_init(mam_wots_t *const wots) {
-  MAM_ASSERT(wots);
-
-  memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
-}
-
-void mam_wots_destroy(mam_wots_t *const wots) {
+void mam_wots_reset(mam_wots_t *const wots) {
   MAM_ASSERT(wots);
 
   memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);

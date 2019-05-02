@@ -48,19 +48,13 @@ typedef struct mam_wots_s {
 } mam_wots_t;
 
 /**
- * Initializes a WOTS interface with a sponge
+ * @brief Initializes a WOTS interface with a sponge
  *
  * @param wots A WOTS interface
  */
-void mam_wots_init(mam_wots_t *const wots);
+void mam_wots_reset(mam_wots_t *const wots);
 
 /**
- * Deallocates memory for WOTS secret key
- *
- * @param wots A WOTS interface
- */
-void mam_wots_destroy(mam_wots_t *const wots);
-
 /**
  * Generates a WOTS secret key with a nonce
  *
