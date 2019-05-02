@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_MSS_MSS_H__
 #define __MAM_MSS_MSS_H__
 
@@ -292,3 +301,5 @@ retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss);
 #endif
 
 #endif  // __MAM_MSS_MSS_H__
+
+/** @} */

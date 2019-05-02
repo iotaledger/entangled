@@ -6,8 +6,8 @@
  */
 
  /**
- * @defgroup mam MAM 
- * @brief The Masked Authenticated Messaging(MAM) implementation. 
+ * @defgroup mam MAM
+ * @brief The Masked Authenticated Messaging (MAM) implementation. 
  *
  * TODO
  */

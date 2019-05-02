@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_PRNG_PRNG_H__
 #define __MAM_PRNG_PRNG_H__
 
@@ -96,3 +105,5 @@ retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng);
 #endif
 
 #endif  // __MAM_PRNG_PRNG_H__
+
+/** @} */

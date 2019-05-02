@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_WOTS_WOTS_H__
 #define __MAM_WOTS_WOTS_H__
 
@@ -131,3 +140,5 @@ bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash, trits_t c
 #endif
 
 #endif  // __MAM_WOTS_WOTS_H__
+
+/** @} */

@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_NTRU_NTRU_TYPES_H__
 #define __MAM_NTRU_NTRU_TYPES_H__
 
@@ -54,3 +63,5 @@ typedef struct mam_ntru_sk_t_set_entry_s mam_ntru_sk_t_set_entry_t;
 typedef mam_ntru_sk_t_set_entry_t* mam_ntru_sk_t_set_t;
 
 #endif  // __MAM_NTRU_NTRU_TYPES_H__
+
+/** @} */

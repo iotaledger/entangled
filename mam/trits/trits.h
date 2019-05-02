@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_TRITS_TRITS_H__
 #define __MAM_TRITS_TRITS_H__
 
@@ -232,3 +241,5 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx);
 #endif
 
 #endif  // __MAM_TRITS_TRITS_H__
+
+/** @} */

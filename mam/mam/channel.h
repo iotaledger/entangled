@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_MAM_CHANNEL_H__
 #define __MAM_MAM_CHANNEL_H__
 
@@ -116,3 +125,5 @@ retcode_t mam_channels_deserialize(trits_t *const buffer, mam_prng_t *const prng
 #endif
 
 #endif  // __MAM_MAM_CHANNEL_H__
+
+/** @} */
