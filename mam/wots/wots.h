@@ -25,17 +25,17 @@
 #include "mam/sponge/spongos.h"
 #include "mam/trits/trits.h"
 
-// WOTS public key size
+/** @brief WOTS public key size */
 #define MAM_WOTS_PK_SIZE 243
-// WOTS secret key part size
+/** @brief WOTS secret key part size */
 #define MAM_WOTS_SK_PART_SIZE 162
-// WOTS secret key parts count
+/** @brief WOTS secret key parts count */
 #define MAM_WOTS_SK_PART_COUNT 81
-// WOTS secret key size
+/** @brief WOTS secret key size */
 #define MAM_WOTS_SK_SIZE (MAM_WOTS_SK_PART_SIZE * MAM_WOTS_SK_PART_COUNT)
-// WOTS signed hash value size
+/** @brief WOTS signed hash value size */
 #define MAM_WOTS_HASH_SIZE 234
-// WOTS signature size
+/** @brief WOTS signature size */
 #define MAM_WOTS_SIG_SIZE MAM_WOTS_SK_SIZE
 
 #ifdef __cplusplus
@@ -48,80 +48,79 @@ typedef struct mam_wots_s {
 } mam_wots_t;
 
 /**
- * @brief Initializes a WOTS interface with a sponge
+ * @brief Safely resets a WOTS secret key
  *
- * @param wots A WOTS interface
+ * @param[out] wots The WOTS secret key
  */
 void mam_wots_reset(mam_wots_t *const wots);
 
 /**
-/**
- * Generates a WOTS secret key with a nonce
+ * @brief Generates a WOTS secret key with a nonce
  *
- * @param wots A WOTS interface
- * @param prng A PRNG interface
- * @param nonce The nonce
+ * @param[out] wots The WOTS secret key
+ * @param[in] prng A PRNG
+ * @param[in] nonce The nonce
  */
-
 void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce);
 
 /**
- * Generates a WOTS secret key with two nonces
+ * @brief Generates a WOTS secret key with two nonces
  *
- * @param wots A WOTS interface
- * @param prng A PRNG interface
- * @param nonce1 The first nonce
- * @param nonce2 The second nonce
+ * @param[out] wots The WOTS secret key
+ * @param[in] prng A PRNG
+ * @param[in] nonce1 The first nonce
+ * @param[in] nonce2 The second nonce
  */
 void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1, trits_t const nonce2);
 
 /**
- * Generate a WOTS secret key with three nonces
+ * @brief Generates a WOTS secret key with three nonces
  *
- * @param wots A WOTS interface
- * @param prng A PRNG interface
- * @param nonce1 The first nonce
- * @param nonce2 The second nonce
- * @param nonce3 The third nonce
+ * @param[out] wots The WOTS secret key
+ * @param[in] prng A PRNG
+ * @param[in] nonce1 The first nonce
+ * @param[in] nonce2 The second nonce
+ * @param[in] nonce3 The third nonce
  */
 void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1, trits_t const nonce2,
                       trits_t const nonce3);
 
 /**
- * Calculates a WOTS public key
- * Private key must have already been generated
+ * @brief Generates a WOTS public key associated with a WOTS private key
  *
- * @param wots A WOTS interface
- * @param public_key The public key
+ * The private key must have already been generated
+ *
+ * @param[in] wots The WOTS secret key
+ * @param[out] public_key The WOTS public key
  */
-void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key);
+void mam_wots_calc_pk(mam_wots_t const *const wots, trits_t public_key);
 
 /**
- * Generates a WOTS signature
+ * @brief Generates a WOTS signature associated with a WOTS private key
  *
- * @param wots A WOTS interface
- * @param hash A hash to be signed
- * @param signature The signature
+ * @param[in] wots The WOTS secret key
+ * @param[in] hash A hash to be signed
+ * @param[out] signature The WOTS signature
  */
-void mam_wots_sign(mam_wots_t *const wots, trits_t const hash, trits_t signature);
+void mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_t signature);
 
 /**
- * Recovers a WOTS public key from a signature
+ * @brief Recovers a WOTS public key from a WOTS signature
  *
- * @param spongos A spongos interface
- * @param hash A signed hash
- * @param signature The signature
- * @param public_key The recovered public key
+ * @param[in,out] spongos A spongos
+ * @param[in] hash A signed hash
+ * @param[in] signature The WOTS signature
+ * @param[out] public_key The WOTS public key
  */
 void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature, trits_t public_key);
 
 /**
- * Verifies a WOTS signature
+ * @brief Verifies a WOTS signature
  *
- * @param spongos A spongos interface
- * @param hash A signed hash
- * @param signature The signature
- * @param public_key The presumed public key
+ * @param[in,out] spongos A spongos
+ * @param[in] hash A signed hash
+ * @param[in] signature The WOTS signature
+ * @param[in] public_key The WOTS public key
  *
  * @return true if valid, false otherwise
  */

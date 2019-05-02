@@ -92,7 +92,7 @@ void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trit
   mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, wots_secret_key_trits(wots));
 }
 
-void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key) {
+void mam_wots_calc_pk(mam_wots_t const *const wots, trits_t public_key) {
   mam_spongos_t spongos;
   mam_spongos_init(&spongos);
   MAM_ASSERT(trits_size(public_key) == MAM_WOTS_PK_SIZE);
@@ -107,7 +107,7 @@ void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key) {
   memset_safe(trits_begin(secret_key), trits_size(secret_key), 0, trits_size(secret_key));
 }
 
-void mam_wots_sign(mam_wots_t *const wots, trits_t const hash, trits_t signature) {
+void mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_t signature) {
   mam_spongos_t spongos;
   mam_spongos_init(&spongos);
   MAM_ASSERT(trits_size(hash) == MAM_WOTS_HASH_SIZE);
