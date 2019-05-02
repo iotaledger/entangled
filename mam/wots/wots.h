@@ -107,25 +107,22 @@ void mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_t sig
 /**
  * @brief Recovers a WOTS public key from a WOTS signature
  *
- * @param[in,out] spongos A spongos
  * @param[in] hash A signed hash
  * @param[in] signature The WOTS signature
  * @param[out] public_key The WOTS public key
  */
-void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature, trits_t public_key);
+void mam_wots_recover(trits_t const hash, trits_t const signature, trits_t public_key);
 
 /**
  * @brief Verifies a WOTS signature
  *
- * @param[in,out] spongos A spongos
  * @param[in] hash A signed hash
  * @param[in] signature The WOTS signature
  * @param[in] public_key The WOTS public key
  *
  * @return true if valid, false otherwise
  */
-bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature,
-                     trits_t const public_key);
+bool mam_wots_verify(trits_t const hash, trits_t const signature, trits_t const public_key);
 
 #ifdef __cplusplus
 }

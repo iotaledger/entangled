@@ -533,7 +533,7 @@ size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss) {
   return MAM_MSS_MAX_SKN(mss->height) - mss->skn;
 }
 
-bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trits_t hash, trits_t sig, trits_t pk) {
+bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_t pk) {
   mss_mt_height_t height;
   mss_mt_idx_t skn;
   MAM_TRITS_DEF0(calculated_pk, MAM_MSS_MT_HASH_SIZE);
@@ -550,7 +550,7 @@ bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trit
   sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
   if (trits_size(sig) != (MAM_MSS_SIG_SIZE(height) - MAM_MSS_SKN_SIZE)) return false;
 
-  mam_wots_recover(wots_spongos, hash, trits_take(sig, MAM_WOTS_SIG_SIZE), calculated_pk);
+  mam_wots_recover(hash, trits_take(sig, MAM_WOTS_SIG_SIZE), calculated_pk);
   sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
 
   mss_fold_auth_path(mt_spongos, skn, sig, calculated_pk);

@@ -231,14 +231,13 @@ size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss);
  * Verifies MSS signature.
  *
  * @param mt_spongos [in] Spongos interface to hash Merkle Tree
- * @param wots_spongos [in] Spongos interface to hash WOTS iterations
  * @param hash [in] signed hash value
  * @param sig [in] signature
  * @param [in] public key (Merkle-tree root)
  *
  * @return bool True is the signature is correct, False otherwise
  */
-bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trits_t hash, trits_t sig, trits_t pk);
+bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_t pk);
 
 /**
  * Allocate memory for internal Merkle tree structure.
