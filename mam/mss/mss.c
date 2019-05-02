@@ -39,8 +39,8 @@ static void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, /*!< [in] leaf index
   /* gen sk from current leaf index */
   trits_put18(nonce_i, i);
   mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
-  /* calc pk & push hash */
-  mam_wots_calc_pk(&wots, pk);
+  /* gen pk & push hash */
+  mam_wots_gen_pk(&wots, pk);
 }
 
 #if defined(MAM_MSS_TRAVERSAL)

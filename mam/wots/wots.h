@@ -105,7 +105,7 @@ static inline void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *con
  * @param[in] wots The WOTS secret key
  * @param[out] public_key The WOTS public key
  */
-void mam_wots_calc_pk(mam_wots_t const *const wots, trits_t public_key);
+void mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key);
 
 /**
  * @brief Generates a WOTS signature associated with a WOTS private key

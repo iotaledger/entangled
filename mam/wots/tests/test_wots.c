@@ -36,7 +36,7 @@ static void mam_wots_test(void) {
   mam_wots_reset(&wots);
   mam_prng_gen(&prng, 7, N, H);
   mam_wots_gen_sk(&wots, &prng, N);
-  mam_wots_calc_pk(&wots, pk);
+  mam_wots_gen_pk(&wots, pk);
   mam_wots_sign(&wots, H, sig);
 
   TEST_ASSERT_TRUE(mam_wots_verify(H, sig, pk));

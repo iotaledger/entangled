@@ -74,7 +74,7 @@ void mam_wots_reset(mam_wots_t *const wots) {
   memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
 }
 
-void mam_wots_calc_pk(mam_wots_t const *const wots, trits_t public_key) {
+void mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
   mam_spongos_t spongos;
   mam_spongos_init(&spongos);
   MAM_ASSERT(trits_size(public_key) == MAM_WOTS_PK_SIZE);
