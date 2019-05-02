@@ -14,19 +14,6 @@
  * Private functions
  */
 
-static void mam_wots_calc_pks(mam_spongos_t *const spongos, trits_t secret_key, trits_t public_key) {
-  trits_t secret_key_part;
-
-  for (size_t i = 0; i < MAM_WOTS_SK_PART_COUNT; ++i) {
-    secret_key_part = trits_take(secret_key, MAM_WOTS_SK_PART_SIZE);
-    secret_key = trits_drop(secret_key, MAM_WOTS_SK_PART_SIZE);
-
-    for (size_t j = 0; j < 26; ++j) {
-      mam_spongos_hash(spongos, secret_key_part, secret_key_part);
-    }
-  }
-}
-
 typedef enum wots_hash_operation_e { WOTS_HASH_SIGN, WOTS_HASH_RECOVER } wots_hash_operation_t;
 
 static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t signature, trits_t const hash,
@@ -76,6 +63,8 @@ void mam_wots_reset(mam_wots_t *const wots) {
 
 void mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
   mam_spongos_t spongos;
+  trits_t secret_key_part;
+
   mam_spongos_init(&spongos);
   MAM_ASSERT(trits_size(public_key) == MAM_WOTS_PK_SIZE);
 
@@ -83,9 +72,13 @@ void mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
   secret_key = MAM_TRITS_INIT(secret_key, MAM_WOTS_SK_SIZE);
 
   trits_copy(wots_secret_key_trits(wots), secret_key);
-  mam_wots_calc_pks(&spongos, secret_key, public_key);
+  for (size_t i = 0; i < MAM_WOTS_SK_PART_COUNT; ++i) {
+    secret_key_part = trits_take(trits_drop(secret_key, MAM_WOTS_SK_PART_SIZE * i), MAM_WOTS_SK_PART_SIZE);
+    for (size_t j = 0; j < 26; ++j) {
+      mam_spongos_hash(&spongos, secret_key_part, secret_key_part);
+    }
+  }
   mam_spongos_hash(&spongos, secret_key, public_key);
-
   memset_safe(trits_begin(secret_key), trits_size(secret_key), 0, trits_size(secret_key));
 }
 
