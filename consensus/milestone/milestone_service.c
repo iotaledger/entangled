@@ -54,7 +54,7 @@ retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, miles
   }
 
   if (last_applied_milestone != NULL) {
-    log_info(logger_id, "Target milestone index: % " PRIu64 "\n", last_applied_milestone->index);
+    log_info(logger_id, "Applied milestone index: % " PRIu64 "\n", last_applied_milestone->index);
     ERR_BIND_GOTO(iota_snapshot_apply_patch_no_lock(snapshot, &merged_balance_changes, last_applied_milestone->index),
                   ret, cleanup);
   }

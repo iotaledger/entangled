@@ -134,7 +134,7 @@ void transaction_invalid_timestamp_too_old() {
   uint64_t current_time = current_timestamp_ms();
   transaction_set_timestamp(tx1, current_time / 1000 - 1);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = current_time / 1000;
+  snapshots_provider.inital_snapshot.metadata.timestamp = current_time / 1000UL;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &conf) == RC_OK);
   TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 

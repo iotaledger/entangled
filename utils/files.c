@@ -94,9 +94,7 @@ retcode_t iota_utils_overwrite_file(char const *const file_path, char const *con
   if ((file = fopen(file_path, "r"))) {
     strcpy(file_path_backup, file_path);
     strcat(file_path_backup, ".backup");
-    if (rename(file_path, file_path_backup) == -1) {
-      return RC_UTILS_FAILED_WRITE_FILE;
-    }
+    ERR_BIND_GOTO(iota_utils_copy_file(file_path_backup, file_path), ret, cleanup);
     fclose(file);
     file_already_exist = true;
   }

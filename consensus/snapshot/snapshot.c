@@ -6,6 +6,7 @@
  */
 
 #include "consensus/snapshot/snapshot.h"
+#include <inttypes.h>
 #include <stdlib.h>
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
@@ -127,8 +128,8 @@ retcode_t iota_snapshot_load_built_in_snapshot(snapshot_t *const snapshot, iota_
 
   hash_to_uint64_t_map_t solid_entry_points = NULL;
 
-  hash_to_uint64_t_map_add(&solid_entry_points, conf->genesis_hash, conf->snapshot_signature_index);
-  iota_snapshot_metadata_init(&snapshot->metadata, conf->genesis_hash, conf->snapshot_signature_index,
+  hash_to_uint64_t_map_add(&solid_entry_points, conf->genesis_hash, conf->last_milestone);
+  iota_snapshot_metadata_init(&snapshot->metadata, conf->genesis_hash, conf->last_milestone,
                               conf->snapshot_timestamp_sec, solid_entry_points);
 
 #if defined(IOTA_MAINNET)
