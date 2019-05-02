@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_NTRU_POLY_PARAM_H__
 #define __MAM_NTRU_POLY_PARAM_H__
 
@@ -355,3 +364,5 @@ static size_t poly_idx_rev[MAM_POLY_N] = {
 #endif
 
 #endif  // __MAM_NTRU_POLY_PARAM_H__
+
+/** @} */

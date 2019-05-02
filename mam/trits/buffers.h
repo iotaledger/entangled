@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_TRITS_BUFFERS_H__
 #define __MAM_TRITS_BUFFERS_H__
 
@@ -81,3 +90,5 @@ size_t buffers_copy_from(buffers_t *const buffers, trits_t trits);
 #endif
 
 #endif  // __MAM_TRITS_BUFFERS_H__
+
+/** @} */

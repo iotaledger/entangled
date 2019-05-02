@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_PB3_PB3_H__
 #define __MAM_PB3_PB3_H__
 
@@ -93,3 +102,5 @@ void pb3_squeeze_external_ntrytes(mam_spongos_t *const spongos, trits_t const tr
 #endif
 
 #endif  // __MAM_PB3_PB3_H__
+
+/** @} */

@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_SPONGE_SPONGOS_TYPES_H__
 #define __MAM_SPONGE_SPONGOS_TYPES_H__
 
@@ -35,3 +44,5 @@ retcode_t mam_spongos_deserialize(trits_t *const trits, mam_spongos_t *const spo
 #endif
 
 #endif  // __MAM_SPONGE_SPONGOS_TYPES_H__
+
+/** @} */
