@@ -28,8 +28,8 @@ static retcode_t check_transaction_is_not_orphan_add_entry_point_do_func(flex_tr
                                                                          void *data, bool *should_branch,
                                                                          bool *should_stop);
 
-static retcode_t check_is_solid_entry_point_relevant_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
-                                                             bool *should_branch, bool *should_stop);
+static retcode_t find_solid_entry_points_and_update_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
+                                                            bool *should_branch, bool *should_stop);
 
 static retcode_t iota_snapshots_service_update_new_solid_entry_points(snapshots_service_t *const snapshots_service,
                                                                       snapshot_t *const initial_snapshot,
@@ -45,14 +45,18 @@ static retcode_t iota_snapshots_service_find_solid_entry_points_and_update(
     snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
     uint64_t min_snapshot_index, flex_trit_t const *const hash, hash_to_uint64_t_map_t *const solid_entry_points);
 
-typedef struct check_is_solid_entry_point_do_func_params_s {
+typedef struct find_solid_entry_points_and_update_do_func_params_s {
   uint64_t min_snapshot_index;
   uint64_t target_milestone_index;
   uint64_t target_milestone_timestamp;
   snapshots_service_t *snapshots_service;
   hash_to_uint64_t_map_t *solid_entry_points;
+} find_solid_entry_points_and_update_do_func_params_t;
+
+typedef struct check_not_orphan_do_func_params_s {
+  uint64_t target_milestone_timestamp;
   bool is_orphan;
-} check_is_solid_entry_point_do_func_params_t;
+} check_not_orphan_do_func_params_t;
 
 retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
                                       snapshots_provider_t *const snapshots_provider,
@@ -214,7 +218,7 @@ static retcode_t check_transaction_is_not_orphan_add_entry_point_do_func(flex_tr
   retcode_t ret = RC_OK;
   *should_stop = false;
   *should_branch = false;
-  check_is_solid_entry_point_do_func_params_t *params = data;
+  find_solid_entry_points_and_update_do_func_params_t *params = data;
 
   if (pack->num_loaded == 0) {
     return RC_OK;
@@ -242,7 +246,7 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
                                                          bool *should_branch, bool *should_stop) {
   *should_stop = false;
   *should_branch = false;
-  check_is_solid_entry_point_do_func_params_t *params = data;
+  check_not_orphan_do_func_params_t *params = data;
 
   if (pack->num_loaded == 0) {
     return RC_OK;
@@ -258,12 +262,12 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
   return RC_OK;
 }
 
-static retcode_t check_is_solid_entry_point_relevant_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
-                                                             bool *should_branch, bool *should_stop) {
+static retcode_t find_solid_entry_points_and_update_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
+                                                            bool *should_branch, bool *should_stop) {
   retcode_t ret = RC_OK;
   *should_stop = false;
   *should_branch = false;
-  check_is_solid_entry_point_do_func_params_t *params = data;
+  find_solid_entry_points_and_update_do_func_params_t *params = data;
 
   if (pack->num_loaded == 0) {
     return RC_OK;
@@ -296,14 +300,14 @@ static retcode_t iota_snapshots_service_find_solid_entry_points_and_update(
     snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
     uint64_t min_snapshot_index, flex_trit_t const *const hash, hash_to_uint64_t_map_t *const solid_entry_points) {
   retcode_t ret;
-  check_is_solid_entry_point_do_func_params_t params;
+  find_solid_entry_points_and_update_do_func_params_t params;
 
   params.target_milestone_index = target_milestone_index;
   params.snapshots_service = snapshots_service;
   params.solid_entry_points = solid_entry_points;
   params.min_snapshot_index = min_snapshot_index;
   params.target_milestone_timestamp = target_milestone_timestamp;
-  ERR_BIND_RETURN(tangle_traversal_dfs_to_past(&snapshots_service->tangle, check_is_solid_entry_point_relevant_do_func,
+  ERR_BIND_RETURN(tangle_traversal_dfs_to_past(&snapshots_service->tangle, find_solid_entry_points_and_update_do_func,
                                                hash, snapshots_service->conf->genesis_hash, NULL, &params),
                   ret);
   return RC_OK;
@@ -313,21 +317,17 @@ static retcode_t iota_snapshots_service_add_non_orphan_solid_entry_points(
     snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
     uint64_t min_snapshot_index, flex_trit_t const *const hash, hash_to_uint64_t_map_t *const solid_entry_points) {
   retcode_t ret;
-  check_is_solid_entry_point_do_func_params_t params;
+  check_not_orphan_do_func_params_t params;
 
-  params.target_milestone_index = target_milestone_index;
-  params.snapshots_service = snapshots_service;
-  params.solid_entry_points = solid_entry_points;
-  params.min_snapshot_index = min_snapshot_index;
   params.target_milestone_timestamp = target_milestone_timestamp;
   params.is_orphan = true;
 
-  ERR_BIND_RETURN(tangle_traversal_dfs_to_future(&params.snapshots_service->tangle,
-                                                 check_transaction_is_not_orphan_do_func, hash, NULL, &params),
+  ERR_BIND_RETURN(tangle_traversal_dfs_to_future(&snapshots_service->tangle, check_transaction_is_not_orphan_do_func,
+                                                 hash, NULL, &params),
                   ret);
 
   if (!params.is_orphan) {
-    ERR_BIND_RETURN(hash_to_uint64_t_map_add(params.solid_entry_points, hash, min_snapshot_index), ret);
+    ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, hash, min_snapshot_index), ret);
   }
   return RC_OK;
 }
