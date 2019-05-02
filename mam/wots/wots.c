@@ -64,10 +64,6 @@ static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t sign
   }
 }
 
-static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
-  return trits_from_rep(MAM_WOTS_SK_SIZE, wots->secret_key);
-}
-
 /*
  * Public functions
  */
@@ -76,20 +72,6 @@ void mam_wots_reset(mam_wots_t *const wots) {
   MAM_ASSERT(wots);
 
   memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
-}
-
-void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce) {
-  mam_wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
-}
-
-void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
-                      trits_t const nonce2) {
-  mam_wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
-}
-
-void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1, trits_t const nonce2,
-                      trits_t const nonce3) {
-  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, wots_secret_key_trits(wots));
 }
 
 void mam_wots_calc_pk(mam_wots_t const *const wots, trits_t public_key) {
