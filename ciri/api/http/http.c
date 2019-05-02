@@ -637,9 +637,6 @@ retcode_t iota_api_http_start(iota_api_http_t *const api) {
 }
 
 retcode_t iota_api_http_stop(iota_api_http_t *const api) {
-  retcode_t ret = RC_OK;
-  tangle_t *tangle;
-
   if (api == NULL) {
     return RC_NULL_PARAM;
   } else if (api->running == false) {
@@ -648,27 +645,29 @@ retcode_t iota_api_http_stop(iota_api_http_t *const api) {
 
   MHD_stop_daemon(api->state);
 
-  for (tangle = (tangle_t *)utarray_back(api->db_connections); tangle != NULL;
-       tangle = (tangle_t *)utarray_back(api->db_connections)) {
-    log_error(logger_id, "Destroying HTTP API database connection\n");
-    iota_tangle_destroy(tangle);
-    free(tangle);
-    utarray_pop_back(api->db_connections);
-  }
-
   api->running = false;
-  return ret;
+
+  return RC_OK;
 }
 
 retcode_t iota_api_http_destroy(iota_api_http_t *const api) {
+  tangle_t *iter = NULL;
+
   if (api == NULL) {
     return RC_NULL_PARAM;
   } else if (api->running) {
     return RC_STILL_RUNNING;
   }
 
+  for (iter = (tangle_t *)utarray_back(api->db_connections); iter != NULL;
+       iter = (tangle_t *)utarray_back(api->db_connections)) {
+    iota_tangle_destroy(iter);
+    free(iter);
+  }
+
   utarray_free(api->db_connections);
 
   logger_helper_release(logger_id);
+
   return RC_OK;
 }
