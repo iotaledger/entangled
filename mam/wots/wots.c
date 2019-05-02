@@ -7,11 +7,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "mam/pb3/pb3.h"
-#include "mam/sponge/spongos_types.h"
 #include "mam/wots/wots.h"
 #include "utils/memset_safe.h"
 
