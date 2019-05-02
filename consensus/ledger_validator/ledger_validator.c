@@ -68,7 +68,8 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv, tangle_t con
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  if ((ret = iota_tangle_milestone_load_first(tangle, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_milestone_load_next(
+           tangle, lv->milestone_tracker->snapshots_provider->inital_snapshot.metadata.index, &pack)) != RC_OK) {
     goto done;
   }
 
@@ -261,11 +262,9 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
       }
 
       iota_snapshot_write_lock(&lv->milestone_tracker->snapshots_provider->latest_snapshot);
-      if ((ret = iota_milestone_service_replay_milestones(tangle, lv->milestone_service,
-                                                          &lv->milestone_tracker->snapshots_provider->latest_snapshot,
-                                                          milestone->index)) != RC_OK) {
-        log_error(logger_id, "Replaying milestones failed\n");
-        iota_snapshot_unlock(&lv->milestone_tracker->snapshots_provider->latest_snapshot);
+      if ((ret = iota_snapshot_apply_patch_no_lock(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
+                                                   milestone->index)) != RC_OK) {
+        log_error(logger_id, "Applying patch failed\n");
         goto done;
       }
       iota_snapshot_unlock(&lv->milestone_tracker->snapshots_provider->latest_snapshot);

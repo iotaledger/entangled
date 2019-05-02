@@ -21,6 +21,9 @@
 extern "C" {
 #endif
 
+#define SNAPSHOT_SERVICE_SOLID_ENTRY_POINT_MAX_DEPTH 500
+#define SNAPSHOT_SERVICE_MAX_NUM_MILESTONE_TO_CALC 500
+
 typedef struct snapshots_service_s {
   iota_consensus_conf_t *conf;
   snapshots_provider_t *snapshots_provider;

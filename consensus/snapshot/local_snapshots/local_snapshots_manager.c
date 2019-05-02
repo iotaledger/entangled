@@ -6,10 +6,13 @@
  */
 
 #include "consensus/snapshot/local_snapshots/local_snapshots_manager.h"
+#include <inttypes.h>
 #include "common/storage/connection.h"
 #include "consensus/snapshot/local_snapshots/conf.h"
+#include "consensus/snapshot/snapshots_service.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 #define LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS 10000
 
@@ -22,6 +25,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   lock_handle_t lock_cond;
   retcode_t err;
   size_t exponential_delay_factor = 1;
+  uint64_t start_timestamp, end_timestamp;
 
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
@@ -33,11 +37,17 @@ static void *local_snapshots_manager_routine(void *arg) {
     return NULL;
   }
 
+  bool skip_check = false;
+
   while (lsm->running) {
-    if (iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
+    if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
+      start_timestamp = current_timestamp_ms();
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, lsm->mt);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
+        end_timestamp = current_timestamp_ms();
+        log_info(logger_id, "Local snapshot completed successfully in %" PRIu64 " ms\n",
+                 end_timestamp - start_timestamp);
         if (iota_tangle_transaction_count(&tangle, &lsm->last_snapshot_transactions_count) != RC_OK) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
@@ -50,8 +60,13 @@ static void *local_snapshots_manager_routine(void *arg) {
         goto cleanup;
       }
     }
-    cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond,
-                          exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+    if (!iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
+      cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond,
+                            exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+      skip_check = false;
+    } else {
+      skip_check = true;
+    }
   }
 
 cleanup:
@@ -60,6 +75,10 @@ cleanup:
   lock_handle_destroy(&lock_cond);
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
+  }
+
+  if (err != RC_OK) {
+    log_warning(logger_id, "Local snapshot is failed with error code: %d\n", err);
   }
 
   return NULL;
@@ -73,11 +92,13 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
     return false;
   }
 
-  if (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
-       lsm->conf->local_snapshots.transactions_growth_threshold) &&
-      (lsm->snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
-       lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index) >
-          lsm->conf->local_snapshots.min_depth) {
+  uint64_t latest_to_initial_gap = lsm->snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
+                                   lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
+
+  if ((latest_to_initial_gap > SNAPSHOT_SERVICE_MAX_NUM_MILESTONE_TO_CALC) ||
+      (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
+        lsm->conf->local_snapshots.transactions_growth_threshold) &&
+       latest_to_initial_gap > lsm->conf->local_snapshots.min_depth)) {
     return true;
   }
   return false;

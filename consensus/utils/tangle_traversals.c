@@ -88,8 +88,8 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
     goto done;
   }
 
-  bool should_branch;
-  bool should_stop;
+  bool should_branch = true;
+  bool should_stop = false;
 
   while (!hash243_stack_empty(non_analyzed_hashes)) {
     curr_tx_hash = hash243_stack_peek(non_analyzed_hashes);

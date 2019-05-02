@@ -204,6 +204,7 @@ int main(void) {
 
   TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
+  api.core->consensus.conf.last_milestone = 0;
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);
 
