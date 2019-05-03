@@ -51,8 +51,10 @@ typedef struct mam_wots_s {
  * @brief Safely resets a WOTS secret key
  *
  * @param[out] wots The WOTS secret key
+ *
+ * @return a status code
  */
-void mam_wots_reset(mam_wots_t *const wots);
+retcode_t mam_wots_reset(mam_wots_t *const wots);
 
 // TODO
 static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
@@ -104,8 +106,10 @@ static inline void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *con
  *
  * @param[in] wots The WOTS secret key
  * @param[out] public_key The WOTS public key
+ *
+ * @return a status code
  */
-void mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key);
+retcode_t mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key);
 
 /**
  * @brief Generates a WOTS signature associated with a WOTS private key
@@ -113,8 +117,10 @@ void mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key);
  * @param[in] wots The WOTS secret key
  * @param[in] hash A hash to be signed
  * @param[out] signature The WOTS signature
+ *
+ * @return a status code
  */
-void mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_t signature);
+retcode_t mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_t signature);
 
 /**
  * @brief Recovers a WOTS public key from a WOTS signature
@@ -122,8 +128,10 @@ void mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_t sig
  * @param[in] hash A signed hash
  * @param[in] signature The WOTS signature
  * @param[out] public_key The WOTS public key
+ *
+ * @return a status code
  */
-void mam_wots_recover(trits_t const hash, trits_t const signature, trits_t public_key);
+retcode_t mam_wots_recover(trits_t const hash, trits_t const signature, trits_t public_key);
 
 /**
  * @brief Verifies a WOTS signature
@@ -131,10 +139,11 @@ void mam_wots_recover(trits_t const hash, trits_t const signature, trits_t publi
  * @param[in] hash A signed hash
  * @param[in] signature The WOTS signature
  * @param[in] public_key The WOTS public key
+ * @param[out] verified True if verified, false otherwise
  *
- * @return true if valid, false otherwise
+ * @return a status code
  */
-bool mam_wots_verify(trits_t const hash, trits_t const signature, trits_t const public_key);
+retcode_t mam_wots_verify(trits_t const hash, trits_t const signature, trits_t const public_key, bool *const verified);
 
 #ifdef __cplusplus
 }

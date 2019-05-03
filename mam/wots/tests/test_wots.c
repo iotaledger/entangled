@@ -14,6 +14,7 @@
 static void mam_wots_test(void) {
   mam_prng_t prng;
   mam_wots_t wots;
+  bool verified;
 
   MAM_TRITS_DEF0(N, 18);
   MAM_TRITS_DEF0(pk, MAM_WOTS_PK_SIZE);
@@ -39,18 +40,26 @@ static void mam_wots_test(void) {
   mam_wots_gen_pk(&wots, pk);
   mam_wots_sign(&wots, H, sig);
 
-  TEST_ASSERT_TRUE(mam_wots_verify(H, sig, pk));
+  verified = false;
+  mam_wots_verify(H, sig, pk, &verified);
+  TEST_ASSERT_TRUE(verified);
 
   trits_put1(H, trit_add(trits_get1(H), 1));
-  TEST_ASSERT_TRUE(!mam_wots_verify(H, sig, pk));
+  verified = true;
+  mam_wots_verify(H, sig, pk, &verified);
+  TEST_ASSERT_FALSE(verified);
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  TEST_ASSERT_TRUE(!mam_wots_verify(H, sig, pk));
+  verified = true;
+  mam_wots_verify(H, sig, pk, &verified);
+  TEST_ASSERT_FALSE(verified);
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  TEST_ASSERT_TRUE(!mam_wots_verify(H, sig, pk));
+  verified = true;
+  mam_wots_verify(H, sig, pk, &verified);
+  TEST_ASSERT_FALSE(verified);
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 }
 
