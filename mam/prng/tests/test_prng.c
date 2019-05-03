@@ -46,7 +46,7 @@ static void test_prng_serialization(void) {
   memset(secret_key_str, 'M', MAM_PRNG_KEY_SIZE / 3);
   trytes_to_trits(secret_key_str, prng1.secret_key, MAM_PRNG_KEY_SIZE / 3);
 
-  size_t size = mam_prng_serialized_size(&prng1);
+  size_t size = mam_prng_serialized_size();
 
   TEST_ASSERT_EQUAL_INT(size, MAM_PRNG_KEY_SIZE);
 

@@ -21,6 +21,7 @@
 
 #include "common/errors.h"
 #include "mam/defs.h"
+#include "mam/pb3/pb3.h"
 #include "mam/trits/trits.h"
 
 // PRNG secret key size
@@ -50,14 +51,14 @@ typedef struct mam_prng_s {
  * @param prng A PRNG interface
  * @param secret_key A secret key of size MAM_PRNG_KEY_SIZE
  */
-void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
+retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
 
 /**
  * PRNG deinitialization
  *
  * @param prng A PRNG interface
  */
-void mam_prng_destroy(mam_prng_t *const prng);
+retcode_t mam_prng_destroy(mam_prng_t *const prng);
 
 /**
  * PRNG output generation with three nonces
@@ -99,9 +100,15 @@ static inline void mam_prng_gen(mam_prng_t const *const prng, mam_prng_destinati
   mam_prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
 }
 
-size_t mam_prng_serialized_size();
-void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer);
-retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng);
+static inline size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }
+
+void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer) {
+  pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
+}
+
+retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng) {
+  return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
+}
 
 #ifdef __cplusplus
 }

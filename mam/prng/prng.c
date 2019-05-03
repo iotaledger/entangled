@@ -8,17 +8,31 @@
  */
 
 #include "mam/prng/prng.h"
-#include "mam/pb3/pb3.h"
 #include "mam/sponge/sponge.h"
 #include "utils/memset_safe.h"
 
-void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
-  MAM_ASSERT(trits_size(secret_key) == MAM_PRNG_KEY_SIZE);
-  trits_copy(secret_key, trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key));
+retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
+  if (prng == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (trits_size(secret_key) != MAM_PRNG_KEY_SIZE) {
+    return RC_INVALID_PARAM;
+  }
+
+  memcpy(prng->secret_key, trits_begin(secret_key), MAM_PRNG_KEY_SIZE);
+
+  return RC_OK;
 }
 
-void mam_prng_destroy(mam_prng_t *const prng) {
+retcode_t mam_prng_destroy(mam_prng_t *const prng) {
+  if (prng == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   memset_safe(prng->secret_key, MAM_PRNG_KEY_SIZE, 0, MAM_PRNG_KEY_SIZE);
+
+  return RC_OK;
 }
 
 void mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination, trits_t const nonce1,
@@ -40,14 +54,4 @@ void mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t co
   mam_sponge_squeeze(&sponge, MAM_SPONGE_CTL_PRN, output);
 
   return RC_OK;
-}
-
-size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }
-
-void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer) {
-  pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
-}
-
-retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng) {
-  return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
 }
