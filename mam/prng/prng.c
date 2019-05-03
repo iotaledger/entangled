@@ -35,12 +35,16 @@ retcode_t mam_prng_reset(mam_prng_t *const prng) {
   return RC_OK;
 }
 
-void mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination, trits_t const nonce1,
-                   trits_t const nonce2, trits_t const nonce3, trits_t output) {
+retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
+                        trits_t const nonce1, trits_t const nonce2, trits_t const nonce3, trits_t output) {
   mam_sponge_t sponge;
   trits_t KdN[5];
   MAM_TRITS_DEF0(dt, 3);
   dt = MAM_TRITS_INIT(dt, 3);
+
+  if (prng == NULL) {
+    return RC_NULL_PARAM;
+  }
 
   KdN[0] = trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key);
   KdN[1] = dt;
