@@ -25,7 +25,7 @@ retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
   return RC_OK;
 }
 
-retcode_t mam_prng_destroy(mam_prng_t *const prng) {
+retcode_t mam_prng_reset(mam_prng_t *const prng) {
   if (prng == NULL) {
     return RC_NULL_PARAM;
   }

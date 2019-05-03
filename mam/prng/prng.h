@@ -58,7 +58,7 @@ retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
  *
  * @param prng A PRNG interface
  */
-retcode_t mam_prng_destroy(mam_prng_t *const prng);
+retcode_t mam_prng_reset(mam_prng_t *const prng);
 
 /**
  * PRNG output generation with three nonces
@@ -102,11 +102,11 @@ static inline void mam_prng_gen(mam_prng_t const *const prng, mam_prng_destinati
 
 static inline size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }
 
-void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer) {
+static inline void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer) {
   pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
 }
 
-retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng) {
+static inline retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng) {
   return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
 }
 

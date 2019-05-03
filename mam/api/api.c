@@ -239,7 +239,7 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
     return RC_NULL_PARAM;
   }
 
-  mam_prng_destroy(&api->prng);
+  mam_prng_reset(&api->prng);
   mam_ntru_sks_destroy(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psks_destroy(&api->psks);
