@@ -72,11 +72,17 @@ static inline retcode_t mam_wots_reset(mam_wots_t *const wots) {
  * @param[in] nonce1 The first nonce
  * @param[in] nonce2 The second nonce
  * @param[in] nonce3 The third nonce
+ *
+ * @return a status code
  */
-static inline void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
-                                    trits_t const nonce2, trits_t const nonce3) {
-  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
-                trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, wots->private_key));
+static inline retcode_t mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
+                                         trits_t const nonce2, trits_t const nonce3) {
+  if (wots == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  return mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
+                       trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, wots->private_key));
 }
 
 /**
@@ -86,10 +92,12 @@ static inline void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *co
  * @param[in] prng A PRNG
  * @param[in] nonce1 The first nonce
  * @param[in] nonce2 The second nonce
+ *
+ * @return a status code
  */
-static inline void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
-                                    trits_t const nonce2) {
-  mam_wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
+static inline retcode_t mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
+                                         trits_t const nonce2) {
+  return mam_wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
 }
 
 /**
@@ -98,9 +106,11 @@ static inline void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *co
  * @param[out] wots The WOTS private key
  * @param[in] prng A PRNG
  * @param[in] nonce The nonce
+ *
+ * @return a status code
  */
-static inline void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce) {
-  mam_wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
+static inline retcode_t mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce) {
+  return mam_wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
 }
 
 /**
