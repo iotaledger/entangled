@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief
+ * @brief The WOTS layer supports Winternitz One-Time Signatures
  *
  */
 #ifndef __MAM_WOTS_WOTS_H__
@@ -42,7 +42,6 @@
 extern "C" {
 #endif
 
-// WOTS layer interface
 typedef struct mam_wots_s {
   trit_t private_key[MAM_WOTS_PRIVATE_KEY_SIZE];
 } mam_wots_t;
@@ -56,7 +55,13 @@ typedef struct mam_wots_s {
  */
 retcode_t mam_wots_reset(mam_wots_t *const wots);
 
-// TODO
+/**
+ * @brief Gets a WOTS private key of a WOTS instance
+ *
+ * @param[in] wots The WOTS instance
+ *
+ * @return the private key
+ */
 static inline trits_t wots_private_key_trits(mam_wots_t const *const wots) {
   return trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, wots->private_key);
 }
