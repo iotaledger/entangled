@@ -56,8 +56,8 @@ static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t sign
 
 retcode_t mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
   mam_spongos_t spongos;
-  trit_t private_key[MAM_WOTS_PRIVATE_KEY_SIZE];
-  trit_t *private_key_part = NULL;
+  mam_spongos_t spongos_part;
+  trit_t private_key_part[MAM_WOTS_PRIVATE_KEY_PART_SIZE];
 
   if (wots == NULL) {
     return RC_NULL_PARAM;
@@ -67,19 +67,17 @@ retcode_t mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
     return RC_INVALID_PARAM;
   }
 
-  mam_spongos_init(&spongos);
-
-  memcpy(private_key, wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE);
+  mam_spongos_init(&spongos_part);
   for (size_t i = 0; i < MAM_WOTS_PRIVATE_KEY_PART_COUNT; ++i) {
-    private_key_part = private_key + MAM_WOTS_PRIVATE_KEY_PART_SIZE * i;
+    memcpy(private_key_part, wots->private_key + MAM_WOTS_PRIVATE_KEY_PART_SIZE * i, MAM_WOTS_PRIVATE_KEY_PART_SIZE);
     for (size_t j = 0; j < 26; ++j) {
       mam_spongos_hash(&spongos, trits_from_rep(MAM_WOTS_PRIVATE_KEY_PART_SIZE, private_key_part),
                        trits_from_rep(MAM_WOTS_PRIVATE_KEY_PART_SIZE, private_key_part));
     }
+    mam_spongos_absorb(&spongos_part, trits_from_rep(MAM_WOTS_PRIVATE_KEY_PART_SIZE, private_key_part));
   }
-  mam_spongos_hash(&spongos, trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, private_key), public_key);
-
-  memset_safe(private_key, MAM_WOTS_PRIVATE_KEY_SIZE, 0, MAM_WOTS_PRIVATE_KEY_SIZE);
+  mam_spongos_commit(&spongos_part);
+  mam_spongos_squeeze(&spongos_part, public_key);
 
   return RC_OK;
 }
