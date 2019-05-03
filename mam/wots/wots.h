@@ -24,6 +24,7 @@
 #include "mam/prng/prng.h"
 #include "mam/sponge/spongos.h"
 #include "mam/trits/trits.h"
+#include "utils/memset_safe.h"
 
 /** @brief Size of a WOTS public key */
 #define MAM_WOTS_PUBLIC_KEY_SIZE 243
@@ -53,17 +54,14 @@ typedef struct mam_wots_s {
  *
  * @return a status code
  */
-retcode_t mam_wots_reset(mam_wots_t *const wots);
+static inline retcode_t mam_wots_reset(mam_wots_t *const wots) {
+  if (wots == NULL) {
+    return RC_NULL_PARAM;
+  }
 
-/**
- * @brief Gets a WOTS private key of a WOTS instance
- *
- * @param[in] wots The WOTS instance
- *
- * @return the private key
- */
-static inline trits_t wots_private_key_trits(mam_wots_t const *const wots) {
-  return trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, wots->private_key);
+  memset_safe(wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE, 0, MAM_WOTS_PRIVATE_KEY_SIZE);
+
+  return RC_OK;
 }
 
 /**
@@ -77,7 +75,8 @@ static inline trits_t wots_private_key_trits(mam_wots_t const *const wots) {
  */
 static inline void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
                                     trits_t const nonce2, trits_t const nonce3) {
-  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, wots_private_key_trits(wots));
+  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
+                trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, wots->private_key));
 }
 
 /**

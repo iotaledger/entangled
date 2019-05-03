@@ -8,7 +8,6 @@
  */
 
 #include "mam/wots/wots.h"
-#include "utils/memset_safe.h"
 
 /*
  * Private functions
@@ -55,17 +54,6 @@ static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t sign
  * Public functions
  */
 
-// TODO
-retcode_t mam_wots_reset(mam_wots_t *const wots) {
-  if (wots == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  memset_safe(wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE, 0, MAM_WOTS_PRIVATE_KEY_SIZE);
-
-  return RC_OK;
-}
-
 retcode_t mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
   mam_spongos_t spongos;
   trit_t private_key[MAM_WOTS_PRIVATE_KEY_SIZE];
@@ -108,7 +96,7 @@ retcode_t mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_
   }
 
   mam_spongos_init(&spongos);
-  trits_copy(wots_private_key_trits(wots), signature);
+  memcpy(trits_begin(signature), wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE);
   wots_hash_sign_or_recover(&spongos, signature, hash, WOTS_HASH_SIGN);
 
   return RC_OK;
