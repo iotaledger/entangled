@@ -23,9 +23,9 @@ static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t sign
   trint3_t j, h;
   trits_t signature_part;
 
-  for (i = 0; i < MAM_WOTS_SK_PART_COUNT - 3; ++i) {
-    signature_part = trits_take(signature, MAM_WOTS_SK_PART_SIZE);
-    signature = trits_drop(signature, MAM_WOTS_SK_PART_SIZE);
+  for (i = 0; i < MAM_WOTS_PRIVATE_KEY_PART_COUNT - 3; ++i) {
+    signature_part = trits_take(signature, MAM_WOTS_PRIVATE_KEY_PART_SIZE);
+    signature = trits_drop(signature, MAM_WOTS_PRIVATE_KEY_PART_SIZE);
 
     h = trits_get3(trits_drop(hash, i * 3));
     t += h;
@@ -37,9 +37,9 @@ static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t sign
   }
 
   t = -t;
-  for (; i < MAM_WOTS_SK_PART_COUNT; ++i) {
-    signature_part = trits_take(signature, MAM_WOTS_SK_PART_SIZE);
-    signature = trits_drop(signature, MAM_WOTS_SK_PART_SIZE);
+  for (; i < MAM_WOTS_PRIVATE_KEY_PART_COUNT; ++i) {
+    signature_part = trits_take(signature, MAM_WOTS_PRIVATE_KEY_PART_SIZE);
+    signature = trits_drop(signature, MAM_WOTS_PRIVATE_KEY_PART_SIZE);
 
     h = MAM_MODS(t, 19683, 27);
     t = MAM_DIVS(t, 19683, 27);
@@ -61,37 +61,37 @@ retcode_t mam_wots_reset(mam_wots_t *const wots) {
     return RC_NULL_PARAM;
   }
 
-  memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
+  memset_safe(wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE, 0, MAM_WOTS_PRIVATE_KEY_SIZE);
 
   return RC_OK;
 }
 
 retcode_t mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key) {
   mam_spongos_t spongos;
-  trits_t secret_key_part;
-  MAM_TRITS_DEF0(secret_key, MAM_WOTS_SK_SIZE);
-  secret_key = MAM_TRITS_INIT(secret_key, MAM_WOTS_SK_SIZE);
+  trit_t private_key[MAM_WOTS_PRIVATE_KEY_SIZE];
+  trit_t *private_key_part = NULL;
 
   if (wots == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if (trits_size(public_key) != MAM_WOTS_PK_SIZE) {
+  if (trits_size(public_key) != MAM_WOTS_PUBLIC_KEY_SIZE) {
     return RC_INVALID_PARAM;
   }
 
   mam_spongos_init(&spongos);
 
-  trits_copy(wots_secret_key_trits(wots), secret_key);
-  for (size_t i = 0; i < MAM_WOTS_SK_PART_COUNT; ++i) {
-    secret_key_part = trits_take(trits_drop(secret_key, MAM_WOTS_SK_PART_SIZE * i), MAM_WOTS_SK_PART_SIZE);
+  memcpy(private_key, wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE);
+  for (size_t i = 0; i < MAM_WOTS_PRIVATE_KEY_PART_COUNT; ++i) {
+    private_key_part = private_key + MAM_WOTS_PRIVATE_KEY_PART_SIZE * i;
     for (size_t j = 0; j < 26; ++j) {
-      mam_spongos_hash(&spongos, secret_key_part, secret_key_part);
+      mam_spongos_hash(&spongos, trits_from_rep(MAM_WOTS_PRIVATE_KEY_PART_SIZE, private_key_part),
+                       trits_from_rep(MAM_WOTS_PRIVATE_KEY_PART_SIZE, private_key_part));
     }
   }
-  mam_spongos_hash(&spongos, secret_key, public_key);
+  mam_spongos_hash(&spongos, trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, private_key), public_key);
 
-  memset_safe(trits_begin(secret_key), trits_size(secret_key), 0, trits_size(secret_key));
+  memset_safe(private_key, MAM_WOTS_PRIVATE_KEY_SIZE, 0, MAM_WOTS_PRIVATE_KEY_SIZE);
 
   return RC_OK;
 }
@@ -103,12 +103,12 @@ retcode_t mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_
     return RC_NULL_PARAM;
   }
 
-  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_SK_SIZE) {
+  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_PRIVATE_KEY_SIZE) {
     return RC_INVALID_PARAM;
   }
 
   mam_spongos_init(&spongos);
-  trits_copy(wots_secret_key_trits(wots), signature);
+  trits_copy(wots_private_key_trits(wots), signature);
   wots_hash_sign_or_recover(&spongos, signature, hash, WOTS_HASH_SIGN);
 
   return RC_OK;
@@ -116,10 +116,10 @@ retcode_t mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_
 
 retcode_t mam_wots_recover(trits_t const hash, trits_t const signature, trits_t public_key) {
   mam_spongos_t spongos;
-  MAM_TRITS_DEF0(sig_pks, MAM_WOTS_SK_SIZE);
-  sig_pks = MAM_TRITS_INIT(sig_pks, MAM_WOTS_SK_SIZE);
+  MAM_TRITS_DEF0(sig_pks, MAM_WOTS_PRIVATE_KEY_SIZE);
+  sig_pks = MAM_TRITS_INIT(sig_pks, MAM_WOTS_PRIVATE_KEY_SIZE);
 
-  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_SK_SIZE) {
+  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_PRIVATE_KEY_SIZE) {
     return RC_INVALID_PARAM;
   }
 

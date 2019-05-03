@@ -25,18 +25,18 @@
 #include "mam/sponge/spongos.h"
 #include "mam/trits/trits.h"
 
-/** @brief WOTS public key size */
-#define MAM_WOTS_PK_SIZE 243
-/** @brief WOTS secret key part size */
-#define MAM_WOTS_SK_PART_SIZE 162
-/** @brief WOTS secret key parts count */
-#define MAM_WOTS_SK_PART_COUNT 81
-/** @brief WOTS secret key size */
-#define MAM_WOTS_SK_SIZE (MAM_WOTS_SK_PART_SIZE * MAM_WOTS_SK_PART_COUNT)
-/** @brief WOTS signed hash value size */
+/** @brief Size of a WOTS public key */
+#define MAM_WOTS_PUBLIC_KEY_SIZE 243
+/** @brief Size of a WOTS private key part */
+#define MAM_WOTS_PRIVATE_KEY_PART_SIZE 162
+/** @brief Number of parts in a WOTS private key */
+#define MAM_WOTS_PRIVATE_KEY_PART_COUNT 81
+/** @brief Size of a WOTS private key */
+#define MAM_WOTS_PRIVATE_KEY_SIZE (MAM_WOTS_PRIVATE_KEY_PART_SIZE * MAM_WOTS_PRIVATE_KEY_PART_COUNT)
+/** @brief Size of a WOTS signed hash */
 #define MAM_WOTS_HASH_SIZE 234
-/** @brief WOTS signature size */
-#define MAM_WOTS_SIG_SIZE MAM_WOTS_SK_SIZE
+/** @brief Size of a WOTS signature */
+#define MAM_WOTS_SIGNATURE_SIZE MAM_WOTS_PRIVATE_KEY_SIZE
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,27 +44,27 @@ extern "C" {
 
 // WOTS layer interface
 typedef struct mam_wots_s {
-  trit_t secret_key[MAM_WOTS_SK_SIZE];
+  trit_t private_key[MAM_WOTS_PRIVATE_KEY_SIZE];
 } mam_wots_t;
 
 /**
- * @brief Safely resets a WOTS secret key
+ * @brief Safely resets a WOTS private key
  *
- * @param[out] wots The WOTS secret key
+ * @param[out] wots The WOTS private key
  *
  * @return a status code
  */
 retcode_t mam_wots_reset(mam_wots_t *const wots);
 
 // TODO
-static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
-  return trits_from_rep(MAM_WOTS_SK_SIZE, wots->secret_key);
+static inline trits_t wots_private_key_trits(mam_wots_t const *const wots) {
+  return trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, wots->private_key);
 }
 
 /**
- * @brief Generates a WOTS secret key with three nonces
+ * @brief Generates a WOTS private key with three nonces
  *
- * @param[out] wots The WOTS secret key
+ * @param[out] wots The WOTS private key
  * @param[in] prng A PRNG
  * @param[in] nonce1 The first nonce
  * @param[in] nonce2 The second nonce
@@ -72,13 +72,13 @@ static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
  */
 static inline void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
                                     trits_t const nonce2, trits_t const nonce3) {
-  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, wots_secret_key_trits(wots));
+  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, wots_private_key_trits(wots));
 }
 
 /**
- * @brief Generates a WOTS secret key with two nonces
+ * @brief Generates a WOTS private key with two nonces
  *
- * @param[out] wots The WOTS secret key
+ * @param[out] wots The WOTS private key
  * @param[in] prng A PRNG
  * @param[in] nonce1 The first nonce
  * @param[in] nonce2 The second nonce
@@ -89,9 +89,9 @@ static inline void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *co
 }
 
 /**
- * @brief Generates a WOTS secret key with a nonce
+ * @brief Generates a WOTS private key with a nonce
  *
- * @param[out] wots The WOTS secret key
+ * @param[out] wots The WOTS private key
  * @param[in] prng A PRNG
  * @param[in] nonce The nonce
  */
@@ -104,7 +104,7 @@ static inline void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *con
  *
  * The private key must have already been generated
  *
- * @param[in] wots The WOTS secret key
+ * @param[in] wots The WOTS private key
  * @param[out] public_key The WOTS public key
  *
  * @return a status code
@@ -114,7 +114,7 @@ retcode_t mam_wots_gen_pk(mam_wots_t const *const wots, trits_t public_key);
 /**
  * @brief Generates a WOTS signature associated with a WOTS private key
  *
- * @param[in] wots The WOTS secret key
+ * @param[in] wots The WOTS private key
  * @param[in] hash A hash to be signed
  * @param[out] signature The WOTS signature
  *

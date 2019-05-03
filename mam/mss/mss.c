@@ -494,8 +494,8 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
     mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
   }
 
-  mam_wots_sign(&wots, hash, trits_take(sig, MAM_WOTS_SIG_SIZE));
-  sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
+  mam_wots_sign(&wots, hash, trits_take(sig, MAM_WOTS_SIGNATURE_SIZE));
+  sig = trits_drop(sig, MAM_WOTS_SIGNATURE_SIZE);
 
   mam_mss_auth_path(mss, mss->skn, sig);
 
@@ -550,8 +550,8 @@ bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_
   sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
   if (trits_size(sig) != (MAM_MSS_SIG_SIZE(height) - MAM_MSS_SKN_SIZE)) return false;
 
-  mam_wots_recover(hash, trits_take(sig, MAM_WOTS_SIG_SIZE), calculated_pk);
-  sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
+  mam_wots_recover(hash, trits_take(sig, MAM_WOTS_SIGNATURE_SIZE), calculated_pk);
+  sig = trits_drop(sig, MAM_WOTS_SIGNATURE_SIZE);
 
   mss_fold_auth_path(mt_spongos, skn, sig, calculated_pk);
 

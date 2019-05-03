@@ -188,8 +188,8 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, m
   for (curr_height = 1; r && curr_height <= max_height; ++curr_height) {
     trits_t sig = trits_take(sig_, MAM_MSS_SIG_SIZE(curr_height));
     trits_t sig_skn = trits_take(sig, MAM_MSS_SKN_SIZE);
-    trits_t sig_wots = trits_take(trits_drop(sig, MAM_MSS_SKN_SIZE), MAM_WOTS_SIG_SIZE);
-    trits_t sig_apath = trits_drop(sig, MAM_MSS_SKN_SIZE + MAM_WOTS_SIG_SIZE);
+    trits_t sig_wots = trits_take(trits_drop(sig, MAM_MSS_SKN_SIZE), MAM_WOTS_SIGNATURE_SIZE);
+    trits_t sig_apath = trits_drop(sig, MAM_MSS_SKN_SIZE + MAM_WOTS_SIGNATURE_SIZE);
 
     mam_mss_init(mss, prng, curr_height, nonce, trits_null());
 
