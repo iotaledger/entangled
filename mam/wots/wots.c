@@ -15,7 +15,7 @@
 
 typedef enum wots_hash_operation_e { WOTS_HASH_SIGN, WOTS_HASH_RECOVER } wots_hash_operation_t;
 
-static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t signature, trits_t const hash,
+static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t const hash, trits_t signature,
                                       wots_hash_operation_t const operation) {
   size_t i;
   trint9_t t = 0;
@@ -89,30 +89,28 @@ retcode_t mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_
     return RC_NULL_PARAM;
   }
 
-  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_PRIVATE_KEY_SIZE) {
+  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_SIGNATURE_SIZE) {
     return RC_INVALID_PARAM;
   }
 
-  mam_spongos_init(&spongos);
   memcpy(trits_begin(signature), wots->private_key, MAM_WOTS_PRIVATE_KEY_SIZE);
-  wots_hash_sign_or_recover(&spongos, signature, hash, WOTS_HASH_SIGN);
+  wots_hash_sign_or_recover(&spongos, hash, signature, WOTS_HASH_SIGN);
 
   return RC_OK;
 }
 
 retcode_t mam_wots_recover(trits_t const hash, trits_t const signature, trits_t public_key) {
   mam_spongos_t spongos;
-  MAM_TRITS_DEF0(sig_pks, MAM_WOTS_PRIVATE_KEY_SIZE);
-  sig_pks = MAM_TRITS_INIT(sig_pks, MAM_WOTS_PRIVATE_KEY_SIZE);
+  trit_t sig_pks[MAM_WOTS_PRIVATE_KEY_SIZE];
 
-  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_PRIVATE_KEY_SIZE) {
+  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_SIGNATURE_SIZE ||
+      trits_size(public_key) != MAM_WOTS_PUBLIC_KEY_SIZE) {
     return RC_INVALID_PARAM;
   }
 
-  mam_spongos_init(&spongos);
-  trits_copy(signature, sig_pks);
-  wots_hash_sign_or_recover(&spongos, sig_pks, hash, WOTS_HASH_RECOVER);
-  mam_spongos_hash(&spongos, sig_pks, public_key);
+  memcpy(sig_pks, trits_begin(signature), MAM_WOTS_SIGNATURE_SIZE);
+  wots_hash_sign_or_recover(&spongos, hash, trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, sig_pks), WOTS_HASH_RECOVER);
+  mam_spongos_hash(&spongos, trits_from_rep(MAM_WOTS_PRIVATE_KEY_SIZE, sig_pks), public_key);
 
   return RC_OK;
 }
