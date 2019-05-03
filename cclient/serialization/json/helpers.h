@@ -188,7 +188,7 @@ retcode_t hash243_queue_to_json_array(hash243_queue_t queue, cJSON *const json_r
 /**
  * @brief Converts a hash243 stack to a JSON array.
  *
- * @param[in] queue A hash243 stack object.
+ * @param[in] stack A hash243 stack object.
  * @param[in] json_root The root of a JSON object.
  * @param[out] obj_name A key of a JSON element.
  * @return #retcode_t
@@ -246,7 +246,7 @@ retcode_t json_array_to_hash81_queue(cJSON const *const obj, char const *const o
 retcode_t json_array_to_hash8019_queue(cJSON const *const obj, char const *const obj_name, hash8019_queue_t *queue);
 
 /**
- * @brief Converts flex trtis to a JSON element.
+ * @brief Converts flex trits to a JSON element.
  *
  * @param[in, out] json_obj A JSON object.
  * @param[in] key A key of a JSON element.
@@ -280,7 +280,7 @@ retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue, cJSON *const json
 /**
  * @brief Converts a hash8019 stack to a JSON array.
  *
- * @param[in] queue A hash8019 stack object.
+ * @param[in] stack A hash8019 stack object.
  * @param[in, out] json_root The root of a JSON object.
  * @param[in] obj_name A key of a JSON element.
  * @return #retcode_t
