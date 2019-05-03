@@ -8,11 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "mam/pb3/pb3.h"
 #include "mam/prng/prng.h"
+#include "mam/pb3/pb3.h"
 #include "mam/sponge/sponge.h"
 #include "utils/memset_safe.h"
 
