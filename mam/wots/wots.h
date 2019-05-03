@@ -133,18 +133,6 @@ retcode_t mam_wots_sign(mam_wots_t const *const wots, trits_t const hash, trits_
  */
 retcode_t mam_wots_recover(trits_t const hash, trits_t const signature, trits_t public_key);
 
-/**
- * @brief Verifies a WOTS signature
- *
- * @param[in] hash A signed hash
- * @param[in] signature The WOTS signature
- * @param[in] public_key The WOTS public key
- * @param[out] verified True if verified, false otherwise
- *
- * @return a status code
- */
-retcode_t mam_wots_verify(trits_t const hash, trits_t const signature, trits_t const public_key, bool *const verified);
-
 #ifdef __cplusplus
 }
 #endif

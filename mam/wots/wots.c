@@ -130,17 +130,3 @@ retcode_t mam_wots_recover(trits_t const hash, trits_t const signature, trits_t 
 
   return RC_OK;
 }
-
-retcode_t mam_wots_verify(trits_t const hash, trits_t const signature, trits_t const public_key, bool *const verified) {
-  MAM_TRITS_DEF0(recovered_public_key, MAM_WOTS_PK_SIZE);
-  recovered_public_key = MAM_TRITS_INIT(recovered_public_key, MAM_WOTS_PK_SIZE);
-
-  if (trits_size(hash) != MAM_WOTS_HASH_SIZE || trits_size(signature) != MAM_WOTS_SK_SIZE) {
-    return RC_INVALID_PARAM;
-  }
-
-  mam_wots_recover(hash, signature, recovered_public_key);
-  *verified = trits_cmp_eq(public_key, recovered_public_key);
-
-  return RC_OK;
-}

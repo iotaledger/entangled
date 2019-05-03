@@ -14,16 +14,17 @@
 static void mam_wots_test(void) {
   mam_prng_t prng;
   mam_wots_t wots;
-  bool verified;
 
   MAM_TRITS_DEF0(N, 18);
   MAM_TRITS_DEF0(pk, MAM_WOTS_PK_SIZE);
+  MAM_TRITS_DEF0(recovered_pk, MAM_WOTS_PK_SIZE);
   MAM_TRITS_DEF0(H, MAM_WOTS_HASH_SIZE);
   MAM_TRITS_DEF0(sig, MAM_WOTS_SIG_SIZE);
   MAM_TRITS_DEF0(K, MAM_PRNG_KEY_SIZE);
 
   N = MAM_TRITS_INIT(N, 18);
   pk = MAM_TRITS_INIT(pk, MAM_WOTS_PK_SIZE);
+  recovered_pk = MAM_TRITS_INIT(recovered_pk, MAM_WOTS_PK_SIZE);
   H = MAM_TRITS_INIT(H, MAM_WOTS_HASH_SIZE);
   sig = MAM_TRITS_INIT(sig, MAM_WOTS_SIG_SIZE);
   K = MAM_TRITS_INIT(K, MAM_PRNG_KEY_SIZE);
@@ -31,7 +32,6 @@ static void mam_wots_test(void) {
   trits_set_zero(N);
   trits_set_zero(H);
   trits_set_zero(K);
-  trits_set_zero(trits_from_rep(MAM_WOTS_SK_SIZE, wots.secret_key));
 
   mam_prng_init(&prng, K);
   mam_wots_reset(&wots);
@@ -40,26 +40,22 @@ static void mam_wots_test(void) {
   mam_wots_gen_pk(&wots, pk);
   mam_wots_sign(&wots, H, sig);
 
-  verified = false;
-  mam_wots_verify(H, sig, pk, &verified);
-  TEST_ASSERT_TRUE(verified);
+  mam_wots_recover(H, sig, recovered_pk);
+  TEST_ASSERT_TRUE(trits_cmp_eq(pk, recovered_pk));
 
   trits_put1(H, trit_add(trits_get1(H), 1));
-  verified = true;
-  mam_wots_verify(H, sig, pk, &verified);
-  TEST_ASSERT_FALSE(verified);
+  mam_wots_recover(H, sig, recovered_pk);
+  TEST_ASSERT_FALSE(trits_cmp_eq(pk, recovered_pk));
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  verified = true;
-  mam_wots_verify(H, sig, pk, &verified);
-  TEST_ASSERT_FALSE(verified);
+  mam_wots_recover(H, sig, recovered_pk);
+  TEST_ASSERT_FALSE(trits_cmp_eq(pk, recovered_pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  verified = true;
-  mam_wots_verify(H, sig, pk, &verified);
-  TEST_ASSERT_FALSE(verified);
+  mam_wots_recover(H, sig, recovered_pk);
+  TEST_ASSERT_FALSE(trits_cmp_eq(pk, recovered_pk));
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 }
 
