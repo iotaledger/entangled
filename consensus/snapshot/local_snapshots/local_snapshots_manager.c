@@ -42,7 +42,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   while (lsm->running) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
-      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, lsm->mt);
+      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, lsm->mt, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
         end_timestamp = current_timestamp_ms();
