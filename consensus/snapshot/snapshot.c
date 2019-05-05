@@ -298,5 +298,7 @@ cleanup:
 }
 
 void iota_snapshot_solid_entry_points_set(snapshot_t const *const snapshot, hash243_set_t *const keys) {
+  rw_lock_handle_rdlock(&snapshot->rw_lock);
   hash_to_uint64_t_map_keys(&snapshot->metadata.solid_entry_points, keys);
+  rw_lock_handle_unlock(&snapshot->rw_lock);
 }
