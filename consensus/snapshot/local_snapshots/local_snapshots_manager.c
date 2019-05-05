@@ -52,16 +52,15 @@ static void *local_snapshots_manager_routine(void *arg) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
         }
-      } else if (err == RC_SNAPSHOT_SERVICE_MILESTONE_NOT_SOLID || err == RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH) {
+      } else {
         exponential_delay_factor *= 2;
         log_warning(logger_id, "Local snapshot is delayed in %d ms, error code: %d\n",
                     exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS, err);
-      } else {
-        goto cleanup;
       }
     }
     if (!iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
-      cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond, LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+      cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond,
+                            exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
       skip_check = false;
     } else {
       skip_check = true;
