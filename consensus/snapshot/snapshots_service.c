@@ -318,14 +318,13 @@ static retcode_t iota_snapshots_service_update_new_solid_entry_points(
   DECLARE_PACK_SINGLE_TX(target_milestone_tx, target_milestone_tx_p, target_milestone_tx_pack);
   prev_milestone = *target_milestone;
   uint64_t index = prev_milestone.index;
-  uint64_t depth = SNAPSHOT_SERVICE_SOLID_ENTRY_POINT_MAX_DEPTH;
 
   ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &target_milestone_tx_pack);
   if (target_milestone_tx_pack.num_loaded == 0) {
     return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
   }
 
-  while (index > initial_snapshot->metadata.index && depth--) {
+  while (index > initial_snapshot->metadata.index && index > 1) {
     ERR_BIND_RETURN(iota_snapshots_service_find_solid_entry_points_and_update(
                         snapshots_service, target_milestone->index, transaction_timestamp(target_milestone_tx_p),
                         prev_milestone.hash, prev_milestone.index, tangle, solid_entry_points),
