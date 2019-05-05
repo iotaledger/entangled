@@ -61,8 +61,7 @@ static void *local_snapshots_manager_routine(void *arg) {
       }
     }
     if (!iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
-      cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond,
-                            exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
+      cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond, LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
       skip_check = false;
     } else {
       skip_check = true;
@@ -95,7 +94,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
   uint64_t latest_to_initial_gap = lsm->snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
                                    lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
 
-  if ((latest_to_initial_gap > SNAPSHOT_SERVICE_MAX_NUM_MILESTONE_TO_CALC) ||
+  if ((latest_to_initial_gap > SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC) ||
       (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
         lsm->conf->local_snapshots.transactions_growth_threshold) &&
        latest_to_initial_gap > lsm->conf->local_snapshots.min_depth)) {

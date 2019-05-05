@@ -86,15 +86,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
 
   ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, &pack, tangle), ret);
 
-  if (pack.num_loaded == 0) {
-    log_error(logger_id, "Target milestone was not loaded\n");
-    return RC_SNAPSHOT_SERVICE_MILESTONE_NOT_LOADED;
-  }
-
   snapshot_t next_snapshot;
-  next_snapshot.state = NULL;
-  next_snapshot.metadata.solid_entry_points = NULL;
-
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot(snapshots_service, &milestone, tangle, &next_snapshot), ret,
                 cleanup);
   if (next_snapshot.metadata.index > snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
@@ -118,24 +110,27 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
   retcode_t err;
   uint64_t index;
 
-  if (snapshots_service->snapshots_provider->latest_snapshot.metadata.index <
+  if (snapshots_service->snapshots_provider->latest_snapshot.metadata.index <=
       snapshots_service->conf->local_snapshots.min_depth) {
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
 
   index = snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
           snapshots_service->conf->local_snapshots.min_depth;
-  if (index == 0) {
-    return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
-  }
 
+  // Make sure snapshots aren't too big
   if ((index - snapshots_service->snapshots_provider->inital_snapshot.metadata.index) >
-      SNAPSHOT_SERVICE_MAX_NUM_MILESTONE_TO_CALC) {
+      SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC) {
     index = snapshots_service->snapshots_provider->inital_snapshot.metadata.index +
-            SNAPSHOT_SERVICE_MAX_NUM_MILESTONE_TO_CALC;
+            SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC;
   }
 
   ERR_BIND_RETURN(iota_tangle_milestone_load_previous(tangle, index, entry_point), err);
+
+  if (entry_point->num_loaded == 0) {
+    log_error(logger_id, "Target milestone was not loaded\n");
+    return RC_SNAPSHOT_SERVICE_MILESTONE_NOT_LOADED;
+  }
 
   return RC_OK;
 }
@@ -146,13 +141,8 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   retcode_t ret;
 
   iota_snapshot_read_lock(&snapshots_service->snapshots_provider->inital_snapshot);
-  iota_snapshot_read_lock(&snapshots_service->snapshots_provider->latest_snapshot);
 
-  if (target_milestone->index > snapshots_service->snapshots_provider->latest_snapshot.metadata.index) {
-    log_error(logger_id, "Target milestone is not solid\n");
-    ret = RC_SNAPSHOT_SERVICE_MILESTONE_NOT_SOLID;
-    goto cleanup;
-  } else if (target_milestone->index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
+  if (target_milestone->index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
     log_error(logger_id, "Target milestone is too old\n");
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
     goto cleanup;
@@ -166,7 +156,6 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
 
 cleanup:
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
-  iota_snapshot_unlock(&snapshots_service->snapshots_provider->latest_snapshot);
 
   return ret;
 }
