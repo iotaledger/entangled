@@ -113,6 +113,10 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
   index = snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
           snapshots_service->conf->local_snapshots.min_depth;
 
+  if (index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
+    return RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
+  }
+
   // Make sure snapshots aren't too big
   if ((index - snapshots_service->snapshots_provider->inital_snapshot.metadata.index) >
       SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC) {
