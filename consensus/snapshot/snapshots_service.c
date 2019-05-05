@@ -81,6 +81,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, &pack, tangle), ret);
 
   snapshot_t next_snapshot;
+  ERR_BIND_GOTO(iota_snapshot_reset(&next_snapshot, snapshots_service->conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshots_service_generate_snapshot(snapshots_service, &milestone, tangle, &next_snapshot), ret,
                 cleanup);
   if (next_snapshot.metadata.index > snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
@@ -141,8 +142,6 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
     ret = RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
     goto cleanup;
   }
-
-  ERR_BIND_GOTO(iota_snapshot_reset(snapshot, snapshots_service->conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
   ERR_BIND_GOTO(iota_milestone_service_replay_milestones(tangle, snapshots_service->milestone_service, snapshot,
                                                          target_milestone->index),
