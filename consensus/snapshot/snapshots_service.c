@@ -229,7 +229,9 @@ static retcode_t find_solid_entry_points_and_update_do_func(flex_trit_t *hash, i
   // entry point!
   if (current_snapshot_index > params->target_milestone_index) {
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(params->solid_entry_points, hash, current_snapshot_index), ret);
-  } else if (current_snapshot_index >= params->min_snapshot_index) {
+  }
+
+  if (current_snapshot_index >= params->min_snapshot_index) {
     *should_branch = true;
     ERR_BIND_GOTO(iota_snapshots_service_add_entry_point_if_not_orphan(
                       params->target_milestone_index, params->target_milestone_timestamp, hash,
@@ -239,7 +241,7 @@ static retcode_t find_solid_entry_points_and_update_do_func(flex_trit_t *hash, i
 
 cleanup:
   if (ret) {
-    *should_stop = false;
+    *should_stop = true;
     return ret;
   }
 

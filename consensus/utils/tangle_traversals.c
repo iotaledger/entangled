@@ -84,7 +84,7 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
     return ret;
   }
 
-  if ((ret = hash_pack_init(&hashes_pack, 10)) != RC_OK) {
+  if ((ret = hash_pack_init(&hashes_pack, 8)) != RC_OK) {
     goto done;
   }
 
