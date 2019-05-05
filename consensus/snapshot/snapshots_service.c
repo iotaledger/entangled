@@ -41,9 +41,8 @@ static retcode_t iota_snapshots_service_find_solid_entry_points_and_update(
     hash_to_uint64_t_map_t *const solid_entry_points);
 
 static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
-    snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
-    uint64_t min_snapshot_index, flex_trit_t const *const hash, tangle_t const *const tangle,
-    hash_to_uint64_t_map_t *const solid_entry_points);
+    uint64_t target_milestone_index, uint64_t target_milestone_timestamp, flex_trit_t const *const hash,
+    uint64_t min_snapshot_index, tangle_t const *const tangle, hash_to_uint64_t_map_t *const solid_entry_points);
 
 typedef struct find_solid_entry_points_and_update_do_func_params_s {
   uint64_t min_snapshot_index;
@@ -300,9 +299,8 @@ static retcode_t iota_snapshots_service_find_solid_entry_points_and_update(
 }
 
 static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
-    snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
-    uint64_t min_snapshot_index, flex_trit_t const *const hash, tangle_t const *const tangle,
-    hash_to_uint64_t_map_t *const solid_entry_points) {
+    uint64_t target_milestone_index, uint64_t target_milestone_timestamp, flex_trit_t const *const hash,
+    uint64_t min_snapshot_index, tangle_t const *const tangle, hash_to_uint64_t_map_t *const solid_entry_points) {
   retcode_t ret;
   check_not_orphan_do_func_params_t params;
 
@@ -323,20 +321,20 @@ static retcode_t iota_snapshots_service_update_old_solid_entry_points(
     iota_milestone_t const *const target_milestone, tangle_t const *const tangle,
     hash_to_uint64_t_map_t *const solid_entry_points) {
   retcode_t ret = RC_OK;
-  hash_to_uint64_t_map_entry_t *curr_entry = NULL;
-  hash_to_uint64_t_map_entry_t *tmp_entry = NULL;
-  DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
-  ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &tx_pack);
-  if (tx_pack.num_loaded == 0) {
+  hash_to_uint64_t_map_entry_t *curr_ep_entry = NULL;
+  hash_to_uint64_t_map_entry_t *tmp_ep_entry = NULL;
+  DECLARE_PACK_SINGLE_TX(milestone_tx, milestone_tx_p, milestone_tx_pack);
+  ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &milestone_tx_pack);
+  if (milestone_tx_pack.num_loaded == 0) {
     return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
   }
 
-  HASH_ITER(hh, snapshot->metadata.solid_entry_points, curr_entry, tmp_entry) {
-    if ((memcmp(curr_entry->hash, snapshots_service->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0) &&
-        (target_milestone->index - curr_entry->value) < SNAPSHOT_SERVICE_SOLID_ENTRY_POINT_MAX_DEPTH) {
+  HASH_ITER(hh, snapshot->metadata.solid_entry_points, curr_ep_entry, tmp_ep_entry) {
+    if ((memcmp(curr_ep_entry->hash, snapshots_service->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0) &&
+        (target_milestone->index - curr_ep_entry->value) < SNAPSHOT_SERVICE_SOLID_ENTRY_POINT_MAX_DEPTH) {
       ERR_BIND_RETURN(iota_snapshots_service_add_entry_point_if_not_orphan(
-                          snapshots_service, target_milestone->index, transaction_timestamp(txp), curr_entry->value,
-                          curr_entry->hash, tangle, solid_entry_points),
+                          target_milestone->index, transaction_timestamp(milestone_tx_p), curr_ep_entry->hash,
+                          curr_ep_entry->value, tangle, solid_entry_points),
                       ret);
     }
   }
