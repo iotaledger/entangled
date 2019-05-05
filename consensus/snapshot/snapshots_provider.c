@@ -12,6 +12,7 @@ retcode_t iota_snapshots_provider_init(snapshots_provider_t *snapshots_provider,
                                        iota_consensus_conf_t const *const conf) {
   retcode_t ret;
 
+  ERR_BIND_GOTO(iota_snapshot_reset(&snapshots_provider->inital_snapshot, conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_init(&snapshots_provider->inital_snapshot, conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_reset(&snapshots_provider->latest_snapshot, conf), ret, cleanup);
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_provider->inital_snapshot, &snapshots_provider->latest_snapshot), ret,

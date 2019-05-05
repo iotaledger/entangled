@@ -198,6 +198,16 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
  */
 void iota_snapshot_solid_entry_points_set(snapshot_t const *const snapshot, hash243_set_t *const keys);
 
+/**
+ * Checks if hash is a solid entry point
+ *
+ * @param snapshot The snapshot
+ * @param hash The hash in question
+ *
+ * @return True if hash is a solid entry point
+ */
+bool iota_snapshot_has_entry_point(snapshot_t const *const snapshot, flex_trit_t const *const hash);
+
 #ifdef __cplusplus
 }
 #endif

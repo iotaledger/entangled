@@ -176,11 +176,14 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
   strcat(file_path, SNAPSHOT_METADATA_EXT);
 
+  iota_snapshot_read_lock(snapshot);
   if ((ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK)) {
     log_critical(logger_id, "Initializing snapshot metadata failed\n");
+    iota_snapshot_unlock(snapshot);
     return ret;
   }
 
+  iota_snapshot_unlock(snapshot);
   log_info(logger_id, "Consistent local snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
 
   return ret;
@@ -301,4 +304,12 @@ void iota_snapshot_solid_entry_points_set(snapshot_t const *const snapshot, hash
   rw_lock_handle_rdlock(&snapshot->rw_lock);
   hash_to_uint64_t_map_keys(&snapshot->metadata.solid_entry_points, keys);
   rw_lock_handle_unlock(&snapshot->rw_lock);
+}
+
+bool iota_snapshot_has_entry_point(snapshot_t const *const snapshot, flex_trit_t const *const hash) {
+  bool is_solid_entry_point;
+  rw_lock_handle_rdlock(&snapshot->rw_lock);
+  is_solid_entry_point = hash_to_uint64_t_map_contains(&snapshot->metadata.solid_entry_points, hash);
+  rw_lock_handle_unlock(&snapshot->rw_lock);
+  return is_solid_entry_point;
 }
