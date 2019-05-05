@@ -40,7 +40,7 @@ static retcode_t iota_snapshots_service_find_solid_entry_points_and_update(
     uint64_t min_snapshot_index, flex_trit_t const *const hash, tangle_t const *const tangle,
     hash_to_uint64_t_map_t *const solid_entry_points);
 
-static retcode_t iota_snapshots_service_add_non_orphan_solid_entry_points(
+static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
     snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
     uint64_t min_snapshot_index, flex_trit_t const *const hash, tangle_t const *const tangle,
     hash_to_uint64_t_map_t *const solid_entry_points);
@@ -299,7 +299,7 @@ static retcode_t iota_snapshots_service_find_solid_entry_points_and_update(
   return RC_OK;
 }
 
-static retcode_t iota_snapshots_service_add_non_orphan_solid_entry_points(
+static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
     snapshots_service_t *const snapshots_service, uint64_t target_milestone_index, uint64_t target_milestone_timestamp,
     uint64_t min_snapshot_index, flex_trit_t const *const hash, tangle_t const *const tangle,
     hash_to_uint64_t_map_t *const solid_entry_points) {
@@ -326,17 +326,15 @@ static retcode_t iota_snapshots_service_update_old_solid_entry_points(
   hash_to_uint64_t_map_entry_t *curr_entry = NULL;
   hash_to_uint64_t_map_entry_t *tmp_entry = NULL;
   DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
+  ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &tx_pack);
+  if (tx_pack.num_loaded == 0) {
+    return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
+  }
 
   HASH_ITER(hh, snapshot->metadata.solid_entry_points, curr_entry, tmp_entry) {
     if ((memcmp(curr_entry->hash, snapshots_service->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0) &&
         (target_milestone->index - curr_entry->value) < SNAPSHOT_SERVICE_SOLID_ENTRY_POINT_MAX_DEPTH) {
-      hash_pack_reset(&tx_pack);
-      ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &tx_pack);
-      if (tx_pack.num_loaded == 0) {
-        return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
-      }
-
-      ERR_BIND_RETURN(iota_snapshots_service_add_non_orphan_solid_entry_points(
+      ERR_BIND_RETURN(iota_snapshots_service_add_entry_point_if_not_orphan(
                           snapshots_service, target_milestone->index, transaction_timestamp(txp), curr_entry->value,
                           curr_entry->hash, tangle, solid_entry_points),
                       ret);
@@ -351,26 +349,26 @@ static retcode_t iota_snapshots_service_update_new_solid_entry_points(
     iota_milestone_t const *const target_milestone, tangle_t const *const tangle,
     hash_to_uint64_t_map_t *const solid_entry_points) {
   retcode_t ret;
-  DECLARE_PACK_SINGLE_MILESTONE(prev_milestone, prev_milestone_ptr, pack);
+  DECLARE_PACK_SINGLE_MILESTONE(prev_milestone, prev_milestone_ptr, prev_milestone_pack);
   DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
   prev_milestone = *target_milestone;
   uint64_t index = prev_milestone.index;
   uint64_t depth = SNAPSHOT_SERVICE_SOLID_ENTRY_POINT_MAX_DEPTH;
 
+  ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &tx_pack);
+  if (tx_pack.num_loaded == 0) {
+    return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
+  }
+
   while (index > initial_snapshot->metadata.index && depth--) {
-    hash_pack_reset(&tx_pack);
-    ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &tx_pack);
-    if (tx_pack.num_loaded == 0) {
-      return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
-    }
     ERR_BIND_RETURN(iota_snapshots_service_find_solid_entry_points_and_update(
                         snapshots_service, target_milestone->index, transaction_timestamp(txp), prev_milestone.index,
                         prev_milestone.hash, tangle, solid_entry_points),
                     ret);
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, prev_milestone.hash, prev_milestone.index), ret);
-    hash_pack_reset(&pack);
-    ERR_BIND_RETURN(iota_tangle_milestone_load_previous(tangle, index, &pack), ret);
-    if (pack.num_loaded == 0 && index > 1) {
+    hash_pack_reset(&prev_milestone_pack);
+    ERR_BIND_RETURN(iota_tangle_milestone_load_previous(tangle, index, &prev_milestone_pack), ret);
+    if (prev_milestone_pack.num_loaded == 0 && index > 1) {
       return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
     } else {
       index = prev_milestone.index;
