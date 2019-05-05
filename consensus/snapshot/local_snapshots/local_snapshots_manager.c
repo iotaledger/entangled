@@ -97,7 +97,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
   if ((latest_to_initial_gap > SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC) ||
       (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
         lsm->conf->local_snapshots.transactions_growth_threshold) &&
-       latest_to_initial_gap > lsm->conf->local_snapshots.min_depth)) {
+       (latest_to_initial_gap > 2 * lsm->conf->local_snapshots.min_depth))) {
     return true;
   }
   return false;
