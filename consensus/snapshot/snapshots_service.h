@@ -65,13 +65,11 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
  * Takes a snapshot and applies it
  *
  * @param snapshots_service The service
- * @param milestone_tracker The milestone tracker
  * @param tangle The tangle
  *
  * @return a status code
  */
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
-                                               milestone_tracker_t const *const milestone_tracker,
                                                tangle_t const *const tangle);
 
 /**

@@ -74,7 +74,6 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
 }
 
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
-                                               milestone_tracker_t const *const milestone_tracker,
                                                tangle_t const *const tangle) {
   retcode_t ret;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
