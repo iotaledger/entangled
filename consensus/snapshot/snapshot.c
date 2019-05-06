@@ -67,6 +67,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   strcpy(metadata_path, snapshot_file_base);
   strcat(metadata_path, SNAPSHOT_METADATA_EXT);
 
+  log_info(logger_id, "Writing state info to file\n");
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
 
@@ -75,6 +76,7 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
     return RC_OOM;
   }
 
+  log_info(logger_id, "Writing metadata info to file\n");
   ERR_BIND_GOTO(iota_snapshot_metadata_serialize_str(&snapshot->metadata, buffer), ret, cleanup);
   ERR_BIND_GOTO(iota_utils_overwrite_file(metadata_path, buffer), ret, cleanup);
 

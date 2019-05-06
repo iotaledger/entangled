@@ -185,9 +185,12 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
                     snapshot, snapshots_service->conf->local_snapshots.local_snapshots_path_base),
                 ret, cleanup);
 
+  log_info(logger_id, "Local snapshot files were succesfully written\n");
   iota_snapshot_write_lock(&snapshots_service->snapshots_provider->inital_snapshot);
 
   ERR_BIND_GOTO(iota_snapshot_copy(snapshot, &snapshots_service->snapshots_provider->inital_snapshot), ret, cleanup);
+  log_info(logger_id, "Local snapshot updated with snapshot index %" PRIu64 "\n",
+           snapshots_service->snapshots_provider->inital_snapshot.metadata.index);
 
 cleanup:
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
