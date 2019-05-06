@@ -334,12 +334,12 @@ static void message_test_generic(mam_prng_t *prng_sender, mam_prng_t *prng_recei
 }
 
 void message_test() {
-  MAM_TRITS_DEF0(key_a, MAM_PRNG_KEY_SIZE);
-  key_a = MAM_TRITS_INIT(key_a, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key_a, MAM_PRNG_SECRET_KEY_SIZE);
+  key_a = MAM_TRITS_INIT(key_a, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(key_a, TEST_PRNG_A_KEY);
 
-  MAM_TRITS_DEF0(key_b, MAM_PRNG_KEY_SIZE);
-  key_b = MAM_TRITS_INIT(key_b, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key_b, MAM_PRNG_SECRET_KEY_SIZE);
+  key_b = MAM_TRITS_INIT(key_b, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(key_b, TEST_PRNG_B_KEY);
 
   mam_prng_init(&prng_sender, key_a);

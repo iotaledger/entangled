@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief
+ * @brief The PRNG layer supports the generation of cryptographically strong pseudorandom trit arrays
  *
  */
 #ifndef __MAM_PRNG_PRNG_H__
@@ -24,32 +24,31 @@
 #include "mam/pb3/pb3.h"
 #include "mam/trits/trits.h"
 
-// PRNG secret key size
-#define MAM_PRNG_KEY_SIZE 243
+/** @brief Size of a PRNG secret key */
+#define MAM_PRNG_SECRET_KEY_SIZE 243
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef enum mam_prng_destination_tryte_e {
-  // PRNG AE destination tryte
+  /** @brief PRNG AE destination tryte */
   MAM_PRNG_DST_SEC_KEY = 0,
-  // PRNG WOTS destination tryte
+  /** @brief PRNG WOTS destination tryte */
   MAM_PRNG_DST_WOTS_KEY = 1,
-  // PRNG NTRU destination tryte
+  /** @brief PRNG NTRU destination tryte */
   MAM_PRNG_DST_NTRU_KEY = 2
 } mam_prng_destination_tryte_t;
 
-// PRNG layer interface
 typedef struct mam_prng_s {
-  trit_t secret_key[MAM_PRNG_KEY_SIZE];
+  trit_t secret_key[MAM_PRNG_SECRET_KEY_SIZE];
 } mam_prng_t;
 
 /**
  * PRNG initialization
  *
  * @param prng A PRNG interface
- * @param secret_key A secret key of size MAM_PRNG_KEY_SIZE
+ * @param secret_key A secret key of size MAM_PRNG_SECRET_KEY_SIZE
  */
 retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
 
@@ -100,14 +99,32 @@ static inline retcode_t mam_prng_gen(mam_prng_t const *const prng, mam_prng_dest
   return mam_prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
 }
 
-static inline size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }
+/**
+ *
+ *
+ * @param
+ *
+ */
+static inline size_t mam_prng_serialized_size() { return MAM_PRNG_SECRET_KEY_SIZE; }
 
+/**
+ *
+ *
+ * @param
+ *
+ */
 static inline void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer) {
-  pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
+  pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key), buffer);
 }
 
+/**
+ *
+ *
+ * @param
+ *
+ */
 static inline retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng) {
-  return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key), buffer);
+  return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key), buffer);
 }
 
 #ifdef __cplusplus

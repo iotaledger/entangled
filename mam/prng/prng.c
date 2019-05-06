@@ -16,11 +16,11 @@ retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
     return RC_NULL_PARAM;
   }
 
-  if (trits_size(secret_key) != MAM_PRNG_KEY_SIZE) {
+  if (trits_size(secret_key) != MAM_PRNG_SECRET_KEY_SIZE) {
     return RC_INVALID_PARAM;
   }
 
-  memcpy(prng->secret_key, trits_begin(secret_key), MAM_PRNG_KEY_SIZE);
+  memcpy(prng->secret_key, trits_begin(secret_key), MAM_PRNG_SECRET_KEY_SIZE);
 
   return RC_OK;
 }
@@ -30,7 +30,7 @@ retcode_t mam_prng_reset(mam_prng_t *const prng) {
     return RC_NULL_PARAM;
   }
 
-  memset_safe(prng->secret_key, MAM_PRNG_KEY_SIZE, 0, MAM_PRNG_KEY_SIZE);
+  memset_safe(prng->secret_key, MAM_PRNG_SECRET_KEY_SIZE, 0, MAM_PRNG_SECRET_KEY_SIZE);
 
   return RC_OK;
 }
@@ -45,7 +45,7 @@ retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte
     return RC_NULL_PARAM;
   }
 
-  KdN[0] = trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key);
+  KdN[0] = trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key);
   KdN[1] = trits_from_rep(3, dt);
   KdN[2] = nonce1;
   KdN[3] = nonce2;
