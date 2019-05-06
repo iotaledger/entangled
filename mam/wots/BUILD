@@ -1,13 +1,14 @@
-package(default_visibility = ["//visibility:public"])
-
 cc_library(
     name = "wots",
     srcs = ["wots.c"],
     hdrs = ["wots.h"],
+    visibility = ["//visibility:public"],
     deps = [
+        "//common:errors",
+        "//mam:defs",
         "//mam/prng",
-        "//mam/sponge",
         "//mam/sponge:spongos",
-        "//mam/sponge:spongos_types",
+        "//mam/trits",
+        "//utils:memset_safe",
     ],
 )

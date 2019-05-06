@@ -35,8 +35,8 @@ void mam_prng_gen2(mam_prng_t const *const prng, mam_prng_destination_tryte_t co
   mam_prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
 }
 
-void mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination, trits_t const nonce1,
-                   trits_t const nonce2, trits_t const nonce3, trits_t output) {
+retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
+                        trits_t const nonce1, trits_t const nonce2, trits_t const nonce3, trits_t output) {
   mam_sponge_t sponge;
   trits_t KdN[5];
   MAM_TRITS_DEF0(dt, 3);
@@ -52,6 +52,8 @@ void mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t co
   mam_sponge_init(&sponge);
   mam_sponge_absorbn(&sponge, MAM_SPONGE_CTL_KEY, 5, KdN);
   mam_sponge_squeeze(&sponge, MAM_SPONGE_CTL_PRN, output);
+
+  return RC_OK;
 }
 
 size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }

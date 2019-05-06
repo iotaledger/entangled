@@ -31,7 +31,7 @@ static void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, /*!< [in] leaf index
 
   MAM_TRITS_DEF0(nonce_i, MAM_MSS_SKN_SIZE);
   mam_sponge_init(&sponge);
-  mam_wots_init(&wots);
+  mam_wots_reset(&wots);
 
   MAM_ASSERT(0 <= i && i <= MAM_MSS_MAX_SKN(mss->height));
   nonce_i = MAM_TRITS_INIT(nonce_i, MAM_MSS_SKN_SIZE);
@@ -39,8 +39,8 @@ static void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, /*!< [in] leaf index
   /* gen sk from current leaf index */
   trits_put18(nonce_i, i);
   mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
-  /* calc pk & push hash */
-  mam_wots_calc_pk(&wots, pk);
+  /* gen pk & push hash */
+  mam_wots_gen_pk(&wots, pk);
 }
 
 #if defined(MAM_MSS_TRAVERSAL)
@@ -485,7 +485,7 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
 
   mam_sponge_init(&sponge);
-  mam_wots_init(&wots);
+  mam_wots_reset(&wots);
   {
     // Generate the current (skn) secret key
     MAM_TRITS_DEF0(nonce_i, MAM_MSS_SKN_SIZE);
@@ -494,8 +494,8 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
     mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
   }
 
-  mam_wots_sign(&wots, hash, trits_take(sig, MAM_WOTS_SIG_SIZE));
-  sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
+  mam_wots_sign(&wots, hash, trits_take(sig, MAM_WOTS_SIGNATURE_SIZE));
+  sig = trits_drop(sig, MAM_WOTS_SIGNATURE_SIZE);
 
   mam_mss_auth_path(mss, mss->skn, sig);
 
@@ -533,7 +533,7 @@ size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss) {
   return MAM_MSS_MAX_SKN(mss->height) - mss->skn;
 }
 
-bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trits_t hash, trits_t sig, trits_t pk) {
+bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_t pk) {
   mss_mt_height_t height;
   mss_mt_idx_t skn;
   MAM_TRITS_DEF0(calculated_pk, MAM_MSS_MT_HASH_SIZE);
@@ -550,8 +550,8 @@ bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trit
   sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
   if (trits_size(sig) != (MAM_MSS_SIG_SIZE(height) - MAM_MSS_SKN_SIZE)) return false;
 
-  mam_wots_recover(wots_spongos, hash, trits_take(sig, MAM_WOTS_SIG_SIZE), calculated_pk);
-  sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
+  mam_wots_recover(hash, trits_take(sig, MAM_WOTS_SIGNATURE_SIZE), calculated_pk);
+  sig = trits_drop(sig, MAM_WOTS_SIGNATURE_SIZE);
 
   mss_fold_auth_path(mt_spongos, skn, sig, calculated_pk);
 

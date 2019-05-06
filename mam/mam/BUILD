@@ -16,6 +16,7 @@ cc_library(
         "//mam/pb3",
         "//mam/prng",
         "//mam/psk",
+        "//mam/sponge:spongos_types",
     ],
 )
 
