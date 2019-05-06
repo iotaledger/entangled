@@ -46,9 +46,8 @@ static bool debug_mode = false;
 static char *test_db_path = "consensus/ledger_validator/tests/test.db";
 static char *ciri_db_path = "consensus/ledger_validator/tests/ciri.db";
 static char *snapshot_path = "consensus/ledger_validator/tests/snapshot.txt";
-static char *snapshot_conf_path = "consensus/ledger_validator/tests/snapshot_conf.json";
-
 static char *local_snapshot_path_base = "consensus/ledger_validator/tests/local_snapshot";
+static char *snapshot_conf_path = "consensus/ledger_validator/tests/snapshot_conf.json";
 
 static uint64_t initial_milestone_index = 1;
 
@@ -74,6 +73,7 @@ static void init_test_structs() {
 
   strcpy(conf.snapshot_file, snapshot_path);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
+  strcpy(conf.local_snapshots.local_snapshots_path_base, local_snapshot_path_base);
   conf.snapshot_signature_skip_validation = true;
   strcpy(conf.db_path, test_db_path);
   conf.last_milestone = 0;
@@ -85,6 +85,7 @@ static void init_test_structs() {
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   flex_trits_from_trytes(g_seed, NUM_TRITS_HASH, (tryte_t *)TEST_SEED, NUM_TRITS_HASH, NUM_TRYTES_HASH);
 
+  conf.local_snapshots.local_snapshots_is_enabled = true;
   TEST_ASSERT(iota_snapshots_provider_init(&snapshots_provider, &conf) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&transaction_solidifier, &conf, NULL, &snapshots_provider,
                                                          NULL) == RC_OK);
@@ -195,6 +196,7 @@ int main(int argc, char *argv[]) {
     ciri_db_path = "ciri.db";
     snapshot_path = "snapshot.txt";
     snapshot_conf_path = "snapshot_conf.json";
+    local_snapshot_path_base = "local_snapshot";
   }
 
   config.db_path = test_db_path;

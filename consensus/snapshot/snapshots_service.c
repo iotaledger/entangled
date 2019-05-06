@@ -386,5 +386,7 @@ cleanup:
   hash_to_uint64_t_map_copy(&solid_entry_points, &snapshot->metadata.solid_entry_points);
   iota_snapshot_unlock(snapshot);
 
+  hash_to_uint64_t_map_free(&solid_entry_points);
+
   return ret;
 }

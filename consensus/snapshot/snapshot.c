@@ -101,6 +101,9 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *
 
   if (!snapshot->conf->local_snapshots.local_snapshots_is_enabled ||
       ((ret = iota_snapshot_load_local_snapshot(snapshot, conf)) != RC_OK)) {
+    if (ret) {
+      iota_snapshot_destroy(snapshot);
+    }
     ERR_BIND_RETURN(iota_snapshot_load_built_in_snapshot(snapshot, conf), ret);
   }
 
@@ -166,14 +169,6 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   char file_path[256];
 
   strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
-  strcat(file_path, SNAPSHOT_STATE_EXT);
-
-  if ((ret = iota_snapshot_state_read_from_file(snapshot, file_path))) {
-    log_critical(logger_id, "Initializing snapshot initial state failed\n");
-    return ret;
-  }
-
-  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
   strcat(file_path, SNAPSHOT_METADATA_EXT);
 
   iota_snapshot_read_lock(snapshot);
@@ -184,6 +179,15 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   }
 
   iota_snapshot_unlock(snapshot);
+
+  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
+  strcat(file_path, SNAPSHOT_STATE_EXT);
+
+  if ((ret = iota_snapshot_state_read_from_file(snapshot, file_path))) {
+    log_critical(logger_id, "Initializing snapshot initial state failed\n");
+    return ret;
+  }
+
   log_info(logger_id, "Consistent local snapshot with %ld addresses and correct supply\n", HASH_COUNT(snapshot->state));
 
   return ret;
