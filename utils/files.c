@@ -119,9 +119,15 @@ cleanup:
 }
 
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
-  FILE *fp = fopen(file_path, "r");
+  FILE *fp;
   long buffer_size;
   size_t offset = 0;
+
+  if (access(file_path, F_OK) == -1) {
+    return RC_UTILS_FILE_DOES_NOT_EXITS;
+  }
+
+  fp = fopen(file_path, "r");
 
   if (fp != NULL) {
     /* Go to the end of the file. */

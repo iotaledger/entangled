@@ -34,9 +34,9 @@ retcode_t iota_snapshot_metadata_destroy(snapshot_metadata_t *const snapshot_met
 }
 
 size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *const snapshot_metadata) {
-  // hash, index, timestamps, solid entries map size, each are followed by new line character
+  // hash, index, timestamps, each are followed by new line character
   // each solid entry point map entry is two fields delimited by ';' and ended with a new line character
-  return NUM_TRYTES_HASH + 1 + MAX_CHARS_UINT64 + 1 + MAX_CHARS_UINT64 + 1 + MAX_CHARS_UINT64 + 1 +
+  return NUM_TRYTES_HASH + 1 + MAX_CHARS_UINT64 + 1 + MAX_CHARS_UINT64 + 1 +
          hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points) *
              (MAX_CHARS_UINT64 + 1 + NUM_TRYTES_ADDRESS + 1);
 }
