@@ -70,8 +70,8 @@ void test_endpoint(void) {
   tryte_t endpoint_name[ENDPOINT_NAME_SIZE];
   trits_t endpoint_name_trits = trits_alloc(ENDPOINT_NAME_SIZE * 3);
 
-  MAM_TRITS_DEF0(prng_key, MAM_PRNG_KEY_SIZE);
-  prng_key = MAM_TRITS_INIT(prng_key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
+  prng_key = MAM_TRITS_INIT(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(prng_key,
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"

@@ -414,7 +414,7 @@ static void test_api_serialization() {
   buffer = trits_pickup_all(buffer);
   TEST_ASSERT((mam_api_deserialize(&buffer, &deserialized_api) == RC_OK));
 
-  TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng, MAM_PRNG_KEY_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
   TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &api.ntru_pks));
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&deserialized_api.psks, &api.psks));
@@ -434,7 +434,7 @@ static void test_api_save_load() {
   TEST_ASSERT(mam_api_save(&api, "mam-api.bin") == RC_OK);
   TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api) == RC_OK);
 
-  TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &api.prng, MAM_PRNG_KEY_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &api.ntru_sks));
   TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&loaded_api.ntru_pks, &api.ntru_pks));
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&loaded_api.psks, &api.psks));

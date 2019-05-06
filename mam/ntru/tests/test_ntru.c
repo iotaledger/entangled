@@ -26,11 +26,11 @@ static void ntru_test(void) {
   MAM_POLY_DEF(f);
   MAM_POLY_DEF(f0);
   MAM_TRITS_DEF0(nonce, 3 * 10);
-  MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key, MAM_PRNG_SECRET_KEY_SIZE);
   MAM_TRITS_DEF0(ekey, MAM_NTRU_EKEY_SIZE);
   MAM_TRITS_DEF0(dekey, MAM_NTRU_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 3 * 10);
-  key = MAM_TRITS_INIT(key, MAM_PRNG_KEY_SIZE);
+  key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
   ekey = MAM_TRITS_INIT(ekey, MAM_NTRU_EKEY_SIZE);
   dekey = MAM_TRITS_INIT(dekey, MAM_NTRU_KEY_SIZE);
 
@@ -117,9 +117,9 @@ static void test_ntru_sk_serialization(void) {
   mam_ntru_sk_t_set_t ntru_sk_set_2 = NULL;
   mam_ntru_sk_t ntru_sk;
   mam_prng_t prng;
-  MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key, MAM_PRNG_SECRET_KEY_SIZE);
   MAM_TRITS_DEF0(nonce, 3 * 10);
-  key = MAM_TRITS_INIT(key, MAM_PRNG_KEY_SIZE);
+  key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 3 * 10);
 
   trits_from_str(key,

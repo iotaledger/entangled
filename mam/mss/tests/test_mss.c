@@ -100,7 +100,7 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
   bool r = true;
   retcode_t e;
   mss_mt_height_t curr_height;
-  MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key, MAM_PRNG_SECRET_KEY_SIZE);
   MAM_TRITS_DEF0(nonce, 24);
   MAM_TRITS_DEF0(hash, MAM_MSS_HASH_SIZE);
   MAM_TRITS_DEF0(pk2, MAM_MSS_PK_SIZE);
@@ -109,7 +109,7 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
   MAM_TRITS_DEF0(store_, MAM_MSS_MAX_STORED_SIZE(5));
   trits_t sig, sig2, store;
 
-  key = MAM_TRITS_INIT(key, MAM_PRNG_KEY_SIZE);
+  key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 24);
   hash = MAM_TRITS_INIT(hash, MAM_MSS_HASH_SIZE);
   pk2 = MAM_TRITS_INIT(pk2, MAM_MSS_PK_SIZE);
@@ -158,7 +158,7 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
 
 static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, mss_mt_height_t max_height) {
   bool r = true;
-  MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key, MAM_PRNG_SECRET_KEY_SIZE);
   mss_mt_height_t curr_height;
   MAM_TRITS_DEF0(nonce, 24);
   MAM_TRITS_DEF0(hash, MAM_MSS_HASH_SIZE);
@@ -166,7 +166,7 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, m
   /*MAM_TRITS_DEF0(sig_, MAM_MSS_SIG_SIZE(MAM_MSS_TEST_MAX_D)); */
   trits_t sig_;
 
-  key = MAM_TRITS_INIT(key, MAM_PRNG_KEY_SIZE);
+  key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 24);
   hash = MAM_TRITS_INIT(hash, MAM_MSS_HASH_SIZE);
   pk = MAM_TRITS_INIT(pk, MAM_MSS_PK_SIZE);
