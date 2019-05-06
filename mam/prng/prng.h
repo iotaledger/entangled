@@ -23,6 +23,7 @@
 #include "mam/defs.h"
 #include "mam/pb3/pb3.h"
 #include "mam/trits/trits.h"
+#include "utils/memset_safe.h"
 
 /** @brief Size of a PRNG secret key */
 #define MAM_PRNG_SECRET_KEY_SIZE 243
@@ -57,7 +58,15 @@ retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
  *
  * @param prng A PRNG interface
  */
-retcode_t mam_prng_reset(mam_prng_t *const prng);
+static inline retcode_t mam_prng_reset(mam_prng_t *const prng) {
+  if (prng == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  memset_safe(prng->secret_key, MAM_PRNG_SECRET_KEY_SIZE, 0, MAM_PRNG_SECRET_KEY_SIZE);
+
+  return RC_OK;
+}
 
 /**
  * PRNG output generation with three nonces

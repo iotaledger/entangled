@@ -9,7 +9,6 @@
 
 #include "mam/prng/prng.h"
 #include "mam/sponge/sponge.h"
-#include "utils/memset_safe.h"
 
 retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
   if (prng == NULL) {
@@ -21,16 +20,6 @@ retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
   }
 
   memcpy(prng->secret_key, trits_begin(secret_key), MAM_PRNG_SECRET_KEY_SIZE);
-
-  return RC_OK;
-}
-
-retcode_t mam_prng_reset(mam_prng_t *const prng) {
-  if (prng == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  memset_safe(prng->secret_key, MAM_PRNG_SECRET_KEY_SIZE, 0, MAM_PRNG_SECRET_KEY_SIZE);
 
   return RC_OK;
 }
