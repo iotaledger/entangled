@@ -223,6 +223,8 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
     offset += value_len;
   }
 
+  str[offset] = '\0';
+
   return RC_OK;
 }
 
