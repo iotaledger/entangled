@@ -21,6 +21,13 @@
 #include "utils/files.h"
 #include "utils/logger_helper.h"
 
+bool iota_utils_file_exist(char const *const file_path) {
+  if (access(file_path, F_OK) == -1) {
+    return false;
+  }
+  return true;
+}
+
 retcode_t iota_utils_copy_file(const char *to, const char *from) {
   retcode_t ret = RC_OK;
   int fd_to, fd_from;
@@ -89,29 +96,13 @@ retcode_t iota_utils_remove_file(const char *file_path) {
 retcode_t iota_utils_overwrite_file(char const *const file_path, char const *const content) {
   retcode_t ret = RC_OK;
   FILE *file;
-  char file_path_backup[256];
-  bool file_already_exist = false;
-  if ((file = fopen(file_path, "r"))) {
-    strcpy(file_path_backup, file_path);
-    strcat(file_path_backup, ".backup");
-    ERR_BIND_GOTO(iota_utils_copy_file(file_path_backup, file_path), ret, cleanup);
-    fclose(file);
-    file_already_exist = true;
-  }
 
   if ((file = fopen(file_path, "w"))) {
-    fputs(content, file);
+    fwrite(content, sizeof(char), strlen(content), file);
   } else {
-    if (file_already_exist && rename(file_path_backup, file_path) == -1) {
-      return RC_UTILS_FAILED_WRITE_FILE;
-    }
+    return RC_UTILS_FAILED_TO_OPEN_FILE;
   }
 
-  if (file_already_exist) {
-    ERR_BIND_GOTO(iota_utils_remove_file(file_path_backup), ret, cleanup);
-  }
-
-cleanup:
   if (file) {
     fclose(file);
   }
@@ -123,7 +114,7 @@ retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **c
   long buffer_size;
   size_t offset = 0;
 
-  if (access(file_path, F_OK) == -1) {
+  if (!iota_utils_file_exist(file_path)) {
     return RC_UTILS_FILE_DOES_NOT_EXITS;
   }
 

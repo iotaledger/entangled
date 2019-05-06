@@ -53,6 +53,15 @@ retcode_t iota_utils_overwrite_file(char const *const file_path, char const *con
  */
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer);
 
+/**
+ * Copies a file to a given path
+ *
+ * @param file_path The path of the file
+ *
+ * @return True if exists
+ */
+bool iota_utils_file_exist(char const *const file_path);
+
 #ifdef __cplusplus
 }
 #endif
