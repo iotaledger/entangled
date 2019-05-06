@@ -32,6 +32,7 @@
 extern "C" {
 #endif
 
+/** @brief Destination context encoded in one tryte */
 typedef enum mam_prng_destination_tryte_e {
   /** @brief PRNG AE destination tryte */
   MAM_PRNG_DST_SEC_KEY = 0,
@@ -46,17 +47,21 @@ typedef struct mam_prng_s {
 } mam_prng_t;
 
 /**
- * PRNG initialization
+ * @brief Initializes a PRNG with a secret key
  *
- * @param prng A PRNG interface
- * @param secret_key A secret key of size MAM_PRNG_SECRET_KEY_SIZE
+ * @param[out] prng The PRNG
+ * @param[in] secret_key The secret key
+ *
+ * @return a status code
  */
 retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
 
 /**
- * PRNG deinitialization
+ * @brief Safely resets a PRNG secret key
  *
- * @param prng A PRNG interface
+ * @param[out] prng The PRNG
+ *
+ * @return a status code
  */
 static inline retcode_t mam_prng_reset(mam_prng_t *const prng) {
   if (prng == NULL) {
@@ -69,26 +74,30 @@ static inline retcode_t mam_prng_reset(mam_prng_t *const prng) {
 }
 
 /**
- * PRNG output generation with three nonces
+ * @brief Generates pseudo random trits with three nonces
  *
- * @param prng A PRNG interface
- * @param destination A destination tryte
- * @param nonce1 The first nonce
- * @param nonce2 The second nonce
- * @param nonce3 The third nonce
- * @param output Pseudorandom output trits
+ * @param[in] prng A PRNG
+ * @param[in] destination A destination tryte
+ * @param[in] nonce1 The first nonce
+ * @param[in] nonce2 The second nonce
+ * @param[in] nonce3 The third nonce
+ * @param[out] output The pseudo random trits
+ *
+ * @return a status code
  */
 retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
                         trits_t const nonce1, trits_t const nonce2, trits_t const nonce3, trits_t output);
 
 /**
- * PRNG output generation with two nonces
+ * @brief Generates pseudo random trits with two nonces
  *
- * @param prng A PRNG interface
- * @param destination A destination tryte
- * @param nonce1 The first nonce
- * @param nonce2 The second nonce
- * @param output Pseudorandom output trits
+ * @param[in] prng A PRNG
+ * @param[in] destination A destination tryte
+ * @param[in] nonce1 The first nonce
+ * @param[in] nonce2 The second nonce
+ * @param[out] output The pseudo random trits
+ *
+ * @return a status code
  */
 static inline retcode_t mam_prng_gen2(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
                                       trits_t const nonce1, trits_t const nonce2, trits_t output) {
@@ -96,12 +105,14 @@ static inline retcode_t mam_prng_gen2(mam_prng_t const *const prng, mam_prng_des
 }
 
 /**
- * PRNG output generation with a nonce
+ * @brief Generates pseudo random trits with a nonce
  *
- * @param prng A PRNG interface
- * @param destination A destination tryte
- * @param nonce The nonce
- * @param output Pseudorandom output trits
+ * @param[in] prng A PRNG
+ * @param[in] destination A destination tryte
+ * @param[in] nonce The nonce
+ * @param[out] output The pseudo random trits
+ *
+ * @return a status code
  */
 static inline retcode_t mam_prng_gen(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
                                      trits_t const nonce, trits_t output) {
@@ -109,28 +120,29 @@ static inline retcode_t mam_prng_gen(mam_prng_t const *const prng, mam_prng_dest
 }
 
 /**
+ * @brief Size of a serialized PRNG
  *
- *
- * @param
- *
+ * @returns the size
  */
 static inline size_t mam_prng_serialized_size() { return MAM_PRNG_SECRET_KEY_SIZE; }
 
 /**
+ * @brief Serializes a PRNG into a trits buffer
  *
- *
- * @param
- *
+ * @param[in] prng The PRNG
+ * @param[out] buffer The trits buffer
  */
 static inline void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer) {
   pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key), buffer);
 }
 
 /**
+ * @brief Deserializes a PRNG from a trits buffer
  *
+ * @param[in] buffer The trits buffer
+ * @param[out] prng The PRNG
  *
- * @param
- *
+ * @return a status code
  */
 static inline retcode_t mam_prng_deserialize(trits_t *const buffer, mam_prng_t *const prng) {
   return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key), buffer);
