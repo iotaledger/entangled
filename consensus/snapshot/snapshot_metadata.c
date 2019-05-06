@@ -81,6 +81,8 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
     offset += value_len;
   }
 
+  str[offset] = "\0";
+
   return RC_OK;
 }
 retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata) {
