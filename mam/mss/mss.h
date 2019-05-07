@@ -40,9 +40,9 @@ extern "C" {
 /*! \brief Trits needed to encode `skn`: tree depth and key number. */
 #define MAM_MSS_SKN_SIZE (MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE)
 /*! \brief MSS authentication path size of height `d`. */
-#define MAM_MSS_APATH_SIZE(d) (MAM_WOTS_PK_SIZE * d)
+#define MAM_MSS_APATH_SIZE(d) (MAM_WOTS_PUBLIC_KEY_SIZE * d)
 /*! \brief MSS signature size with a tree of height `d`. */
-#define MAM_MSS_SIG_SIZE(d) (MAM_MSS_SKN_SIZE + MAM_WOTS_SIG_SIZE + MAM_MSS_APATH_SIZE(d))
+#define MAM_MSS_SIG_SIZE(d) (MAM_MSS_SKN_SIZE + MAM_WOTS_SIGNATURE_SIZE + MAM_MSS_APATH_SIZE(d))
 /*! \brief MSS signed hash value size. */
 #define MAM_MSS_HASH_SIZE MAM_WOTS_HASH_SIZE
 
@@ -50,7 +50,7 @@ extern "C" {
 #define MAM_MSS_MAX_D 20
 
 /*! \brief Size of hash values stored in Merkle tree */
-#define MAM_MSS_MT_HASH_SIZE MAM_WOTS_PK_SIZE
+#define MAM_MSS_MT_HASH_SIZE MAM_WOTS_PUBLIC_KEY_SIZE
 
 /*! \brief Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <=
  * 20`.
@@ -88,7 +88,7 @@ typedef struct mss_mt_stack_s {
 #define MAM_MSS_MT_AUTH_WORDS(d) MAM_MSS_HASH_IDX(d)
 #else
 /*! \brief MSS Merkle-tree implementation storage words. */
-#define MAM_MSS_MT_WORDS(height) (MAM_WOTS_PK_SIZE * (2 * (1 << (height)) - 1))
+#define MAM_MSS_MT_WORDS(height) (MAM_WOTS_PUBLIC_KEY_SIZE * (2 * (1 << (height)) - 1))
 #endif
 
 #if defined(MAM_MSS_TRAVERSAL)
@@ -231,14 +231,13 @@ size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss);
  * Verifies MSS signature.
  *
  * @param mt_spongos [in] Spongos interface to hash Merkle Tree
- * @param wots_spongos [in] Spongos interface to hash WOTS iterations
  * @param hash [in] signed hash value
  * @param sig [in] signature
  * @param [in] public key (Merkle-tree root)
  *
  * @return bool True is the signature is correct, False otherwise
  */
-bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos, trits_t hash, trits_t sig, trits_t pk);
+bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_t pk);
 
 /**
  * Allocate memory for internal Merkle tree structure.
