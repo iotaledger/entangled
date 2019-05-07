@@ -32,7 +32,6 @@ cc_library(
     name = "milestone_service",
     srcs = [
         "milestone_service.c",
-        "milestone_service.h",
     ],
     hdrs = ["milestone_service.h"],
     visibility = ["//visibility:public"],
