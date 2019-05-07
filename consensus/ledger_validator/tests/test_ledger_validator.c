@@ -159,7 +159,7 @@ static void test_replay_several_milestones() {
   memcpy(curr_hash, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   milestone.index = 0;
 
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &conf, &mt, &milestone_service) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &conf, &mt) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(snapshots_provider.latest_snapshot.metadata.index, 0);
 

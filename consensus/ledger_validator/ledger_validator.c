@@ -68,8 +68,8 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv, tangle_t con
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  if ((ret = iota_tangle_milestone_load_next(
-           tangle, lv->milestone_tracker->snapshots_provider->inital_snapshot.metadata.index, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_milestone_load_by_index(
+           tangle, lv->milestone_tracker->snapshots_provider->inital_snapshot.metadata.index + 1, &pack)) != RC_OK) {
     goto done;
   }
 
@@ -100,7 +100,7 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv, tangle_t con
       }
     }
     hash_pack_reset(&pack);
-    if ((ret = iota_tangle_milestone_load_next(tangle, milestone.index, &pack)) != RC_OK) {
+    if ((ret = iota_tangle_milestone_load_by_index(tangle, milestone.index + 1, &pack)) != RC_OK) {
       goto done;
     }
     state_delta_destroy(&delta);
@@ -190,14 +190,12 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv, tangle_t *
  */
 
 retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv, tangle_t const *const tangle,
-                                               iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
-                                               milestone_service_t *const milestone_service) {
+                                               iota_consensus_conf_t *const conf, milestone_tracker_t *const mt) {
   retcode_t ret = RC_OK;
 
   logger_id = logger_helper_enable(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->conf = conf;
   lv->milestone_tracker = mt;
-  lv->milestone_service = milestone_service;
 
   if ((ret = build_snapshot(lv, tangle, &mt->latest_solid_subtangle_milestone_index,
                             mt->latest_solid_subtangle_milestone)) != RC_OK) {
@@ -261,13 +259,11 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
         }
       }
 
-      iota_snapshot_write_lock(&lv->milestone_tracker->snapshots_provider->latest_snapshot);
-      if ((ret = iota_snapshot_apply_patch_no_lock(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
-                                                   milestone->index)) != RC_OK) {
+      if ((ret = iota_snapshot_apply_patch(&lv->milestone_tracker->snapshots_provider->latest_snapshot, &delta,
+                                           milestone->index)) != RC_OK) {
         log_error(logger_id, "Applying patch failed\n");
         goto done;
       }
-      iota_snapshot_unlock(&lv->milestone_tracker->snapshots_provider->latest_snapshot);
     }
   }
 

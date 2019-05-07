@@ -16,7 +16,6 @@ cc_library(
     deps = [
         ":ledger_validator_shared",
         "//consensus/bundle_validator",
-        "//consensus/milestone:milestone_service",
         "//consensus/milestone:milestone_tracker_shared",
         "//consensus/snapshot",
         "//consensus/snapshot:snapshots_provider",

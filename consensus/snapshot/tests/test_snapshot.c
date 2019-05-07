@@ -89,7 +89,7 @@ void test_snapshot_get_balance() {
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
-void test_delta_serialization() {
+void test_snapshot_create_and_apply_patch() {
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
   int64_t balance = 0;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_snapshot_init_file_invalid_supply);
   RUN_TEST(test_snapshot_check_consistency);
   RUN_TEST(test_snapshot_get_balance);
-  RUN_TEST(test_delta_serialization);
+  RUN_TEST(test_snapshot_create_and_apply_patch);
 
   return UNITY_END();
 }

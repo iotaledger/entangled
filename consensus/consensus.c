@@ -91,8 +91,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
 
   log_info(logger_id, "Initializing ledger validator\n");
   if ((ret = iota_consensus_ledger_validator_init(&consensus->ledger_validator, tangle, &consensus->conf,
-                                                  &consensus->milestone_tracker, &consensus->milestone_service)) !=
-      RC_OK) {
+                                                  &consensus->milestone_tracker)) != RC_OK) {
     log_critical(logger_id, "Initializing ledger validator failed\n");
     return ret;
   }

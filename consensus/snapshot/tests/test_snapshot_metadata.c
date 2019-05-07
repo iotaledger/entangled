@@ -10,11 +10,12 @@
 
 #include "common/model/transaction.h"
 #include "consensus/snapshot/snapshot_metadata.h"
+#include "utils/handles/rand.h"
 #include "utils/time.h"
 
 #define TEST_NULL_HASH_TRYTES "999999999999999999999999999999999999999999999999999999999999999999999999999999999"
 
-void test_delta_serialization() {
+void test_snapshot_create_and_apply_patch() {
   snapshot_metadata_t metadata_orig, metadata_deserialized;
   size_t serialized_size;
   char *buffer;
@@ -24,7 +25,7 @@ void test_delta_serialization() {
   flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(null_hash, NUM_TRITS_HASH, TEST_NULL_HASH_TRYTES, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
-  iota_snapshot_metadata_init(&metadata_orig, null_hash, rand(), current_timestamp_ms() / 1000, NULL);
+  iota_snapshot_metadata_init(&metadata_orig, null_hash, rand_handle_rand(), current_timestamp_ms() / 1000, NULL);
   iota_snapshot_metadata_init(&metadata_deserialized, null_hash, 0, 0, NULL);
 
   flex_trits_from_trytes(metadata_orig.hash, NUM_TRITS_HASH,
@@ -61,7 +62,7 @@ void test_delta_serialization() {
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_delta_serialization);
+  RUN_TEST(test_snapshot_create_and_apply_patch);
 
   return UNITY_END();
 }

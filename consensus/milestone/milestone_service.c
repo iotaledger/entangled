@@ -38,7 +38,7 @@ retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, miles
   for (uint64_t current_milestone_index = snapshot->metadata.index; current_milestone_index < index;
        ++current_milestone_index) {
     hash_pack_reset(&pack);
-    ERR_BIND_GOTO(iota_tangle_milestone_load_next(tangle, current_milestone_index, &pack), ret, cleanup);
+    ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, current_milestone_index + 1, &pack), ret, cleanup);
     if (pack.num_loaded == 0) {
       log_warning(logger_id, "Target milestone was not loaded\n");
       break;

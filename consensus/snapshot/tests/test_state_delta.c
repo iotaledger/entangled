@@ -16,7 +16,7 @@ static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.json";
 snapshot_t snapshot;
 iota_consensus_conf_t conf;
 
-void test_delta_serialization() {
+void test_snapshot_create_and_apply_patch() {
   state_delta_t delta_deserialized = NULL;
   size_t serialized_size;
   char *buffer;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
   conf.snapshot_signature_skip_validation = true;
 
-  RUN_TEST(test_delta_serialization);
+  RUN_TEST(test_snapshot_create_and_apply_patch);
 
   return UNITY_END();
 }

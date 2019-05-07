@@ -57,7 +57,6 @@ typedef struct check_not_orphan_do_func_params_s {
 retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
                                       snapshots_provider_t *const snapshots_provider,
                                       milestone_service_t *const milestone_service, iota_consensus_conf_t *conf) {
-  retcode_t ret;
   snapshots_service->snapshots_provider = snapshots_provider;
   snapshots_service->milestone_service = milestone_service;
   snapshots_service->conf = conf;
@@ -124,7 +123,7 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
             SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC;
   }
 
-  ERR_BIND_RETURN(iota_tangle_milestone_load_previous(tangle, index, entry_point), err);
+  ERR_BIND_RETURN(iota_tangle_milestone_load_by_index(tangle, index - 1, entry_point), err);
 
   if (entry_point->num_loaded == 0) {
     log_error(logger_id, "Target milestone was not loaded\n");
@@ -348,7 +347,7 @@ static retcode_t iota_snapshots_service_update_new_solid_entry_points(
                     ret);
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, prev_milestone.hash, prev_milestone.index), ret);
     hash_pack_reset(&prev_milestone_pack);
-    ERR_BIND_RETURN(iota_tangle_milestone_load_previous(tangle, index, &prev_milestone_pack), ret);
+    ERR_BIND_RETURN(iota_tangle_milestone_load_by_index(tangle, index - 1, &prev_milestone_pack), ret);
     if (prev_milestone_pack.num_loaded == 0 && index > 1) {
       return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
     } else {
