@@ -336,7 +336,8 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   rw_lock_handle_init(&mt->candidates_lock);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
-  mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
+  mt->latest_solid_subtangle_milestone_index =
+      MAX(conf->last_milestone, snapshots_provider->inital_snapshot.metadata.index);
   mt->snapshots_provider = snapshots_provider;
   cond_handle_init(&mt->cond_validator);
   cond_handle_init(&mt->cond_solidifier);

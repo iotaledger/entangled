@@ -9,6 +9,7 @@
 
 #include "common/model/milestone.h"
 #include "consensus/milestone/milestone_tracker.h"
+#include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/test_utils/tangle.h"
 
 static char *test_db_path = "consensus/milestone/tests/test.db";
@@ -17,6 +18,7 @@ static connection_config_t config;
 static tangle_t tangle;
 static milestone_tracker_t mt;
 static iota_consensus_conf_t conf;
+static snapshots_provider_t snapshots_provider;
 
 void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
 
@@ -34,7 +36,7 @@ void milestone_validation_curl_p_27_sec_lvl_1(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 1;
   conf.coordinator_signature_type = SPONGE_CURLP27;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {(tryte_t*)
@@ -114,7 +116,7 @@ void milestone_validation_kerl_sec_lvl_1(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 1;
   conf.coordinator_signature_type = SPONGE_KERL;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {(tryte_t*)
@@ -194,7 +196,7 @@ void milestone_validation_curl_p_27_sec_lvl_3(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 3;
   conf.coordinator_signature_type = SPONGE_CURLP27;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = { (tryte_t*)
@@ -324,7 +326,7 @@ void milestone_validation_kerl_sec_lvl_3(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 3;
   conf.coordinator_signature_type = SPONGE_KERL;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = { (tryte_t*)
@@ -447,6 +449,7 @@ int main() {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
+  snapshots_provider.inital_snapshot.metadata.index = 0;
 
   RUN_TEST(milestone_validation_curl_p_27_sec_lvl_1);
   RUN_TEST(milestone_validation_kerl_sec_lvl_1);
@@ -454,5 +457,6 @@ int main() {
   RUN_TEST(milestone_validation_kerl_sec_lvl_3);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
+
   return UNITY_END();
 }

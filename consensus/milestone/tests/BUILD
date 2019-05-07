@@ -13,6 +13,7 @@ cc_test(
     visibility = ["//visibility:public"],
     deps = [
         "//consensus/milestone:milestone_tracker",
+        "//consensus/snapshot:snapshots_provider",
         "//consensus/test_utils",
         "@unity",
     ],
