@@ -75,7 +75,7 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
 
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
                                                tangle_t const *const tangle) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
   ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, &pack, tangle), ret);
