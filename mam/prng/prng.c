@@ -27,22 +27,22 @@ retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
 retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
                         trits_t const nonce1, trits_t const nonce2, trits_t const nonce3, trits_t output) {
   mam_sponge_t sponge;
-  trits_t input[5];
+  trits_t inputs[5];
   trit_t dest[3];
 
   if (prng == NULL) {
     return RC_NULL_PARAM;
   }
 
-  input[0] = trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key);
-  input[1] = trits_from_rep(3, dest);
-  input[2] = nonce1;
-  input[3] = nonce2;
-  input[4] = nonce3;
-  trits_put3(input[1], destination);
+  inputs[0] = trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, prng->secret_key);
+  inputs[1] = trits_from_rep(3, dest);
+  inputs[2] = nonce1;
+  inputs[3] = nonce2;
+  inputs[4] = nonce3;
+  trits_put3(inputs[1], destination);
 
   mam_sponge_init(&sponge);
-  mam_sponge_absorbn(&sponge, MAM_SPONGE_CTL_KEY, 5, input);
+  mam_sponge_absorbn(&sponge, MAM_SPONGE_CTL_KEY, 5, inputs);
   mam_sponge_squeeze(&sponge, MAM_SPONGE_CTL_PRN, output);
 
   return RC_OK;
