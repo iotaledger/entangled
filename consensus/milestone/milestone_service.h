@@ -24,7 +24,7 @@ typedef struct milestone_service_s {
 } milestone_service_t;
 
 /**
- * Initializes a snapshot
+ * Initializes a milestone service
  *
  * @param milestone_service The service
  * @param conf The configuration
@@ -34,10 +34,9 @@ typedef struct milestone_service_s {
 retcode_t iota_milestone_service_init(milestone_service_t *const milestone_service, iota_consensus_conf_t *conf);
 
 /**
- * Destroys a snapshot
+ * Destroys a milestone service
  *
  * @param milestone_service The service
- * @param tangle The tangle to load from
  *
  * @return a status code
  */
@@ -47,12 +46,13 @@ retcode_t iota_milestone_service_destroy(milestone_service_t *const milestone_se
  * Replays milestones on a snapshot
  *
  * @param milestone_service The service
+ * @param tangle The tangle
  * @param snapshot The initial snapshot to forward with changes
  * @param index The last milestone in the new snapshot
  *
  * @return a status code
  */
-retcode_t iota_milestone_service_replay_milestones(tangle_t *const tangle, milestone_service_t *const milestone_service,
+retcode_t iota_milestone_service_replay_milestones(milestone_service_t *const milestone_service, tangle_t *const tangle,
                                                    snapshot_t *const snapshot, uint64_t index);
 
 #ifdef __cplusplus

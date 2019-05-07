@@ -17,7 +17,6 @@
 #include "consensus/snapshot/snapshots_service.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
-#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -38,8 +37,8 @@ typedef struct local_snapshots_manager_s {
  * Initializes a local snapshots manager
  *
  * @param lsm The local snapshots manager
- * @param conf Consensus configuration
  * @param snapshots_service The snapshots service
+ * @param conf Consensus configuration
  * @param mt The milestones tracker
  *
  * @return a status code

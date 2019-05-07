@@ -363,7 +363,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
     return ret;
   }
   if (pack.num_loaded != 0) {
-    mt->latest_milestone_index = latest_milestone.index;
+    mt->latest_milestone_index = MAX(latest_milestone.index, mt->snapshots_provider->latest_snapshot.metadata.index);
     memcpy(mt->latest_milestone, latest_milestone.hash, FLEX_TRIT_SIZE_243);
   }
   log_info(logger_id, "Latest milestone: #%d\n", mt->latest_milestone_index);
@@ -454,11 +454,6 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, fl
 
   if (mt == NULL || hash == NULL) {
     return RC_NULL_PARAM;
-  }
-
-  // If the milestone is in the solid entry points map, that means it was already validated
-  if (iota_snapshot_has_entry_point(&mt->snapshots_provider->inital_snapshot, hash)) {
-    return RC_OK;
   }
 
   rw_lock_handle_wrlock(&mt->candidates_lock);

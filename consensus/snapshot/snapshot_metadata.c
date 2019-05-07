@@ -38,46 +38,36 @@ size_t iota_snapshot_metadata_serialized_str_size(snapshot_metadata_t const *con
   // each solid entry point map entry is two fields delimited by ';' and ended with a new line character
   return NUM_TRYTES_HASH + 1 + MAX_CHARS_UINT64 + 1 + MAX_CHARS_UINT64 + 1 +
          hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points) *
-             (MAX_CHARS_UINT64 + 1 + NUM_TRYTES_ADDRESS + 1);
+             (MAX_CHARS_UINT64 + 1 + NUM_TRYTES_HASH + 1);
 }
 
 retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const snapshot_metadata, char *const str) {
   hash_to_uint64_t_map_entry_t *iter = NULL, *tmp = NULL;
-  tryte_t hash_trytes[NUM_TRYTES_HASH];
-  char svalue[MAX_CHARS_UINT64];
   size_t value_len;
   size_t offset = 0;
 
-  if (flex_trits_to_trytes(hash_trytes, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
+  if (flex_trits_to_trytes(str + offset, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
       NUM_TRITS_HASH) {
     return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
   }
 
-  memcpy(str + offset, hash_trytes, NUM_TRYTES_HASH);
   offset += NUM_TRYTES_HASH;
-  memcpy(str + offset, "\n", 1);
+  str[offset] = '\n';
   offset += 1;
-  sprintf(svalue, "%" PRIu64 "\n", snapshot_metadata->index);
-  value_len = strlen(svalue);
-  memcpy(str + offset, svalue, value_len);
+  value_len = sprintf(str + offset, "%" PRIu64 "\n", snapshot_metadata->index);
   offset += value_len;
-  sprintf(svalue, "%" PRIu64 "\n", snapshot_metadata->timestamp);
-  value_len = strlen(svalue);
-  memcpy(str + offset, svalue, value_len);
+  value_len = sprintf(str + offset, "%" PRIu64 "\n", snapshot_metadata->timestamp);
   offset += value_len;
 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
-    if (flex_trits_to_trytes(hash_trytes, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
+    if (flex_trits_to_trytes(str + offset, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
         NUM_TRITS_HASH) {
       return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
     }
-    memcpy(str + offset, hash_trytes, NUM_TRYTES_ADDRESS);
     offset += NUM_TRYTES_ADDRESS;
-    memcpy(str + offset, ";", 1);
+    str[offset] = ';';
     offset += 1;
-    sprintf(svalue, "%" PRIu64 "\n", iter->value);
-    value_len = strlen(svalue);
-    memcpy(str + offset, svalue, value_len);
+    value_len = sprintf(str + offset, "%" PRIu64 "\n", iter->value);
     offset += value_len;
   }
 
@@ -88,47 +78,39 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
 retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata) {
   retcode_t ret;
   char c;
-  tryte_t curr_address_trytes[NUM_TRYTES_ADDRESS];
   flex_trit_t curr_address[FLEX_TRIT_SIZE_243];
-  tryte_t curr_hash_trytes[NUM_TRYTES_ADDRESS + 1];
   uint64_t snapshot_index;
   int offset;
   char const *ptr = str;
   char *token;
 
-  if (memcpy(curr_hash_trytes, ptr, NUM_TRYTES_HASH) == NULL) {
-    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-  }
-  if (flex_trits_from_trytes(snapshot_metadata->hash, NUM_TRITS_HASH, curr_hash_trytes, NUM_TRYTES_HASH,
-                             NUM_TRYTES_HASH) != NUM_TRYTES_HASH) {
+  if (flex_trits_from_trytes(snapshot_metadata->hash, NUM_TRITS_HASH, ptr, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
+      NUM_TRYTES_HASH) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += NUM_TRYTES_HASH;
 
-  if (memcpy(&c, ptr, 1) == NULL) {
-    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-  }
+  c = ptr[0];
   ptr += 1;
   if (sscanf(ptr, "%" PRIu64 "%n", &snapshot_metadata->index, &offset) != 1) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += offset;
-  if (memcpy(&c, ptr, 1) == NULL) {
-    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-  }
+  c = ptr[0];
   ptr += 1;
   if (sscanf(ptr, "%" PRIu64 "%n", &snapshot_metadata->timestamp, &offset) != 1) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += offset;
-  if (memcpy(&c, ptr, 1) == NULL) {
-    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-  }
+  c = ptr[0];
   ptr += 1;
 
   token = strtok(ptr, ";");
   while (token != NULL) {
-    memcpy(curr_address_trytes, token, NUM_TRYTES_ADDRESS);
+    if (flex_trits_from_trytes(curr_address, NUM_TRITS_ADDRESS, token, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS) !=
+        NUM_TRYTES_ADDRESS) {
+      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+    }
 
     if ((token = strtok(NULL, "\n")) == NULL) {
       break;
@@ -137,10 +119,6 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
     }
 
-    if (flex_trits_from_trytes(curr_address, NUM_TRITS_ADDRESS, curr_address_trytes, NUM_TRYTES_ADDRESS,
-                               NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
-      return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
-    }
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(&snapshot_metadata->solid_entry_points, curr_address, snapshot_index),
                     ret);
     token = strtok(NULL, ";");
@@ -151,7 +129,7 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
 
 retcode_t iota_snapshot_metadata_read_from_file(snapshot_metadata_t *const snapshot_metadata,
                                                 char const *const metadata_file) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   char *buffer = NULL;
 
   ERR_BIND_GOTO(iota_utils_read_file_into_buffer(metadata_file, &buffer), ret, cleanup);

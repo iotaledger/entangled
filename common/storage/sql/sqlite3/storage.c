@@ -900,20 +900,6 @@ done:
   return ret;
 }
 
-retcode_t iota_stor_milestone_load_first(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
-  sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
-  retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_first;
-
-  if ((ret = execute_statement_load_milestones(sqlite_statement, pack, 1)) != RC_OK) {
-    goto done;
-  }
-
-done:
-  sqlite3_reset(sqlite_statement);
-  return ret;
-}
-
 retcode_t iota_stor_milestone_load_last(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
   sqlite3_connection_t const* sqlite3_connection = (sqlite3_connection_t*)connection->actual;
   retcode_t ret = RC_OK;

@@ -126,8 +126,6 @@ static void test_util_create_bundle(flex_trit_t *const curr_branch_trunk_hash, i
 }
 
 static void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *const rhs) {
-  // TODO - serialize index
-  // TEST_ASSERT_EQUAL_INT64(lhs->index, rhs->index);
   TEST_ASSERT(state_delta_equal(lhs->state, rhs->state));
 
   TEST_ASSERT_EQUAL_MEMORY(lhs->metadata.hash, rhs->metadata.hash, FLEX_TRIT_SIZE_243);

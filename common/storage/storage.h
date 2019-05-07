@@ -137,9 +137,6 @@ extern retcode_t iota_stor_milestone_store(storage_connection_t const* const con
 extern retcode_t iota_stor_milestone_load(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                           iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_milestone_load_first(storage_connection_t const* const connection,
-                                                iota_stor_pack_t* const pack);
-
 extern retcode_t iota_stor_milestone_load_last(storage_connection_t const* const connection,
                                                iota_stor_pack_t* const pack);
 

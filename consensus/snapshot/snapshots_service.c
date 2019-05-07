@@ -62,8 +62,6 @@ retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
   snapshots_service->conf = conf;
   logger_id = logger_helper_enable(SNAPSHOTS_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
 
-  connection_config_t db_conf = {.db_path = snapshots_service->conf->db_path};
-
   return RC_OK;
 }
 
@@ -146,7 +144,7 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
     goto cleanup;
   }
   ERR_BIND_GOTO(iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot), ret, cleanup);
-  ERR_BIND_GOTO(iota_milestone_service_replay_milestones(tangle, snapshots_service->milestone_service, snapshot,
+  ERR_BIND_GOTO(iota_milestone_service_replay_milestones(snapshots_service->milestone_service, tangle, snapshot,
                                                          target_milestone->index),
                 ret, cleanup);
 

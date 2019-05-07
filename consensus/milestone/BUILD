@@ -34,6 +34,7 @@ cc_library(
         "milestone_service.c",
         "milestone_service.h",
     ],
+    hdrs = ["milestone_service.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",

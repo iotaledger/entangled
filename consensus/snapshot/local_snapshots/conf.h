@@ -8,8 +8,8 @@
 #ifndef __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_LOCAL_SNAPSHOTS_CONF_H__
 #define __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_LOCAL_SNAPSHOTS_CONF_H__
 
+#include <stdbool.h>
 #include "common/errors.h"
-#include "common/trinary/flex_trit.h"
 
 #ifdef __cplusplus
 extern "C" {

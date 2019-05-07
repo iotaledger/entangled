@@ -102,7 +102,6 @@ retcode_t iota_utils_overwrite_file(char const *const file_path, char const *con
   if ((file = fopen(file_path, "w"))) {
     write_count = fwrite(content, sizeof(char), content_size, file);
     if (write_count < content_size) {
-      printf("LS: Failed to write file, errno: %d", errno);
       return RC_UTILS_FAILED_WRITE_FILE;
     }
 

@@ -12,6 +12,7 @@
 #include "consensus/conf.h"
 #include "utils/files.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 #include "utils/signed_files.h"
 
 #define SNAPSHOT_STATE_EXT ".state"
@@ -53,13 +54,12 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   log_info(logger_id, "Writing snapshot file\n");
 
   state_size = state_delta_serialized_str_size(snapshot->state);
+  metadata_size = iota_snapshot_metadata_serialized_str_size(&snapshot->metadata);
   char *buffer;
-  if ((buffer = (char *)calloc(state_size, sizeof(char))) == NULL) {
+  if ((buffer = (char *)calloc(MAX(state_size, metadata_size), sizeof(char))) == NULL) {
     log_critical(logger_id, "Failed in allocating buffer for snapshot file\n");
     return RC_OOM;
   }
-
-  metadata_size = iota_snapshot_metadata_serialized_str_size(&snapshot->metadata);
 
   strcpy(state_path, snapshot_file_base);
   strcat(state_path, SNAPSHOT_STATE_EXT);
@@ -70,11 +70,6 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   log_info(logger_id, "Writing state info to file\n");
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
-
-  if (metadata_size > state_size && (buffer = (char *)realloc(buffer, metadata_size * sizeof(char))) == NULL) {
-    log_critical(logger_id, "Failed in reallocating buffer for snapshot file\n");
-    return RC_OOM;
-  }
 
   log_info(logger_id, "Writing metadata info to file\n");
   ERR_BIND_GOTO(iota_snapshot_metadata_serialize_str(&snapshot->metadata, buffer), ret, cleanup);
@@ -173,14 +168,10 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
   strcat(file_path, SNAPSHOT_METADATA_EXT);
 
-  iota_snapshot_read_lock(snapshot);
   if ((ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK)) {
     log_critical(logger_id, "Initializing snapshot metadata failed\n");
-    iota_snapshot_unlock(snapshot);
     return ret;
   }
-
-  iota_snapshot_unlock(snapshot);
 
   strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
   strcat(file_path, SNAPSHOT_STATE_EXT);
@@ -314,8 +305,10 @@ void iota_snapshot_solid_entry_points_set(snapshot_t const *const snapshot, hash
 
 bool iota_snapshot_has_entry_point(snapshot_t const *const snapshot, flex_trit_t const *const hash) {
   bool is_solid_entry_point;
+
   rw_lock_handle_rdlock(&snapshot->rw_lock);
   is_solid_entry_point = hash_to_uint64_t_map_contains(&snapshot->metadata.solid_entry_points, hash);
   rw_lock_handle_unlock(&snapshot->rw_lock);
+
   return is_solid_entry_point;
 }

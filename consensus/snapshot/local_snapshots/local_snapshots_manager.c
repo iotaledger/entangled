@@ -7,7 +7,6 @@
 
 #include "consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include <inttypes.h>
-#include "common/storage/connection.h"
 #include "consensus/snapshot/local_snapshots/conf.h"
 #include "consensus/snapshot/snapshots_service.h"
 #include "utils/logger_helper.h"
@@ -100,6 +99,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
        (latest_to_initial_gap > 2 * lsm->conf->local_snapshots.min_depth))) {
     return true;
   }
+
   return false;
 }
 
