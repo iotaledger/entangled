@@ -186,7 +186,7 @@ static struct cli_argument_s {
 
     // Local snapshots configuration
 
-    {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "whether or not local snapshots should be enabled",
+    {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "Whether or not local snapshots should be enabled.",
      REQUIRED_ARG},
     {"local-snapshots-prunning-enabled", CONF_LOCAL_SNAPSHOTS_PRUNNING_ENABLED,
      "whether or not prunning should be enabled", REQUIRED_ARG},
