@@ -22,7 +22,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
   char *neighbor_uri, *cpy, *ptr;
 
   if (node == NULL) {
-    return RC_NODE_NULL_NODE;
+    return RC_NULL_PARAM;
   } else if (node->conf.neighbors == NULL) {
     return RC_OK;
   }
@@ -55,10 +55,8 @@ static retcode_t node_neighbors_init(node_t* const node) {
 retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tangle) {
   retcode_t ret = RC_OK;
 
-  if (node == NULL) {
-    return RC_NODE_NULL_NODE;
-  } else if (core == NULL) {
-    return RC_NODE_NULL_CORE;
+  if (node == NULL || core == NULL || tangle == NULL) {
+    return RC_NULL_PARAM;
   }
 
   logger_id = logger_helper_enable(NODE_LOGGER_ID, LOGGER_DEBUG, true);
@@ -123,6 +121,13 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     return ret;
   }
 
+  log_info(logger_id, "Initializing recent seen bytes cache\n");
+  if ((ret = recent_seen_bytes_cache_init(&node->recent_seen_bytes, node->conf.recent_seen_bytes_cache_size,
+                                          node->conf.p_drop_cache_entry)) != RC_OK) {
+    log_error(logger_id, "Initializing recent seen bytes cache failed\n");
+    return ret;
+  }
+
   return ret;
 }
 
@@ -130,7 +135,7 @@ retcode_t node_start(node_t* const node) {
   retcode_t ret = RC_OK;
 
   if (node == NULL) {
-    return RC_NODE_NULL_NODE;
+    return RC_NULL_PARAM;
   }
 
   log_info(logger_id, "Starting broadcaster component\n");
@@ -186,7 +191,7 @@ retcode_t node_stop(node_t* const node) {
   retcode_t ret = RC_OK;
 
   if (node == NULL) {
-    return RC_NODE_NULL_NODE;
+    return RC_NULL_PARAM;
   } else if (node->running == false) {
     return RC_OK;
   }
@@ -241,9 +246,9 @@ retcode_t node_destroy(node_t* const node) {
   retcode_t ret = RC_OK;
 
   if (node == NULL) {
-    return RC_NODE_NULL_NODE;
+    return RC_NULL_PARAM;
   } else if (node->running) {
-    return RC_NODE_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   log_info(logger_id, "Destroying transaction requester component\n");
@@ -295,6 +300,7 @@ retcode_t node_destroy(node_t* const node) {
   rw_lock_handle_destroy(&node->neighbors_lock);
 
   tips_cache_destroy(&node->tips);
+  recent_seen_bytes_cache_destroy(&node->recent_seen_bytes);
   free(node->conf.neighbors);
 
   logger_helper_release(logger_id);

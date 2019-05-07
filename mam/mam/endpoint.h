@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_MAM_ENDPOINT_H__
 #define __MAM_MAM_ENDPOINT_H__
 
@@ -108,3 +117,5 @@ retcode_t mam_endpoints_deserialize(trits_t *const buffer, trits_t const channel
 #endif
 
 #endif  // __MAM_MAM_ENDPOINT_H__
+
+/** @} */

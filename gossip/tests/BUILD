@@ -6,3 +6,13 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_recent_seen_bytes_cache",
+    srcs = ["test_recent_seen_bytes_cache.c"],
+    deps = [
+        "//consensus/test_utils",
+        "//gossip:recent_seen_bytes_cache",
+        "@unity",
+    ],
+)

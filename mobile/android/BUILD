@@ -5,7 +5,10 @@ cc_library(
         "jni.h",
     ],
     hdrs = ["Interface.h"],
-    linkopts = ["-lm"],
+    linkopts = [
+        "-lm",
+        "-ldl",
+    ],
     deps = [
         "//common/helpers",
         "//utils:memset_safe",

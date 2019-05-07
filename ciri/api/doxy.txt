@@ -1,0 +1,11 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup ciri_api cIRI API
+ * @brief The IOTA API implementation
+ */

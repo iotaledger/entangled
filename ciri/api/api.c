@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "ciri/api/api.h"
+#include "ciri/api/feature.h"
 #include "common/helpers/pow.h"
 #include "common/network/uri.h"
 #include "utils/logger_helper.h"
@@ -437,6 +438,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   res->time = current_timestamp_ms();
   res->tips = tips_cache_size(&api->core->node.tips);
   res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
+  node_features_set(api->features, res->features);
   memcpy(res->coordinator_address, api->core->consensus.conf.coordinator_address, FLEX_TRIT_SIZE_243);
 
   return RC_OK;
@@ -609,6 +611,7 @@ retcode_t iota_api_init(iota_api_t *const api, core_t *const core) {
 
   logger_id = logger_helper_enable(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->core = core;
+  node_features_clear(&api->features);
 
   return RC_OK;
 }

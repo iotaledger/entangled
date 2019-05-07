@@ -17,7 +17,7 @@ retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
 
   if (!{TYPE}_set_contains(set, value)) {
     if ((entry = ({TYPE}_set_entry_t *)malloc(sizeof({TYPE}_set_entry_t))) == NULL) {
-      return RC_UTILS_OOM;
+      return RC_OOM;
     }
     memcpy(&entry->value, value, sizeof({TYPE}));
     HASH_ADD(hh, *set, value, sizeof({TYPE}), entry);

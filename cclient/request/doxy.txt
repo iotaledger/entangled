@@ -7,6 +7,19 @@
 
  /**
  * @defgroup request Requests
- * @brief The Tangle request object implementations. 
+ * @brief The request objects provide read/write methods for the API requests.
+ *
+ * Request data structures:
+ * - #add_neighbors_req_t
+ * - #attach_to_tangle_req_t
+ * - #broadcast_transactions_req_t
+ * - #check_consistency_req_t
+ * - #find_transactions_req_t
+ * - #get_balances_req_t
+ * - #get_inclusion_states_req_t
+ * - #get_transactions_to_approve_req_t
+ * - #get_trytes_req_t
+ * - #remove_neighbors_req_t
+ * - #store_transactions_req_t
  *
  */

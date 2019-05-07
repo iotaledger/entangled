@@ -8,6 +8,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup mam
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef __MAM_SPONGE_SPONGOS_H__
 #define __MAM_SPONGE_SPONGOS_H__
 
@@ -125,3 +134,5 @@ void mam_spongos_copy(mam_spongos_t const *const src, mam_spongos_t *const dst);
 #endif
 
 #endif  // __MAM_SPONGE_SPONGOS_H__
+
+/** @} */

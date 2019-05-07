@@ -50,8 +50,8 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
 
   bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(&tangle, transaction_hash(test_tx), bundle, &bundle_status) ==
-              RC_OK);
-  TEST_ASSERT(bundle_status == BUNDLE_TAIL_NOT_FOUND);
+              RC_TANGLE_TAIL_NOT_FOUND);
+  TEST_ASSERT(bundle_status == BUNDLE_NOT_INITIALIZED);
 
   bundle_transactions_free(&bundle);
   transaction_free(test_tx);

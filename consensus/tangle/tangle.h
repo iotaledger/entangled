@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "common/model/bundle.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/defs.h"
@@ -122,6 +123,16 @@ retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_que
                                        hash243_queue_t const approvees, iota_stor_pack_t *const pack);
 
 /*
+ * Bundle operations
+ */
+
+retcode_t iota_tangle_bundle_update_validity(tangle_t const *const tangle, bundle_transactions_t const *const bundle,
+                                             bundle_status_t const status);
+
+retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t const *const tail_hash,
+                                  bundle_transactions_t *const bundle);
+
+/*
  * Milestone operations
  */
 
@@ -154,6 +165,16 @@ retcode_t iota_tangle_state_delta_load(tangle_t const *const tangle, uint64_t co
  * Utilities
  */
 
+/**
+ *  Finds the tail of the associated bundle of a transaction hash
+ *
+ * @param tangle The tangle
+ * @param tx_hash The transaction hash
+ * @param tail The tail hash
+ * @param found_tail Whether a tail has been found or not
+ *
+ * @return a status code
+ */
 retcode_t iota_tangle_find_tail(tangle_t const *const tangle, flex_trit_t const *const tx_hash, flex_trit_t *const tail,
                                 bool *const found_tail);
 

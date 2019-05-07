@@ -27,8 +27,8 @@ void test_channel(void) {
   tryte_t channel_name[27];
   trits_t channel_name_trits = trits_alloc(81);
 
-  MAM_TRITS_DEF0(prng_key, MAM_PRNG_KEY_SIZE);
-  prng_key = MAM_TRITS_INIT(prng_key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
+  prng_key = MAM_TRITS_INIT(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(prng_key,
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"

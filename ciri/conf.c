@@ -192,6 +192,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       gossip_conf->neighbors = strdup(value);
       break;
+    case CONF_P_DROP_CACHE_ENTRY:  // --p-drop-cache-entry
+      ret = get_probability(value, &gossip_conf->p_drop_cache_entry);
+      break;
     case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
       ret = get_probability(value, &gossip_conf->p_propagate_request);
       break;
@@ -206,6 +209,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_P_SEND_MILESTONE:  // --p-send-milestone
       ret = get_probability(value, &gossip_conf->p_send_milestone);
+      break;
+    case CONF_RECENT_SEEN_BYTES_CACHE_SIZE:  // --recent-seen-bytes-cache-size
+      gossip_conf->recent_seen_bytes_cache_size = atoi(value);
       break;
     case CONF_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
       gossip_conf->requester_queue_size = atoi(value);

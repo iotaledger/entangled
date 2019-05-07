@@ -18,15 +18,13 @@ extern "C" {
 #include "cclient/response/get_transactions_to_approve.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_get_transactions_to_approve_serialize_request(serializer_t const* const s,
-                                                             get_transactions_to_approve_req_t const* const req,
+retcode_t json_get_transactions_to_approve_serialize_request(get_transactions_to_approve_req_t const* const req,
                                                              char_buffer_t* out);
-retcode_t json_get_transactions_to_approve_deserialize_request(serializer_t const* const s, char const* const obj,
+retcode_t json_get_transactions_to_approve_deserialize_request(char const* const obj,
                                                                get_transactions_to_approve_req_t* out);
-retcode_t json_get_transactions_to_approve_serialize_response(serializer_t const* const s,
-                                                              get_transactions_to_approve_res_t const* const obj,
+retcode_t json_get_transactions_to_approve_serialize_response(get_transactions_to_approve_res_t const* const obj,
                                                               char_buffer_t* out);
-retcode_t json_get_transactions_to_approve_deserialize_response(serializer_t const* const s, char const* const obj,
+retcode_t json_get_transactions_to_approve_deserialize_response(char const* const obj,
                                                                 get_transactions_to_approve_res_t* res);
 
 #ifdef __cplusplus

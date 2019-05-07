@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup response
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_RESPONSE_GET_NODE_INFO_H
 #define CCLIENT_RESPONSE_GET_NODE_INFO_H
 
@@ -14,6 +23,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief The data structure of the get node info response.
+ *
+ */
 typedef struct get_node_info_res_s {
   /**
    * Name of the IOTA software you're currently using.
@@ -57,48 +70,127 @@ typedef struct get_node_info_res_s {
    */
   uint16_t packets_queue_size;
   /**
-   * Latest milestone that was signed off by the coordinator.
+   * The hash of the latest transaction that was signed off by the coordinator.
    */
   flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   /**
-   * The latest milestone which is solid and is used for sending transactions.
-   * For a milestone to become solid your local node must basically approve the
-   * subtangle of coordinator-approved transactions, and have a consistent view
+   * The hash of the latest transaction which is solid and is used for sending transactions. For a milestone to become
+   * solid, your local node must approve the subtangle of coordinator-approved transactions, and have a consistent view
    * of all referenced transactions.
    */
   flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
+  /*
+   * Enabled features
+   */
+  UT_array* features;
   /**
    * The address of the coordinator being followed by this node.
    */
   flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
 } get_node_info_res_t;
 
+/**
+ * @brief Allocates a get node info response object.
+ *
+ * @return A pointer to the response object.
+ */
 get_node_info_res_t* get_node_info_res_new();
+
+/**
+ * @brief Frees a get node info response object.
+ *
+ * @param[in] res The response object.
+ */
 void get_node_info_res_free(get_node_info_res_t** res);
+
+/**
+ * @brief Sets application name to the response.
+ *
+ * @param[in] res The response object.
+ * @param[in] name A string of the application name.
+ * @return #retcode_t
+ */
 static inline retcode_t get_node_info_res_app_name_set(get_node_info_res_t* const res, char const* const name) {
   return char_buffer_set(res->app_name, name);
 }
+
+/**
+ * @brief Gets the application name
+ *
+ * @param[in] res The response object.
+ * @return A pointer to the application name.
+ */
 static inline char const* get_node_info_res_app_name(get_node_info_res_t const* const res) {
   return res->app_name->data;
 }
+
+/**
+ * @brief Sets the application version
+ *
+ * @param[in] res The response object.
+ * @param[in] version  A string of the application version.
+ * @return #retcode_t
+ */
 static inline retcode_t get_node_info_res_app_version_set(get_node_info_res_t* const res, char const* const version) {
   return char_buffer_set(res->app_version, version);
 }
+
+/**
+ * @brief Gets the application version.
+ *
+ * @param[in] res The response object.
+ * @return A pointer to the application version.
+ */
 static inline char const* get_node_info_res_app_version(get_node_info_res_t const* const res) {
   return res->app_version->data;
 }
+
+/**
+ * @brief Sets the latest milestone hash.
+ *
+ * @param[in] res The response object
+ * @param[in] hash A milestone hash.
+ */
 static inline void get_node_info_res_lm_set(get_node_info_res_t* const res, flex_trit_t const* const hash) {
   memcpy(res->latest_milestone, hash, FLEX_TRIT_SIZE_243);
 }
+
+/**
+ * @brief Gets the latest milestone hash.
+ *
+ * @param[in] res The response object.
+ * @return A pointer to the hash of latest milestone.
+ */
 static inline flex_trit_t const* get_node_info_res_lm(get_node_info_res_t const* const res) {
   return res->latest_milestone;
 }
+
+/**
+ * @brief Sets the latest solid subtangle milestone hash.
+ *
+ * @param[in] res The response object.
+ * @param[in] hash A pointer to the hash of latest solid subtangle milestone.
+ */
 static inline void get_node_info_res_lssm_set(get_node_info_res_t* const res, flex_trit_t const* const hash) {
   memcpy(res->latest_solid_subtangle_milestone, hash, FLEX_TRIT_SIZE_243);
 }
+
+/**
+ * @brief Gets the latest solid subtangle milestone hash.
+ *
+ * @param[in] res The response object.
+ * @return A pointer to the hash of latest solid subtangle milestone.
+ */
 static inline flex_trit_t const* get_node_info_res_lssm(get_node_info_res_t const* const res) {
   return res->latest_solid_subtangle_milestone;
 }
+
+/**
+ * @brief Sets the coordinator address
+ *
+ * @param[in] res The response object.
+ * @param[in] hash A coordinator hash.
+ */
 static inline void get_node_info_res_coordinator_address_set(get_node_info_res_t* const res,
                                                              flex_trit_t const* const hash) {
   memcpy(res->coordinator_address, hash, FLEX_TRIT_SIZE_243);
@@ -106,9 +198,15 @@ static inline void get_node_info_res_coordinator_address_set(get_node_info_res_t
 static inline flex_trit_t const* get_node_info_res_coordinator_address(get_node_info_res_t const* const res) {
   return res->coordinator_address;
 }
+static inline char const* get_node_info_res_features_at(get_node_info_res_t* res, size_t idx) {
+  return *(const char**)utarray_eltptr(res->features, idx);
+}
+static inline size_t get_node_info_req_features_len(get_node_info_res_t* res) { return utarray_len(res->features); }
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif  // CCLIENT_RESPONSE_GET_NODE_INFO_H
+
+/** @} */

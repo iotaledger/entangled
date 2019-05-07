@@ -5,6 +5,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup ciri_api
+ *
+ * @{
+ *
+ * @file
+ * @brief The IOTA API implementation
+ *
+ * https://docs.iota.org/docs/iri/0.1/references/api-reference
+ *
+ */
 #ifndef __CIRI_API_API_H__
 #define __CIRI_API_API_H__
 
@@ -25,45 +36,43 @@
 extern "C" {
 #endif
 
-/**
- * The IOTA API implementation
- * https://iota.readme.io/reference
- */
 typedef struct iota_api_s {
-  iota_api_conf_t conf;
-  core_t *core;
+  iota_api_conf_t conf;  //!< The API configuration
+  core_t *core;          //!< Reference to a cIRI core
+  uint8_t features;      //!< Enabled features of the cIRI instance
 } iota_api_t;
 
 /**
- * Initializes an API
+ * @brief Initializes an API
  *
- * @param api The API [in]
- * @param core The core [in]
+ * @param[in] api   The API
+ * @param[in] core  The core
  *
  * @return a status code
  */
 retcode_t iota_api_init(iota_api_t *const api, core_t *const core);
 
 /**
- * Destroys an API
+ * @brief Destroys an API
  *
- * @param api The API [in]
+ * @param[in] api The API
  *
  * @return a status code
  */
 retcode_t iota_api_destroy(iota_api_t *const api);
 
 /**
- * Temporarily adds a list of neighbors to the node.
+ * @brief Temporarily adds a list of neighbors to the node.
+ *
  * Added neighbors will be removed after restarting cIRI.
  * Add the neighbors to the config file or supply them in the -n command line option if you want them to be permanent.
  *
  * The URI (Unique Resource Identification) for adding neighbors is: {tcp,udp}://ip:port
  *
- * @param api The API [in]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[in]   req   The request
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -71,7 +80,8 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
                                  add_neighbors_res_t *const res, error_res_t **const error);
 
 /**
- * Prepares the specified transactions trytes for attachment to the Tangle by doing Proof of Work.
+ * @brief Prepares the specified transactions trytes for attachment to the Tangle by doing Proof of Work.
+ *
  * You need to supply branchTransaction as well as trunkTransaction, they are the tips which you're going to validate
  * and reference with this transaction and are both obtainable by the getTransactionsToApprove API call.
  * The returned value is a different set of trytes which you can input into broadcastTransactions and
@@ -79,10 +89,10 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
  * The last 243 trytes of the returned trytes consist of: trunkTransaction + branchTransaction + nonce.
  * These are valid trytes which are then accepted by the network.
  *
- * @param api The API [in]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[in]   req   The request
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -90,13 +100,14 @@ retcode_t iota_api_attach_to_tangle(iota_api_t const *const api, attach_to_tangl
                                     attach_to_tangle_res_t *const res, error_res_t **const error);
 
 /**
- * Broadcasts a list of transactions to all the node neighbors.
+ * @brief Broadcasts a list of transactions to all the node neighbors.
+ *
  * The trytes to be used for this call should be valid and attached transaction trytes.
  * These trytes are returned by attachToTangle, or by doing proof of work somewhere else.
  *
- * @param api The API [in]
- * @param req The request [in]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[in]   req   The request
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -104,7 +115,8 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
                                           error_res_t **const error);
 
 /**
- * Checks the consistency of transactions.
+ * @brief Checks the consistency of transactions.
+ *
  * Error is returned if:
  * - Transaction does not exist
  * - Transaction is not a tail
@@ -114,11 +126,11 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
  * - Tails would lead to inconsistent ledger
  * True is returned otherwise
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -127,17 +139,18 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
                                      error_res_t **const error);
 
 /**
- * Finds the transactions which match the specified input and return.
+ * @brief Finds the transactions which match the specified input and return.
+ *
  * All input values are lists, for which a list of return values (transaction hashes), in the same order, is returned
  * for all individual elements.
  * The input fields can either be bundles, addresses, tags or approvees.
  * Using multiple of these input fields returns the intersection of the values.
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -146,17 +159,18 @@ retcode_t iota_api_find_transactions(iota_api_t const *const api, tangle_t *cons
                                      error_res_t **const error);
 
 /**
- * Calculates the confirmed balances of addresses, as viewed by the specified tips.
+ * @brief Calculates the confirmed balances of addresses, as viewed by the specified tips.
+ *
  * In case tips are not supplied, the balances are based on the latest confirmed milestone.
  * In addition to the balances, it also returns the referencing tips (or milestone), as well as the index with which the
  * confirmed balances were determined.
  * The balances are returned as a list in the same order as the addresses were provided as input.
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -165,17 +179,18 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
                                 error_res_t **const error);
 
 /**
- * Gets the inclusion states of a set of transactions.
+ * @brief Gets the inclusion states of a set of transactions.
+ *
  * This is for determining if a transaction was accepted and confirmed by the network or not.
  * You can search for multiple tips (and thus, milestones) to get past inclusion states of transactions.
  * This API call simply returns a list of boolean values in the same order as the submitted transactions.
  * Boolean values will be true or false whether a transaction is confirmed or not.
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -184,11 +199,11 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
                                         get_inclusion_states_res_t *const res, error_res_t **const error);
 
 /**
- * Returns hashes of transactions currently missing from the node.
+ * @brief Returns hashes of transactions currently missing from the node.
  *
- * @param api The API [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -196,12 +211,13 @@ retcode_t iota_api_get_missing_transactions(iota_api_t const *const api, get_mis
                                             error_res_t **const error);
 
 /**
- * Returns the set of neighbors the node is connected with, as well as their activity statistics or counters.
+ * @brief Returns the set of neighbors the node is connected with, as well as their activity statistics or counters.
+ *
  * These numbers are reset after restarting cIRI.
  *
- * @param api The API [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -209,11 +225,11 @@ retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_
                                  error_res_t **const error);
 
 /**
- * Returns information about the node.
+ * @brief Returns information about the node.
  *
- * @param api The API [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -221,29 +237,30 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
                                  error_res_t **const error);
 
 /**
- * Returns tips currently known by the node.
+ * @brief Returns tips currently known by the node.
  *
- * @param api The API [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
 retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error);
 
 /**
- * Tips selection which returns trunkTransaction and branchTransaction.
+ * @brief Tips selection which returns trunkTransaction and branchTransaction.
+ *
  * The input value depth determines how many milestones to go back to for finding the transactions to approve. The
  * higher the depth value, the more work has to do done confirming more transactions. If the depth is too
  * large (usually above 15, it depends on the node's configuration) an error will be returned.
  * The reference is an optional hash of a transaction to approve. If it can't be found at the specified depth
  * then an error will be returned.
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -252,14 +269,15 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
                                                get_transactions_to_approve_res_t *const res, error_res_t **const error);
 
 /**
- * Returns the raw transaction data (trytes) of a specific transaction.
+ * @brief Returns the raw transaction data (trytes) of a specific transaction.
+ *
  * These trytes can then be easily converted into the actual transaction object.
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -267,27 +285,28 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangl
                               get_trytes_res_t *const res, error_res_t **const error);
 
 /**
- * Interrupts and completely aborts the attachToTangle process.
+ * @brief Interrupts and completely aborts the attachToTangle process.
  *
- * @param api The API [in]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[out]  error An error response
  *
  * @return a status code
  */
 retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, error_res_t **const error);
 
 /**
- * Temporarily removes a list of neighbors from the node.
+ * @brief Temporarily removes a list of neighbors from the node.
+ *
  * Removed neighbors will be added again after relaunching cIRI.
  * Remove the neighbors from the config file or make sure they aren't supplied in the -n command line option if you
  * don't want to keep them anymore.
  *
  * The URI (Unique Resource Identification) for removing neighbors is: {tcp,udp}://ip:port
  *
- * @param api The API [in]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[in]   req   The request
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -295,13 +314,14 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbor
                                     remove_neighbors_res_t *const res, error_res_t **const error);
 
 /**
- * Stores transactions into the local storage.
+ * @brief Stores transactions into the local storage.
+ *
  * The trytes to be used for this call should be valid and attached transaction trytes.
  *
- * @param api The API [in]
- * @param tangle A tangle connection [in,out]
- * @param req The request [in]
- * @param error An error response [out]
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in]     req     The request
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
@@ -309,13 +329,14 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
                                       store_transactions_req_t const *const req, error_res_t **const error);
 
 /**
- * Checks if a list of addresses was ever spent from, in the current epoch, or in previous epochs.
+ * @brief Checks if a list of addresses was ever spent from, in the current epoch, or in previous epochs.
+ *
  * If an address has a pending transaction, it is also marked as spent.
  *
- * @param api The API [in]
- * @param req The request [in]
- * @param res The response [out]
- * @param error An error response [out]
+ * @param[in]   api   The API
+ * @param[in]   req   The request
+ * @param[out]  res   The response
+ * @param[out]  error An error response
  *
  * @return a status code
  */
@@ -327,3 +348,5 @@ retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, check_
 #endif
 
 #endif
+
+/** @} */
