@@ -15,7 +15,7 @@
 
 #define TEST_NULL_HASH_TRYTES "999999999999999999999999999999999999999999999999999999999999999999999999999999999"
 
-void test_snapshot_create_and_apply_patch() {
+void test_metadata_serialization() {
   snapshot_metadata_t metadata_orig, metadata_deserialized;
   size_t serialized_size;
   char *buffer;
@@ -62,7 +62,7 @@ void test_snapshot_create_and_apply_patch() {
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_snapshot_create_and_apply_patch);
+  RUN_TEST(test_metadata_serialization);
 
   return UNITY_END();
 }

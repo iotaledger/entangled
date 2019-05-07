@@ -47,7 +47,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
 
   log_info(logger_id, "Initializing snapshots provider\n");
   if ((ret = iota_snapshots_provider_init(&consensus->snapshots_provider, &consensus->conf)) != RC_OK) {
-    log_critical(logger_id, "Initializing snapshots provider failed failed\n");
+    log_critical(logger_id, "Initializing snapshots provider failed\n");
     return ret;
   }
 
@@ -106,7 +106,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   log_info(logger_id, "Initializing local snapshots manager\n");
   if ((ret = iota_local_snapshots_manager_init(&consensus->local_snapshots_manager, &consensus->snapshots_service,
                                                &consensus->conf, &consensus->milestone_tracker)) != RC_OK) {
-    log_critical(logger_id, "Initializing local snapshots manager\n");
+    log_critical(logger_id, "Failed initializing local snapshots manager\n");
     return ret;
   }
 

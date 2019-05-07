@@ -212,7 +212,7 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
       return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
     }
     offset += NUM_TRYTES_ADDRESS;
-    memcpy(str + offset, ";", 1);
+    str[offset] = ';';
     offset += 1;
     value_len = sprintf(str + offset, "%" PRId64 "\n", iter->value);
     offset += value_len;

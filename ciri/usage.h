@@ -189,7 +189,7 @@ static struct cli_argument_s {
     {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "Whether or not local snapshots should be enabled.",
      REQUIRED_ARG},
     {"local-snapshots-prunning-enabled", CONF_LOCAL_SNAPSHOTS_PRUNNING_ENABLED,
-     "whether or not prunning should be enabled", REQUIRED_ARG},
+     "Whether or not prunning should be enabled.", REQUIRED_ARG},
     {"local-snapshots-transactions-growth-threshold", CONF_LOCAL_SNAPSHOTS_TRANSACTIONS_GROWTH_THRESHOLD,
      "Minimal number of new transactions from last local snapshot for triggering a new local snapshot.", REQUIRED_ARG},
     {"local-snapshots-min-depth", CONF_LOCAL_SNAPSHOTS_MIN_DEPTH,
