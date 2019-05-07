@@ -184,9 +184,9 @@ static struct cli_argument_s {
      "Skip validation of snapshot signature. Must be \"true\" or \"false\".", REQUIRED_ARG},
     {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP, "Epoch time of the last snapshot.", REQUIRED_ARG},
 
-    // Local snapshots
+    // Local snapshots configuration
 
-    {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "whether or not local snapshots should be enabled",
+    {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "Whether or not local snapshots should be enabled.",
      REQUIRED_ARG},
     {"local-snapshots-prunning-enabled", CONF_LOCAL_SNAPSHOTS_PRUNNING_ENABLED,
      "whether or not prunning should be enabled", REQUIRED_ARG},
