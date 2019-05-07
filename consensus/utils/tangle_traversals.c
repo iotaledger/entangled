@@ -75,7 +75,7 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
   retcode_t ret = RC_OK;
   iota_stor_pack_t hashes_pack;
   hash243_stack_t non_analyzed_hashes = NULL;
-  flex_trit_t *curr_tx_hash = NULL;
+  flex_trit_t curr_tx_hash[FLEX_TRIT_SIZE_243];
   hash243_set_t analyzed_hashes_local = NULL;
   hash243_set_t *analyzed_hashes = analyzed_hashes_param ? analyzed_hashes_param : &analyzed_hashes_local;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
@@ -92,7 +92,7 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
   bool should_stop = false;
 
   while (!hash243_stack_empty(non_analyzed_hashes)) {
-    curr_tx_hash = hash243_stack_peek(non_analyzed_hashes);
+    memcpy(curr_tx_hash, hash243_stack_peek(non_analyzed_hashes), FLEX_TRIT_SIZE_243);
 
     if (!hash243_set_contains(analyzed_hashes, curr_tx_hash)) {
       hash_pack_reset(&transaction_pack);
@@ -120,9 +120,9 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
           goto done;
         }
         while (hashes_pack.num_loaded > 0) {
-          curr_tx_hash = ((flex_trit_t *)hashes_pack.models[--hashes_pack.num_loaded]);
           // Add each found approver to the currently traversed tx
-          if ((ret = hash243_stack_push(&non_analyzed_hashes, curr_tx_hash)) != RC_OK) {
+          if ((ret = hash243_stack_push(&non_analyzed_hashes,
+                                        ((flex_trit_t *)hashes_pack.models[--hashes_pack.num_loaded]))) != RC_OK) {
             goto done;
           }
         }

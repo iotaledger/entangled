@@ -208,15 +208,12 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
   check_solidity_do_func_params_t *params = data;
   transaction_solidifier_t *ts = params->ts;
   tangle_t *tangle = params->tangle;
-  char h[82];
 
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 && !((transaction_solid((iota_transaction_t *)pack->models[0])))) {
     *should_branch = true;
     return hash243_set_add(params->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0 && !hash243_set_contains(params->solid_entry_points, hash)) {
-    memcpy(h, hash, 81);
-    printf("LS: missing hash: %s", h);
     params->is_solid = false;
     return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
   }

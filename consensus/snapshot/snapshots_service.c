@@ -197,7 +197,7 @@ cleanup:
 static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
                                                          bool *should_branch, bool *should_stop) {
   *should_stop = false;
-  *should_branch = false;
+  *should_branch = true;
   check_not_orphan_do_func_params_t *params = data;
 
   if (pack->num_loaded == 0) {
@@ -205,8 +205,10 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
   }
 
   uint64_t current_arrival_timestamp = transaction_arrival_timestamp((iota_transaction_t *)pack->models[0]);
+  uint64_t current_timestamp = transaction_timestamp((iota_transaction_t *)pack->models[0]);
 
-  if (current_arrival_timestamp > params->target_milestone_timestamp * 1000UL) {
+  if (current_arrival_timestamp > params->target_milestone_timestamp * 1000UL ||
+      current_timestamp > params->target_milestone_timestamp) {
     params->is_orphan = false;
     *should_stop = true;
   }
@@ -346,7 +348,7 @@ static retcode_t iota_snapshots_service_update_new_solid_entry_points(
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, prev_milestone.hash, prev_milestone.index), ret);
     hash_pack_reset(&prev_milestone_pack);
     ERR_BIND_RETURN(iota_tangle_milestone_load_by_index(tangle, index - 1, &prev_milestone_pack), ret);
-    if (prev_milestone_pack.num_loaded == 0 && index > 1) {
+    if (prev_milestone_pack.num_loaded == 0) {
       return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
     } else {
       index = prev_milestone.index;
@@ -371,8 +373,6 @@ retcode_t iota_snapshots_service_update_solid_entry_points(snapshots_service_t *
   ERR_BIND_GOTO(
       hash_to_uint64_t_map_add(&solid_entry_points, snapshots_service->conf->genesis_hash, target_milestone->index),
       ret, cleanup);
-  ERR_BIND_GOTO(hash_to_uint64_t_map_add(&solid_entry_points, target_milestone->hash, target_milestone->index), ret,
-                cleanup);
 
   ERR_BIND_GOTO(iota_snapshots_service_update_old_solid_entry_points(
                     snapshots_service, &snapshots_service->snapshots_provider->inital_snapshot, target_milestone,
