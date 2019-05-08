@@ -235,6 +235,10 @@ static retcode_t find_solid_entry_points_and_update_do_func(flex_trit_t *hash, i
 
   uint64_t current_snapshot_index = transaction_snapshot_index((iota_transaction_t *)pack->models[0]);
 
+  // TODO - remove
+  ERR_BIND_RETURN(hash_to_uint64_t_map_add(params->solid_entry_points, hash, current_snapshot_index), ret);
+  return RC_OK;
+
   // Transaction was referenced by a newer milestone than "target_milestone", therefor, this is a relevant
   // entry point!
   if (current_snapshot_index > params->target_milestone_index) {
@@ -287,8 +291,10 @@ static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
   params.solid_entry_points = solid_entry_points;
   params.is_orphan = true;
 
-  ERR_BIND_RETURN(tangle_traversal_dfs_to_future(tangle, check_transaction_is_not_orphan_do_func, hash, NULL, &params),
-                  ret);
+  // TODO - remove
+  // ERR_BIND_RETURN(tangle_traversal_dfs_to_future(tangle, check_transaction_is_not_orphan_do_func, hash, NULL,
+  // &params),
+  //              ret);
 
   if (!params.is_orphan) {
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, hash, min_snapshot_index), ret);
