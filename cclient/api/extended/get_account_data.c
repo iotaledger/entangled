@@ -39,7 +39,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
       find_tx_req = find_transactions_req_new();
       find_tx_res = find_transactions_res_new();
       if (!find_tx_req || !find_tx_res) {
-        ret_code = RC_CCLIENT_OOM;
+        ret_code = RC_OOM;
         log_error(client_extended_logger_id, "%s find transactions request or response object failed: %s\n", __func__,
                   error_2_string(ret_code));
         goto done;
@@ -94,7 +94,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
     balances_req = get_balances_req_new();
     balances_res = get_balances_res_new();
     if (!balances_req || !balances_res) {
-      ret_code = RC_CCLIENT_OOM;
+      ret_code = RC_OOM;
       log_error(client_extended_logger_id, "%s create get balances request or response object failed: %s\n", __func__,
                 error_2_string(ret_code));
       goto done;

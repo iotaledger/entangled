@@ -244,7 +244,6 @@ enum retcode_t {
   RC_CCLIENT_JSON_CREATE = 0x01 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL, /**< json create object error, might OOM. */
   RC_CCLIENT_JSON_PARSE =
       0x02 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,                   /**< json parsing error, might the wrong format */
-  RC_CCLIENT_OOM = 0x03 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,      /**< Out of memory */
   RC_CCLIENT_HTTP = 0x04 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,     /**< HTTP service error */
   RC_CCLIENT_HTTP_REQ = 0x05 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR, /**< HTTP post error */
   RC_CCLIENT_HTTP_RES = 0x06 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR, /**< HTTP response error */

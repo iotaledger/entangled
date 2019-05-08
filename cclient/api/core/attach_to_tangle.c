@@ -57,7 +57,7 @@ retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const servic
     req_buff = char_buffer_new();
     if (req_buff == NULL || res_buff == NULL) {
       log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
-      result = RC_CCLIENT_OOM;
+      result = RC_OOM;
       goto done;
     }
 

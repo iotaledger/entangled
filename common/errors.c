@@ -82,8 +82,6 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_JSON_CREATE;
     case RC_CCLIENT_JSON_PARSE:
       return STR_CCLIENT_JSON_PARSE;
-    case RC_CCLIENT_OOM:
-      return STR_CCLIENT_OOM;
     case RC_CCLIENT_HTTP:
       return STR_CCLIENT_HTTP;
     case RC_CCLIENT_HTTP_REQ:

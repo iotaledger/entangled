@@ -21,7 +21,7 @@ retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv, 
 
   broadcast_transactions_req = broadcast_transactions_req_new();
   if (!broadcast_transactions_req) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "%s broadcast_transactions_req_new failed: %s\n", __func__,
               error_2_string(ret_code));
     goto cleanup;

@@ -24,13 +24,13 @@ retcode_t traverse_bundle(iota_client_service_t const* const serv, flex_trit_t c
   log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   get_trytes_req = get_trytes_req_new();
   if (!get_trytes_req) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "%s get_trytes_req_new failed: %s\n", __func__, error_2_string(ret_code));
     goto cleanup;
   }
   get_trytes_res = get_trytes_res_new();
   if (!get_trytes_res) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "%s get_trytes_res_new failed: %s\n", __func__, error_2_string(ret_code));
     goto cleanup;
   }

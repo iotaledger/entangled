@@ -16,7 +16,7 @@ retcode_t iota_client_store_transactions(const iota_client_service_t* const serv
   log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
-    result = RC_CCLIENT_OOM;
+    result = RC_OOM;
     goto done;
   }
   result = service->serializer.vtable.store_transactions_serialize_request(req, req_buff);

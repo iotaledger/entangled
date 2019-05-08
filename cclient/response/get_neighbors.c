@@ -52,7 +52,7 @@ retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* res, char const* c
   nb.address = char_buffer_new();
   nb.connection_type = char_buffer_new();
   if (!nb.address || !nb.connection_type) {
-    return RC_CCLIENT_OOM;
+    return RC_OOM;
   }
   char_buffer_set(nb.address, addr);
   char_buffer_set(nb.connection_type, connection_type);
