@@ -146,7 +146,7 @@ retcode_t iota_consensus_transaction_solidifier_init(transaction_solidifier_t *c
 
 retcode_t iota_consensus_transaction_solidifier_start(transaction_solidifier_t *const ts) {
   if (ts == NULL) {
-    return RC_CONSENSUS_NULL_PTR;
+    return RC_NULL_PARAM;
   }
 
   ts->running = true;
@@ -162,7 +162,7 @@ retcode_t iota_consensus_transaction_solidifier_stop(transaction_solidifier_t *c
   retcode_t ret = RC_OK;
 
   if (ts == NULL) {
-    return RC_CONSENSUS_NULL_PTR;
+    return RC_NULL_PARAM;
   } else if (ts->running == false) {
     return RC_OK;
   }
@@ -179,7 +179,7 @@ retcode_t iota_consensus_transaction_solidifier_stop(transaction_solidifier_t *c
 
 retcode_t iota_consensus_transaction_solidifier_destroy(transaction_solidifier_t *const ts) {
   if (ts == NULL) {
-    return RC_CONSENSUS_NULL_PTR;
+    return RC_NULL_PARAM;
   } else if (ts->running) {
     return RC_STILL_RUNNING;
   }

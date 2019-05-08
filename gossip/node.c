@@ -64,34 +64,35 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   node->core = core;
 
   log_info(logger_id, "Initializing neighbors\n");
-  if (node_neighbors_init(node) != RC_OK) {
+  if ((ret = node_neighbors_init(node)) != RC_OK) {
     log_info(logger_id, "Initializing neighbors failed\n");
-    return RC_NODE_FAILED_NEIGHBORS_INIT;
+    return ret;
   }
 
   log_info(logger_id, "Initializing broadcaster component\n");
-  if (broadcaster_init(&node->broadcaster, node) != RC_OK) {
+  if ((ret = broadcaster_init(&node->broadcaster, node)) != RC_OK) {
     log_critical(logger_id, "Initializing broadcaster component failed\n");
-    return RC_NODE_FAILED_BROADCASTER_INIT;
+    return ret;
   }
 
   log_info(logger_id, "Initializing processor component\n");
-  if (processor_init(&node->processor, node, &core->consensus.transaction_validator,
-                     &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker) != RC_OK) {
+  if ((ret = processor_init(&node->processor, node, &core->consensus.transaction_validator,
+                            &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) != RC_OK) {
     log_critical(logger_id, "Initializing processor component failed\n");
-    return RC_NODE_FAILED_PROCESSOR_INIT;
+    return ret;
   }
 
   log_info(logger_id, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, node->conf.tcp_receiver_port, node->conf.udp_receiver_port) != RC_OK) {
+  if ((ret = receiver_init(&node->receiver, node, node->conf.tcp_receiver_port, node->conf.udp_receiver_port)) !=
+      RC_OK) {
     log_critical(logger_id, "Initializing receiver component failed\n");
-    return RC_NODE_FAILED_RECEIVER_INIT;
+    return ret;
   }
 
   log_info(logger_id, "Initializing responder component\n");
-  if (responder_init(&node->responder, node) != RC_OK) {
+  if ((ret = responder_init(&node->responder, node)) != RC_OK) {
     log_critical(logger_id, "Initializing responder component failed\n");
-    return RC_NODE_FAILED_RESPONDER_INIT;
+    return ret;
   }
 
   log_info(logger_id, "Initializing tips requester component\n");
@@ -101,9 +102,9 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing transaction requester component\n");
-  if (requester_init(&node->transaction_requester, node) != RC_OK) {
+  if ((ret = requester_init(&node->transaction_requester, node)) != RC_OK) {
     log_critical(logger_id, "Initializing transaction requester component failed\n");
-    return RC_NODE_FAILED_REQUESTER_INIT;
+    return ret;
   }
 
   if (node->conf.tips_solidifier_enabled) {
@@ -139,27 +140,27 @@ retcode_t node_start(node_t* const node) {
   }
 
   log_info(logger_id, "Starting broadcaster component\n");
-  if (broadcaster_start(&node->broadcaster) != RC_OK) {
+  if ((ret = broadcaster_start(&node->broadcaster)) != RC_OK) {
     log_critical(logger_id, "Starting broadcaster component failed\n");
-    return RC_NODE_FAILED_BROADCASTER_START;
+    return ret;
   }
 
   log_info(logger_id, "Starting processor component\n");
-  if (processor_start(&node->processor) != RC_OK) {
+  if ((ret = processor_start(&node->processor)) != RC_OK) {
     log_critical(logger_id, "Starting processor component failed\n");
-    return RC_NODE_FAILED_PROCESSOR_START;
+    return ret;
   }
 
   log_info(logger_id, "Starting receiver component\n");
-  if (receiver_start(&node->receiver) != RC_OK) {
+  if ((ret = receiver_start(&node->receiver)) != RC_OK) {
     log_critical(logger_id, "Starting receiver component failed\n");
-    return RC_NODE_FAILED_RECEIVER_START;
+    return ret;
   }
 
   log_info(logger_id, "Starting responder component\n");
-  if (responder_start(&node->responder) != RC_OK) {
+  if ((ret = responder_start(&node->responder)) != RC_OK) {
     log_critical(logger_id, "Starting responder component failed\n");
-    return RC_NODE_FAILED_RESPONDER_START;
+    return ret;
   }
 
   log_info(logger_id, "Starting tips requester component\n");
@@ -199,27 +200,23 @@ retcode_t node_stop(node_t* const node) {
   node->running = false;
 
   log_info(logger_id, "Stopping broadcaster component\n");
-  if (broadcaster_stop(&node->broadcaster) != RC_OK) {
+  if ((ret = broadcaster_stop(&node->broadcaster)) != RC_OK) {
     log_error(logger_id, "Stopping broadcaster component failed\n");
-    ret = RC_NODE_FAILED_BROADCASTER_STOP;
   }
 
   log_info(logger_id, "Stopping processor component\n");
-  if (processor_stop(&node->processor) != RC_OK) {
+  if ((ret = processor_stop(&node->processor)) != RC_OK) {
     log_error(logger_id, "Stopping processor component failed\n");
-    ret = RC_NODE_FAILED_PROCESSOR_STOP;
   }
 
   log_info(logger_id, "Stopping responder component\n");
-  if (responder_stop(&node->responder) != RC_OK) {
+  if ((ret = responder_stop(&node->responder)) != RC_OK) {
     log_error(logger_id, "Stopping responder component failed\n");
-    ret = RC_NODE_FAILED_RESPONDER_STOP;
   }
 
   log_info(logger_id, "Stopping receiver component\n");
-  if (receiver_stop(&node->receiver) != RC_OK) {
+  if ((ret = receiver_stop(&node->receiver)) != RC_OK) {
     log_error(logger_id, "Stopping receiver component failed\n");
-    ret = RC_NODE_FAILED_RECEIVER_STOP;
   }
 
   log_info(logger_id, "Stopping tips requester component\n");
@@ -252,9 +249,8 @@ retcode_t node_destroy(node_t* const node) {
   }
 
   log_info(logger_id, "Destroying transaction requester component\n");
-  if (requester_destroy(&node->transaction_requester) != RC_OK) {
+  if ((ret = requester_destroy(&node->transaction_requester)) != RC_OK) {
     log_error(logger_id, "Destroying transaction requester component failed\n");
-    ret = RC_NODE_FAILED_REQUESTER_DESTROY;
   }
 
   if (node->conf.tips_solidifier_enabled) {
@@ -270,27 +266,23 @@ retcode_t node_destroy(node_t* const node) {
   }
 
   log_info(logger_id, "Destroying broadcaster component\n");
-  if (broadcaster_destroy(&node->broadcaster) != RC_OK) {
+  if ((ret = broadcaster_destroy(&node->broadcaster)) != RC_OK) {
     log_error(logger_id, "Destroying broadcaster component failed\n");
-    ret = RC_NODE_FAILED_BROADCASTER_DESTROY;
   }
 
   log_info(logger_id, "Destroying receiver component\n");
-  if (receiver_destroy(&node->receiver) != RC_OK) {
+  if ((ret = receiver_destroy(&node->receiver)) != RC_OK) {
     log_error(logger_id, "Destroying receiver component failed\n");
-    ret = RC_NODE_FAILED_RECEIVER_DESTROY;
   }
 
   log_info(logger_id, "Destroying processor component\n");
-  if (processor_destroy(&node->processor) != RC_OK) {
+  if ((ret = processor_destroy(&node->processor)) != RC_OK) {
     log_error(logger_id, "Destroying processor component failed\n");
-    ret = RC_NODE_FAILED_PROCESSOR_DESTROY;
   }
 
   log_info(logger_id, "Destroying responder component\n");
-  if (responder_destroy(&node->responder) != RC_OK) {
+  if ((ret = responder_destroy(&node->responder)) != RC_OK) {
     log_error(logger_id, "Destroying responder component failed\n");
-    ret = RC_NODE_FAILED_RESPONDER_DESTROY;
   }
 
   log_debug(logger_id, "Destroying neighbors\n");
