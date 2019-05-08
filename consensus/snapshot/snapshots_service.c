@@ -296,7 +296,7 @@ static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
   // &params),
   //              ret);
 
-  if (!params.is_orphan) {
+  if (!params.is_orphan || true) {
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, hash, min_snapshot_index), ret);
   }
   return RC_OK;
