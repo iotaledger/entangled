@@ -90,10 +90,10 @@ const char* error_2_string(retcode_t err) {
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
-    case RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB:
-    case RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS:
+    case RC_CW_FAILED_IN_DFS_FROM_DB:
+    case RC_CW_FAILED_IN_LIGHT_DFS:
     case RC_CONSENSUS_NULL_PTR:
-    case RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT:
+    case RC_EXIT_PROBABILITIES_INVALID_ENTRYPOINT:
     // Utils module
     case RC_UTILS_FAILED_REMOVE_FILE:
     case RC_UTILS_FAILED_TO_COPY_FILE:
@@ -126,7 +126,7 @@ const char* error_2_string(retcode_t err) {
     // Processor component module
     case RC_PROCESSOR_INVALID_TRANSACTION:
     // Conf Module
-    case RC_CIRI_CONF_INVALID_ARGUMENT:
+    case RC_CONF_INVALID_ARGUMENT:
     // Snapshot Module
     case RC_SNAPSHOT_FILE_NOT_FOUND:
     case RC_SNAPSHOT_INVALID_FILE:

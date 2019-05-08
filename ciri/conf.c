@@ -96,7 +96,7 @@ static retcode_t get_log_level(char const* const input, logger_level_t* const ou
   }
 
   if ((*output = map[i].level) == LOGGER_UNKNOWN) {
-    return RC_CIRI_CONF_INVALID_ARGUMENT;
+    return RC_CONF_INVALID_ARGUMENT;
   }
 
   return RC_OK;
@@ -113,7 +113,7 @@ static retcode_t get_sponge_type(char const* const input, sponge_type_t* const o
   }
 
   if ((*output = map[i].type) == SPONGE_UNKNOWN) {
-    return RC_CIRI_CONF_INVALID_ARGUMENT;
+    return RC_CONF_INVALID_ARGUMENT;
   }
 
   return RC_OK;
@@ -122,7 +122,7 @@ static retcode_t get_sponge_type(char const* const input, sponge_type_t* const o
 static retcode_t get_probability(char const* const input, double* const output) {
   *output = atof(input);
   if (*output < 0 || *output > 1) {
-    return RC_CIRI_CONF_INVALID_ARGUMENT;
+    return RC_CONF_INVALID_ARGUMENT;
   }
 
   return RC_OK;
@@ -130,11 +130,11 @@ static retcode_t get_probability(char const* const input, double* const output) 
 
 static retcode_t get_trytes(char const* const input, flex_trit_t* const output, size_t const length) {
   if (strlen(input) != length) {
-    return RC_CIRI_CONF_INVALID_ARGUMENT;
+    return RC_CONF_INVALID_ARGUMENT;
   }
   for (size_t i = 0; i < length; i++) {
     if (INDEX_OF_TRYTE(input[i]) < 0 || INDEX_OF_TRYTE(input[i]) > 26) {
-      return RC_CIRI_CONF_INVALID_ARGUMENT;
+      return RC_CONF_INVALID_ARGUMENT;
     }
   }
   flex_trits_from_trytes(output, length * 3, (tryte_t*)input, length, length);
@@ -148,7 +148,7 @@ static retcode_t get_true_false(char const* const input, bool* const output) {
   } else if (strcmp(input, "false") == 0) {
     *output = false;
   } else {
-    return RC_CIRI_CONF_INVALID_ARGUMENT;
+    return RC_CONF_INVALID_ARGUMENT;
   }
   return RC_OK;
 }
@@ -165,7 +165,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case 'd':  // --db-path
       if (strlen(value) == 0) {
-        return RC_CIRI_CONF_INVALID_ARGUMENT;
+        return RC_CONF_INVALID_ARGUMENT;
       }
       strncpy(ciri_conf->db_path, value, sizeof(ciri_conf->db_path));
       strncpy(consensus_conf->db_path, value, sizeof(consensus_conf->db_path));
@@ -188,7 +188,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case 'n':  // --neighbors
       if (strlen(value) == 0) {
-        return RC_CIRI_CONF_INVALID_ARGUMENT;
+        return RC_CONF_INVALID_ARGUMENT;
       }
       gossip_conf->neighbors = strdup(value);
       break;
@@ -252,7 +252,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
         if (token[0]) {
           if (i >= API_ENDPOINTS_NUM) {
             free(free_str);
-            return RC_CIRI_CONF_INVALID_ARGUMENT;
+            return RC_CONF_INVALID_ARGUMENT;
           }
           api_conf->remote_limit_api[i++] = strdup(token);
         }
@@ -281,7 +281,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       int security_level = atoi(value);
 
       if (security_level < 0 || security_level > 3) {
-        return RC_CIRI_CONF_INVALID_ARGUMENT;
+        return RC_CONF_INVALID_ARGUMENT;
       }
       consensus_conf->coordinator_security_level = (uint8_t)security_level;
       break;
@@ -319,7 +319,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
 
     default:
       iota_usage();
-      return RC_CIRI_CONF_INVALID_ARGUMENT;
+      return RC_CONF_INVALID_ARGUMENT;
   }
 
   return ret;
@@ -378,13 +378,13 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
   }
 
   if (!yaml_parser_initialize(&parser)) {
-    return RC_CIRI_CONF_PARSER_ERROR;
+    return RC_CONF_PARSER_ERROR;
   }
   yaml_parser_set_input_file(&parser, file);
 
   do {
     if (!yaml_parser_scan(&parser, &token)) {
-      return RC_CIRI_CONF_PARSER_ERROR;
+      return RC_CONF_PARSER_ERROR;
     }
     switch (token.type) {
       case YAML_KEY_TOKEN:
@@ -413,7 +413,7 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
 
 done:
 
-  if (ret == RC_CIRI_CONF_INVALID_ARGUMENT) {
+  if (ret == RC_CONF_INVALID_ARGUMENT) {
     print_invalid_argument(key);
   }
   yaml_token_delete(&token);
@@ -431,17 +431,17 @@ retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t* const ciri_conf, iota_consen
 
   while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
     if (key == ':') {
-      ret = RC_CIRI_CONF_MISSING_ARGUMENT;
+      ret = RC_CONF_MISSING_ARGUMENT;
       break;
     } else if (key == '?') {
-      ret = RC_CIRI_CONF_UNKNOWN_OPTION;
+      ret = RC_CONF_UNKNOWN_OPTION;
       break;
     } else if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
       break;
     }
   }
 
-  if (ret == RC_CIRI_CONF_INVALID_ARGUMENT) {
+  if (ret == RC_CONF_INVALID_ARGUMENT) {
     print_invalid_argument(key);
   }
   free(long_options);

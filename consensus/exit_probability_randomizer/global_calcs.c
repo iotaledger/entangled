@@ -21,7 +21,7 @@ retcode_t map_transition_probabilities(double alpha, hash_to_int64_t_map_t const
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
-      return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
+      return RC_EXIT_PROBABILITIES_MISSING_RATING;
     }
     transition_probs[idx++] = curr_rating->value;
     max_weight = MAX(max_weight, curr_rating->value);
