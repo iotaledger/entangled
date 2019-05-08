@@ -283,7 +283,7 @@ static retcode_t check_transaction_and_update_solid_state(transaction_solidifier
 
   *is_new_solid = false;
 
-  if (iota_snapshot_has_entry_point(&ts->snapshots_provider->inital_snapshot, hash)) {
+  if (iota_snapshot_has_solid_entry_point(&ts->snapshots_provider->inital_snapshot, hash)) {
     return RC_OK;
   }
 
@@ -322,7 +322,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts, 
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  if (iota_snapshot_has_entry_point(&ts->snapshots_provider->inital_snapshot, approvee)) {
+  if (iota_snapshot_has_solid_entry_point(&ts->snapshots_provider->inital_snapshot, approvee)) {
     *solid = true;
     return RC_OK;
   }

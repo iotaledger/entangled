@@ -206,7 +206,7 @@ void iota_snapshot_solid_entry_points_set(snapshot_t const *const snapshot, hash
  *
  * @return True if hash is a solid entry point
  */
-bool iota_snapshot_has_entry_point(snapshot_t const *const snapshot, flex_trit_t const *const hash);
+bool iota_snapshot_has_solid_entry_point(snapshot_t const *const snapshot, flex_trit_t const *const hash);
 
 #ifdef __cplusplus
 }
