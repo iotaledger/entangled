@@ -45,8 +45,6 @@ static void *local_snapshots_manager_routine(void *arg) {
       if (err == RC_OK) {
         exponential_delay_factor = 1;
         end_timestamp = current_timestamp_ms();
-        log_info(logger_id, "Local snapshot completed successfully in %" PRIu64 " ms\n",
-                 end_timestamp - start_timestamp);
         if (iota_tangle_transaction_count(&tangle, &lsm->last_snapshot_transactions_count) != RC_OK) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
