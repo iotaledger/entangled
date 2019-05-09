@@ -134,15 +134,15 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
 retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const snapshots_service,
                                                    iota_milestone_t const *const target_milestone,
                                                    tangle_t const *const tangle, snapshot_t *const snapshot) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
 
   iota_snapshot_read_lock(&snapshots_service->snapshots_provider->inital_snapshot);
-
   if (target_milestone->index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
     log_error(logger_id, "Target milestone is too old\n");
-    return RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
+    ret = RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
+  } else {
+    ret = iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot);
   }
-  ret = iota_snapshot_copy(&snapshots_service->snapshots_provider->inital_snapshot, snapshot);
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
   if (ret) {
     return ret;
