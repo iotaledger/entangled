@@ -96,13 +96,15 @@ int main(void) {
   config.db_path = test_db_path;
   api.core = &core;
   broadcaster_init(&api.core->node.broadcaster, &api.core->node);
+  TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;
   api.core->consensus.conf.mwm = 1;
 
   iota_snapshots_provider_init(&api.core->consensus.snapshots_provider, &api.core->consensus.conf);
   iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator,
-                                            &api.core->consensus.snapshots_provider, &api.core->consensus.conf);
+                                            &api.core->consensus.snapshots_provider,
+                                            &api.core->node.transaction_requester, &api.core->consensus.conf);
 
   RUN_TEST(test_broadcast_transactions_empty);
   RUN_TEST(test_broadcast_transactions_invalid_tx);

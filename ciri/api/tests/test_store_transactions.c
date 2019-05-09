@@ -118,7 +118,8 @@ int main(void) {
   api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;
   api.core->consensus.conf.mwm = 1;
   iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator,
-                                            &api.core->consensus.snapshots_provider, &api.core->consensus.conf);
+                                            &api.core->consensus.snapshots_provider,
+                                            &api.core->node.transaction_requester, &api.core->consensus.conf);
   tips_cache_init(&api.core->node.tips, 5000);
   iota_consensus_transaction_solidifier_init(&api.core->consensus.transaction_solidifier, &api.core->consensus.conf,
                                              &api.core->node.transaction_requester,
