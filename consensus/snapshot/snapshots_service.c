@@ -202,7 +202,7 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
   check_not_orphan_do_func_params_t *params = data;
 
   if (pack->num_loaded == 0) {
-    *should_branch = true;
+    *should_branch = false;
     return RC_OK;
   }
 
