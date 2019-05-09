@@ -49,15 +49,23 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash, iota
 
 static retcode_t update_snapshot_milestone(ledger_validator_t const *const lv, tangle_t const *const tangle,
                                            flex_trit_t *const hash, uint64_t index) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   hash243_set_t hashes_to_update = NULL;
+  hash243_set_t analyzed_hashes = NULL;
 
-  if ((ret = tangle_traversal_dfs_to_past(tangle, update_snapshot_milestone_do_func, hash, lv->conf->genesis_hash, NULL,
-                                          &hashes_to_update)) != RC_OK) {
+  // TODO this could be removed if SEPs were in database instead of in a map
+  iota_snapshot_solid_entry_points_set(&lv->milestone_tracker->snapshots_provider->inital_snapshot, &analyzed_hashes);
+
+  if ((ret = tangle_traversal_dfs_to_past(tangle, update_snapshot_milestone_do_func, hash, lv->conf->genesis_hash,
+                                          &analyzed_hashes, &hashes_to_update)) != RC_OK) {
     return ret;
   }
+
   ret = iota_tangle_transactions_update_snapshot_index(tangle, hashes_to_update, index);
+
   hash243_set_free(&hashes_to_update);
+  hash243_set_free(&analyzed_hashes);
+
   return ret;
 }
 
@@ -172,16 +180,19 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv, tangle_t *
                                   flex_trit_t const *const tip, uint64_t const latest_snapshot_index,
                                   bool const is_milestone, bool *const valid_delta) {
   retcode_t ret = RC_OK;
-
   get_latest_delta_do_func_params_t params = {.state = state,
                                               .valid_delta = true,
                                               .latest_snapshot_index = latest_snapshot_index,
                                               .is_milestone = is_milestone,
                                               .tangle = tangle};
 
+  // TODO this could be removed if SEPs were in database instead of in a map
+  iota_snapshot_solid_entry_points_set(&lv->milestone_tracker->snapshots_provider->inital_snapshot, analyzed_hashes);
+
   ret = tangle_traversal_dfs_to_past(tangle, get_latest_delta_do_func, tip, lv->conf->genesis_hash, analyzed_hashes,
                                      &params);
   *valid_delta = params.valid_delta;
+
   return ret;
 }
 
@@ -218,6 +229,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
   bool valid_delta = true;
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
+  hash243_set_t analyzed_hashes = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   *has_snapshot = false;
 
@@ -234,7 +246,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
 
   *has_snapshot = transaction_snapshot_index(&tx) != 0;
   if (!(*has_snapshot)) {
-    if ((ret = get_latest_delta(lv, tangle, NULL, &delta, milestone->hash,
+    if ((ret = get_latest_delta(lv, tangle, &analyzed_hashes, &delta, milestone->hash,
                                 iota_snapshot_get_index(&lv->milestone_tracker->snapshots_provider->latest_snapshot),
                                 true, &valid_delta)) != RC_OK) {
       log_error(logger_id, "Getting latest delta failed\n");
@@ -268,6 +280,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(ledger_validator_t con
   }
 
 done:
+  hash243_set_free(&analyzed_hashes);
   state_delta_destroy(&delta);
   state_delta_destroy(&patch);
   return ret;
