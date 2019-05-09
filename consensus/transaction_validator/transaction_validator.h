@@ -14,6 +14,7 @@
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "consensus/snapshot/snapshots_provider.h"
+#include "gossip/components/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +26,7 @@ extern "C" {
 typedef struct transaction_validator_s {
   iota_consensus_conf_t *conf;
   snapshots_provider_t *snapshots_provider;
+  transaction_requester_t *transaction_requester;
 } transaction_validator_t;
 
 /**
@@ -36,7 +38,8 @@ typedef struct transaction_validator_s {
  * @return a status code
  */
 retcode_t iota_consensus_transaction_validator_init(transaction_validator_t *const tv,
-                                                    snapshots_provider_t const *const snapshots_provider,
+                                                    snapshots_provider_t *const snapshots_provider,
+                                                    transaction_requester_t *const transaction_requester,
                                                     iota_consensus_conf_t *const conf);
 
 /**

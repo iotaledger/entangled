@@ -38,11 +38,17 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
   uint64_t timestamp_ms = transaction_attachment_timestamp(transaction) == 0
                               ? transaction_timestamp(transaction) * 1000UL
                               : transaction_attachment_timestamp(transaction);
-
+  bool is_requested = false;
   bool is_too_futuristic = timestamp_ms > (current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS);
   bool is_below_snapshot =
       (timestamp_ms < tv->snapshots_provider->inital_snapshot.metadata.timestamp * 1000UL) &&
       !iota_snapshot_has_solid_entry_point(&tv->snapshots_provider->inital_snapshot, transaction_hash(transaction));
+
+  requester_is_requested(tv->transaction_requester, transaction_hash(transaction), true, &is_requested);
+
+  if (is_requested) {
+    return false;
+  }
 
   if (is_too_futuristic) {
     return true;
@@ -60,11 +66,13 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
  */
 
 retcode_t iota_consensus_transaction_validator_init(transaction_validator_t* const tv,
-                                                    snapshots_provider_t const* const snapshots_provider,
+                                                    snapshots_provider_t* const snapshots_provider,
+                                                    transaction_requester_t* const transaction_requester,
                                                     iota_consensus_conf_t* const conf) {
   logger_id = logger_helper_enable(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->conf = conf;
   tv->snapshots_provider = snapshots_provider;
+  tv->transaction_requester = transaction_requester;
 
   return RC_OK;
 }

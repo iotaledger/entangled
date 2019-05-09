@@ -77,8 +77,9 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   }
 
   log_info(logger_id, "Initializing transaction validator\n");
-  if ((ret = iota_consensus_transaction_validator_init(&consensus->transaction_validator,
-                                                       &consensus->snapshots_provider, &consensus->conf)) != RC_OK) {
+  if ((ret =
+           iota_consensus_transaction_validator_init(&consensus->transaction_validator, &consensus->snapshots_provider,
+                                                     transaction_requester, &consensus->conf)) != RC_OK) {
     log_critical(logger_id, "Initializing transaction validator failed\n");
     return ret;
   }
