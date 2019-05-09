@@ -160,13 +160,6 @@ void test_stored_milestone(void) {
   milestone.hash[0]--;
   milestone.index--;
 
-  // Test get first
-  ms_pack.num_loaded = 0;
-  iota_stor_milestone_load_first(&connection, &ms_pack);
-  TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
-  TEST_ASSERT_EQUAL_INT(ms.index, milestone.index);
-  TEST_ASSERT_EQUAL_MEMORY(ms.hash, milestone.hash, FLEX_TRIT_SIZE_243);
-
   bool exist = false;
   TEST_ASSERT(iota_stor_milestone_exist(&connection, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
