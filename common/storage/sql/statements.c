@@ -173,10 +173,6 @@ char *iota_statement_milestone_insert =
 char *iota_statement_milestone_select_by_hash = "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
                                                 " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
 
-char *iota_statement_milestone_select_first =
-    "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
-    " ASC LIMIT 1";
-
 char *iota_statement_milestone_select_last =
     "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
     " DESC LIMIT 1";
