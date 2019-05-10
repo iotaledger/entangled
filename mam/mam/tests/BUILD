@@ -11,7 +11,7 @@ cc_library(
 
 cc_test(
     name = "test_message",
-    timeout = "long",
+    timeout = "eternal",
     srcs = ["test_message.c"],
     deps = [
         "//mam/mam:message",
