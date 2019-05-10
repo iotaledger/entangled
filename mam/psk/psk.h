@@ -13,7 +13,10 @@
  * @{
  *
  * @file
- * @brief
+ * @brief Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE)
+ *
+ * It is preliminarily transmitted between the entities and is beyond the scope of MAM
+ * The PSK id is an identifier of a group of recipients who share the same PSK
  *
  */
 #ifndef __MAM_PSK_PSK_H__
@@ -31,12 +34,6 @@
 extern "C" {
 #endif
 
-/**
- * Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE)
- * It is preliminarily transmitted between the entities and is beyond the scope
- * of MAM
- * The PSK id is an identifier of a group of recipients who share the same PSK
- */
 typedef struct mam_psk_s {
   trit_t id[MAM_PSK_ID_SIZE];
   trit_t key[MAM_PSK_KEY_SIZE];
@@ -46,10 +43,10 @@ typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;
 typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
 
 /**
- * Generates a pre-shared key with an id and a nonce
+ * @brief Generates a pre-shared key with an id and a nonce
  *
  * @param psk The pre-shared key
- * @param prng A PRNG interface
+ * @param prng A PRNG
  * @param id The pre-shared key id (27 trytes)
  * @param nonce A trytes nonce
  * @param nonce_length Length of the trytes nonce
@@ -60,7 +57,7 @@ retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng, tryte_
                       tryte_t const* const nonce, size_t const nonce_length);
 
 /**
- * Safely destroys a pre-shared key by clearing its secret part
+ * @brief Safely destroys a pre-shared key by clearing its secret part
  *
  * @param psk The pre-shared key
  */
@@ -73,7 +70,7 @@ static inline void mam_psk_destroy(mam_psk_t* const psk) {
 }
 
 /**
- * Gets a pre-shared key id trits
+ * @brief Gets a pre-shared key id trits
  *
  * @param psk The pre-shared key
  *
@@ -88,7 +85,7 @@ static inline trits_t mam_psk_id(mam_psk_t const* const psk) {
 }
 
 /**
- * Gets a pre-shared key trits
+ * @brief Gets a pre-shared key trits
  *
  * @param psk The pre-shared key
  *
@@ -103,7 +100,7 @@ static inline trits_t mam_psk_key(mam_psk_t const* const psk) {
 }
 
 /**
- * Safely destroys a set of pre-shared keys by clearing their secret part and
+ * @brief Safely destroys a set of pre-shared keys by clearing their secret part and
  * releasing memory
  *
  * @param psks The set of pre-shared keys
@@ -111,7 +108,7 @@ static inline trits_t mam_psk_key(mam_psk_t const* const psk) {
 void mam_psks_destroy(mam_psk_t_set_t* const psks);
 
 /**
- * Gets the size of a serialized set of pre-shared keys
+ * @brief Gets the size of a serialized set of pre-shared keys
  *
  * @param psks The set of pre-shared keys
  *
@@ -120,7 +117,7 @@ void mam_psks_destroy(mam_psk_t_set_t* const psks);
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks);
 
 /**
- * Serializes a set of pre-shared keys into a trits buffer
+ * @brief Serializes a set of pre-shared keys into a trits buffer
  *
  * @param psks The set of pre-shared keys
  * @param trits The trits buffer to serialize into
@@ -130,7 +127,7 @@ size_t mam_psks_serialized_size(mam_psk_t_set_t const psks);
 retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t* const trits);
 
 /**
- * Deserializes a set of pre-shared keys from a trits buffer
+ * @brief Deserializes a set of pre-shared keys from a trits buffer
  *
  * @param trits The trits buffer to deserialize from
  * @param psks The set of pre-shared keys
