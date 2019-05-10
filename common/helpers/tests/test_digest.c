@@ -5,15 +5,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <gtest/gtest.h>
-#include <cstdint>
+#include <stdlib.h>
+
+#include <unity/unity.h>
 
 #include "common/helpers/digest.h"
 
-namespace {
-
-TEST(CurlTest, testDigest) {
-  const std::string TX =
+static void test_digest(void) {
+  tryte_t const * const TX = (tryte_t*)
       "999999999999999999999999999999999999999999999999999999999999999999999999"
       "999999999999999999999999999999999999999999999999999999999999999999999999"
       "999999999999999999999999999999999999999999999999999999999999999999999999"
@@ -52,19 +51,18 @@ TEST(CurlTest, testDigest) {
       "BISQSVEWBKKVKBWCTBEV9PVWETXPXII99HHXMELOJKZIC9IUGIAUKBMPKTPHQILDLRDDA999"
       "999999999999999999999999999999999999999999999999999999ZM99999999IA999999"
       "999999999";
-
-  const std::string HASH =
+  tryte_t const * const  HASH = (tryte_t*)
       "EBCGQXTGVGYPVKWI9AHYCVNXBLDJOHVKIMPOCJJE99PUOZJKNTLDLVBLZLXABOCKLQVVDACL"
       "9VHWST999";
 
-  char* out = iota_digest(TX.c_str());
+  char* out = iota_digest((char*)TX);
 
-  EXPECT_EQ(out, HASH);
+  TEST_ASSERT_EQUAL_MEMORY(out, HASH, HASH_LENGTH_TRYTE);
 
   free(out);
 }
 
-TEST(CurlTest, testFlexDigest) {
+static void test_flex_digest(void) {
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   const flex_trit_t TX[] = {
       0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -658,9 +656,16 @@ TEST(CurlTest, testFlexDigest) {
 #endif
   const size_t NUM_TRITS = 8019;
 
-  auto hash = iota_flex_digest(TX, NUM_TRITS);
-  EXPECT_TRUE(memcmp(hash, HASH, sizeof(HASH)) == 0);
+  flex_trit_t* hash = iota_flex_digest(TX, NUM_TRITS);
+  TEST_ASSERT_EQUAL_MEMORY(hash, HASH, sizeof(HASH));
   free(hash);
 }
 
-}  // namespace
+int main(void) {
+  UNITY_BEGIN();
+
+  RUN_TEST(test_digest);
+  RUN_TEST(test_flex_digest);
+
+  return UNITY_END();
+}

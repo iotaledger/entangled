@@ -1,39 +1,39 @@
 cc_test(
     name = "test_checksum",
     timeout = "short",
-    srcs = ["test_checksum.cpp"],
+    srcs = ["test_checksum.c"],
     deps = [
         "//common/helpers:checksum",
-        "@com_google_googletest//:gtest_main",
+        "@unity",
     ],
 )
 
 cc_test(
     name = "test_digest",
     timeout = "short",
-    srcs = ["test_digest.cpp"],
+    srcs = ["test_digest.c"],
     deps = [
         "//common/helpers:digest",
-        "@com_google_googletest//:gtest_main",
+        "@unity",
     ],
 )
 
 cc_test(
     name = "test_pow",
     timeout = "short",
-    srcs = ["test_pow.cpp"],
+    srcs = ["test_pow.c"],
     deps = [
         "//common/helpers:pow",
-        "@com_google_googletest//:gtest_main",
+        "@unity",
     ],
 )
 
 cc_test(
     name = "test_sign",
     timeout = "short",
-    srcs = ["test_sign.cpp"],
+    srcs = ["test_sign.c"],
     deps = [
         "//common/helpers:sign",
-        "@com_google_googletest//:gtest_main",
+        "@unity",
     ],
 )
