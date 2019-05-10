@@ -34,7 +34,7 @@ int mam_create(trit_t *const payload, size_t const payload_length, trit_t const 
                size_t const index, trit_t const *const next_root, size_t const start, trit_t const *const seed,
                size_t const security, Curl *const enc_curl) {
   if (security > 3) {
-    fprintf(stderr, "invalid security %zd\n", security);
+    fprintf(stderr, "invalid security %zu\n", security);
     return -1;
   }
 
@@ -48,7 +48,7 @@ int mam_create(trit_t *const payload, size_t const payload_length, trit_t const 
                               (siblings_number * HASH_LENGTH_TRIT);
 
   if (payload_length < payload_min_length) {
-    fprintf(stderr, "payload too short: needed %zd, given %zd\n", payload_min_length, payload_length);
+    fprintf(stderr, "payload too short: needed %zu, given %zu\n", payload_min_length, payload_length);
     return -1;
   }
 
