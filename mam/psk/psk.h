@@ -22,6 +22,7 @@
 #include "common/errors.h"
 #include "mam/prng/prng.h"
 #include "mam/trits/trits.h"
+#include "utils/memset_safe.h"
 
 #define MAM_PSK_ID_SIZE 81
 #define MAM_PSK_KEY_SIZE 243
@@ -63,7 +64,13 @@ retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng, tryte_
  *
  * @param psk The pre-shared key
  */
-void mam_psk_destroy(mam_psk_t* const psk);
+static inline void mam_psk_destroy(mam_psk_t* const psk) {
+  if (psk == NULL) {
+    return;
+  }
+
+  memset_safe(psk->key, MAM_PSK_KEY_SIZE, 0, MAM_PSK_KEY_SIZE);
+}
 
 /**
  * Gets a pre-shared key id trits
@@ -72,7 +79,13 @@ void mam_psk_destroy(mam_psk_t* const psk);
  *
  * @return the pre-shared key id trits
  */
-trits_t mam_psk_id(mam_psk_t const* const psk);
+static inline trits_t mam_psk_id(mam_psk_t const* const psk) {
+  if (psk == NULL) {
+    return trits_null();
+  }
+
+  return trits_from_rep(MAM_PSK_ID_SIZE, psk->id);
+}
 
 /**
  * Gets a pre-shared key trits
@@ -81,7 +94,13 @@ trits_t mam_psk_id(mam_psk_t const* const psk);
  *
  * @return the pre-shared key trits
  */
-trits_t mam_psk_key(mam_psk_t const* const psk);
+static inline trits_t mam_psk_key(mam_psk_t const* const psk) {
+  if (psk == NULL) {
+    return trits_null();
+  }
+
+  return trits_from_rep(MAM_PSK_KEY_SIZE, psk->key);
+}
 
 /**
  * Safely destroys a set of pre-shared keys by clearing their secret part and

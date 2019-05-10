@@ -8,6 +8,7 @@ cc_library(
         "//common:errors",
         "//mam/prng",
         "//mam/trits",
+        "//utils:memset_safe",
     ],
 )
 
@@ -19,7 +20,6 @@ cc_library(
         ":mam_psk_t_set",
         ":psk_hdr",
         "//mam/pb3",
-        "//utils:memset_safe",
     ],
 )
 
