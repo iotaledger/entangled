@@ -61,7 +61,7 @@ retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng, tryte_
  *
  * @param psk The pre-shared key
  */
-static inline void mam_psk_destroy(mam_psk_t* const psk) {
+static inline void mam_psk_reset(mam_psk_t* const psk) {
   if (psk == NULL) {
     return;
   }

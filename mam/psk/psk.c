@@ -36,7 +36,7 @@ retcode_t mam_psks_destroy(mam_psk_t_set_t *const psks) {
   }
 
   SET_ITER(*psks, entry, tmp) {
-    mam_psk_destroy(&entry->value);
+    mam_psk_reset(&entry->value);
     mam_psk_t_set_remove_entry(psks, entry);
   }
 
