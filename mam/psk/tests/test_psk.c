@@ -12,7 +12,6 @@
 #include <unity/unity.h>
 
 #include "common/trinary/trit_tryte.h"
-#include "mam/pb3/pb3.h"
 #include "mam/psk/mam_psk_t_set.h"
 #include "mam/psk/psk.h"
 
