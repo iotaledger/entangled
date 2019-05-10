@@ -104,8 +104,10 @@ static inline trits_t mam_psk_key(mam_psk_t const* const psk) {
  * releasing memory
  *
  * @param psks The set of pre-shared keys
+ *
+ * @return a status code
  */
-void mam_psks_destroy(mam_psk_t_set_t* const psks);
+retcode_t mam_psks_destroy(mam_psk_t_set_t* const psks);
 
 /**
  * @brief Gets the size of a serialized set of pre-shared keys
