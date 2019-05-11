@@ -168,7 +168,7 @@ retcode_t json_get_uint8(cJSON const* const json_obj, char const* const obj_name
     return RC_CCLIENT_JSON_KEY;
   }
 
-  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && json_value->valueint <= UINT8_MAX) {
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && (uint8_t)json_value->valueint <= UINT8_MAX) {
     *num = (uint8_t)json_value->valueint;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
@@ -185,7 +185,7 @@ retcode_t json_get_uint16(cJSON const* const json_obj, char const* const obj_nam
     return RC_CCLIENT_JSON_KEY;
   }
 
-  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && json_value->valueint <= UINT16_MAX) {
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && (uint16_t)json_value->valueint <= UINT16_MAX) {
     *num = (uint16_t)json_value->valueint;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
@@ -202,7 +202,7 @@ retcode_t json_get_uint32(cJSON const* const json_obj, char const* const obj_nam
     return RC_CCLIENT_JSON_KEY;
   }
 
-  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && json_value->valueint <= UINT32_MAX) {
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && (uint32_t)json_value->valueint <= UINT32_MAX) {
     *num = (uint32_t)json_value->valueint;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
@@ -219,7 +219,7 @@ retcode_t json_get_uint64(cJSON const* const json_obj, char const* const obj_nam
     return RC_CCLIENT_JSON_KEY;
   }
 
-  if (cJSON_IsNumber(json_value)) {
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 && (uint64_t)json_value->valueint <= UINT64_MAX) {
     *num = (uint64_t)json_value->valuedouble;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
