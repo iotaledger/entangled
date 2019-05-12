@@ -61,7 +61,7 @@ bool IotaJsonAPI::isNodeSolid() {
     return false;
   }
 
-  auto tx = getTransactions({ni.latestMilestone})[0];
+  auto tx = getTransactions({ni.latestMilestone}, false)[0];
   auto now = std::chrono::system_clock::now();
 
   if ((now - tx.timestamp) > std::chrono::seconds(300)) {
@@ -217,7 +217,7 @@ std::vector<std::string> IotaJsonAPI::getTrytes(const std::vector<std::string>& 
   return trytes;
 }
 
-std::vector<Transaction> IotaJsonAPI::getTransactions(const std::vector<std::string>& hashes) {
+std::vector<Transaction> IotaJsonAPI::getTransactions(const std::vector<std::string>& hashes, bool includeMessages) {
   VLOG(3) << __FUNCTION__;
   auto trytes = getTrytes(hashes);
 
@@ -228,7 +228,7 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(const std::vector<std::str
   std::vector<Transaction> txs;
   std::chrono::system_clock::time_point epoch;
 
-  boost::copy(trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
+  boost::copy(trytes | transformed([&epoch, includeMessages](const std::string& trytes) -> Transaction {
                 TryteTransaction* tx = new TryteTransaction(trytes);
 
                 // We could also rely on the ordering of the hashes argument here.
@@ -239,11 +239,12 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(const std::vector<std::str
                 auto sAddress = tx->address();
                 auto sBundle = tx->bundle();
                 auto sTrunk = tx->trunk();
+                auto sOptMessage = includeMessages ? nonstd::optional<std::string>(tx->message()) : nonstd::nullopt;
 
                 std::chrono::seconds sinceEpoch(tx->timestamp());
 
                 return {sHash,           sAddress, tx->value(), epoch + sinceEpoch, tx->currentIndex(),
-                        tx->lastIndex(), sBundle,  sTrunk};
+                        tx->lastIndex(), sBundle,  sTrunk,      sOptMessage};
               }),
               boost::back_move_inserter(txs));
 
@@ -253,11 +254,11 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(const std::vector<std::str
 }
 
 std::unordered_multimap<std::string, Bundle> IotaJsonAPI::getConfirmedBundlesForAddresses(
-    const std::vector<std::string>& addresses) {
+    const std::vector<std::string>& addresses, bool includeMessages) {
   VLOG(3) << __FUNCTION__;
   // 1. Get all transactions for address [findTransactions, getTransactions]
   auto txHashes = findTransactions(addresses, {}, {});
-  auto transactions = getTransactions(txHashes);
+  auto transactions = getTransactions(txHashes, false);
 
   // 2. Filter unique bundles from these []
   std::vector<std::string> bundles;
@@ -266,7 +267,7 @@ std::unordered_multimap<std::string, Bundle> IotaJsonAPI::getConfirmedBundlesFor
 
   // 3. Materialise all bundles [findTransactions, getTransactions]
   txHashes = findTransactions({}, bundles, {});
-  transactions = getTransactions(txHashes);
+  transactions = getTransactions(txHashes, includeMessages);
 
   // 4. Filter unconfirmed bundles [getNodeInfo, getInclusionStates]
   std::vector<std::string> tails;
