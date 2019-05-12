@@ -5,40 +5,42 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <gtest/gtest.h>
-#include <cstdint>
+#include <stdlib.h>
+
+#include <unity/unity.h>
 
 #include "common/helpers/checksum.h"
 
-namespace {
-
-TEST(ChecksumTest, testChecksumEquality) {
-  const std::string ADDRESS =
+static void test_checksum_equality(void) {
+  tryte_t const *const ADDRESS = (tryte_t*)
       "UYEEERFQYTPFAHIPXDQAQYWYMSMCLMGBTYAXLWFRFFWPYFOICOVLK9A9VYNCKK9TQUNBTARC"
       "EQXJHD9VY";
-
-  const std::string CHECKSUM =
+  tryte_t const *const CHECKSUM = (tryte_t*)
       "CFOHVYSWYAKMFOPCSUXAYJQFXIZCAFLJSLZQNNJMYCBEERFGZ9C9GYDZYDADZIHJMUWGIYRP"
       "XOEDEOMRC";
 
-  char *out = iota_checksum(ADDRESS.c_str(), ADDRESS.size(), 9);
-  EXPECT_EQ(out, CHECKSUM.substr(CHECKSUM.size() - 9, 9));
+  char *out = iota_checksum((char *)ADDRESS, HASH_LENGTH_TRYTE, 9);
+  TEST_ASSERT_EQUAL_MEMORY(out, CHECKSUM + HASH_LENGTH_TRYTE - 9, 9);
   free(out);
 
-  out = iota_checksum(ADDRESS.c_str(), ADDRESS.size(), 0);
-  EXPECT_EQ(out, nullptr);
+  out = iota_checksum((char *)ADDRESS, HASH_LENGTH_TRYTE, 0);
+  TEST_ASSERT(out == NULL);
   free(out);
 
-  out = iota_checksum(ADDRESS.c_str(), ADDRESS.size(), 3);
-  EXPECT_EQ(out, CHECKSUM.substr(CHECKSUM.size() - 3, 3));
+  out = iota_checksum((char *)ADDRESS, HASH_LENGTH_TRYTE, 3);
+  TEST_ASSERT_EQUAL_MEMORY(out, CHECKSUM + HASH_LENGTH_TRYTE - 3, 3);
   free(out);
 
-  out = iota_checksum(ADDRESS.c_str(), ADDRESS.size(), 81);
-  EXPECT_EQ(out, CHECKSUM);
+  out = iota_checksum((char *)ADDRESS, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+  TEST_ASSERT_EQUAL_MEMORY(out, CHECKSUM, HASH_LENGTH_TRYTE);
   free(out);
 }
 
-TEST(ChecksumTest, testFlexChecksumEquality) {
+static void test_flex_checksum_equality(void) {
+  size_t const NUM_TRITS = 243;
+  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS);
+  flex_trit_t *partial = (flex_trit_t *)calloc(flex_len, sizeof(flex_trit_t));
+
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   const flex_trit_t ADDRESS[] = {
       0,  1,  -1, 1,  -1, 0,  -1, -1, 1,  -1, -1, 1,  -1, -1, 1,  0,  0,  -1, 0,  -1, 1,  -1, 0,  -1, 1, -1, 0,
@@ -96,30 +98,35 @@ TEST(ChecksumTest, testFlexChecksumEquality) {
       93,  36,   -1,  106, 120,  -114, 21,  -15, -63,  -10, 41,  -104, 46, -77, 3,
   };
 #endif
-  const size_t NUM_TRITS = 243;
-  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS);
-  flex_trit_t *partial = (flex_trit_t *)calloc(flex_len, sizeof(flex_trit_t));
 
-  auto checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 0);
-  EXPECT_EQ(checksum, nullptr);
+  flex_trit_t *checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 0);
+  TEST_ASSERT(checksum == NULL);
   free(checksum);
 
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, NUM_TRITS);
-  EXPECT_TRUE(memcmp(checksum, CHECKSUM, sizeof(CHECKSUM)) == 0);
+  TEST_ASSERT_EQUAL_MEMORY(checksum, CHECKSUM, sizeof(CHECKSUM));
   free(checksum);
 
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 9);
   memset(partial, FLEX_TRIT_NULL_VALUE, flex_len);
   flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 9, 9);
-  EXPECT_TRUE(memcmp(checksum, partial, NUM_FLEX_TRITS_FOR_TRITS(9)) == 0);
+  TEST_ASSERT_EQUAL_MEMORY(checksum, partial, NUM_FLEX_TRITS_FOR_TRITS(9));
   free(checksum);
 
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 27);
   memset(partial, FLEX_TRIT_NULL_VALUE, flex_len);
   flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 27, 27);
-  EXPECT_TRUE(memcmp(checksum, partial, NUM_FLEX_TRITS_FOR_TRITS(27)) == 0);
+  TEST_ASSERT_EQUAL_MEMORY(checksum, partial, NUM_FLEX_TRITS_FOR_TRITS(27));
   free(checksum);
 
   free(partial);
 }
-}  // namespace
+
+int main(void) {
+  UNITY_BEGIN();
+
+  RUN_TEST(test_checksum_equality);
+  RUN_TEST(test_flex_checksum_equality);
+
+  return UNITY_END();
+}
