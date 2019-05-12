@@ -94,7 +94,7 @@ size_t get_balances_res_balances_num(get_balances_res_t const* const res);
  * @param[in] index An index of the balance list.
  * @return The balance to the corresponding index.
  */
-uint64_t get_balances_res_balances_at(get_balances_res_t const* const res, int const index);
+uint64_t get_balances_res_balances_at(get_balances_res_t const* const res, size_t const index);
 
 /**
  * @brief Adds a balance to the response object.

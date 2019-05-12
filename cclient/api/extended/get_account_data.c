@@ -107,7 +107,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
     ret_code = iota_client_get_balances(serv, balances_req, balances_res);
     if (!ret_code) {
       // count all balances
-      for (int i = 0; i < get_balances_res_balances_num(balances_res); i++) {
+      for (size_t i = 0; i < get_balances_res_balances_num(balances_res); i++) {
         out_account->balance += get_balances_res_balances_at(balances_res, i);
       }
     }
@@ -117,7 +117,9 @@ done:
   free(tmp_addr);
   find_transactions_req_free(&find_tx_req);
   find_transactions_res_free(&find_tx_res);
-  balances_req->addresses = NULL;  // no need to be freed
+  if (balances_req) {
+    balances_req->addresses = NULL;  // no need to be freed
+  }
   get_balances_req_free(&balances_req);
   get_balances_res_free(&balances_res);
   return ret_code;

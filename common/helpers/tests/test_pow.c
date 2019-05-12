@@ -5,18 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <cstdint>
-#include <iostream>
-#include <memory>
-
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include <unity/unity.h>
 
 #include "common/helpers/digest.h"
 #include "common/helpers/pow.h"
 
-namespace {
-const std::string TX_TRYTES =
+static tryte_t const *const TX_TRYTES = (tryte_t*)
     "XYIUIABLAEBBFCTMDCGPVNCQELHIEBVNRPWBSCABWRAVGVOVMFEHWJCUILYIXOPJNASEOHXP"
     "JBXFNHHSWEKEGEEFSAZDENWMOAXGJCQZQDGSTTMNQPYJBLRVY9T9HSQNXWYCSMLEXVWCASQ9"
     "MHPMBZ9PSSZEKCXYLDYKTOVAWQXOTGMWHUIACLUTAIKUIXZND9YMQKZBTIWOUIVQWTSBNVDC"
@@ -56,45 +50,46 @@ const std::string TX_TRYTES =
     "999999999999999999999999999HDU9RGVJE999999999MMMMMMMMM999999999999999999"
     "999999999";
 
-TEST(PoWTest, testsPoW) {
-  using namespace testing;
+static void test_pow(void) {
+  tryte_t powed[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  char *nonce = iota_pow_trytes((char *)TX_TRYTES, 9);
 
-  auto nonce = iota_pow_trytes(TX_TRYTES.c_str(), 9);
-  auto powed = TX_TRYTES.substr(0, NUM_TRYTES_SERIALIZED_TRANSACTION - NUM_TRYTES_NONCE) + nonce;
+  memcpy(powed, TX_TRYTES, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  memcpy(powed + NUM_TRYTES_SERIALIZED_TRANSACTION - NUM_TRYTES_NONCE, nonce, NUM_TRYTES_NONCE);
 
-  auto c_hash = iota_digest(powed.c_str());
-  auto hash = std::string(c_hash);
+  char *hash = iota_digest((char *)powed);
 
-  EXPECT_EQ("999", hash.substr(NUM_TRYTES_HASH - 3));
+  TEST_ASSERT_EQUAL_MEMORY(hash + HASH_LENGTH_TRYTE - 3, "999", 3);
 
-  std::free(nonce);
-  std::free(c_hash);
+  free(nonce);
+  free(hash);
 }
 
-TEST(PoWTest, testsFlexPoW) {
-  using namespace testing;
-
+static void test_flex_pow(void) {
   flex_trit_t tx[FLEX_TRIT_SIZE_8019] = {0};
-  flex_trits_from_trytes(tx, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t *)TX_TRYTES.c_str(), TX_TRYTES.length(),
-                         TX_TRYTES.size());
+  flex_trits_from_trytes(tx, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t *)TX_TRYTES, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  auto nonce = iota_pow_flex(tx, FLEX_TRIT_SIZE_8019, 9);
+  flex_trit_t *nonce = iota_pow_flex(tx, FLEX_TRIT_SIZE_8019, 9);
 
   flex_trits_insert_from_pos(tx, NUM_TRITS_SERIALIZED_TRANSACTION, nonce, NUM_TRITS_NONCE, 0,
                              NUM_TRITS_SERIALIZED_TRANSACTION - NUM_TRITS_NONCE, NUM_TRITS_NONCE);
-  auto c_fhash = iota_flex_digest(tx, FLEX_TRIT_SIZE_8019);
+  flex_trit_t *fhash = iota_flex_digest(tx, FLEX_TRIT_SIZE_8019);
 
-  tryte_t c_hash[NUM_TRYTES_HASH] = {0};
-  flex_trits_to_trytes(c_hash, NUM_TRYTES_HASH, c_fhash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
+  tryte_t hash[NUM_TRYTES_HASH] = {0};
+  flex_trits_to_trytes(hash, NUM_TRYTES_HASH, fhash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
 
-  auto hash = std::string((const char *)c_hash, NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(hash + HASH_LENGTH_TRYTE - 3, "999", 3);
 
-  std::cerr << hash << std::endl;
-
-  std::free(nonce);
-  std::free(c_fhash);
-
-  EXPECT_EQ("999", hash.substr(NUM_TRYTES_HASH - 3));
+  free(nonce);
+  free(fhash);
 }
 
-}  // namespace
+int main(void) {
+  UNITY_BEGIN();
+
+  RUN_TEST(test_pow);
+  RUN_TEST(test_flex_pow);
+
+  return UNITY_END();
+}
