@@ -53,7 +53,10 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   strcpy(consensus_conf.snapshot_file, snapshot_path);
   strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
   consensus_conf.snapshot_signature_skip_validation = true;
-  TEST_ASSERT(iota_snapshots_provider_init(&snapshots_provider, &consensus_conf) == RC_OK);
+
+  // Avoid complete initialization with state file loading
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.inital_snapshot, &consensus_conf) == RC_OK);
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.latest_snapshot, &consensus_conf) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, NULL, &snapshots_provider, NULL) ==
               RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &snapshots_provider, &lv, &ts) == RC_OK);

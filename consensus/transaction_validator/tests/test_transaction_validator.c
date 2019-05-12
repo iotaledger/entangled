@@ -176,7 +176,10 @@ int main(int argc, char *argv[]) {
   iota_consensus_conf_init(&conf);
   conf.mwm = 14;
   conf.local_snapshots.local_snapshots_is_enabled = false;
-  iota_snapshots_provider_init(&snapshots_provider, &conf);
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.inital_snapshot, &conf) == RC_OK);
+  // Avoid complete initialization with state file loading
+  iota_snapshot_reset(&snapshots_provider.inital_snapshot, &conf);
+  iota_snapshot_reset(&snapshots_provider.latest_snapshot, &conf);
   TEST_ASSERT(requester_init(&transaction_requester, &node) == RC_OK);
 
   RUN_TEST(transaction_is_valid);
