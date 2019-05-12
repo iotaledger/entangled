@@ -16,7 +16,7 @@
 #include "consensus/conf.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/ledger_validator/ledger_validator.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/hash_indexed_map.h"
 

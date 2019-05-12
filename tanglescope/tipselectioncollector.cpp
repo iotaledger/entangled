@@ -127,7 +127,7 @@ void TipSelectionCollector::queryTipSelection() {
       auto approvers = _api->findTransactions({}, {}, {txHashes});
 
       if (!approvers.empty()) {
-        auto transactions = _api->getTransactions(approvers);
+        auto transactions = _api->getTransactions(approvers, false);
 
         for (const auto& approver : transactions) {
           auto txTimestampMS =

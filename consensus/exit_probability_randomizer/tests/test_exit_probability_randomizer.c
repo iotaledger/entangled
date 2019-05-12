@@ -52,7 +52,7 @@ typedef enum test_tangle_topology {
 } test_tangle_topology;
 
 static exit_prob_transaction_validator_t epv;
-static snapshot_t snapshot;
+static snapshots_provider_t snapshots_provider;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
@@ -79,13 +79,16 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   strcpy(conf.snapshot_file, snapshot_path);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
   conf.snapshot_signature_skip_validation = true;
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
-  TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &conf, NULL, NULL) == RC_OK);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshot, &lv, &ts) == RC_OK);
+
+  // Avoid complete initialization with state file loading
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.inital_snapshot, &conf) == RC_OK);
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.latest_snapshot, &conf) == RC_OK);
+  TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &conf, NULL, &snapshots_provider, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &ts) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &conf, &mt) == RC_OK);
 
   // We want to avoid unnecessary validation
-  mt.latest_snapshot->index = 9999999;
+  mt.snapshots_provider->latest_snapshot.metadata.index = 9999999;
   mt.latest_solid_subtangle_milestone_index = max_depth;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(&conf, &mt, &lv, epv) == RC_OK);
@@ -93,10 +96,10 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(epv->lv);
-  iota_snapshot_destroy(&snapshot);
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
   iota_consensus_transaction_solidifier_destroy(&ts);
+  iota_snapshots_provider_destroy(&snapshots_provider);
 }
 
 void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implementation_t ep_impl,

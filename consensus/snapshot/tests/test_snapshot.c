@@ -38,7 +38,7 @@ void test_snapshot_conf() {
 
 void test_snapshot_init_file_not_found() {
   strcpy(conf.snapshot_file, "consensus/snapshot/tests/snapshot_not_found.txt");
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_SNAPSHOT_FILE_NOT_FOUND);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_UTILS_FILE_DOES_NOT_EXITS);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
@@ -127,6 +127,7 @@ int main(int argc, char *argv[]) {
   iota_consensus_conf_init(&conf);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
   conf.snapshot_signature_skip_validation = true;
+  conf.local_snapshots.local_snapshots_is_enabled = false;
 
   RUN_TEST(test_snapshot_conf);
   RUN_TEST(test_snapshot_init_file_not_found);

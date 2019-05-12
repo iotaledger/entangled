@@ -15,10 +15,6 @@
 
 static char const trinary_alphabet[] = "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"; /* [-13..13] */
 
-tryte_t tryte_from_trits(trit_t t0, trit_t t1, trit_t t2) {
-  return (tryte_t)t0 + (tryte_t)3 * (tryte_t)t1 + (tryte_t)9 * (tryte_t)t2;
-}
-
 bool tryte_from_char(tryte_t *t, char c) {
   bool r = true;
 
@@ -242,40 +238,6 @@ bool trits_put_char(trits_t x, char c) {
   return 1;
 }
 
-byte trits_get_byte(trits_t x) {
-  trit_t ts[5] = {0, 0, 0, 0, 0};
-  int i;
-
-  trits_get(trits_take_min(x, 5), ts);
-  i = 0 + 1 * ts[0] + 3 * ts[1] + 9 * ts[2] + 27 * ts[3] + 81 * ts[4];
-
-  return (0 <= i) ? (byte)i : (byte)(243 + i);
-}
-
-bool trits_put_byte(trits_t x, byte b) {
-  trit_t ts[5] = {0, 0, 0, 0, 0};
-  int i = (b <= 121) ? (int)b : ((int)b - 243);
-  size_t k;
-
-  if (242 < b) return 0;
-
-  ts[0] = MAM_MODS(i, 3 * 3 * 3 * 3 * 3, 3);
-  i = MAM_DIVS(i, 3 * 3 * 3 * 3 * 3, 3);
-  ts[1] = MAM_MODS(i, 3 * 3 * 3 * 3, 3);
-  i = MAM_DIVS(i, 3 * 3 * 3 * 3, 3);
-  ts[2] = MAM_MODS(i, 3 * 3 * 3, 3);
-  i = MAM_DIVS(i, 3 * 3 * 3, 3);
-  ts[3] = MAM_MODS(i, 3 * 3, 3);
-  i = MAM_DIVS(i, 3 * 3, 3);
-  ts[4] = MAM_MODS(i, 3, 3);
-
-  for (k = trits_size_min(x, 5); k < 5; ++k)
-    if (0 != ts[k]) return 0;
-
-  trits_put(trits_take_min(x, 5), ts);
-  return 1;
-}
-
 void trits_to_str(trits_t x, char *s) {
   for (; !trits_is_empty(x); x = trits_drop_min(x, 3)) *s++ = trits_get_char(x);
 }
@@ -304,26 +266,8 @@ void trits_padc0(trit_t c0, trits_t y) {
   trits_set_zero(trits_drop(y, 1));
 }
 
-void trits_copy_padc0(trit_t c0, trits_t x, trits_t y) {
-  size_t n = trits_size(x);
-  MAM_ASSERT(n < trits_size(y));
-
-  trits_copy(x, trits_take(y, n));
-  y = trits_drop(y, n);
-  trits_padc0(c0, y);
-}
-
 void trits_padc(trit_t c0, trits_t y) {
   if (!trits_is_empty(y)) trits_padc0(c0, y);
-}
-
-void trits_copy_padc(trit_t c0, trits_t x, trits_t y) {
-  size_t n = trits_size(x);
-  MAM_ASSERT(n <= trits_size(y));
-
-  trits_copy(x, trits_take(y, n));
-  y = trits_drop(y, n);
-  trits_padc(c0, y);
 }
 
 #define MAM_TRIT_NORM(t) (((t) == 2) ? -1 : ((t) == -2) ? 1 : (t))
@@ -348,36 +292,6 @@ void trit_swap_sub(trit_t *y, trit_t *s) {
   x = MAM_TRIT_NORM(x);
   *s = x;
   *y = x;
-}
-
-void trits_add(trits_t x, trits_t s, trits_t y) {
-  trit_t tx, ts, ty;
-
-  MAM_ASSERT(trits_size(x) == trits_size(s));
-  MAM_ASSERT(trits_size(x) == trits_size(y));
-  MAM_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
-
-  for (; !trits_is_empty(x); x = trits_drop(x, 1), s = trits_drop(s, 1), y = trits_drop(y, 1)) {
-    tx = trits_get1(x);
-    ts = trits_get1(s);
-    ty = trit_add(tx, ts);
-    trits_put1(y, ty);
-  }
-}
-
-void trits_sub(trits_t y, trits_t s, trits_t x) {
-  trit_t tx, ts, ty;
-
-  MAM_ASSERT(trits_size(x) == trits_size(s));
-  MAM_ASSERT(trits_size(x) == trits_size(y));
-  MAM_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
-
-  for (; !trits_is_empty(x); x = trits_drop(x, 1), s = trits_drop(s, 1), y = trits_drop(y, 1)) {
-    ty = trits_get1(y);
-    ts = trits_get1(s);
-    tx = trit_sub(ty, ts);
-    trits_put1(x, tx);
-  }
 }
 
 void trits_copy_add(trits_t x, trits_t s, trits_t y) {
@@ -524,14 +438,4 @@ void trits_free(trits_t x) {
   if (x.p) {
     free(x.p);
   }
-}
-
-void trits_print(trits_t x) {
-  for (; !trits_is_empty(x); x = trits_drop_min(x, 3)) printf("%c", trits_get_char(x));
-}
-
-void trits_print2(char const *pfx, trits_t x, char const *sfx) {
-  if (pfx) printf("%spongos", pfx);
-  trits_print(x);
-  if (sfx) printf("%spongos", sfx);
 }

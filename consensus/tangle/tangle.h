@@ -143,12 +143,10 @@ retcode_t iota_tangle_milestone_store(tangle_t const *const tangle, iota_milesto
 retcode_t iota_tangle_milestone_load(tangle_t const *const tangle, flex_trit_t const *const hash,
                                      iota_stor_pack_t *const pack);
 
-retcode_t iota_tangle_milestone_load_first(tangle_t const *const tangle, iota_stor_pack_t *const pack);
-
 retcode_t iota_tangle_milestone_load_last(tangle_t const *const tangle, iota_stor_pack_t *const pack);
 
-retcode_t iota_tangle_milestone_load_next(tangle_t const *const tangle, uint64_t const index,
-                                          iota_stor_pack_t *const pack);
+retcode_t iota_tangle_milestone_load_by_index(tangle_t const *const tangle, uint64_t const index,
+                                              iota_stor_pack_t *const pack);
 
 retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle, flex_trit_t const *const hash, bool *const exist);
 

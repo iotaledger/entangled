@@ -15,6 +15,7 @@
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
+#include "consensus/snapshot/snapshots_provider.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
@@ -40,7 +41,7 @@ typedef enum milestone_status_e {
 typedef struct milestone_tracker_s {
   bool running;
   iota_consensus_conf_t* conf;
-  snapshot_t* latest_snapshot;
+  snapshots_provider_t* snapshots_provider;
   uint64_t milestone_start_index;
   thread_handle_t milestone_validator;
   cond_handle_t cond_validator;
@@ -68,7 +69,7 @@ typedef struct milestone_tracker_s {
  * @return a status code
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
-                                      snapshot_t* const snapshot, ledger_validator_t* const lv,
+                                      snapshots_provider_t* const snapshots_provider, ledger_validator_t* const lv,
                                       transaction_solidifier_t* ts);
 
 /**
@@ -114,6 +115,8 @@ uint64_t iota_milestone_tracker_get_milestone_index(iota_transaction_t* const tx
 retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const mt, tangle_t* const tangle,
                                                     iota_milestone_t* const candidate,
                                                     milestone_status_t* const milestone_status);
+
+retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt, tangle_t* const tangle);
 
 #ifdef __cplusplus
 }

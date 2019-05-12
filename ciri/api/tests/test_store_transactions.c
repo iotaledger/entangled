@@ -117,12 +117,16 @@ int main(void) {
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;
   api.core->consensus.conf.mwm = 1;
-  iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator, &api.core->consensus.conf);
+  iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator,
+                                            &api.core->consensus.snapshots_provider,
+                                            &api.core->node.transaction_requester, &api.core->consensus.conf);
   tips_cache_init(&api.core->node.tips, 5000);
   iota_consensus_transaction_solidifier_init(&api.core->consensus.transaction_solidifier, &api.core->consensus.conf,
-                                             &api.core->node.transaction_requester, &api.core->node.tips);
-  iota_milestone_tracker_init(&core.consensus.milestone_tracker, &core.consensus.conf, &core.consensus.snapshot,
-                              &core.consensus.ledger_validator, &core.consensus.transaction_solidifier);
+                                             &api.core->node.transaction_requester,
+                                             &api.core->consensus.snapshots_provider, &api.core->node.tips);
+  iota_milestone_tracker_init(&core.consensus.milestone_tracker, &core.consensus.conf,
+                              &core.consensus.snapshots_provider, &core.consensus.ledger_validator,
+                              &core.consensus.transaction_solidifier);
 
   RUN_TEST(test_store_transactions_empty);
   RUN_TEST(test_store_transactions_invalid_tx);
