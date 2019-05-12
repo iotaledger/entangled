@@ -31,7 +31,7 @@ class IotaJsonAPI : virtual public IotaAPI {
       const std::vector<std::string>& addresses) override;
 
   std::unordered_multimap<std::string, Bundle> getConfirmedBundlesForAddresses(
-      const std::vector<std::string>& addresses) override;
+      const std::vector<std::string>& addresses, bool includeMessages) override;
 
   std::unordered_set<std::string> filterConfirmedTails(const std::vector<std::string>& tails,
                                                        const nonstd::optional<std::string>& reference) override;
@@ -43,7 +43,7 @@ class IotaJsonAPI : virtual public IotaAPI {
   std::unordered_set<std::string> filterConsistentTails(const std::vector<std::string>& tails) override;
 
   nonstd::optional<NodeInfo> getNodeInfo() override;
-  std::vector<Transaction> getTransactions(const std::vector<std::string>& hashes) override;
+  std::vector<Transaction> getTransactions(const std::vector<std::string>& hashes, bool includeMessages) override;
 
   std::vector<std::string> getTrytes(const std::vector<std::string>& hashes) override;
 
