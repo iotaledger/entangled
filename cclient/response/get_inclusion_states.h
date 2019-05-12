@@ -65,7 +65,7 @@ void get_inclusion_states_res_free(get_inclusion_states_res_t** res);
  * @param[in] index An index of the list.
  * @return Boolean. <b>True</b> means the transaction was confirmed, otherwise <b>false</b>.
  */
-bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* res, int index);
+bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* res, size_t index);
 
 /**
  * @brief Gets the size of the states list.

@@ -26,7 +26,7 @@ retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, i
   return RC_OK;
 }
 
-bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* in, int index) {
+bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* in, size_t index) {
   int* b = (int*)utarray_eltptr(in->states, index);
   if (b != NULL) {
     return (*b > 0) ? true : false;
