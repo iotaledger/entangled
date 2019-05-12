@@ -11,6 +11,7 @@
 #include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "consensus/snapshot/local_snapshots/conf.h"
 
 #define IOTA_SUPPLY 2779530283277761LL
 
@@ -82,6 +83,8 @@ typedef struct iota_consensus_conf_s {
   bool snapshot_signature_skip_validation;
   // Epoch time of the last snapshot
   uint64_t snapshot_timestamp_sec;
+  // local snapshots configuration
+  iota_consensus_local_snapshots_conf_t local_snapshots;
 } iota_consensus_conf_t;
 
 /**

@@ -48,8 +48,8 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
     flex_trit_t tip[FLEX_TRIT_SIZE_243];
 
     log_debug(logger_id, "Responding to random tip request\n");
-    if (rand_handle_probability() < responder->node->conf.p_reply_random_tip &&
-        !requester_is_empty(&responder->node->transaction_requester)) {
+    if (!requester_is_empty(&responder->node->transaction_requester) ||
+        rand_handle_probability() < responder->node->conf.p_reply_random_tip) {
       neighbor->nbr_random_tx_reqs++;
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
@@ -115,6 +115,7 @@ static retcode_t respond_to_request(responder_t const *const responder, tangle_t
     // If a transaction was requested but not found, requests it
     if (!flex_trits_are_null(hash, FLEX_TRIT_SIZE_243) &&
         rand_handle_probability() < responder->node->conf.p_propagate_request) {
+      // TODO - check that the tx is not a solid entry point before requesting
       if ((ret = request_transaction(&responder->node->transaction_requester, tangle, hash, false)) != RC_OK) {
         log_warning(logger_id, "Requesting transaction failed\n");
         return ret;

@@ -21,8 +21,25 @@ cc_library(
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
         "//consensus/snapshot",
+        "//consensus/snapshot:snapshots_provider",
         "//consensus/transaction_solidifier",
         "//utils:macros",
         "//utils:time",
+    ],
+)
+
+cc_library(
+    name = "milestone_service",
+    srcs = [
+        "milestone_service.c",
+    ],
+    hdrs = ["milestone_service.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//common/model:milestone",
+        "//consensus:conf",
+        "//consensus/snapshot",
+        "//consensus/tangle",
     ],
 )

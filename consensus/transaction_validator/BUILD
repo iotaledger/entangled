@@ -7,6 +7,8 @@ cc_library(
         "//common:errors",
         "//common/model:transaction",
         "//consensus:conf",
+        "//consensus/snapshot:snapshots_provider",
+        "//gossip/components:transaction_requester_shared",
         "//utils:logger_helper",
         "//utils:time",
     ],

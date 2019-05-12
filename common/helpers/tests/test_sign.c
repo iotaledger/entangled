@@ -5,53 +5,44 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <cstdint>
-#include <iostream>
-#include <memory>
+#include <stdlib.h>
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include <unity/unity.h>
 
 #include "common/helpers/sign.h"
 
-namespace {
-
-TEST(KerlTest, testAddressGeneration) {
-  using namespace testing;
-
-  const std::string SEED =
+static void test_address_generation(void) {
+  tryte_t const * const  SEED = (tryte_t*)
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQ"
       "RSTUVWXYZ9";
-
-  const std::string EX_ADD_0_1 =
+  tryte_t const * const  EX_ADD_0_1 = (tryte_t*)
       "CFOYUCXLHLSUBAEYOTAWUNRPJFA9TSJNLBFLMZQASPTVCMTFBOQQRGGQ9MRZCJWYGBORJZQW"
       "VSBLVKBVW";
-  const std::string EX_ADD_2_2 =
+  tryte_t const * const  EX_ADD_2_2 = (tryte_t*)
       "TZZUOMKXUUIIAJEQJJRIJQKWQVYK9YPFNWWUUHDQWVVWIBWHC9J9FJJEFZKOZZAIMUDDGHOI"
       "WTIWCOHGD";
-  const std::string EX_ADD_2_3 =
+  tryte_t const * const  EX_ADD_2_3 = (tryte_t*)
       "MLAUELWJHZ9QBPCIYLOXAWCVSZTK9XUEIWQSRLFDWEORDOLVOMOF9RUMFXSAMYWCGXDAVXZM"
       "RWQOJH9RY";
 
-  char* out_1 = iota_sign_address_gen_trytes(SEED.c_str(), 0, 1);
-  char* out_2 = iota_sign_address_gen_trytes(SEED.c_str(), 2, 2);
-  char* out_3 = iota_sign_address_gen_trytes(SEED.c_str(), 2, 3);
+  char* out_1 = iota_sign_address_gen_trytes((char*)SEED, 0, 1);
+  char* out_2 = iota_sign_address_gen_trytes((char*)SEED, 2, 2);
+  char* out_3 = iota_sign_address_gen_trytes((char*)SEED, 2, 3);
 
-  EXPECT_EQ(out_1, EX_ADD_0_1);
-  EXPECT_EQ(out_2, EX_ADD_2_2);
-  EXPECT_EQ(out_3, EX_ADD_2_3);
+  TEST_ASSERT_EQUAL_MEMORY(out_1, EX_ADD_0_1, HASH_LENGTH_TRYTE);
+  TEST_ASSERT_EQUAL_MEMORY(out_2, EX_ADD_2_2, HASH_LENGTH_TRYTE);
+  TEST_ASSERT_EQUAL_MEMORY(out_3, EX_ADD_2_3, HASH_LENGTH_TRYTE);
 
   free(out_1);
   free(out_2);
   free(out_3);
 }
 
-TEST(KerlTest, testSignature) {
-  const std::string SEED =
+static void test_signature(void) {
+  tryte_t const * const SEED = (tryte_t*)
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQ"
       "RSTUVWXYZ9";
-
-  const std::string EX =
+  tryte_t const * const EX = (tryte_t*)
       "IRRWWESEWUSGFCQZQUETVGNLONDOHXJRQPECGNOI9FSDSVDHH9EXGXHLW9TXQSFRZK9TKFMW"
       "SLOGAD9OWUCQCZTCRHQXINFJHVGPVWYWFKIGHUAYFWNJXGZZYISMFTVQKDLUQWHEVUWYCIHE"
       "VW9QKRJSYDCBTFTOL9HTNPRBPGTSQACDUGZSXRJWSKFJUXCH9TEXJUUDOI9EDDFAQ9QMDNPJ"
@@ -115,16 +106,14 @@ TEST(KerlTest, testSignature) {
       "GMV99T9HTXML9EUZYADINHCSQISPTQXKTIHAWYCGYFTRFT99IHJCURQUYMVYKXSBYUALS9GK"
       "Q9LOWROQSZANOVISNYYZQK9KBKA";
 
-  char* out_1 = iota_sign_signature_gen_trytes(SEED.c_str(), 2, 2, SEED.c_str());
+  char* out_1 = iota_sign_signature_gen_trytes((char*)SEED, 2, 2, (char*)SEED);
 
-  EXPECT_EQ(out_1, EX);
+  TEST_ASSERT_EQUAL_MEMORY(out_1, EX, (ISS_KEY_LENGTH * 2) / 3);
 
   free(out_1);
 }
 
-TEST(KerlTest, testFlexAddressGeneration) {
-  using namespace testing;
-
+static void test_flex_address_generation(void) {
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   const flex_trit_t SEED[] = {
       1, 0, 0,  -1, 1, 0,  0, 1, 0,  1, 1, 0,  -1, -1, 1,  0, -1, 1,  1, -1, 1,  -1, 0, 1,  0, 0, 1,
@@ -223,16 +212,16 @@ TEST(KerlTest, testFlexAddressGeneration) {
   flex_trit_t* out_2 = iota_sign_address_gen_flex_trits(SEED, 2, 2);
   flex_trit_t* out_3 = iota_sign_address_gen_flex_trits(SEED, 2, 3);
 
-  EXPECT_TRUE(memcmp(out_1, EX_ADD_0_1, FLEX_TRIT_SIZE_243) == 0);
-  EXPECT_TRUE(memcmp(out_2, EX_ADD_2_2, FLEX_TRIT_SIZE_243) == 0);
-  EXPECT_TRUE(memcmp(out_3, EX_ADD_2_3, FLEX_TRIT_SIZE_243) == 0);
+  TEST_ASSERT_EQUAL_MEMORY(out_1, EX_ADD_0_1, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(out_2, EX_ADD_2_2, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(out_3, EX_ADD_2_3, FLEX_TRIT_SIZE_243);
 
   free(out_1);
   free(out_2);
   free(out_3);
 }
 
-TEST(KerlTest, testFlexSignature) {
+static void test_flex_signature(void) {
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   const flex_trit_t SEED[] = {
       1, 0, 0,  -1, 1, 0,  0, 1, 0,  1, 1, 0,  -1, -1, 1,  0, -1, 1,  1, -1, 1,  -1, 0, 1,  0, 0, 1,
@@ -1085,8 +1074,18 @@ TEST(KerlTest, testFlexSignature) {
 #endif
   flex_trit_t* out_1 = iota_sign_signature_gen_flex_trits(SEED, 2, 2, SEED);
 
-  EXPECT_TRUE(memcmp(out_1, EX, NUM_FLEX_TRITS_FOR_TRITS(ISS_KEY_LENGTH * 2)) == 0);
+  TEST_ASSERT_EQUAL_MEMORY(out_1, EX, NUM_FLEX_TRITS_FOR_TRITS(ISS_KEY_LENGTH * 2));
 
   free(out_1);
 }
-}  // namespace
+
+int main(void) {
+  UNITY_BEGIN();
+
+  RUN_TEST(test_address_generation);
+  RUN_TEST(test_signature);
+  RUN_TEST(test_flex_address_generation);
+  RUN_TEST(test_flex_signature);
+
+  return UNITY_END();
+}

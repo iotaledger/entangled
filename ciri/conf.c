@@ -316,6 +316,22 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
       consensus_conf->snapshot_timestamp_sec = atoi(value);
       break;
+    case CONF_LOCAL_SNAPSHOTS_ENABLED:
+      ret = get_true_false(value, &consensus_conf->local_snapshots.local_snapshots_is_enabled);
+      break;
+    case CONF_LOCAL_SNAPSHOTS_PRUNNING_ENABLED:
+      ret = get_true_false(value, &consensus_conf->local_snapshots.prunning_is_enabled);
+      break;
+    case CONF_LOCAL_SNAPSHOTS_TRANSACTIONS_GROWTH_THRESHOLD:
+      consensus_conf->local_snapshots.transactions_growth_threshold = atoi(value);
+      break;
+    case CONF_LOCAL_SNAPSHOTS_MIN_DEPTH:
+      consensus_conf->local_snapshots.min_depth = atoi(value);
+      break;
+    case CONF_LOCAL_SNAPSHOTS_PATH_BASE:
+      strncpy(consensus_conf->local_snapshots.local_snapshots_path_base, value,
+              sizeof(consensus_conf->local_snapshots.local_snapshots_path_base));
+      break;
 
     default:
       iota_usage();
@@ -373,18 +389,22 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
     return RC_NULL_PARAM;
   }
 
-  if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
-    return RC_OK;
+  if (!yaml_parser_initialize(&parser)) {
+    ret = RC_CIRI_CONF_PARSER_ERROR;
+    goto done;
   }
 
-  if (!yaml_parser_initialize(&parser)) {
-    return RC_CIRI_CONF_PARSER_ERROR;
+  if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
+    ret = RC_OK;
+    goto done;
   }
+
   yaml_parser_set_input_file(&parser, file);
 
   do {
     if (!yaml_parser_scan(&parser, &token)) {
-      return RC_CIRI_CONF_PARSER_ERROR;
+      ret = RC_CIRI_CONF_PARSER_ERROR;
+      goto done;
     }
     switch (token.type) {
       case YAML_KEY_TOKEN:
@@ -419,6 +439,7 @@ done:
   yaml_token_delete(&token);
   yaml_parser_delete(&parser);
   fclose(file);
+
   return ret;
 }
 
