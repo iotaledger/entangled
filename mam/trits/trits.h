@@ -104,8 +104,6 @@ void trits_put18(trits_t x, trint18_t t);
 
 char trits_get_char(trits_t x);
 bool trits_put_char(trits_t x, char c);
-byte trits_get_byte(trits_t x);
-bool trits_put_byte(trits_t x, byte b);
 
 /*! \brief Check whether `x` and `y` point to the same memory location.
 \note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
@@ -163,21 +161,8 @@ size_t trits_copy_min(trits_t x, trits_t y);
 /*! \brief Pad trits: `y := c0 || 0^{|y|-1}`. */
 void trits_padc0(trit_t c0, trits_t y);
 
-/*! \brief Copy and pad trits: `y := x || c0 || 0^{|y|-|x|-1}`. */
-void trits_copy_padc0(trit_t c0, trits_t x, trits_t y);
-
 /*! \brief Pad non-empty trits: `y := c0 || 0^{|y|-1}` if `|y|>0`. */
 void trits_padc(trit_t c0, trits_t y);
-
-/*! \brief Copy and pad non-empty trits: `y := x || c0 || 0^{|y|-|x|-1}` if `|y|
- * > |x|` else `y := x`. */
-void trits_copy_padc(trit_t c0, trits_t x, trits_t y);
-
-/*! \brief Add trits: `y` := `x` + `s`. */
-void trits_add(trits_t x, trits_t s, trits_t y);
-
-/*! \brief Sub trits: `x` := `y` - `s`. */
-void trits_sub(trits_t y, trits_t s, trits_t x);
 
 /*! \brief Copy and add trits: `y` := `x` + `s`, `s` := `x`. */
 void trits_copy_add(trits_t x, trits_t s, trits_t y);
@@ -230,11 +215,6 @@ trits_t trits_alloc(size_t n);
 
 /*! \brief Free trits `x`. */
 void trits_free(trits_t x);
-
-/*! \brief Print string rep of `x` into stdout. */
-void trits_print(trits_t x);
-
-void trits_print2(char const *pfx, trits_t x, char const *sfx);
 
 #ifdef __cplusplus
 }

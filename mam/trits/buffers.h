@@ -75,16 +75,6 @@ size_t buffers_size(buffers_t buffers);
  */
 size_t buffers_copy_to(buffers_t *const buffers, trits_t trits);
 
-/**
- * Copy buffers `*buffers` from a source `trits`
- *
- * @param
- * @param
- *
- * @return return the number of trits copied
- */
-size_t buffers_copy_from(buffers_t *const buffers, trits_t trits);
-
 #ifdef __cplusplus
 }
 #endif
