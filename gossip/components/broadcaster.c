@@ -100,7 +100,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   if (broadcaster == NULL) {
     return RC_NULL_PARAM;
   } else if (broadcaster->running) {
-    return RC_BROADCASTER_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   broadcaster->node = NULL;
@@ -139,12 +139,12 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, flex_trit_t cons
 
   if (ret != RC_OK) {
     log_warning(logger_id, "Pushing transaction flex trits to broadcaster queue failed\n");
-    return RC_BROADCASTER_FAILED_PUSH_QUEUE;
-  } else {
-    cond_handle_signal(&broadcaster->cond);
+    return ret;
   }
 
-  return RC_OK;
+  cond_handle_signal(&broadcaster->cond);
+
+  return ret;
 }
 
 size_t broadcaster_size(broadcaster_t *const broadcaster) {

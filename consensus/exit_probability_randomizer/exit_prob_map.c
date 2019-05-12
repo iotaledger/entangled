@@ -130,7 +130,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(ep_randomizer_t const *co
     return ret;
   } else if (!ep_is_valid) {
     log_error(logger_id, "Invalid entry point\n");
-    return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
+    return RC_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
   if ((ret = iota_consensus_exit_prob_remove_invalid_tip_candidates(tangle, cw_result, ep_validator)) != RC_OK) {

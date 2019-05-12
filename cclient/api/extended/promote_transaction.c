@@ -38,7 +38,7 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
   consistency_req = check_consistency_req_new();
   consistency_res = check_consistency_res_new();
   if (!consistency_req || !consistency_res) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "creating check_consistency failed: %s\n", error_2_string(ret_code));
     goto done;
   }
@@ -67,7 +67,7 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
     gtta_req = get_transactions_to_approve_req_new();
     gtta_res = get_transactions_to_approve_res_new();
     if (!gtta_req || !gtta_res) {
-      ret_code = RC_CCLIENT_OOM;
+      ret_code = RC_OOM;
       log_error(client_extended_logger_id, "creating get_transactions_to_approve failed: %s\n",
                 error_2_string(ret_code));
       goto done;
@@ -81,7 +81,7 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
       att_req = attach_to_tangle_req_new();
       att_res = attach_to_tangle_res_new();
       if (!att_req || !att_res) {
-        ret_code = RC_CCLIENT_OOM;
+        ret_code = RC_OOM;
         log_error(client_extended_logger_id, "creating get_transactions_to_approve failed: %s\n",
                   error_2_string(ret_code));
         goto done;

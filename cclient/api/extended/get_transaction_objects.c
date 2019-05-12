@@ -19,7 +19,7 @@ retcode_t iota_client_get_transaction_objects(iota_client_service_t const* const
   get_trytes_res_t* out_trytes = get_trytes_res_new();
 
   if (!out_trytes) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "%s: create get trytes response failed: %s\n", __func__,
               error_2_string(ret_code));
     goto done;

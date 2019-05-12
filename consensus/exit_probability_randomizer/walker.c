@@ -135,7 +135,7 @@ retcode_t iota_consensus_random_walker_randomize(ep_randomizer_t const *const ex
     return ret;
   } else if (!ep_is_valid) {
     log_error(logger_id, "Invalid entry point\n");
-    return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
+    return RC_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
   do {

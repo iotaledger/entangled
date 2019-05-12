@@ -44,7 +44,7 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, fle
 
     hash_array_free(trytes);
   } else {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "%s new hash array failed: %s\n", __func__, error_2_string(ret_code));
   }
   return ret_code;

@@ -39,7 +39,7 @@ retcode_t char_buffer_allocate(char_buffer_t* in, const size_t n) {
   in->data = (char*)malloc(sizeof(char) * (n + 1));
   if (in->data == NULL) {
     log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__, STR_CCLIENT_OOM);
-    return RC_CCLIENT_OOM;
+    return RC_OOM;
   }
   in->length = n;
   *(in->data + n) = '\0';
@@ -52,7 +52,7 @@ retcode_t char_buffer_set(char_buffer_t* in, char const* const str) {
   in->data = (char*)realloc(in->data, sizeof(char) * (size + 1));
   if (in->data == NULL) {
     log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__, STR_CCLIENT_OOM);
-    return RC_CCLIENT_OOM;
+    return RC_OOM;
   }
   in->length = size;
   strcpy(in->data, str);

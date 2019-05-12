@@ -24,7 +24,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
   iota_transaction_t tx;
 
   if (!tx_approve_req || !tx_approve_res) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "creating get transaction to approve request or response failed: %s\n",
               error_2_string(ret_code));
     goto done;
@@ -44,7 +44,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
   attach_req = attach_to_tangle_req_new();
   attach_res = attach_to_tangle_res_new();
   if (!attach_req || !attach_res) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "creating attach to tangle request or response failed: %s\n",
               error_2_string(ret_code));
     goto done;
