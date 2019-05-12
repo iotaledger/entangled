@@ -103,6 +103,13 @@ void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl, flex
   flex_trits_from_trits(out, NUM_TRITS_HASH, bundle_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
 }
 
+iota_transaction_t *bundle_at(bundle_transactions_t *const bundle, size_t index) {
+  if (index < utarray_len(bundle)) {
+    return (iota_transaction_t *)(utarray_eltptr(bundle, index));
+  }
+  return NULL;
+}
+
 void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
   iota_transaction_t *curr_tx = NULL;
   bool valid_bundle = false;

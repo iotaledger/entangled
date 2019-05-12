@@ -15,6 +15,7 @@
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "consensus/conf.h"
+#include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/components/transaction_requester.h"
 #include "gossip/tips_cache.h"
@@ -31,6 +32,7 @@ extern "C" {
 typedef struct transaction_solidifier_s {
   iota_consensus_conf_t *conf;
   transaction_requester_t *transaction_requester;
+  snapshots_provider_t *snapshots_provider;
   thread_handle_t thread;
   bool running;
   lock_handle_t lock;
@@ -42,6 +44,7 @@ typedef struct transaction_solidifier_s {
 retcode_t iota_consensus_transaction_solidifier_init(transaction_solidifier_t *const ts,
                                                      iota_consensus_conf_t *const conf,
                                                      transaction_requester_t *const transaction_requester,
+                                                     snapshots_provider_t const *const snapshots_provider,
                                                      tips_cache_t *const tips);
 
 retcode_t iota_consensus_transaction_solidifier_start(transaction_solidifier_t *const ts);

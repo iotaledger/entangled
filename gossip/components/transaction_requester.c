@@ -123,6 +123,24 @@ retcode_t requester_clear_request(transaction_requester_t *const transaction_req
   return RC_OK;
 }
 
+retcode_t requester_is_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
+                                 bool const is_milestone, bool *const is_requested) {
+  if (transaction_requester == NULL || hash == NULL || is_requested == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  rw_lock_handle_rdlock(&transaction_requester->lock);
+  if (is_milestone) {
+    *is_requested = hash243_set_contains(&transaction_requester->milestones, hash);
+  } else {
+    *is_requested = hash243_set_contains(&transaction_requester->transactions, hash) ||
+                    hash243_set_contains(&transaction_requester->milestones, hash);
+  }
+  rw_lock_handle_unlock(&transaction_requester->lock);
+
+  return RC_OK;
+}
+
 retcode_t request_transaction(transaction_requester_t *const transaction_requester, tangle_t *const tangle,
                               flex_trit_t const *const hash, bool const is_milestone) {
   retcode_t ret = RC_OK;

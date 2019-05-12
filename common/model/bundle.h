@@ -39,6 +39,7 @@ typedef UT_array bundle_hashes_t;
 void bundle_transactions_new(bundle_transactions_t **const bundle);
 void bundle_transactions_free(bundle_transactions_t **const bundle);
 void bundle_transactions_add(bundle_transactions_t *const bundle, iota_transaction_t const *const transaction);
+iota_transaction_t *bundle_at(bundle_transactions_t *const bundle, size_t index);
 
 static inline size_t bundle_transactions_size(bundle_transactions_t const *const bundle) {
   if (bundle == NULL) {
