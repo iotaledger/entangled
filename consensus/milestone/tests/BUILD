@@ -12,7 +12,8 @@ cc_test(
     data = [":db_file"],
     visibility = ["//visibility:public"],
     deps = [
-        "//consensus/milestone_tracker",
+        "//consensus/milestone:milestone_tracker",
+        "//consensus/snapshot:snapshots_provider",
         "//consensus/test_utils",
         "@unity",
     ],

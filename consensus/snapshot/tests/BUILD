@@ -23,3 +23,32 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_state_delta",
+    srcs = ["test_state_delta.c"],
+    data = [
+        ":snapshot_test_files",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/model:transaction",
+        "//consensus/snapshot",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_snapshot_metadata",
+    srcs = ["test_snapshot_metadata.c"],
+    data = [
+        ":snapshot_test_files",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/model:transaction",
+        "//consensus/snapshot:snapshot_metadata",
+        "//utils:time",
+        "@unity",
+    ],
+)

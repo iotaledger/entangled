@@ -94,6 +94,19 @@ bool requester_is_full(transaction_requester_t *const transaction_requester);
 retcode_t requester_clear_request(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash);
 
 /**
+ * Checks if a transaction was requested
+ *
+ * @param transaction_requester The transaction requester
+ * @param hash The transaction to check for request
+ * @param is_milestone Flag that indicates if the hash was requested by a milestone request
+ * @param is_requested Will be set to true if requested, false otherwise
+ *
+ * @return a status code
+ */
+retcode_t requester_is_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
+                                 bool const is_milestone, bool *const is_requested);
+
+/**
  * Adds a transaction to be requested by a transaction requester
  *
  * @param transaction_requester The transaction requester

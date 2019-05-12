@@ -1,5 +1,6 @@
 cc_test(
     name = "test_transaction_validator",
+    timeout = "moderate",
     srcs = [
         "test_transaction_validator.c",
     ],
@@ -7,6 +8,7 @@ cc_test(
     deps = [
         "//consensus/test_utils",
         "//consensus/transaction_validator",
+        "//gossip:node",
         "@unity",
     ],
 )

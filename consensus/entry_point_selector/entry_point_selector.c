@@ -9,7 +9,7 @@
 
 #include "common/model/milestone.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
@@ -30,7 +30,7 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(entry_point_select
   uint64_t milestone_index = MAX((int64_t)eps->mt->latest_solid_subtangle_milestone_index - depth - 1, 0);
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  if ((ret = iota_tangle_milestone_load_next(tangle, milestone_index, &pack))) {
+  if ((ret = iota_tangle_milestone_load_by_index(tangle, milestone_index + 1, &pack))) {
     log_error(logger_id, "Finding closest next milestone failed with error %" PRIu64 "\n", ret);
     return ret;
   }

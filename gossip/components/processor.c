@@ -9,7 +9,7 @@
 
 #include "common/crypto/curl-p/ptrit.h"
 #include "common/trinary/trit_ptrit.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/milestone/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "gossip/components/processor.h"
 #include "gossip/neighbor.h"

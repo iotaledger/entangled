@@ -87,6 +87,10 @@ hash_map_generate(
 )
 
 hash_map_generate(
+    mapped_type = "uint64_t",
+)
+
+hash_map_generate(
     mapped_type = "double",
 )
 

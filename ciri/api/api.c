@@ -23,8 +23,8 @@ static logger_id_t logger_id;
  */
 
 static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **const error) {
-  bool invalid = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index ==
-                 api->core->consensus.milestone_tracker.milestone_start_index;
+  bool invalid = api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.metadata.index ==
+                 api->core->consensus.milestone_tracker.snapshots_provider->inital_snapshot.metadata.index;
 
   if (invalid) {
     *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
@@ -178,7 +178,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
     bundle_transactions_free(&bundle);
   }
 
-  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+  iota_snapshot_read_lock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
            &api->core->consensus.conf, &api->core->consensus.milestone_tracker, &api->core->consensus.ledger_validator,
@@ -197,7 +197,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
 
   iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator);
 
-  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+  iota_snapshot_unlock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
 
 done:
   bundle_transactions_free(&bundle);
@@ -259,9 +259,10 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
     return RC_API_GET_BALANCES_INVALID_THRESHOLD;
   }
 
-  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+  iota_snapshot_read_lock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
 
-  res->milestone_index = iota_snapshot_get_index(api->core->consensus.milestone_tracker.latest_snapshot);
+  res->milestone_index =
+      iota_snapshot_get_index(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
 
   if (req->tips == NULL) {
     if ((ret = hash243_queue_push(&tips, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone)) !=
@@ -278,7 +279,8 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
 
     CDL_FOREACH(req->addresses, address) {
       balance = 0;
-      if ((ret = iota_snapshot_get_balance(&api->core->consensus.snapshot, address->hash, &balance)) != RC_OK &&
+      if ((ret = iota_snapshot_get_balance(&api->core->consensus.snapshots_provider.latest_snapshot, address->hash,
+                                           &balance)) != RC_OK &&
           ret != RC_SNAPSHOT_BALANCE_NOT_FOUND) {
         goto done;
       }
@@ -338,7 +340,7 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
   }
 
 done:
-  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+  iota_snapshot_unlock(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
   if (tips != req->tips) {
     hash243_queue_free(&tips);
   }

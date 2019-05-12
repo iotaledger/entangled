@@ -12,7 +12,7 @@ cc_library(
         "//consensus/exit_probability_randomizer",
         "//consensus/exit_probability_validator",
         "//consensus/ledger_validator",
-        "//consensus/milestone_tracker",
+        "//consensus/milestone:milestone_tracker",
         "//consensus/tangle",
         "//utils:logger_helper",
     ],
