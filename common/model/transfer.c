@@ -367,6 +367,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], uint32_t len
     memcpy(transfer_iterator->bundle_hash, transfer_ctx.bundle, FLEX_TRIT_SIZE_243);
   } else {
     log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
+    free(transfer_iterator);
     return NULL;
   }
   transfer_iterator->iota_signature_gen = iota_sign_signature_gen_flex_trits;
