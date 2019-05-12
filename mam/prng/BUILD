@@ -1,9 +1,8 @@
-package(default_visibility = ["//visibility:public"])
-
 cc_library(
     name = "prng",
     srcs = ["prng.c"],
     hdrs = ["prng.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
         "//mam:defs",
