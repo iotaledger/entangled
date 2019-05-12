@@ -107,7 +107,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
     ret_code = iota_client_get_balances(serv, balances_req, balances_res);
     if (!ret_code) {
       // count all balances
-      for (int i = 0; i < get_balances_res_balances_num(balances_res); i++) {
+      for (size_t i = 0; i < get_balances_res_balances_num(balances_res); i++) {
         out_account->balance += get_balances_res_balances_at(balances_res, i);
       }
     }
