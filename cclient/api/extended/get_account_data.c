@@ -117,7 +117,9 @@ done:
   free(tmp_addr);
   find_transactions_req_free(&find_tx_req);
   find_transactions_res_free(&find_tx_res);
-  balances_req->addresses = NULL;  // no need to be freed
+  if (balances_req) {
+    balances_req->addresses = NULL;  // no need to be freed
+  }
   get_balances_req_free(&balances_req);
   get_balances_res_free(&balances_res);
   return ret_code;
