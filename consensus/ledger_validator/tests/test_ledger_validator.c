@@ -103,8 +103,8 @@ static void destroy_test_structs() {
   iota_snapshots_service_destroy(&snapshots_service);
 }
 
-static void test_util_create_bundle(flex_trit_t *const curr_branch_trunk_hash, iota_milestone_t *const milestone,
-                                    size_t num_milestones, uint64_t *sk_index) {
+static void test_util_create_bundles(flex_trit_t *const curr_branch_trunk_hash, iota_milestone_t *const milestone,
+                                     size_t num_milestones, uint64_t *sk_index) {
   bundle_transactions_t *bundle = NULL;
   iota_transaction_t *tx_iter;
 
@@ -137,7 +137,7 @@ static void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *
 static void test_replay_several_milestones() {
   iota_milestone_t milestone;
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
-  size_t num_milestones = 10;
+  size_t num_milestones = 4;
   uint64_t sk_index = 0;
 
   flex_trit_t milestone_hash[FLEX_TRIT_SIZE_243];
@@ -164,7 +164,7 @@ static void test_replay_several_milestones() {
   mt.running = true;
 
   for (size_t i = 0; i < TEST_NUM_SNAPSHOTS; ++i) {
-    test_util_create_bundle(curr_hash, &milestone, num_milestones, &sk_index);
+    test_util_create_bundles(curr_hash, &milestone, num_milestones, &sk_index);
 
     mt.latest_milestone_index = milestone.index;
     TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_subtangle_milestone(&mt, &tangle));
