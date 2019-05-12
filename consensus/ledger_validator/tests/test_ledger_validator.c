@@ -79,7 +79,7 @@ static void init_test_structs() {
   conf.last_milestone = 0;
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;
-  conf.local_snapshots.min_depth = 2;
+  conf.local_snapshots.min_depth = 1;
   conf.snapshot_signature_index = 0;
   strcpy(conf.local_snapshots.local_snapshots_path_base, debug_mode ? "local_snapshot" : local_snapshot_path_base);
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
@@ -137,7 +137,7 @@ static void test_snapshots_equal(snapshot_t const *const lhs, snapshot_t const *
 static void test_replay_several_milestones() {
   iota_milestone_t milestone;
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
-  size_t num_milestones = 4;
+  size_t num_milestones = 3;
   uint64_t sk_index = 0;
 
   flex_trit_t milestone_hash[FLEX_TRIT_SIZE_243];
