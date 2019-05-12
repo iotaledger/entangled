@@ -61,7 +61,7 @@ retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* res, char const* c
   return RC_OK;
 }
 
-neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, int index) {
+neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, size_t index) {
   if (!res) {
     return NULL;
   }

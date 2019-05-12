@@ -102,7 +102,7 @@ static inline size_t get_neighbors_res_num(get_neighbors_res_t* res) { return ut
  * @param[in] index An index of the neighbor list.
  * @return A pointer to a neighbor object.
  */
-neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, int index);
+neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, size_t index);
 
 /**
  * @brief Adds a neighbor to the response.
