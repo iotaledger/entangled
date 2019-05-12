@@ -63,7 +63,8 @@ static inline void get_transactions_to_approve_res_set_branch(get_transactions_t
  * @param[in] res The response object.
  * @return A pointer to the branch transaction hash.
  */
-static inline flex_trit_t* const get_transactions_to_approve_res_branch(get_transactions_to_approve_res_t* const res) {
+static inline flex_trit_t const* get_transactions_to_approve_res_branch(
+    get_transactions_to_approve_res_t const* const res) {
   return res->branch;
 }
 
@@ -84,7 +85,8 @@ static inline void get_transactions_to_approve_res_set_trunk(get_transactions_to
  * @param[in] res The response object.
  * @return A pointer to the trunk transaction hash.
  */
-static inline flex_trit_t* const get_transactions_to_approve_res_trunk(get_transactions_to_approve_res_t* const res) {
+static inline flex_trit_t const* get_transactions_to_approve_res_trunk(
+    get_transactions_to_approve_res_t const* const res) {
   return res->trunk;
 }
 
