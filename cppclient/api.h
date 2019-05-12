@@ -31,6 +31,7 @@ struct Transaction {
   int64_t lastIndex;
   std::string bundleHash;
   std::string trunk;
+  nonstd::optional<std::string> message;
 };
 
 struct NodeInfo {
@@ -64,7 +65,7 @@ class IotaAPI {
       const std::vector<std::string>& addresses) = 0;
 
   virtual std::unordered_multimap<std::string, Bundle> getConfirmedBundlesForAddresses(
-      const std::vector<std::string>& addresses) = 0;
+      const std::vector<std::string>& addresses, bool includeMessages) = 0;
 
   virtual std::unordered_set<std::string> filterConfirmedTails(const std::vector<std::string>& tails,
                                                                const nonstd::optional<std::string>& reference) = 0;
@@ -77,7 +78,7 @@ class IotaAPI {
 
   virtual nonstd::optional<NodeInfo> getNodeInfo() = 0;
 
-  virtual std::vector<Transaction> getTransactions(const std::vector<std::string>& hashes) = 0;
+  virtual std::vector<Transaction> getTransactions(const std::vector<std::string>& hashes, bool includeMessages) = 0;
 
   virtual std::vector<std::string> getTrytes(const std::vector<std::string>& hashes) = 0;
 
