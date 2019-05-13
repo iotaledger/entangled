@@ -19,7 +19,6 @@
 #include <stdlib.h>
 
 #include "utils/files.h"
-#include "utils/logger_helper.h"
 
 bool iota_utils_file_exist(char const *const file_path) {
   if (access(file_path, F_OK) == -1) {
@@ -95,28 +94,32 @@ retcode_t iota_utils_remove_file(const char *file_path) {
 
 retcode_t iota_utils_overwrite_file(char const *const file_path, char const *const content) {
   retcode_t ret = RC_OK;
-  FILE *file;
+  FILE *file = NULL;
   size_t write_count = 0;
   size_t content_size = strlen(content);
 
   if ((file = fopen(file_path, "w"))) {
     write_count = fwrite(content, sizeof(char), content_size, file);
     if (write_count < content_size) {
-      return RC_UTILS_FAILED_WRITE_FILE;
+      ret = RC_UTILS_FAILED_WRITE_FILE;
+      goto done;
     }
 
   } else {
-    return RC_UTILS_FAILED_TO_OPEN_FILE;
+    ret = RC_UTILS_FAILED_TO_OPEN_FILE;
   }
 
+done:
   if (file) {
     fclose(file);
   }
+
   return ret;
 }
 
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
-  FILE *fp;
+  retcode_t ret = RC_OK;
+  FILE *fp = NULL;
   long buffer_size;
   size_t offset = 0;
 
@@ -132,7 +135,8 @@ retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **c
       /* Get the size of the file. */
       buffer_size = ftell(fp);
       if (buffer_size == -1) {
-        return RC_UTILS_FAILED_READ_FILE;
+        ret = RC_UTILS_FAILED_READ_FILE;
+        goto done;
       }
 
       /* Allocate our buffer to that size. */
@@ -140,23 +144,30 @@ retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **c
 
       /* Go back to the start of the file. */
       if (fseek(fp, 0L, SEEK_SET) != 0) {
-        return RC_UTILS_FAILED_READ_FILE;
+        ret = RC_UTILS_FAILED_READ_FILE;
+        goto done;
       }
 
       /* Read the entire file into memory. */
       while (offset < buffer_size) {
         offset += fread(*(buffer + offset), sizeof(char), buffer_size, fp);
         if (ferror(fp) != 0) {
-          return RC_UTILS_FAILED_READ_FILE;
+          ret = RC_UTILS_FAILED_READ_FILE;
+          goto done;
         }
       }
 
       (*buffer)[offset++] = '\0'; /* Just to be safe. */
     }
-    fclose(fp);
+
   } else {
-    return RC_UTILS_FAILED_TO_OPEN_FILE;
+    ret = RC_UTILS_FAILED_TO_OPEN_FILE;
   }
 
-  return RC_OK;
+done:
+  if (fp) {
+    fclose(fp);
+  }
+
+  return ret;
 }

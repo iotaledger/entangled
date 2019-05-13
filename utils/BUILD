@@ -15,7 +15,6 @@ cc_library(
     srcs = ["files.c"],
     hdrs = ["files.h"],
     deps = [
-        ":logger_helper",
         "//common:errors",
     ],
 )
