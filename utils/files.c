@@ -19,7 +19,6 @@
 #include <stdlib.h>
 
 #include "utils/files.h"
-#include "utils/logger_helper.h"
 
 bool iota_utils_file_exist(char const *const file_path) {
   if (access(file_path, F_OK) == -1) {
