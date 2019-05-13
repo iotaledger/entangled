@@ -179,6 +179,7 @@ enum retcode_t {
   RC_CCLIENT_INVALID_TRANSFER = 0x11 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,  /**< Invalid transfer object */
   RC_CCLIENT_INVALID_TAIL_HASH = 0x12 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,    /**< Invalid tail hash */
   RC_CCLIENT_INVALID_BUNDLE = 0x13 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,       /**< Invalid bundle object */
+  RC_CCLIENT_CHECK_BALANCE = 0x14 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,        /**< Checking balance value failed */
 
   // Consensus Module
   RC_CONSENSUS_NOT_IMPLEMENTED = 0x01 | RC_MODULE_CONSENSUS | RC_SEVERITY_MAJOR,

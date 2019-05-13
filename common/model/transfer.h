@@ -12,131 +12,60 @@ extern "C" {
 #ifndef __COMMON_MODEL_TRANSFER_H_
 #define __COMMON_MODEL_TRANSFER_H_
 
-#include <stdlib.h>
-#include <string.h>
-#include "common/crypto/kerl/kerl.h"
-#include "common/helpers/sign.h"
+#include "common/errors.h"
 #include "common/model/transaction.h"
-#include "common/trinary/trit_long.h"
-#include "utils/logger_helper.h"
 
-typedef enum { DATA = 0, VALUE_OUT, VALUE_IN } transfer_type_e;
-
-/***********************************************************************************************************
- * Transfer Data data structure
- ***********************************************************************************************************/
-typedef struct _transfer_data {
-  const flex_trit_t *data;
-  uint32_t len;  // length of trits
-} transfer_data_t;
-
-/***********************************************************************************************************
- * Transfer Value Out data structure
- ***********************************************************************************************************/
-typedef struct _transfer_value_out {
-  const flex_trit_t *seed;
-  uint8_t security;
-  uint64_t seed_index;
-} transfer_value_out_t;
-
-/***********************************************************************************************************
- * Transfer Value In data structure
- ***********************************************************************************************************/
-typedef struct _transfer_value_in {
-  // can have up to 2187 trytes as data
-  uint32_t len;  // length of trits
-  const flex_trit_t *data;
-} transfer_value_in_t;
-
-/***********************************************************************************************************
- * Transfer data structure
- ***********************************************************************************************************/
-
-typedef struct _transfer {
-  transfer_type_e type;
-  const flex_trit_t *address;
-  const flex_trit_t *tag;
-  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
+/**
+ * @brief A transfer object
+ *
+ */
+typedef struct transfer_s {
   int64_t value;
   uint64_t timestamp;
-  void *meta;  // extend informations depended on transfer type.
+  tryte_t *message;
+  flex_trit_t address[FLEX_TRIT_SIZE_243];
+  flex_trit_t tag[FLEX_TRIT_SIZE_81];
 } transfer_t;
 
-// create a data transfer object.
-transfer_t *transfer_data_new(flex_trit_t const *const address, flex_trit_t const *const tag,
-                              flex_trit_t const *const data, uint32_t data_len, uint64_t timestamp);
+typedef UT_array signature_fragments_t;
 
-// create a value_out transfer object.
-transfer_t *transfer_value_out_new(transfer_value_out_t const *const output, flex_trit_t const *const tag,
-                                   flex_trit_t const *const address, int64_t value, uint64_t timestamp);
+static inline signature_fragments_t *signature_fragments_new() {
+  signature_fragments_t *fragments = NULL;
+  utarray_new(fragments, &ut_str_icd);
+  return fragments;
+}
 
-// create a value_int transfer object.
-transfer_t *transfer_value_in_new(flex_trit_t const *const address, flex_trit_t const *const tag, int64_t value,
-                                  flex_trit_t const *const data, uint32_t data_len, uint64_t timestamp);
+static inline void signature_fragments_add(signature_fragments_t *fragments, tryte_t const *msg_or_sign) {
+  utarray_push_back(fragments, &msg_or_sign);
+}
 
-// Get the number of transactions for this transfer
-uint32_t transfer_transactions_count(transfer_t *tf);
+static inline void signature_fragments_free(signature_fragments_t *fragments) { utarray_free(fragments); }
+static inline tryte_t **signature_fragments_at(signature_fragments_t *fragments, int index) {
+  return (tryte_t **)utarray_eltptr(fragments, index);
+}
 
-// Get transfer value
-int64_t transfer_value(transfer_t *tf);
-void transfer_free(transfer_t **transfer);
+#define SIGNATURE_FRAGMENTS_FOREACH(fragments, fg) \
+  for (fg = (tryte_t **)utarray_front(fragments); fg != NULL; fg = (tryte_t **)utarray_next(fragments, fg))
 
-/***********************************************************************************************************
- * Transfer Context data structure
- ***********************************************************************************************************/
-typedef struct _transfer_ctx {
-  uint32_t count;  // number of transactions
-  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
-} transfer_ctx_t;
+typedef UT_array transfer_array_t;
 
-// Creates and returns a new transfer context
-bool transfer_ctx_init(transfer_ctx_t *transfer_ctx, transfer_t *transfers[], uint32_t len);
+retcode_t transfer_message_set(transfer_t *tf, tryte_t const *const msg);
+static inline void transfer_message_free(transfer_t *tf) { free(tf->message); }
+static inline tryte_t *transfer_message_get(transfer_t *tf) { return tf->message; }
 
-// Calculates the bundle hash for a collection of transfers
-void transfer_ctx_hash(transfer_ctx_t *transfer_ctx, Kerl *kerl, transfer_t *transfers[], uint32_t tx_len);
+transfer_array_t *transfer_array_new();
+static inline void transfer_array_free(transfer_array_t *transfers) { utarray_free(transfers); }
+static inline size_t transfer_array_count(transfer_array_t *transfers) { return utarray_len(transfers); }
+static inline void transfer_array_add(transfer_array_t *tfs, transfer_t *tf) { utarray_push_back(tfs, tf); }
+static inline transfer_t *transfer_array_at(transfer_array_t *tfs, int index) {
+  return (transfer_t *)utarray_eltptr(tfs, index);
+}
 
-// Returns the resulting bundle hash
-// flex_trit_t *transfer_ctx_finalize(transfer_ctx_t *transfer_ctx);
-
-void absorb_essence(Kerl *const kerl, flex_trit_t const *address, int64_t value, flex_trit_t const *obsolete_tag,
-                    uint64_t timestamp, int64_t current_index, int64_t last_index, trit_t *const essence_trits);
-/***********************************************************************************************************
- * Transfer Iterator data structure
- ***********************************************************************************************************/
-typedef flex_trit_t *(*iota_signature_generator)(const flex_trit_t *seed, const size_t index, const size_t security,
-                                                 const flex_trit_t *bundleHash);
-
-typedef struct _transfer_iterator {
-  uint32_t transfers_count;
-  uint32_t transactions_count;
-  uint32_t current_transfer;
-  uint32_t current_transfer_transaction_index;
-  uint32_t current_transaction_index;
-  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  flex_trit_t *transaction_signature;
-  iota_transaction_t *transaction;
-  uint8_t dynamic_transaction;
-  iota_signature_generator iota_signature_gen;
-  transfer_t **transfers;
-} transfer_iterator_t;
-
-// Returns the next transaction
-iota_transaction_t *transfer_iterator_next(transfer_iterator_t *transfer_iterator);
-
-// Creates and returns a new transfer iterator
-// if `transaction` is NULL will be dynamically allocated a transaction object.
-transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[], uint32_t len, Kerl *kerl,
-                                           iota_transaction_t *transaction);
-
-// Free an existing transfer iterator
-void transfer_iterator_free(transfer_iterator_t **iter);
-
-bool validate_output(transfer_value_out_t const *const output);
-
-void transfer_logger_init();
-void transfer_logger_destroy();
+#define TRANSFER_NEW_FOREACH(tfs, tf) \
+  for (tf = (transfer_t *)utarray_front(tfs); tf != NULL; tf = (transfer_t *)utarray_next(tfs, tf))
 
 #endif  // __COMMON_MODEL_TRANSFER_H_
+
 #ifdef __cplusplus
 }
 #endif

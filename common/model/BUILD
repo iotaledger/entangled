@@ -9,6 +9,8 @@ cc_library(
         "//common:errors",
         "//common/crypto/iss:normalize",
         "//common/crypto/iss/v1:iss_kerl",
+        "//common/helpers:sign",
+        "//common/model:inputs",
         "//common/model:transfer",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
@@ -40,10 +42,10 @@ cc_library(
     srcs = ["transfer.c"],
     hdrs = ["transfer.h"],
     deps = [
-        "//common/crypto/kerl",
-        "//common/helpers:sign",
+        "//common:errors",
         "//common/model:transaction",
-        "//utils:logger_helper",
+        "//common/trinary:tryte_ascii",
+        "@com_github_uthash//:uthash",
     ],
 )
 
