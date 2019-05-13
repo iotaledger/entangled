@@ -21,7 +21,7 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv, flex
   find_tran_req = find_transactions_req_new();
   find_tran_res = find_transactions_res_new();
   if (!find_tran_req || !find_tran_res) {
-    ret_code = RC_CCLIENT_OOM;
+    ret_code = RC_OOM;
     log_error(client_extended_logger_id, "%s: create find transactions request or response failed: %s\n", __func__,
               error_2_string(ret_code));
     goto done;
@@ -72,7 +72,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
         tmp = NULL;
       } else {
         // gen address failed.
-        ret = RC_CCLIENT_OOM;
+        ret = RC_OOM;
         log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret));
         goto done;
       }
@@ -95,7 +95,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
         tmp = NULL;
       } else {
         // gen address failed.
-        ret = RC_CCLIENT_OOM;
+        ret = RC_OOM;
         log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret));
         goto done;
       }

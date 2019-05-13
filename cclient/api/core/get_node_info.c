@@ -15,7 +15,7 @@ retcode_t iota_client_get_node_info(const iota_client_service_t* const service, 
   log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
-    result = RC_CCLIENT_OOM;
+    result = RC_OOM;
     goto done;
   }
   result = service->serializer.vtable.get_node_info_serialize_request(req_buff);

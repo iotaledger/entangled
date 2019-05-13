@@ -18,12 +18,10 @@
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
   char scheme[MAX_SCHEME_LENGTH];
 
-  if (neighbor == NULL) {
+  if (neighbor == NULL || uri == NULL) {
     return RC_NULL_PARAM;
   }
-  if (uri == NULL) {
-    return RC_NEIGHBOR_NULL_URI;
-  }
+
   memset(neighbor, 0, sizeof(neighbor_t));
   if (uri_parse(uri, scheme, MAX_SCHEME_LENGTH, neighbor->endpoint.host, MAX_HOST_LENGTH, &neighbor->endpoint.port) ==
       false) {

@@ -25,7 +25,7 @@ retcode_t iota_consensus_ep_randomizer_init(ep_randomizer_t *const ep_randomizer
   } else if (impl == EP_RANDOMIZE_MAP_AND_SAMPLE) {
     iota_consensus_exit_prob_map_init(ep_randomizer);
   } else if (impl == EP_NO_IMPLEMENTATION) {
-    return RC_CONSENSUS_NOT_IMPLEMENTED;
+    return RC_EXIT_PROBABILITIES_NOT_IMPLEMENTED;
   }
   return RC_OK;
 }

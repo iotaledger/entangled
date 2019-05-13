@@ -85,7 +85,7 @@ retcode_t json_get_neighbors_deserialize_response(char const *const obj, get_nei
   char_buffer_t *addr = char_buffer_new();
   char_buffer_t *connection = char_buffer_new();
   if (!addr || !connection) {
-    return RC_CCLIENT_OOM;
+    return RC_OOM;
   }
 
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);

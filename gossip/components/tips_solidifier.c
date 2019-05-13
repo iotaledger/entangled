@@ -152,7 +152,7 @@ retcode_t tips_solidifier_destroy(tips_solidifier_t *const tips_solidifier) {
   if (tips_solidifier == NULL) {
     return RC_NULL_PARAM;
   } else if (tips_solidifier->running) {
-    return RC_BROADCASTER_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   tips_solidifier->conf = NULL;

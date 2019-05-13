@@ -148,7 +148,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   if ((ret = cw_rating_dfs_do_dfs_from_db(cw_calc, tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size,
                                           0)) != RC_OK) {
     log_error(logger_id, "Failed in DFS from DB, error code is: %" PRIu64 "\n", ret);
-    return RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB;
+    return RC_CW_FAILED_IN_DFS_FROM_DB;
   }
 
   // Insert first "ratings" entry
@@ -179,7 +179,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
       if ((ret = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash, &visited_txs_bitset, &sub_tangle_size)) !=
           RC_OK) {
         log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n", ret);
-        return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
+        return RC_CW_FAILED_IN_LIGHT_DFS;
       }
 
       if ((ret = hash_to_int64_t_map_add(&out->cw_ratings, curr_hash, sub_tangle_size))) {
