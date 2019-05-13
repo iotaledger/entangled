@@ -17,7 +17,7 @@ retcode_t transfer_message_set(transfer_t* tf, tryte_t const* const msg) {
     return RC_OOM;
   }
   memcpy(tf->message, msg, len);
-  tf->message[len] = '\0';
+  tf->message[len - 1] = '\0';
   return RC_OK;
 }
 
