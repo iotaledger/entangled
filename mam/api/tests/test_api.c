@@ -255,8 +255,7 @@ static void test_api_write_header(mam_api_t *const api, mam_psk_t const *const p
 }
 
 static void test_api_write_packet(mam_api_t *const api, bundle_transactions_t *const bundle, trit_t *const msg_id,
-                                  mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum, char const *payload1,
-                                  bool is_last_packet) {
+                                  mam_msg_checksum_t checksum, char const *payload1, bool is_last_packet) {
   tryte_t *payload_trytes = NULL;
 
   payload_trytes = (tryte_t *)malloc(2 * strlen(payload1) * sizeof(tryte_t));
@@ -268,8 +267,7 @@ static void test_api_write_packet(mam_api_t *const api, bundle_transactions_t *c
   free(payload_trytes);
 }
 
-static void test_api_read_msg(mam_api_t *const api, bundle_transactions_t *const bundle,
-                              mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru, char **payload2,
+static void test_api_read_msg(mam_api_t *const api, bundle_transactions_t *const bundle, char **payload2,
                               bool *const is_last_packet) {
   tryte_t *payload_trytes = NULL;
   size_t payload_size = 0;
@@ -331,10 +329,10 @@ static void test_api_generic() {
         /* write header and packet */
         test_api_write_header(&api, &pska, &pskb, &ntru->public_key, pubkey, keyload, ch_id, ep_id, ch1_id, ep1_id,
                               bundle, msg_id);
-        test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, PAYLOAD, true);
+        test_api_write_packet(&api, bundle, msg_id, checksum, PAYLOAD, true);
 
         /* read header and packet */
-        test_api_read_msg(&api, bundle, &pskb, ntru, &payload2, &is_last_packet);
+        test_api_read_msg(&api, bundle, &payload2, &is_last_packet);
         TEST_ASSERT(is_last_packet);
         TEST_ASSERT_EQUAL_STRING(PAYLOAD, payload2);
 

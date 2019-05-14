@@ -168,9 +168,8 @@ static retcode_t mam_api_bundle_write_header(mam_api_t *const api, tryte_t const
   return trit_t_to_mam_msg_write_context_t_map_add(&api->write_ctxs, msg_id, &ctx);
 }
 
-static retcode_t mam_api_bundle_read_packet_from_msg(mam_api_t *const api, mam_msg_read_context_t *ctx, trits_t msg,
-                                                     tryte_t **const payload, size_t *const payload_size,
-                                                     bool *const is_last_packet) {
+static retcode_t mam_api_bundle_read_packet_from_msg(mam_msg_read_context_t *ctx, trits_t msg, tryte_t **const payload,
+                                                     size_t *const payload_size, bool *const is_last_packet) {
   retcode_t ret = RC_OK;
   trits_t payload_trits = trits_null();
 
@@ -528,7 +527,7 @@ retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const 
       }
 
       trits_advance(&msg, NUM_TRITS_MESSAGE - msg.d % NUM_TRITS_MESSAGE);
-      ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(api, &ctx, msg, payload, payload_size, is_last_packet), ret);
+      ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(&ctx, msg, payload, payload_size, is_last_packet), ret);
     }
 
     return trit_t_to_mam_msg_read_context_t_map_add(&api->read_ctxs, tag, &ctx);
@@ -552,7 +551,7 @@ retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const 
       ctx->ord = -ctx->ord;
     }
 
-    ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(api, ctx, msg, payload, payload_size, is_last_packet), ret);
+    ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(ctx, msg, payload, payload_size, is_last_packet), ret);
     if (*is_last_packet) {
       if (!trit_t_to_mam_msg_read_context_t_map_remove(&api->read_ctxs, tag)) {
         return RC_MAM_RECV_CTX_NOT_FOUND;

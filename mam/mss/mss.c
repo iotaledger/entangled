@@ -451,6 +451,7 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
   MAM_ASSERT(trits_size(path) == MAM_MSS_APATH_SIZE(mss->height));
 
 #if defined(MAM_MSS_TRAVERSAL)
+  (void)skn;
   // current apath is already stored in `mss->ap`
   for (height = 0; height < mss->height; ++height)
 #else
