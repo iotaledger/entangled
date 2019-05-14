@@ -31,7 +31,7 @@ retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const servic
     }
 
     // PoW on bundle
-    if (iota_pow_bundle(bundle, req->trunk, req->branch, req->mwm) != RC_OK) {
+    if ((result = iota_pow_bundle(bundle, req->trunk, req->branch, req->mwm)) != RC_OK) {
       log_info(client_core_logger_id, "[%s:%d] PoW failed.\n", __func__, __LINE__);
       result = RC_CCLIENT_POW_FAILED;
       goto done;
