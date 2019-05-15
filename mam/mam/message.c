@@ -167,10 +167,10 @@ static size_t mam_msg_wrap_pubkey_chid_size() {
          + 0;
 }
 
-static void mam_msg_wrap_pubkey_chid(mam_spongos_t *s, trits_t *b) { /*  absorb null chid; */
+static void mam_msg_wrap_pubkey_chid() { /*  absorb null chid; */
 }
 
-static retcode_t mam_msg_unwrap_pubkey_chid(mam_spongos_t *s, trits_t *b) {
+static retcode_t mam_msg_unwrap_pubkey_chid() {
   /*  absorb null chid; */
   return RC_OK;
 }
@@ -382,10 +382,10 @@ static size_t mam_msg_wrap_checksum_none_size() {
          + 0;
 }
 
-static void mam_msg_wrap_checksum_none(mam_spongos_t *s, trits_t *b) { /*  absorb null none; */
+static void mam_msg_wrap_checksum_none() { /*  absorb null none; */
 }
 
-static retcode_t mam_msg_unwrap_checksum_none(mam_spongos_t *s, trits_t *b) {
+static retcode_t mam_msg_unwrap_checksum_none() {
   /*  absorb null none; */
   return RC_OK;
 }
@@ -514,7 +514,7 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t co
     } else { /*  absorb null chid = 0; */
       pubkey = (tryte_t)mam_msg_pubkey_chid;
       pb3_wrap_absorb_tryte(&ctx->spongos, msg, pubkey);
-      mam_msg_wrap_pubkey_chid(&ctx->spongos, msg);
+      mam_msg_wrap_pubkey_chid();
     }
   }
 
@@ -631,7 +631,7 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx, mam_msg_check
   pb3_wrap_absorb_tryte(&ctx->spongos, buffer, (tryte_t)checksum);
   if (mam_msg_checksum_none == checksum) {
     /*    absorb null none = 0; */
-    mam_msg_wrap_checksum_none(&ctx->spongos, buffer);
+    mam_msg_wrap_checksum_none();
   } else if (mam_msg_checksum_mac == checksum) {
     /*    MAC mac = 1; */
     mam_msg_wrap_checksum_mac(&ctx->spongos, buffer);
@@ -698,7 +698,7 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
         return RC_MAM_PK_IS_NOT_TRUSTED;
       }
     } else if (mam_msg_pubkey_chid == pubkey) { /*  absorb null chid = 0; */
-      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(&ctx->spongos, msg), ret);
+      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(), ret);
     } else
       MAM_ASSERT(0);
   }
@@ -795,7 +795,7 @@ retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx, trits_t *const 
 
   if (mam_msg_checksum_none == checksum) {
     /*    absorb null none = 0; */
-    ERR_BIND_GOTO(mam_msg_unwrap_checksum_none(&ctx->spongos, buffer), e, cleanup);
+    ERR_BIND_GOTO(mam_msg_unwrap_checksum_none(), e, cleanup);
   } else if (mam_msg_checksum_mac == checksum) {
     /*    MAC mac = 1; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mac(&ctx->spongos, buffer), e, cleanup);

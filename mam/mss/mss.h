@@ -55,10 +55,10 @@ extern "C" {
 /*! \brief Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <=
  * 20`.
  */
-typedef trint6_t mss_mt_height_t;
+typedef uint8_t mss_mt_height_t;
 /*! \brief Index (skn) of leaf/node on the level of height `d`; 0 <= i <
  * 2^(D-d). */
-typedef trint18_t mss_mt_idx_t;
+typedef uint32_t mss_mt_idx_t;
 
 #if defined(MAM_MSS_TRAVERSAL)
 
