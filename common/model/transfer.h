@@ -51,7 +51,7 @@ typedef UT_array transfer_array_t;
 
 retcode_t transfer_message_set(transfer_t *tf, tryte_t const *const msg);
 static inline void transfer_message_free(transfer_t *tf) { free(tf->message); }
-static inline tryte_t *transfer_message_get(transfer_t *tf) { return tf->message; }
+static inline tryte_t *transfer_message_get(transfer_t const *const tf) { return tf->message; }
 
 transfer_array_t *transfer_array_new();
 static inline void transfer_array_free(transfer_array_t *transfers) { utarray_free(transfers); }
