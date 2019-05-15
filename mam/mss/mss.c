@@ -263,7 +263,7 @@ void mss_mt_rewind(mam_mss_t *mss, mss_mt_idx_t skn) {
   }
 }
 #else
-static trits_t mss_mt_node_t_trits(mss_t *mss, mss_mt_height_t height, mss_mt_idx_t i) {
+static trits_t mss_mt_node_t_trits(mam_mss_t *mss, mss_mt_height_t height, mss_mt_idx_t i) {
   MAM_ASSERT(height <= mss->height);
   MAM_ASSERT(i < ((mss_mt_idx_t)1 << height));
 
@@ -392,6 +392,7 @@ void mam_mss_gen(mam_mss_t *mss) {
 #else
   mss_mt_height_t height;
   mss_mt_idx_t i, n;
+  mam_spongos_t spongos;
 
   for (i = 0, n = (mss_mt_idx_t)1 << mss->height; i < n; ++i) {
     trits_t wpk = mss_mt_node_t_trits(mss, mss->height, i);
@@ -581,7 +582,7 @@ retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
   ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 #else
   mss->mt = malloc(sizeof(trit_t) * MAM_MSS_MT_WORDS(height));
-  ERR_GUARD_RETURN(mss->mt, RC_OOM, e);
+  ERR_GUARD_RETURN(mss->mt, RC_OOM);
 #endif
 
   /* do not free here in case of error */
