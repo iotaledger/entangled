@@ -1,9 +1,8 @@
 /*
- * Copyright (c) 2018 IOTA Stiftung
+ * Copyright (c) 2019 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
- * MAM is based on an original implementation & specification by apmi.bsu.by
- * [ITSec Lab]
+ * MAM is based on an original implementation & specification by apmi.bsu.by [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -312,6 +311,7 @@ void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height
 void mam_mss_gen(mam_mss_t *mss) {
   trits_t root_trits = trits_from_rep(MAM_MSS_PK_SIZE, mss->root);
 #if defined(MAM_MSS_TRAVERSAL)
+  fprintf(stderr, "TRAVERSAL\n");
   if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, root_trits);
   } else {
@@ -390,6 +390,7 @@ void mam_mss_gen(mam_mss_t *mss) {
   }
 
 #else
+  fprintf(stderr, "NO TRAVERSAL\n");
   mss_mt_height_t height;
   mss_mt_idx_t i, n;
   mam_spongos_t spongos;
