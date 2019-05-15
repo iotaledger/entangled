@@ -112,6 +112,11 @@ const char* error_2_string(retcode_t err) {
     case RC_SNAPSHOT_INCONSISTENT_PATCH:
     case RC_SNAPSHOT_BALANCE_NOT_FOUND:
       return "String not defined.";
+
+    // Common Module
+    case RC_COMMON_BUNDLE_SIGN:
+      return SRT_COMMON_BUNDLE_SIGN;
+
     default:
       return "WTF";
   }

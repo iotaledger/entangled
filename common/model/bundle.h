@@ -58,8 +58,8 @@ retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *
 void bundle_reset_indexes(bundle_transactions_t *const bundle);
 
 void bundle_set_messages(bundle_transactions_t *bundle, signature_fragments_t *messages);
-void bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const seed, inputs_t const *const inputs,
-                 Kerl *const kerl);
+retcode_t bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const seed, inputs_t const *const inputs,
+                      Kerl *const kerl);
 
 #ifdef DEBUG
 void bundle_dump(bundle_transactions_t *bundle);

@@ -100,7 +100,7 @@ void test_transfer_array() {
   transfer_array_add(tf_array, &tf);
   TEST_ASSERT_EQUAL_UINT(4, transfer_array_count(tf_array));
 
-  TRANSFER_NEW_FOREACH(tf_array, elm) {
+  TRANSFER_FOREACH(tf_array, elm) {
     TEST_ASSERT_NULL(elm->message);
     TEST_ASSERT_EQUAL_UINT64(0, elm->timestamp);
     TEST_ASSERT_EQUAL_INT64(0, elm->value);

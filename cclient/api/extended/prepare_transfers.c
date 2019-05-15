@@ -13,6 +13,7 @@
 #include "cclient/api/extended/get_new_address.h"
 #include "cclient/api/extended/logger.h"
 #include "cclient/api/extended/prepare_transfers.h"
+#include "utils/containers/hash/hash243_queue.h"
 #include "utils/time.h"
 
 static void add_transaction_entry(bundle_transactions_t* bundle, int num_txs, flex_trit_t const* const address,
@@ -44,7 +45,7 @@ static retcode_t add_remainder(iota_client_service_t const* const serv, flex_tri
   INPUTS_FOREACH(inputs->input_array, input) {
     int64_t input_value = input->balance;
     int64_t substract = 0 - input_value;
-    int64_t timestamp = current_timestamp_ms();
+    uint64_t timestamp = current_timestamp_ms();
     if (input_value == 0) {
       continue;
     }
@@ -58,8 +59,7 @@ static retcode_t add_remainder(iota_client_service_t const* const serv, flex_tri
         // put remainder value to remainder address
         add_transaction_entry(bundle, 1, remainder_address, remainder_value, tag, timestamp);
         // sign and return
-        bundle_sign(bundle, seed, inputs, kerl);
-        return RC_OK;
+        return bundle_sign(bundle, seed, inputs, kerl);
       } else if (remainder_value > 0) {
         // remainder address is needed
         address_opt_t addr_info = {0, 0, security};
@@ -67,16 +67,16 @@ static retcode_t add_remainder(iota_client_service_t const* const serv, flex_tri
         if ((ret = iota_client_get_new_address(serv, seed, addr_info, &new_addresses)) == RC_OK) {
           // unused address
           add_transaction_entry(bundle, 1, new_addresses->prev->hash, remainder_value, tag, timestamp);
-          bundle_sign(bundle, seed, inputs, kerl);
-          return RC_OK;
+          hash243_queue_free(&new_addresses);
+          return bundle_sign(bundle, seed, inputs, kerl);
         }
         // get address failed
         log_error(client_extended_logger_id, "get address failed\n");
+        hash243_queue_free(&new_addresses);
         return ret;
       } else {
         // no remainder value, simply sign and return
-        bundle_sign(bundle, seed, inputs, kerl);
-        return RC_OK;
+        return bundle_sign(bundle, seed, inputs, kerl);
       }
 
     } else {
@@ -143,7 +143,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
   transfer_t* elm = NULL;
   flex_trit_t* tag = NULL;
   iota_transaction_t tx;
-  TRANSFER_NEW_FOREACH(transfers, elm) {
+  TRANSFER_FOREACH(transfers, elm) {
     // TODO validate transfer: check if the address is valid(with a trailing zero trit).
     int msg_chunks = 1;
     // count message length

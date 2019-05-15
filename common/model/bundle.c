@@ -265,33 +265,23 @@ void bundle_set_messages(bundle_transactions_t *bundle, signature_fragments_t *m
   tryte_t trytes_buff[NUM_TRYTES_SIGNATURE];
 
   BUNDLE_FOREACH(bundle, tx) {
-    memset(trytes_buff, '9', NUM_TRYTES_SIGNATURE);
-    memset(tx->data.signature_or_message, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
     msg = signature_fragments_at(messages, index);
     if (msg == NULL) {
       break;
     }
     msg_len = strlen((char *)*msg);
     memcpy(trytes_buff, *msg, msg_len);
+    memset(trytes_buff + msg_len, '9', NUM_TRYTES_SIGNATURE - msg_len);
 
     // trytes to flex_trits
     flex_trits_from_trytes(tx->data.signature_or_message, NUM_TRITS_SIGNATURE, trytes_buff, NUM_TRYTES_SIGNATURE,
                            NUM_TRYTES_SIGNATURE);
-
-    memset(tx->attachment.branch, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-    memset(tx->attachment.trunk, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-    memset(tx->attachment.nonce, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_81);
-
-    transaction_set_attachment_timestamp(tx, 0);
-    transaction_set_attachment_timestamp_lower(tx, 0);
-    transaction_set_attachment_timestamp_upper(tx, 0);
-    tx->loaded_columns_mask.attachment = MASK_ATTACHMENT_ALL;
     index++;
   }
 }
 
-void bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const seed, inputs_t const *const inputs,
-                 Kerl *const kerl) {
+retcode_t bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const seed, inputs_t const *const inputs,
+                      Kerl *const kerl) {
   iota_transaction_t *tx = NULL;
   input_t *input = NULL;
   size_t curr_index = 0;
@@ -310,14 +300,20 @@ void bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const s
           }
           signed_signature =
               iota_sign_signature_gen_flex_trits(seed, input->key_index, input->security, transaction_bundle(tx));
-          // for each security level add signature
-          for (int i = 0; i < input->security; i++) {
-            tx = bundle_at(bundle, curr_index + i);
-            memcpy(tx->data.signature_or_message, signed_signature + (i * NUM_FLEX_TRITS_SIGNATURE),
-                   NUM_FLEX_TRITS_MESSAGE);
-            tx->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
+          if (signed_signature) {
+            // for each security level add signature
+            for (int i = 0; i < input->security; i++) {
+              tx = bundle_at(bundle, curr_index + i);
+              memcpy(tx->data.signature_or_message, signed_signature + (i * NUM_FLEX_TRITS_SIGNATURE),
+                     NUM_FLEX_TRITS_MESSAGE);
+              tx->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
+            }
+            curr_index += input->security;
+            free(signed_signature);
+            signed_signature = NULL;
+          } else {
+            return RC_COMMON_BUNDLE_SIGN;
           }
-          curr_index += input->security;
         }
       }
     } else {
@@ -325,6 +321,7 @@ void bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const s
     }
   }
   bundle_reset_indexes(bundle);
+  return RC_OK;
 }
 
 #ifdef DEBUG

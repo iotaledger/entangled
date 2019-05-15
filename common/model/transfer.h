@@ -40,7 +40,7 @@ static inline void signature_fragments_add(signature_fragments_t *fragments, try
 }
 
 static inline void signature_fragments_free(signature_fragments_t *fragments) { utarray_free(fragments); }
-static inline tryte_t **signature_fragments_at(signature_fragments_t *fragments, int index) {
+static inline tryte_t **signature_fragments_at(signature_fragments_t const *const fragments, size_t index) {
   return (tryte_t **)utarray_eltptr(fragments, index);
 }
 
@@ -55,13 +55,13 @@ static inline tryte_t *transfer_message_get(transfer_t *tf) { return tf->message
 
 transfer_array_t *transfer_array_new();
 static inline void transfer_array_free(transfer_array_t *transfers) { utarray_free(transfers); }
-static inline size_t transfer_array_count(transfer_array_t *transfers) { return utarray_len(transfers); }
+static inline size_t transfer_array_count(transfer_array_t const *const transfers) { return utarray_len(transfers); }
 static inline void transfer_array_add(transfer_array_t *tfs, transfer_t *tf) { utarray_push_back(tfs, tf); }
-static inline transfer_t *transfer_array_at(transfer_array_t *tfs, int index) {
+static inline transfer_t *transfer_array_at(transfer_array_t const *const tfs, size_t index) {
   return (transfer_t *)utarray_eltptr(tfs, index);
 }
 
-#define TRANSFER_NEW_FOREACH(tfs, tf) \
+#define TRANSFER_FOREACH(tfs, tf) \
   for (tf = (transfer_t *)utarray_front(tfs); tf != NULL; tf = (transfer_t *)utarray_next(tfs, tf))
 
 #endif  // __COMMON_MODEL_TRANSFER_H_
