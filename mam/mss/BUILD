@@ -22,7 +22,10 @@ cc_library(
 
 cc_library(
     name = "mss_traversal",
-    srcs = ["mss_traversal.c"],
+    srcs = [
+        "mss_common.c",
+        "mss_traversal.c",
+    ],
     hdrs = [
         "mss.h",
         "mss_common.h",
@@ -37,7 +40,10 @@ cc_library(
 
 cc_library(
     name = "mss_classic",
-    srcs = ["mss_traversal.c"],
+    srcs = [
+        "mss_classic.c",
+        "mss_common.c",
+    ],
     hdrs = [
         "mss.h",
         "mss_classic.h",

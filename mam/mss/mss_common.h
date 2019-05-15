@@ -61,7 +61,16 @@ typedef uint32_t mss_mt_idx_t;
 
 #define MAM_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM_MSS_MT_MAX_STORED_SIZE(d))
 
+#define MAM_MSS_MAX_SKN(d) (((mss_mt_idx_t)1 << (d)) - 1)
+
 typedef struct mam_mss_s mam_mss_t;
+
+bool mss_parse_skn(mss_mt_height_t *height, mss_mt_idx_t *skn, trits_t trits);
+void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn, trits_t auth_path, trits_t pk);
+size_t mss_mt_serialized_size(mam_mss_t const *const mss);
+void mss_hash2(mam_spongos_t *s, trits_t children_hashes[2], trits_t parent_hash);
+void mss_mt_serialize(mam_mss_t const *const mss, trits_t *buffer);
+void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, trits_t pk);
 
 /**
  * MSS interface initialization
