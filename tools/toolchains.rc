@@ -1,0 +1,19 @@
+build:aarch64 --crosstool_top=@iota_toolchains//tools/aarch64--glibc--bleeding-edge-2018.07-1:toolchain
+build:aarch64 --cpu=aarch64
+build:aarch64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+
+build:armv7 --crosstool_top=@iota_toolchains//tools/armv7-eabihf--glibc--bleeding-edge-2018.07-1:toolchain
+build:armv7 --cpu=armeabi-v7a
+build:armv7 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+
+build:i686 --crosstool_top=@iota_toolchains//tools/x86-i686--glibc--bleeding-edge-2018.07-1:toolchain
+build:i686 --cpu=i686
+build:i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+
+build:x86_64 --crosstool_top=@iota_toolchains//tools/x86-64-core-i7--glibc--bleeding-edge-2018.07-1:toolchain
+build:x86_64 --cpu=x86_64
+build:x86_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+
+build:esp32_64 --crosstool_top=@iota_toolchains//tools/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0:toolchain
+build:esp32_64 --cpu=xtensa
+build:esp32_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
