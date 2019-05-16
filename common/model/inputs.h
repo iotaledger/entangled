@@ -93,7 +93,7 @@ static inline int64_t inputs_balance(inputs_t* inputs) { return inputs->total_ba
  * @param inputs
  * @return size_t
  */
-static inline size_t inputs_len(inputs_t* inputs) {
+static inline size_t inputs_len(inputs_t const* const inputs) {
   if (!inputs->input_array) {
     return 0;
   }

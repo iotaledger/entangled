@@ -65,6 +65,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_INVALID_TAIL_HASH;
     case RC_CCLIENT_INVALID_BUNDLE:
       return SRT_CCLIENT_INVALID_BUNDLE;
+    case RC_CCLIENT_CHECK_BALANCE:
+      return SRT_CCLIENT_CHECK_BALANCE;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
@@ -110,6 +112,11 @@ const char* error_2_string(retcode_t err) {
     case RC_SNAPSHOT_INCONSISTENT_PATCH:
     case RC_SNAPSHOT_BALANCE_NOT_FOUND:
       return "String not defined.";
+
+    // Common Module
+    case RC_COMMON_BUNDLE_SIGN:
+      return SRT_COMMON_BUNDLE_SIGN;
+
     default:
       return "WTF";
   }

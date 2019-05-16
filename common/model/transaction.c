@@ -301,6 +301,11 @@ void transaction_free(iota_transaction_t *const transaction) { free(transaction)
 void transaction_obj_dump(iota_transaction_t *tx_obj) {
   tryte_t trytes_81[NUM_TRYTES_HASH + 1];
   tryte_t trytes_27[NUM_TRYTES_TAG + 1];
+  tryte_t trytes_2187[NUM_TRYTES_SIGNATURE + 1];
+
+  field_mask_t old_mask = {};
+  memcpy(&old_mask, &tx_obj->loaded_columns_mask, sizeof(field_mask_t));
+  memset(&tx_obj->loaded_columns_mask, 0xFFFFF, sizeof(field_mask_t));
 
   printf("==========Transaction Object==========\n");
   // address
@@ -345,5 +350,11 @@ void transaction_obj_dump(iota_transaction_t *tx_obj) {
   flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_hash(tx_obj), NUM_TRITS_HASH, NUM_TRITS_HASH);
   trytes_81[NUM_TRYTES_HASH] = '\0';
   printf("hash: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_2187, NUM_TRYTES_SIGNATURE, transaction_message(tx_obj), NUM_TRITS_SIGNATURE,
+                       NUM_TRITS_SIGNATURE);
+  trytes_2187[NUM_TRYTES_SIGNATURE] = '\0';
+  printf("message: \n%s\n", trytes_2187);
+  memcpy(&tx_obj->loaded_columns_mask, &old_mask, sizeof(field_mask_t));
 }
 #endif
