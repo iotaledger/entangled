@@ -355,6 +355,7 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
 
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
   strncpy(ciri_conf->db_path, DEFAULT_DB_PATH, sizeof(ciri_conf->db_path));
+  strncpy(ciri_conf->conf_path, DEFAULT_CONF_PATH, sizeof(ciri_conf->conf_path));
   strncpy(consensus_conf->db_path, DEFAULT_DB_PATH, sizeof(consensus_conf->db_path));
   strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
   strncpy(api_conf->db_path, DEFAULT_DB_PATH, sizeof(api_conf->db_path));
@@ -376,7 +377,8 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
 }
 
 retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                   iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
+                                   iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
+                                   char** argv) {
   retcode_t ret = RC_OK;
   yaml_parser_t parser;
   yaml_token_t token;
@@ -394,7 +396,25 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
     goto done;
   }
 
-  if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
+  while ((key = getopt(argc, argv, "c:")) != -1) {
+    if (key == ':') {
+      ret = RC_CONF_MISSING_ARGUMENT;
+      break;
+    } else if (key == '?') {
+      ret = RC_CONF_UNKNOWN_OPTION;
+      break;
+    } else if (key == 'c') {  // configure file path
+      if (strlen(optarg) == 0) {
+        return RC_CONF_INVALID_ARGUMENT;
+      }
+      strncpy(ciri_conf->conf_path, optarg, sizeof(ciri_conf->conf_path));
+      break;
+    }
+  }
+  /* reinitialized getopt */
+  optind = 1;
+
+  if ((file = fopen(ciri_conf->conf_path, "r")) == NULL) {
     ret = RC_OK;
     goto done;
   }
