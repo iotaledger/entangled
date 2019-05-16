@@ -44,6 +44,8 @@ cc_test(
     deps = [
         ":defs",
         "//common/model:transfer",
+        "//common/trinary:tryte_ascii",
+        "//utils:time",
         "@unity",
     ],
 )

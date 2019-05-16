@@ -7,11 +7,32 @@
 
 #include "common/model/bundle.h"
 #include "common/crypto/iss/v1/iss_kerl.h"
-#include "common/model/transfer.h"
+#include "common/helpers/sign.h"
 #include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_long.h"
 
 static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
+
+static void absorb_essence(Kerl *const kerl, flex_trit_t const *address, int64_t value, flex_trit_t const *obsolete_tag,
+                           uint64_t timestamp, int64_t current_index, int64_t last_index, trit_t *const essence_trits) {
+  memset(essence_trits, 0, NUM_TRITS_ESSENCE);
+
+  trit_t *curr_pos = essence_trits;
+
+  flex_trits_to_trits(curr_pos, NUM_TRITS_ADDRESS, address, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+  curr_pos = &curr_pos[NUM_TRITS_ADDRESS];
+  long_to_trits(value, curr_pos);
+  curr_pos = &curr_pos[NUM_TRITS_VALUE];
+  flex_trits_to_trits(curr_pos, NUM_TRITS_OBSOLETE_TAG, obsolete_tag, NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
+  curr_pos = &curr_pos[NUM_TRITS_OBSOLETE_TAG];
+  long_to_trits(timestamp, curr_pos);
+  curr_pos = &curr_pos[NUM_TRITS_TIMESTAMP];
+  long_to_trits(current_index, curr_pos);
+  curr_pos = &curr_pos[NUM_TRITS_CURRENT_INDEX];
+  long_to_trits(last_index, curr_pos);
+  // Absorb essence in kerl
+  kerl_absorb(kerl, essence_trits, NUM_TRITS_ESSENCE);
+}
 
 /**
  * Validate signatures in a bundle,
@@ -234,6 +255,73 @@ void bundle_reset_indexes(bundle_transactions_t *const bundle) {
     transaction_set_current_index(current_tx, current_index);
     current_index++;
   }
+}
+
+void bundle_set_messages(bundle_transactions_t *bundle, signature_fragments_t *messages) {
+  iota_transaction_t *tx = NULL;
+  size_t index = 0;
+  tryte_t **msg = NULL;
+  size_t msg_len = 0;
+  tryte_t trytes_buff[NUM_TRYTES_SIGNATURE];
+
+  BUNDLE_FOREACH(bundle, tx) {
+    msg = signature_fragments_at(messages, index);
+    if (msg == NULL) {
+      break;
+    }
+    msg_len = strlen((char *)*msg);
+    memcpy(trytes_buff, *msg, msg_len);
+    memset(trytes_buff + msg_len, '9', NUM_TRYTES_SIGNATURE - msg_len);
+
+    // trytes to flex_trits
+    flex_trits_from_trytes(tx->data.signature_or_message, NUM_TRITS_SIGNATURE, trytes_buff, NUM_TRYTES_SIGNATURE,
+                           NUM_TRYTES_SIGNATURE);
+    index++;
+  }
+}
+
+retcode_t bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const seed, inputs_t const *const inputs,
+                      Kerl *const kerl) {
+  iota_transaction_t *tx = NULL;
+  input_t *input = NULL;
+  size_t curr_index = 0;
+  flex_trit_t *signed_signature = NULL;
+
+  bundle_reset_indexes(bundle);
+  bundle_finalize(bundle, kerl);
+
+  // find the inputs and get the corresponding private key and calculate the signature fragment
+  BUNDLE_FOREACH(bundle, tx) {
+    if (transaction_value(tx) < 0) {  // input transactions
+      INPUTS_FOREACH(inputs->input_array, input) {
+        if (memcmp(input->address, transaction_address(tx), FLEX_TRIT_SIZE_243) == 0) {
+          if (curr_index > transaction_current_index(tx)) {
+            continue;
+          }
+          signed_signature =
+              iota_sign_signature_gen_flex_trits(seed, input->key_index, input->security, transaction_bundle(tx));
+          if (signed_signature) {
+            // for each security level add signature
+            for (int i = 0; i < input->security; i++) {
+              tx = bundle_at(bundle, curr_index + i);
+              memcpy(tx->data.signature_or_message, signed_signature + (i * NUM_FLEX_TRITS_SIGNATURE),
+                     NUM_FLEX_TRITS_MESSAGE);
+              tx->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
+            }
+            curr_index += input->security;
+            free(signed_signature);
+            signed_signature = NULL;
+          } else {
+            return RC_COMMON_BUNDLE_SIGN;
+          }
+        }
+      }
+    } else {
+      curr_index++;
+    }
+  }
+  bundle_reset_indexes(bundle);
+  return RC_OK;
 }
 
 #ifdef DEBUG

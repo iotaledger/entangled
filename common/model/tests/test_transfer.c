@@ -11,128 +11,129 @@
 
 #include "common/model/tests/defs.h"
 #include "common/model/transfer.h"
+#include "common/trinary/tryte_ascii.h"
+#include "utils/time.h"
 
-void test_bundle_hash(void) {
-  transfer_ctx_t transfer_ctx = {};
-  flex_trit_t address[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(address, NUM_TRITS_ADDRESS, TEST_ADDRESS_1, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
+static char const msg[] =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ac leo a "
+    "massa porta tempus scelerisque in leo. Duis ligula dolor, condimentum vel "
+    "ipsum et, accumsan viverra lacus.";
+static tryte_t trytes[] =
+    "VBCDFDTCADEAXCDDGDIDADEASCCD9DCDFDEAGDXCHDEAPCADTCHDQAEARCCDBDGDTCRCHDTCHD"
+    "IDFDEAPCSCXCDDXCGDRCXCBDVCEATC9DXCHDSAEAWBPCIDFDXCGDEAPCRCEA9DTCCDEAPCEAAD"
+    "PCGDGDPCEADDCDFDHDPCEAHDTCADDDIDGDEAGDRCTC9DTCFDXCGDEDIDTCEAXCBDEA9DTCCDSA"
+    "EANBIDXCGDEA9DXCVCID9DPCEASCCD9DCDFDQAEARCCDBDSCXCADTCBDHDIDADEAJDTC9DEAXC"
+    "DDGDIDADEATCHDQAEAPCRCRCIDADGDPCBDEAJDXCJDTCFDFDPCEA9DPCRCIDGDSA";
 
-  flex_trit_t tag[FLEX_TRIT_SIZE_81];
-  flex_trits_from_trytes(tag, NUM_TRITS_TAG, TEST_TAG, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+void test_fragments() {
+  signature_fragments_t* fragments = signature_fragments_new();
+  tryte_t** fg = NULL;
+  signature_fragments_add(fragments, trytes);
+  signature_fragments_add(fragments, TEST_SEED);
+  signature_fragments_add(fragments, TEST_TAG);
 
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, TEST_HASH, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  fg = signature_fragments_at(fragments, 0);
+  TEST_ASSERT_EQUAL_MEMORY(*fg, trytes, strlen((char*)trytes));
 
-  transfer_t* transfer = transfer_value_in_new(address, tag, 0, NULL, 0, 1509136296);
-  TEST_ASSERT_NOT_NULL(transfer);
+  fg = signature_fragments_at(fragments, 1);
+  TEST_ASSERT_EQUAL_MEMORY(*fg, TEST_SEED, strlen((char*)TEST_SEED));
 
-  transfer_t* transfers[1] = {transfer};
-  Kerl kerl = {};
-  TEST_ASSERT_TRUE(transfer_ctx_init(&transfer_ctx, transfers, 1));
+  fg = signature_fragments_at(fragments, 2);
+  TEST_ASSERT_EQUAL_MEMORY(*fg, TEST_TAG, strlen((char*)TEST_TAG));
 
-  transfer_ctx_hash(&transfer_ctx, &kerl, transfers, 1);
-  TEST_ASSERT_EQUAL_MEMORY(hash, transfer_ctx.bundle, FLEX_TRIT_SIZE_243);
-  transfer_free(&transfer);
-  TEST_ASSERT_NULL(transfer);
+  fg = signature_fragments_at(fragments, 3);
+  TEST_ASSERT_NULL(fg);
+
+  signature_fragments_free(fragments);
 }
 
-void test_value_out(void) {
-  iota_transaction_t* tx;
-  transfer_iterator_t* tf_iter = NULL;
-  flex_trit_t sig_buff[FLEX_TRIT_SIZE_6561];
-  flex_trit_t seed[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(seed, NUM_TRITS_ADDRESS, TEST_SEED, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
-  transfer_value_out_t OUTPUT = {seed, 2, 0};
-  iota_transaction_t TX = {};
-  flex_trit_t address_out[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(address_out, NUM_TRITS_ADDRESS, TEST_ADDRESS_0, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
+void test_transfer() {
+  transfer_t tf = {};
+  size_t size = strlen(msg);
+  char buffer[size];
+  size_t trytes_len = strlen((char*)trytes);
 
-  flex_trit_t tag[FLEX_TRIT_SIZE_81];
-  flex_trits_from_trytes(tag, NUM_TRITS_TAG, TEST_TAG_NULL, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
-  transfer_t* transfer_out = transfer_value_out_new(&OUTPUT, tag, address_out, -1, 1548690545190);
+  // test message
+  TEST_ASSERT_NULL(tf.message);
+  transfer_message_set(&tf, trytes);
+  TEST_ASSERT_EQUAL_MEMORY(transfer_message_get(&tf), trytes, trytes_len);
 
-  flex_trit_t address_in[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(address_in, NUM_TRITS_ADDRESS, TEST_ADDRESS_1, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
-  transfer_t* transfer_in = transfer_value_in_new(address_in, tag, 1, NULL, 0, 1548690545190);
+  trytes_to_ascii(trytes, strlen((char*)trytes), buffer);
+  TEST_ASSERT_EQUAL_MEMORY(msg, buffer, size);
 
-  transfer_t* transfers[2] = {transfer_in, transfer_out};
-  Kerl kerl = {};
-  tf_iter = transfer_iterator_new(transfers, 2, &kerl, &TX);
-  TEST_ASSERT_NOT_NULL(tf_iter);
+  transfer_message_free(&tf);
+  tf.message = NULL;
 
-  tx = transfer_iterator_next(tf_iter);
-  TEST_ASSERT_NOT_NULL(tx);
-  flex_trits_from_trytes(sig_buff, NUM_TRITS_SIGNATURE, TEST_SIG_1, NUM_TRYTES_SIGNATURE, NUM_TRYTES_SIGNATURE);
-  TEST_ASSERT_EQUAL_MEMORY(sig_buff, tx->data.signature_or_message, FLEX_TRIT_SIZE_6561);
-  TEST_ASSERT_EQUAL_MEMORY(tag, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+  // test timestamp
+  TEST_ASSERT_EQUAL_UINT64(0, tf.timestamp);
+  uint64_t now = current_timestamp_ms();
+  tf.timestamp = now;
+  TEST_ASSERT_EQUAL_UINT64(now, tf.timestamp);
 
-  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
-  flex_trits_from_trytes(obsolete_tag, NUM_TRITS_TAG, TEST_OBSOLETE_TAG_1, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
-  TEST_ASSERT_EQUAL_MEMORY(obsolete_tag, tx->essence.obsolete_tag, FLEX_TRIT_SIZE_81);
+  // test value
+  TEST_ASSERT_EQUAL_INT64(0, tf.value);
+  tf.value = 123456789123456789;
+  TEST_ASSERT_EQUAL_INT64(123456789123456789, tf.value);
 
-  tx = transfer_iterator_next(tf_iter);
-  TEST_ASSERT_NOT_NULL(tx);
-  flex_trits_from_trytes(sig_buff, NUM_TRITS_SIGNATURE, TEST_SIG_2, NUM_TRYTES_SIGNATURE, NUM_TRYTES_SIGNATURE);
-  TEST_ASSERT_EQUAL_MEMORY(sig_buff, tx->data.signature_or_message, FLEX_TRIT_SIZE_6561);
-  TEST_ASSERT_EQUAL_MEMORY(tag, tx->attachment.tag, FLEX_TRIT_SIZE_81);
-  TEST_ASSERT_EQUAL_MEMORY(tag, tx->essence.obsolete_tag, FLEX_TRIT_SIZE_81);
+  // test address
+  flex_trit_t address[FLEX_TRIT_SIZE_243] = {};
+  TEST_ASSERT_EQUAL_MEMORY(address, tf.address, FLEX_TRIT_SIZE_243);
+  flex_trits_from_trytes(address, NUM_TRITS_ADDRESS, TEST_ADDRESS_0, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
+  flex_trits_from_trytes(tf.address, NUM_TRITS_ADDRESS, TEST_ADDRESS_0, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
+  TEST_ASSERT_EQUAL_MEMORY(address, tf.address, FLEX_TRIT_SIZE_243);
 
-  tx = transfer_iterator_next(tf_iter);
-  TEST_ASSERT_NOT_NULL(tx);
-  flex_trits_from_trytes(sig_buff, NUM_TRITS_SIGNATURE, TEST_SIG_3, NUM_TRYTES_SIGNATURE, NUM_TRYTES_SIGNATURE);
-  TEST_ASSERT_EQUAL_MEMORY(sig_buff, tx->data.signature_or_message, FLEX_TRIT_SIZE_6561);
-  TEST_ASSERT_EQUAL_MEMORY(tag, tx->attachment.tag, FLEX_TRIT_SIZE_81);
-  TEST_ASSERT_EQUAL_MEMORY(tag, tx->essence.obsolete_tag, FLEX_TRIT_SIZE_81);
-
-  tx = transfer_iterator_next(tf_iter);
-  TEST_ASSERT_NULL(tx);
-
-  transfer_iterator_free(&tf_iter);
-  transfer_free(&transfer_out);
-  TEST_ASSERT_NULL(transfer_out);
-  transfer_free(&transfer_in);
-  TEST_ASSERT_NULL(transfer_in);
+  // test tag
+  flex_trit_t tag[FLEX_TRIT_SIZE_81] = {};
+  TEST_ASSERT_EQUAL_MEMORY(tag, tf.tag, FLEX_TRIT_SIZE_81);
+  flex_trits_from_trytes(tag, NUM_TRITS_TAG, TEST_TAG, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+  flex_trits_from_trytes(tf.tag, NUM_TRITS_TAG, TEST_TAG, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+  TEST_ASSERT_EQUAL_MEMORY(tag, tf.tag, FLEX_TRIT_SIZE_81);
 }
 
-void test_transfer_data(void) {
-  iota_transaction_t* tx;
-  transfer_iterator_t* tf_iter = NULL;
-  transfer_t* transfer = NULL;
+void test_transfer_array() {
+  transfer_array_t* tf_array = transfer_array_new();
+  transfer_t tf = {};
+  transfer_t* elm = NULL;
+  transfer_array_add(tf_array, &tf);
+  transfer_array_add(tf_array, &tf);
+  transfer_array_add(tf_array, &tf);
+  transfer_array_add(tf_array, &tf);
+  TEST_ASSERT_EQUAL_UINT(4, transfer_array_count(tf_array));
 
-  flex_trit_t address[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(address, NUM_TRITS_ADDRESS, TEST_DATA_ADDRESS, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
+  TRANSFER_FOREACH(tf_array, elm) {
+    TEST_ASSERT_NULL(elm->message);
+    TEST_ASSERT_EQUAL_UINT64(0, elm->timestamp);
+    TEST_ASSERT_EQUAL_INT64(0, elm->value);
+  }
 
-  flex_trit_t data[FLEX_TRIT_SIZE_243] = {};
-  flex_trits_from_trytes(data, NUM_TRITS_ADDRESS, TEST_DATA, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
+  elm = transfer_array_at(tf_array, 3);
+  TEST_ASSERT_NOT_NULL(elm);
+  elm->value = -1235566778;
 
-  flex_trit_t tag[FLEX_TRIT_SIZE_81];
-  flex_trits_from_trytes(tag, NUM_TRITS_TAG, TEST_TAG, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
-  transfer = transfer_data_new(address, tag, data, NUM_TRITS_ADDRESS, 1509136296);
+  elm = transfer_array_at(tf_array, 5);
+  TEST_ASSERT_NULL(elm);
 
-  transfer_t* transfers[1] = {transfer};
-  Kerl kerl = {};
-  tf_iter = transfer_iterator_new(transfers, 1, &kerl, NULL);
-  TEST_ASSERT_NOT_NULL(tf_iter);
+  elm = transfer_array_at(tf_array, 3);
+  TEST_ASSERT_EQUAL_INT64(-1235566778, elm->value);
 
-  tx = transfer_iterator_next(tf_iter);
-  TEST_ASSERT_NOT_NULL(tx);
-  TEST_ASSERT_EQUAL_MEMORY(data, tx->data.signature_or_message, FLEX_TRIT_SIZE_243);
+  transfer_message_set(elm, trytes);
 
-  tx = transfer_iterator_next(tf_iter);
-  TEST_ASSERT_NULL(tx);
+  // trytes to ascii
+  size_t size = strlen((char*)trytes) / 2;
+  char buffer[size];
+  trytes_to_ascii(trytes, strlen((char*)trytes), buffer);
+  TEST_ASSERT_EQUAL_MEMORY(msg, buffer, size);
+  transfer_message_free(elm);
 
-  transfer_iterator_free(&tf_iter);
-  TEST_ASSERT_NULL(tf_iter);
-  transfer_free(&transfer);
-  TEST_ASSERT_NULL(transfer);
+  transfer_array_free(tf_array);
 }
 
 int main(void) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_bundle_hash);
-  RUN_TEST(test_value_out);
-  RUN_TEST(test_transfer_data);
+  RUN_TEST(test_fragments);
+  RUN_TEST(test_transfer);
+  RUN_TEST(test_transfer_array);
 
   return UNITY_END();
 }
