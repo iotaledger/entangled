@@ -19,8 +19,8 @@
 static void add_transaction_entry(bundle_transactions_t* bundle, int num_txs, flex_trit_t const* const address,
                                   int64_t value, flex_trit_t* tag, uint64_t timestamp) {
   iota_transaction_t tx = {};
+  transaction_reset(&tx);
   for (int i = 0; i < num_txs; i++) {
-    transaction_reset(&tx);
     transaction_set_address(&tx, address);
     transaction_set_tag(&tx, tag);
     transaction_set_timestamp(&tx, timestamp);
@@ -115,6 +115,7 @@ static retcode_t check_balances(iota_client_service_t const* const serv, inputs_
         log_error(client_extended_logger_id, "balance is not match\n");
         goto end;
       }
+      index++;
     }
     *passed = true;
   }
@@ -210,7 +211,6 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
   } else {
     bundle_reset_indexes(out_bundle);
     bundle_finalize(out_bundle, &kerl);
-    bundle_set_messages(out_bundle, sign_fragments);
     ret = RC_OK;
   }
 
