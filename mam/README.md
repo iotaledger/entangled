@@ -1,5 +1,13 @@
 # MAM
 
+## What is MAM ?
+
+### MAMv0 ? MAMv1 ? MAMv2 ? MAM+ ?
+
+A lot of names have been used in the past, either by the Iota Foundation or by the community, to refer to two different versions of MAM. As of now, the name `MAM` will refer to the current fully spec'd and fully revised implementation while `MAM prototype` will refer to the previous implementation.
+
+### Definition
+
 MAM (Masked authenticated messaging) is a trinary messages encryption scheme
 that allows for both confidentiality and authenticity based on an original
 implementation & specification by apmi.bsu.by
@@ -12,49 +20,28 @@ MAM allows for:
 
 - Authenticating a message either via MAC (Integrity) or via MSS signature (Integrity + Authenticity)
 
-## MAM components (directories within this repo)
+## MAM layers
 
-*API* - Translates MAM messages into Tangle's bundle
 
-*Examples* - Naive implementation of MAM messaging over
-            the Tangle that makes use of CClient (https://github.com/iotaledger/entangled/tree/develop/cclient)
+| Name | Description | Dependencies | Sources |
+|------|-------------|---------|
+| API | The API layer supports high-level operations that translates MAM messages to/from IOTA bundles. | MAM | [/mam/api](https://github.com/iotaledger/entangled/tree/develop/mam/api) |
+| MAM | The MAM layer supports high-level operations of the MAM protocol like writing and reading messages. | MSS, NTRU, PB3, PRNG, PSK | [/mam/mam](https://github.com/iotaledger/entangled/tree/develop/mam/mam) |
+| MSS | The MSS layer supports Merkle-tree Signature Scheme. | Sponge, WOTS | [/mam/mss](https://github.com/iotaledger/entangled/tree/develop/mam/mss) |
+| NTRU | The NTRU layer supports an NTRU-style public key encryption scheme. | PRNG, Sponge | [/mam/ntru](https://github.com/iotaledger/entangled/tree/develop/mam/ntru) |
+| PB3 | The Protobuf3 layer supports encoding, decoding and cryptographic processing of structured data. | Sponge | [/mam/pb3](https://github.com/iotaledger/entangled/tree/develop/mam/pb3) |
+| PRNG | The PRNG layer supports the generation of cryptographically strong pseudorandom array of trits. | Sponge | [/mam/prng](https://github.com/iotaledger/entangled/tree/develop/mam/prng) |
+| PSK | The PSK layer supports Authenticated Encryption with the means of a Pre-Shared Key. | | [/mam/psk](https://github.com/iotaledger/entangled/tree/develop/mam/psk) |
+| Sponge | The sponge layer supports operations based on a sponge function. | Troika | [/mam/sponge](https://github.com/iotaledger/entangled/tree/develop/mam/sponge) |
+| Troika | The troika layer supports a trinary hash function used as underlying function of the sponge layer. | | [/mam/troika](https://github.com/iotaledger/entangled/tree/develop/mam/troika) |
+| WOTS | The WOTS layer supports Winternitz One-Time Signatures. | PRNG, Sponge | [/mam/wots](https://github.com/iotaledger/entangled/tree/develop/mam/wots) |
 
-*MAM* - Contains implementation of messages encryption/decryption
+For a more in-depth description of the layers, their states and their algorithms, read [spec.pdf](https://github.com/iotaledger/entangled/blob/develop/mam/spec.pdf).
 
-*MSS* - "Merkle Signature Scheme" - this implementation is used to create new channels/endpoints
+## Anatomy of a MAM message
 
-*WOTS* - "Winternitz one time signatures" - the underlying signature implementation of the MSS layer
+## How to use MAM ?
 
-*NTRU* - Supports an NTRU-style public key encryption scheme. Using NTRU a sender can encrypt session keys with a public key of a recipient. The secret key must be kept in secret. The corresponding public key, on the contrary, is publicly announced.
+To start using MAM, you need a seed. To know how to generate a seed, refer to [create-a-seed](https://docs.iota.org/docs/getting-started/0.1/tutorials/create-a-seed).
 
-*PSK* - Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE). It is preliminarily transmitted between the entities and is beyond the scope of MAM. The PSK id is an identifier of a group of recipients who share the same PSK.
-
-*PRNG* - Pseudo randomness generator based on sponge's hash function
-
-*PB3* - Encoding implementation used for serialization and by the MAM layer mostly
-
-*Sponge* - Hash based cryptography based on the Keccack duplex construction (https://keccak.team/sponge_duplex.html)
-
-*Troika* - Trinary hash function, it's transform function is used as the _Round_ function for the Sponge layer
-
-*Trits* - utility functions for manipulating trit arrays
-
-## How to use it?
-
-### Managing PSKs
-
-The sender creates a PSK by providing a 27-trytes id and a custom trytes nonce, then provides it to recipients.
-```
-mam_psk_t psk;
-mam_psk_gen(&psk, &prng, "B9IOSRYXSJPELPKGTG9PJDQC9YS", "PZQZ...AKKEF", 42);
-// Provides it to recipients
-mam_psk_destroy(&psk);
-```
-
-The receiver receives a PSK from a sender and adds it to the API.
-```
-mam_psk_t psk;
-// Receives it from sender
-mam_api_add_psk(&api, &psk);
-mam_psk_destroy(&psk);
-```
+> **WARNING**: Do not use your regular token seed for MAM !
