@@ -11,7 +11,9 @@
 #include "common/crypto/iss/normalize.h"
 #include "common/crypto/kerl/kerl.h"
 #include "common/errors.h"
+#include "common/model/inputs.h"
 #include "common/model/transaction.h"
+#include "common/model/transfer.h"
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"
 
@@ -54,6 +56,10 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
 retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *const status);
 
 void bundle_reset_indexes(bundle_transactions_t *const bundle);
+
+void bundle_set_messages(bundle_transactions_t *bundle, signature_fragments_t *messages);
+retcode_t bundle_sign(bundle_transactions_t *const bundle, flex_trit_t const *const seed, inputs_t const *const inputs,
+                      Kerl *const kerl);
 
 #ifdef DEBUG
 void bundle_dump(bundle_transactions_t *bundle);

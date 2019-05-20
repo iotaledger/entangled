@@ -24,6 +24,7 @@ cc_library(
     deps = [
         ":api_core",
         "//common/model:inputs",
+        "//common/model:transfer",
         "//utils:time",
     ],
 )

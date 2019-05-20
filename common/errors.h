@@ -80,6 +80,7 @@ extern "C" {
 #define RC_MODULE_MAM (0x11 << RC_MODULE_SHIFT)
 #define RC_MODULE_HELPERS (0x12 << RC_MODULE_SHIFT)
 #define RC_MODULE_CRYPTO (0x13 << RC_MODULE_SHIFT)
+#define RC_MODULE_COMMON (0x14 << RC_MODULE_SHIFT)
 
 /** @} */
 
@@ -179,6 +180,7 @@ enum retcode_t {
   RC_CCLIENT_INVALID_TRANSFER = 0x11 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,  /**< Invalid transfer object */
   RC_CCLIENT_INVALID_TAIL_HASH = 0x12 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,    /**< Invalid tail hash */
   RC_CCLIENT_INVALID_BUNDLE = 0x13 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,       /**< Invalid bundle object */
+  RC_CCLIENT_CHECK_BALANCE = 0x14 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,        /**< Checking balance value failed */
 
   // Consensus Module
   RC_CONSENSUS_NOT_IMPLEMENTED = 0x01 | RC_MODULE_CONSENSUS | RC_SEVERITY_MAJOR,
@@ -315,6 +317,8 @@ enum retcode_t {
   // Crypto Module
   RC_CRYPTO_UNSUPPORTED_SPONGE_TYPE = 0x01 | RC_MODULE_CRYPTO | RC_SEVERITY_MAJOR,
 
+  // Common Module
+  RC_COMMON_BUNDLE_SIGN = 0x01 | RC_MODULE_COMMON | RC_SEVERITY_MINOR,
 };
 
 typedef enum retcode_t retcode_t;
