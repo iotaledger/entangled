@@ -118,6 +118,6 @@ const char* error_2_string(retcode_t err) {
       return SRT_COMMON_BUNDLE_SIGN;
 
     default:
-      return "WTF";
+      return "Unknown error";
   }
 }
