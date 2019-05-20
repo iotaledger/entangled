@@ -16,7 +16,7 @@
 #include "utils/signed_files.h"
 
 #define SNAPSHOT_STATE_EXT ".state"
-#define SNAPSHOT_METADATA_EXT ".metadata"
+#define SNAPSHOT_METADATA_EXT ".meta"
 
 #define SNAPSHOT_LOGGER_ID "snapshot"
 
