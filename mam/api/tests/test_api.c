@@ -241,13 +241,13 @@ static void test_api_write_header(mam_api_t *const api, mam_psk_t const *const p
   }
 
   if (mam_msg_pubkey_epid == pubkey) {
-    TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(api, ch, ep, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(api, ch, ep, psks, ntru_pks, bundle, msg_id) == RC_OK);
   } else if (mam_msg_pubkey_chid1 == pubkey) {
-    TEST_ASSERT(mam_api_bundle_announce_new_channel(api, ch, ch1, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_announce_new_channel(api, ch, ch1, psks, ntru_pks, bundle, msg_id) == RC_OK);
   } else if (mam_msg_pubkey_epid1 == pubkey) {
-    TEST_ASSERT(mam_api_bundle_announce_new_endpoint(api, ch, ep1, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_announce_new_endpoint(api, ch, ep1, psks, ntru_pks, bundle, msg_id) == RC_OK);
   } else {
-    TEST_ASSERT(mam_api_bundle_write_header_on_channel(api, ch, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(api, ch, psks, ntru_pks, bundle, msg_id) == RC_OK);
   }
 
   mam_psk_t_set_free(&psks);
@@ -373,7 +373,7 @@ static void test_api_multiple_packets_run(mam_api_t *const param_api, size_t con
   // write and read header
   {
     bundle_transactions_new(&bundle);
-    TEST_ASSERT(mam_api_bundle_write_header_on_channel(param_api, ch_id, NULL, NULL, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(param_api, ch_id, NULL, NULL, bundle, msg_id) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(param_api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
     TEST_ASSERT(payload_out == NULL);
     TEST_ASSERT(payload_out_size == 0);

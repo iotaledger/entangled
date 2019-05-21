@@ -42,6 +42,11 @@
 extern "C" {
 #endif
 
+typedef enum mam_msg_type_e {
+  MAM_MSG_TYPE_UNSTRUCTURED = 0,
+  MAM_MSG_TYPE_PK_CERT = 1,
+} mam_msg_type_t;
+
 typedef enum mam_msg_pubkey_e {
   mam_msg_pubkey_chid = 0,
   mam_msg_pubkey_epid = 1,
