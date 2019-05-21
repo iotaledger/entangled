@@ -157,7 +157,6 @@ void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t 
  * @param ch_id - A known channel ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
- * @param msg_type_id - The message type [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id (hashed channel_name and message index within the
  *  channel) embedded into transaction's tag (together with packet index to
@@ -166,8 +165,8 @@ void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t 
  * @return return code
  */
 retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
-                                                 mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                                 bundle_transactions_t *const bundle, trit_t *const msg_id);
+                                                 mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                                 trit_t *const msg_id);
 
 /**
  * Writes MAM header on an endpoint(keyloads (session keys) + potential packet)
@@ -178,7 +177,6 @@ retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t c
  * @param ep_id - A known endpoint ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
- * @param msg_type_id - The message type [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id (hashed channel_name and message index within the
  *  channel) embedded into transaction's tag (together with packet index to
@@ -188,8 +186,8 @@ retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t c
  */
 retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
                                                   tryte_t const *const ep_id, mam_psk_t_set_t psks,
-                                                  mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                                  bundle_transactions_t *const bundle, trit_t *const msg_id);
+                                                  mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                                  trit_t *const msg_id);
 
 /**
  * Writes an announcement of a new channel (keyloads (session keys) +
@@ -200,7 +198,6 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
  * @param ch1_id - The new channel ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
- * @param msg_type_id - The message type [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id (hashed channel_name and message index within the
  *  channel) embedded into transaction's tag (together with packet index to
@@ -210,8 +207,8 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
  */
 retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t const *const ch_id,
                                               tryte_t const *const ch1_id, mam_psk_t_set_t psks,
-                                              mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                              bundle_transactions_t *const bundle, trit_t *const msg_id);
+                                              mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                              trit_t *const msg_id);
 
 /**
  * Writes an announcement of a new endpoint (keyloads (session keys) +
@@ -222,7 +219,6 @@ retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t cons
  * @param ep1_id - The new endpoint ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
- * @param msg_type_id - The message type [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id (hashed channel_name and message index within the
  *  channel) embedded into transaction's tag (together with packet index to
@@ -232,8 +228,8 @@ retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t cons
  */
 retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
                                                tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                               mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                               bundle_transactions_t *const bundle, trit_t *const msg_id);
+                                               mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                               trit_t *const msg_id);
 
 /**
  * Writes MAM packet into a bundle

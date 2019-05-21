@@ -53,18 +53,18 @@ static trits_t message_test_generic_write_msg(mam_prng_t *prng, mam_psk_t const 
   mam_psk_t_set_t psks = NULL;
   mam_ntru_pk_t_set_t ntru_pks = NULL;
 
-  if (mam_msg_pubkey_epid == pubkey) {
+  if (MAM_MSG_PUBKEY_EPID == pubkey) {
     ep = epa;
-  } else if (mam_msg_pubkey_chid1 == pubkey) {
+  } else if (MAM_MSG_PUBKEY_CHID1 == pubkey) {
     ch1 = ch1a;
-  } else if (mam_msg_pubkey_epid1 == pubkey) {
+  } else if (MAM_MSG_PUBKEY_EPID1 == pubkey) {
     ep1 = ep1a;
   }
 
-  if (mam_msg_keyload_psk == keyload) {
+  if (MAM_MSG_KEYLOAD_PSK == keyload) {
     mam_psk_t_set_add(&psks, pska);
     mam_psk_t_set_add(&psks, pskb);
-  } else if (mam_msg_keyload_ntru == keyload) {
+  } else if (MAM_MSG_KEYLOAD_NTRU == keyload) {
     mam_ntru_pk_t_set_add(&ntru_pks, ntru_pk);
   }
 
@@ -91,14 +91,14 @@ static trits_t message_test_generic_write_first_packet(mam_msg_pubkey_t pubkey, 
   trits_t packet = trits_null();
   trits_t payload = trits_null();
 
-  if (mam_msg_checksum_mssig == checksum) {
-    if (mam_msg_pubkey_chid == pubkey) {
+  if (MAM_MSG_CHECKSUM_SIG == checksum) {
+    if (MAM_MSG_PUBKEY_CHID == pubkey) {
       write_ctx->mss = &cha->mss;
-    } else if (mam_msg_pubkey_epid == pubkey) {
+    } else if (MAM_MSG_PUBKEY_EPID == pubkey) {
       write_ctx->mss = &epa->mss;
-    } else if (mam_msg_pubkey_chid1 == pubkey) {
+    } else if (MAM_MSG_PUBKEY_CHID1 == pubkey) {
       write_ctx->mss = &ch1a->mss;
-    } else if (mam_msg_pubkey_epid1 == pubkey) {
+    } else if (MAM_MSG_PUBKEY_EPID1 == pubkey) {
       write_ctx->mss = &ep1a->mss;
     }
   }
@@ -291,7 +291,7 @@ static void message_test_generic(mam_prng_t *prng_sender, mam_prng_t *prng_recei
               message_test_generic_write_first_packet(pubkey, checksum, cha, epa, ch1a, ep1a, &write_ctx, payload_str);
         }
 
-        if (pubkey == mam_msg_pubkey_epid) {
+        if (pubkey == MAM_MSG_PUBKEY_EPID) {
           curr_ep = epa;
         } else {
           curr_ep = NULL;

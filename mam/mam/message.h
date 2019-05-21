@@ -43,21 +43,26 @@ extern "C" {
 #endif
 
 typedef enum mam_msg_pubkey_e {
-  mam_msg_pubkey_chid = 0,
-  mam_msg_pubkey_epid = 1,
-  mam_msg_pubkey_chid1 = 2,
-  mam_msg_pubkey_epid1 = 3,
+  MAM_MSG_PUBKEY_CHID = 0,
+  MAM_MSG_PUBKEY_EPID = 1,
+  MAM_MSG_PUBKEY_CHID1 = 2,
+  MAM_MSG_PUBKEY_EPID1 = 3,
 } mam_msg_pubkey_t;
 
+typedef enum mam_msg_type_e {
+  MAM_MSG_TYPE_UNSTRUCTURED = 0,
+  MAM_MSG_TYPE_PK_CERT = 1,
+} mam_msg_type_t;
+
 typedef enum mam_msg_keyload_e {
-  mam_msg_keyload_psk = 1,
-  mam_msg_keyload_ntru = 2,
+  MAM_MSG_KEYLOAD_PSK = 1,
+  MAM_MSG_KEYLOAD_NTRU = 2,
 } mam_msg_keyload_t;
 
 typedef enum mam_msg_checksum_e {
-  mam_msg_checksum_none = 0,
-  mam_msg_checksum_mac = 1,
-  mam_msg_checksum_mssig = 2,
+  MAM_MSG_CHECKSUM_NONE = 0,
+  MAM_MSG_CHECKSUM_MAC = 1,
+  MAM_MSG_CHECKSUM_SIG = 2,
 } mam_msg_checksum_t;
 
 typedef struct mam_msg_write_context_s {

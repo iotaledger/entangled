@@ -153,7 +153,7 @@ static mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api, tryte_t 
 static retcode_t mam_api_bundle_write_header(mam_api_t *const api, tryte_t const *const ch_id,
                                              tryte_t const *const ep_id, tryte_t const *const ch1_id,
                                              tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                             mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+                                             mam_ntru_pk_t_set_t ntru_pks, mam_msg_type_t msg_type_id,
                                              bundle_transactions_t *const bundle, trit_t *const msg_id) {
   retcode_t ret = RC_OK;
   mam_channel_t *ch = NULL;
@@ -413,30 +413,34 @@ void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t 
 }
 
 retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
-                                                 mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                                 bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, NULL, psks, ntru_pks, msg_type_id, bundle, msg_id);
+                                                 mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                                 trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, NULL, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
+                                     msg_id);
 }
 
 retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
                                                   tryte_t const *const ep_id, mam_psk_t_set_t psks,
-                                                  mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                                  bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch_id, ep_id, NULL, NULL, psks, ntru_pks, msg_type_id, bundle, msg_id);
+                                                  mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                                  trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, ep_id, NULL, NULL, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
+                                     msg_id);
 }
 
 retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t const *const ch_id,
                                               tryte_t const *const ch1_id, mam_psk_t_set_t psks,
-                                              mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                              bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch_id, NULL, ch1_id, NULL, psks, ntru_pks, msg_type_id, bundle, msg_id);
+                                              mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                              trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, NULL, ch1_id, NULL, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
+                                     msg_id);
 }
 
 retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
                                                tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                               mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-                                               bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, ep1_id, psks, ntru_pks, msg_type_id, bundle, msg_id);
+                                               mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                               trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, ep1_id, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
+                                     msg_id);
 }
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const msg_id, tryte_t const *const payload,
