@@ -128,16 +128,6 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 
 /**
- * Gets a channel from its id
- *
- * @param api - The API [in]
- * @param channel_id - The channel id [in]
- *
- * @return a pointer to the channel or NULL if not found
- */
-mam_channel_t *mam_api_get_channel(mam_api_t const *const api, tryte_t const *const channel_id);
-
-/**
  * Creates and adds an endpoint to the API
  *
  * @param api - The API [in, out]
@@ -149,18 +139,6 @@ mam_channel_t *mam_api_get_channel(mam_api_t const *const api, tryte_t const *co
  */
 retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id);
-
-/**
- * Gets an endpoint from its id
- *
- * @param api - The API [in]
- * @param channel_id - The associated channel id [in]
- * @param endpoint_id - The endpoint id [in]
- *
- * @return a pointer to the endpoint or NULL if not found
- */
-mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api, tryte_t const *const channel_id,
-                                     tryte_t const *const endpoint_id);
 
 /**
  * Creates a MAM tag that can be used in IOTA transactions
