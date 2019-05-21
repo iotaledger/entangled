@@ -500,19 +500,19 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t co
     tryte_t pubkey;
 
     if (ch1) { /*  SignedId chid1 = 2; */
-      pubkey = (tryte_t)mam_msg_pubkey_chid1;
+      pubkey = (tryte_t)MAM_MSG_PUBKEY_CHID1;
       pb3_wrap_absorb_tryte(&ctx->spongos, msg, pubkey);
       ERR_BIND_RETURN(mam_msg_wrap_pubkey_chid1(&ctx->spongos, msg, mam_channel_id(ch1), &ch->mss), ret);
     } else if (ep1) { /*  SignedId epid1 = 3; */
-      pubkey = (tryte_t)mam_msg_pubkey_epid1;
+      pubkey = (tryte_t)MAM_MSG_PUBKEY_EPID1;
       pb3_wrap_absorb_tryte(&ctx->spongos, msg, pubkey);
       ERR_BIND_RETURN(mam_msg_wrap_pubkey_epid1(&ctx->spongos, msg, mam_endpoint_id(ep1), &ch->mss), ret);
     } else if (ep) { /*  absorb tryte epid[81] = 1; */
-      pubkey = (tryte_t)mam_msg_pubkey_epid;
+      pubkey = (tryte_t)MAM_MSG_PUBKEY_EPID;
       pb3_wrap_absorb_tryte(&ctx->spongos, msg, pubkey);
       mam_msg_wrap_pubkey_epid(&ctx->spongos, msg, mam_endpoint_id(ep));
     } else { /*  absorb null chid = 0; */
-      pubkey = (tryte_t)mam_msg_pubkey_chid;
+      pubkey = (tryte_t)MAM_MSG_PUBKEY_CHID;
       pb3_wrap_absorb_tryte(&ctx->spongos, msg, pubkey);
       mam_msg_wrap_pubkey_chid();
     }
@@ -541,7 +541,7 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t co
 
       HASH_ITER(hh, psks, curr_entry_psk, tmp_entry_psk) {
         /*  absorb oneof keyload */
-        keyload = (tryte_t)mam_msg_keyload_psk;
+        keyload = (tryte_t)MAM_MSG_KEYLOAD_PSK;
         pb3_wrap_absorb_tryte(&ctx->spongos, msg, keyload);
         /*  fork; */
         mam_mam_spongos_fork(&ctx->spongos, &spongos_fork);
@@ -555,7 +555,7 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t co
 
       HASH_ITER(hh, ntru_pks, curr_entry_ntru, tmp_entry_ntru) {
         /*  absorb oneof keyload */
-        keyload = (tryte_t)mam_msg_keyload_ntru;
+        keyload = (tryte_t)MAM_MSG_KEYLOAD_NTRU;
         pb3_wrap_absorb_tryte(&ctx->spongos, msg, keyload);
         /*  fork; */
         mam_mam_spongos_fork(&ctx->spongos, &spongos_fork);
@@ -588,13 +588,13 @@ size_t mam_msg_packet_size(mam_msg_checksum_t checksum, mam_mss_t const *const m
        /*  absorb oneof checksum */
        + pb3_sizeof_oneof();
 
-  if (mam_msg_checksum_none == checksum) {
+  if (MAM_MSG_CHECKSUM_NONE == checksum) {
     // absorb null none = 0;
     sz += mam_msg_wrap_checksum_none_size();
-  } else if (mam_msg_checksum_mac == checksum) {
+  } else if (MAM_MSG_CHECKSUM_MAC == checksum) {
     //  MAC mac = 1;
     sz += mam_msg_wrap_checksum_mac_size();
-  } else if (mam_msg_checksum_mssig == checksum) {
+  } else if (MAM_MSG_CHECKSUM_SIG == checksum) {
     //  MSSig mssig = 2;
     MAM_ASSERT(mss);
     sz += mam_msg_wrap_checksum_mssig_size(mss);
@@ -629,13 +629,13 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx, mam_msg_check
 
   /*  absorb oneof checksum */
   pb3_wrap_absorb_tryte(&ctx->spongos, buffer, (tryte_t)checksum);
-  if (mam_msg_checksum_none == checksum) {
+  if (MAM_MSG_CHECKSUM_NONE == checksum) {
     /*    absorb null none = 0; */
     mam_msg_wrap_checksum_none();
-  } else if (mam_msg_checksum_mac == checksum) {
+  } else if (MAM_MSG_CHECKSUM_MAC == checksum) {
     /*    MAC mac = 1; */
     mam_msg_wrap_checksum_mac(&ctx->spongos, buffer);
-  } else if (mam_msg_checksum_mssig == checksum) {
+  } else if (MAM_MSG_CHECKSUM_SIG == checksum) {
     /*    MSSig mssig = 2; */
     ERR_BIND_RETURN(mam_msg_wrap_checksum_mssig(&ctx->spongos, buffer, ctx->mss), ret);
   } else {
@@ -680,24 +680,24 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
     ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(&ctx->spongos, msg, &pubkey), ret);
     ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM_PB3_BAD_ONEOF);
 
-    if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
+    if (MAM_MSG_PUBKEY_CHID1 == pubkey) { /*  SignedId chid1 = 2; */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid1(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key),
                                                   &spongos_mss, trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
                       ret);
       mam_pk_t_set_add(trusted_channels_pks, &ctx->pk);
-    } else if (mam_msg_pubkey_epid1 == pubkey) { /*  SignedId epid1 = 3; */
+    } else if (MAM_MSG_PUBKEY_EPID1 == pubkey) { /*  SignedId epid1 = 3; */
 
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_epid1(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key),
                                                   &spongos_mss, trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
                       ret);
       mam_pk_t_set_add(trusted_endpoints_pks, &ctx->pk);
-    } else if (mam_msg_pubkey_epid == pubkey) { /*  absorb tryte epid[81] = 1; */
+    } else if (MAM_MSG_PUBKEY_EPID == pubkey) { /*  absorb tryte epid[81] = 1; */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_epid(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key)),
                       ret);
       if (!mam_pk_t_set_contains(trusted_endpoints_pks, &ctx->pk)) {
         return RC_MAM_PK_IS_NOT_TRUSTED;
       }
-    } else if (mam_msg_pubkey_chid == pubkey) { /*  absorb null chid = 0; */
+    } else if (MAM_MSG_PUBKEY_CHID == pubkey) { /*  absorb null chid = 0; */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(), ret);
     } else
       MAM_ASSERT(0);
@@ -732,10 +732,10 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
           /*  fork; */
           mam_mam_spongos_fork(&ctx->spongos, &spongos_fork);
 
-          if (mam_msg_keyload_psk == keyload) { /*  KeyloadPSK psk = 1; */
+          if (MAM_MSG_KEYLOAD_PSK == keyload) { /*  KeyloadPSK psk = 1; */
             ERR_BIND_RETURN(mam_msg_unwrap_keyload_psk(&spongos_fork, msg, session_key, &key_found, psks), ret);
 
-          } else if (mam_msg_keyload_ntru == keyload) { /*  KeyloadNTRU ntru = 2; */
+          } else if (MAM_MSG_KEYLOAD_NTRU == keyload) { /*  KeyloadNTRU ntru = 2; */
             ERR_BIND_RETURN(
                 mam_msg_unwrap_keyload_ntru(&spongos_fork, msg, session_key, &key_found, ntru_sks, &spongos_ntru), ret);
 
@@ -793,13 +793,13 @@ retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx, trits_t *const 
   /*  absorb oneof checksum */
   ERR_BIND_GOTO(pb3_unwrap_absorb_tryte(&ctx->spongos, buffer, &checksum), e, cleanup);
 
-  if (mam_msg_checksum_none == checksum) {
+  if (MAM_MSG_CHECKSUM_NONE == checksum) {
     /*    absorb null none = 0; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_none(), e, cleanup);
-  } else if (mam_msg_checksum_mac == checksum) {
+  } else if (MAM_MSG_CHECKSUM_MAC == checksum) {
     /*    MAC mac = 1; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mac(&ctx->spongos, buffer), e, cleanup);
-  } else if (mam_msg_checksum_mssig == checksum) {
+  } else if (MAM_MSG_CHECKSUM_SIG == checksum) {
     mam_spongos_t spongos_mss;
     /*    MSSig mssig = 2; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mssig(&ctx->spongos, buffer, &spongos_mss,
