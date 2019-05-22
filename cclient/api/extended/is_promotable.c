@@ -29,7 +29,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv, fle
 
   consistency_req = check_consistency_req_new();
   consistency_res = check_consistency_res_new();
-  if (!consistency_req || consistency_res) {
+  if (!consistency_req || !consistency_res) {
     log_error(client_extended_logger_id, "%s: create check consistency request or response failed: %s.\n", __func__,
               error_2_string(ret_code));
     goto done;

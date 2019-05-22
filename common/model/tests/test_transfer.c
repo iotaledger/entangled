@@ -53,14 +53,21 @@ void test_transfer() {
   char buffer[size];
   size_t trytes_len = strlen((char*)trytes);
 
-  // test message
+  // test message from trytes
   TEST_ASSERT_NULL(tf.message);
-  transfer_message_set(&tf, trytes);
+  transfer_message_set_trytes(&tf, trytes, trytes_len);
   TEST_ASSERT_EQUAL_MEMORY(transfer_message_get(&tf), trytes, trytes_len);
 
   trytes_to_ascii(trytes, strlen((char*)trytes), buffer);
   TEST_ASSERT_EQUAL_MEMORY(msg, buffer, size);
 
+  transfer_message_free(&tf);
+  tf.message = NULL;
+
+  // test message from string
+  TEST_ASSERT_NULL(tf.message);
+  transfer_message_set_string(&tf, msg);
+  TEST_ASSERT_EQUAL_MEMORY(transfer_message_get(&tf), trytes, trytes_len);
   transfer_message_free(&tf);
   tf.message = NULL;
 
@@ -116,12 +123,13 @@ void test_transfer_array() {
   elm = transfer_array_at(tf_array, 3);
   TEST_ASSERT_EQUAL_INT64(-1235566778, elm->value);
 
-  transfer_message_set(elm, trytes);
+  size_t trytes_len = strlen((char*)trytes);
+  transfer_message_set_trytes(elm, trytes, trytes_len);
 
   // trytes to ascii
   size_t size = strlen((char*)trytes) / 2;
   char buffer[size];
-  trytes_to_ascii(trytes, strlen((char*)trytes), buffer);
+  trytes_to_ascii(trytes, trytes_len, buffer);
   TEST_ASSERT_EQUAL_MEMORY(msg, buffer, size);
   transfer_message_free(elm);
 
