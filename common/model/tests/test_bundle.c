@@ -83,24 +83,25 @@ static void message_to_bundle(bundle_transactions_t *bundle, char const *const s
 }
 
 static void test_bundle_message(char const *const message) {
+  // applying message to a bundle
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
   message_to_bundle(bundle, message);
+
+  // extracting bundle message
   iota_transaction_t *curr_tx = NULL;
-  size_t buff_size = (NUM_TRYTES_MESSAGE * bundle_transactions_size(bundle)) + 1;
-  tryte_t trytes_buf[buff_size];
+  size_t trytes_buff_size = NUM_TRYTES_MESSAGE * bundle_transactions_size(bundle);
+  tryte_t trytes_buff[trytes_buff_size + trytes_buff_size % 2];
   size_t index = 0;
   BUNDLE_FOREACH(bundle, curr_tx) {
-    flex_trits_to_trytes(trytes_buf + (index * NUM_TRYTES_MESSAGE), NUM_TRYTES_MESSAGE, transaction_message(curr_tx),
+    flex_trits_to_trytes(trytes_buff + (index * NUM_TRYTES_MESSAGE), NUM_TRYTES_MESSAGE, transaction_message(curr_tx),
                          NUM_TRITS_MESSAGE, NUM_TRITS_MESSAGE);
     index++;
   }
-  trytes_buf[buff_size] = '\0';
 
   // trytes to string
-  size_t str_size = strlen((char *)trytes_buf) / 2;
-  char str_buff[str_size];
-  trytes_to_ascii(trytes_buf, strlen((char *)trytes_buf), str_buff);
+  char str_buff[trytes_buff_size / 2 + trytes_buff_size % 2];
+  trytes_to_ascii(trytes_buff, trytes_buff_size, str_buff);
 
   TEST_ASSERT_EQUAL_MEMORY(message, str_buff, strlen((char *)message));
   bundle_transactions_free(&bundle);
