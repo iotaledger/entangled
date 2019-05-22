@@ -1,4 +1,12 @@
 cc_binary(
+    name = "readme",
+    srcs = ["readme.c"],
+    deps = [
+        "//mam/api",
+    ],
+)
+
+cc_binary(
     name = "send-header",
     srcs = ["send-header.c"],
     deps = [

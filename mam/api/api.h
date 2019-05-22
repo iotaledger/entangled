@@ -51,11 +51,11 @@ typedef struct mam_api_s {
  * Initialize an API
  *
  * @param api - The API [out]
- * @param mam_seed - The seed for PRNG initialization [in]
+ * @param seed - The seed for PRNG initialization [in]
  *
  * @return return code
  */
-MAM_EXPORT retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
+MAM_EXPORT retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const seed);
 
 /**
  * Destroys an API

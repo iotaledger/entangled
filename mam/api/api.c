@@ -265,17 +265,17 @@ static retcode_t mam_api_bundle_read_packet_from_msg(mam_msg_read_context_t *ctx
  * Public functions
  */
 
-retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
+retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const seed) {
   retcode_t ret = RC_OK;
-  trit_t mam_seed_trits[MAM_PRNG_SECRET_KEY_SIZE];
+  trit_t seed_trits[MAM_PRNG_SECRET_KEY_SIZE];
 
-  if (api == NULL || mam_seed == NULL) {
+  if (api == NULL || seed == NULL) {
     return RC_NULL_PARAM;
   }
 
-  trytes_to_trits(mam_seed, mam_seed_trits, MAM_PRNG_SECRET_KEY_SIZE / 3);
-  mam_prng_init(&api->prng, trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, mam_seed_trits));
-  memset_safe(mam_seed_trits, MAM_PRNG_SECRET_KEY_SIZE, 0, MAM_PRNG_SECRET_KEY_SIZE);
+  trytes_to_trits(seed, seed_trits, MAM_PRNG_SECRET_KEY_SIZE / 3);
+  mam_prng_init(&api->prng, trits_from_rep(MAM_PRNG_SECRET_KEY_SIZE, seed_trits));
+  memset_safe(seed_trits, MAM_PRNG_SECRET_KEY_SIZE, 0, MAM_PRNG_SECRET_KEY_SIZE);
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
