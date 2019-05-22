@@ -22,6 +22,7 @@ extern "C" {
 typedef struct transfer_s {
   int64_t value;
   uint64_t timestamp;
+  size_t msg_len;
   tryte_t *message;
   flex_trit_t address[FLEX_TRIT_SIZE_243];
   flex_trit_t tag[FLEX_TRIT_SIZE_81];
@@ -49,7 +50,8 @@ static inline tryte_t **signature_fragments_at(signature_fragments_t const *cons
 
 typedef UT_array transfer_array_t;
 
-retcode_t transfer_message_set(transfer_t *tf, tryte_t const *const msg);
+retcode_t transfer_message_set_trytes(transfer_t *tf, tryte_t const *const trytes, size_t length);
+retcode_t transfer_message_set_string(transfer_t *tf, char const *const str);
 static inline void transfer_message_free(transfer_t *tf) { free(tf->message); }
 static inline tryte_t *transfer_message_get(transfer_t const *const tf) { return tf->message; }
 

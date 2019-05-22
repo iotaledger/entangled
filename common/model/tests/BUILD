@@ -13,6 +13,8 @@ cc_test(
     deps = [
         "//common/crypto/iss:normalize",
         "//common/model:bundle",
+        "//common/trinary:flex_trit",
+        "//common/trinary:tryte_ascii",
         "@unity",
     ],
 )
