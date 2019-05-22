@@ -30,7 +30,7 @@ A lot of names have been used in the past, either by the Iota Foundation or by t
 For a more in-depth description of the layers, their states and their algorithms, read [spec.pdf](https://github.com/iotaledger/entangled/blob/develop/mam/spec.pdf).
 
 | Name | Description | Dependencies | Sources |
-|------|-------------|---------|
+|------|-------------|--------------|---------|
 | API | The API layer supports high-level operations that translates MAM messages to/from IOTA bundles. | MAM | [/mam/api](https://github.com/iotaledger/entangled/tree/develop/mam/api) |
 | MAM | The MAM layer supports high-level operations of the MAM protocol like writing and reading messages. | MSS, NTRU, PB3, PRNG, PSK | [/mam/mam](https://github.com/iotaledger/entangled/tree/develop/mam/mam) |
 | MSS | The MSS layer supports Merkle-tree Signature Scheme. | Sponge, WOTS | [/mam/mss](https://github.com/iotaledger/entangled/tree/develop/mam/mss) |
