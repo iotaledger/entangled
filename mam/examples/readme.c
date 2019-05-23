@@ -56,6 +56,22 @@ int main() {
   mam_api_bundle_write_packet(&api, message_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_SIG, true, bundle);
 
   /**
+   * Read a packet from a bundle
+   */
+
+  tryte_t *payload = NULL;
+  size_t payload_size = 0;
+  bool is_last_packet = false;
+
+  mam_api_bundle_read(&api, bundle, &payload, &payload_size, &is_last_packet);
+  fprintf(stderr, "Payload: ");
+  for (size_t i = 0; i < payload_size; i++) {
+    fprintf(stderr, "%c", payload[i]);
+  }
+  fprintf(stderr, "\n");
+  free(payload);
+
+  /**
    * Destroy the API
    */
 

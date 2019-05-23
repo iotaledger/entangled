@@ -4,30 +4,25 @@
 
 ### Definition
 
-MAM (Masked authenticated messaging) is a trinary messages encryption scheme that allows for both confidentiality and authenticity.
+Masked Authenticated Messaging (MAM) is a second layer data communication protocol which adds functionality to emit and access encrypted data streams, like RSS, over the Tangle. IOTA’s consensus protocol adds integrity to these message streams. Given these properties, MAM fulfills an important need in industries where integrity and privacy meet.
 
-Using MAM2 entities of IOTA can (see Figure 1):
-– create channels for broadcasting messages;
-– create channel endpoints for protecting messages during broadcasting;
-– protect messages in different ways, for example, turn on / off encryption / authentication; – split messages into parts (packets), protect and transmit each part almost independently; – set message recipients and provide them with key material in different ways.
+Using MAM you can:
 
-MAM allows for:
-
-- Message encryption via NTRU (public key encrytpion) and PSK (Pre-Shared Key)
-
-- Sending a message to multiple receivers, each having his/her own session key
-
-- Authenticating a message either via MAC (Integrity) or via MSS signature (Integrity + Authenticity)
+- create channels for broadcasting messages
+- create channel endpoints for protecting messages during broadcasting
+- protect messages in different ways, for example, turn on / off encryption / authentication
+- split messages into parts (packets), protect and transmit each part almost independently
+- set message recipients and provide them with key material in different ways
 
 ### Versions
 
-A lot of names have been used in the past, either by the Iota Foundation or by the community, to refer to two iterations of the MAM project. You may have heard, for example: MAM, MAM0, MAM1, MAM2, MAM+... As of now, the name `MAM` will refer to the current fully spec'd and fully revised implementation while `MAM prototype` will refer to the previous implementation.
+A lot of names have been used in the past, either by the Iota Foundation or by the community, to refer to two iterations of the MAM project. You may have heard, for example: MAM prototype, MAM, MAM0, MAM1, MAM2, MAM+...
+
+As of now, the name MAM is referring to this current implementation.
 
 ### Layers
 
-3.7 layer: a set of interconnected algorithms. The algorithms share a common state which is implicitly included in their inputs and outputs (that is, each algorithm can use and modify the common state);
-
-For a more in-depth description of the layers, their states and their algorithms, read [spec.pdf](https://github.com/iotaledger/entangled/blob/develop/mam/spec.pdf).
+MAM uses a set of interconnected algorithms called layers. The following table is a quick definition of the main layers, for a more in-depth description of their states and algorithms, read [spec.pdf](https://github.com/iotaledger/entangled/blob/develop/mam/spec.pdf).
 
 | Name | Description | Dependencies | Sources |
 |------|-------------|--------------|---------|
@@ -105,7 +100,9 @@ MAM is a stateful library. The API instance is holding your MAM account informat
 retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 ```
 
-We create a new MAM channel by providing the desired height - of the underlying merkle tree - and a tryte array to store the new channel ID. The channel ID is the address where messages created through this channel will be sent to.
+We create a new MAM channel by providing:
+- the desired height of the underlying merkle tree which will determine how many signatures we can generate with this channel central endpoint
+- a tryte array to store the new channel ID which is the address where messages created through this channel will be sent to
 
 Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 messages with this channel central endpoint.
 
@@ -123,7 +120,10 @@ mam_api_create_channel(&api, 5, channel_id);
 retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id, tryte_t *const endpoint_id);
 ```
 
-We create a new MAM endpoint that belongs to the previously created channel by providing the desired height - of the underlying merkle tree - , the channel ID and a tryte array to store the endpoint ID. Messages created through this endpoint will still be sent to the address of the channel, the channel ID.
+We create a new MAM endpoint that belongs to the previously created channel by providing:
+- the desired height of the underlying merkle tree which will determine how many signatures we can generate with this endpoint
+- the channel ID
+- a tryte array to store the new endpoint ID. Messages created through this endpoint will still be sent to the address of the channel, the channel ID.
 
 Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 messages with this endpoint.
 
@@ -146,7 +146,13 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
 
 Now that we have a channel and an endpoint, we are ready to initiate our first message by writing a header to a bundle. We can do that directly through the central endpoint of the channel, or through the created endpoint. In both cases, the message will be sent to the channel address.
 
-We need to provide the channel ID, the endpoint ID, a set of Pre-Shared Keys, a set of NTRU public keys, a new bundle and a trit array to store the message ID. This message ID uniquely identifies the message inside the channel and will be needed to write packets in the message.
+We need to provide:
+- the channel ID
+- the endpoint ID (only when using the endpoint)
+- a set of Pre-Shared Keys
+- a set of NTRU public keys
+- a new bundle
+- a trit array to store the new message ID. This message ID uniquely identifies the message inside the channel and will be needed to write packets in the message.
 
 To create the message through the central endpoint
 ```c
@@ -166,7 +172,7 @@ bundle_transactions_new(&bundle);
 mam_api_bundle_write_header_on_endpoint(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
 ```
 
-At this point, the bundle can already be sent to the Tangle. You can also add the first packet of the message to this bundle before sending it.
+At this point, the bundle can already be sent to the Tangle. You can also add the first packet of the message to this bundle before sending it, this is what the example will show.
 
 ### Write a packet to a bundle
 
@@ -174,32 +180,55 @@ At this point, the bundle can already be sent to the Tangle. You can also add th
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const msg_id, tryte_t const *const payload, size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet, bundle_transactions_t *const bundle);
 ```
 
-You can write as many packet as you want in the message. For this, you'll need to provide the message ID, a trytes payload and its size, a checksum method, a boolean value to tell if this is the last packet or an intermediate one and the bundle.
+We are now going to write the first (and only) packet of the message to the same bundle that already contains the header.
 
-You can choose one of the following.
+We need to provide:
+- the message ID that uniquely identifies the message
+- a payload and its size, they both need to be in trytes. If your data is not in trytes (ASCII, trits, bytes...), you will first need to convert it using one of the functions provided [here](https://github.com/iotaledger/entangled/tree/develop/common/trinary)
+- a checksum method between none, MAC and signature
+- a boolean value to tell if this is an intermediate packet (`false`) or the last packet of the message (`true`). If this is the last packet, all contexts related to this message will be removed on the sender side as well as the receiver side and it won't be possible to write new packets to this message anymore
+- the bundle you wish to write the packet in
 
-No checksum
+With no checksum.
 ```c
 mam_api_bundle_write_packet(&api, message_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true, bundle);
 ```
 
-With MAC checksum
+With MAC checksum you add integrity to your packet. Due to the underlying sponge construction of a MAM message, a MAC checksum actually also adds integrity to all previous packets of the message. Adding a MAC checksum to a packet is a really cheap operation so it is recommended in most cases.
 ```c
 mam_api_bundle_write_packet(&api, message_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_MAC, true, bundle);
 ```
 
-With signature (chosen method in the example)
+With signature (chosen method in the example) you add integrity and authenticity to your packet. The integrity part is due to the fact that the signed hash is actually the MAC checksum. For the same reasons, by signing a packet you add authentication to all previous packets of the message. Signing a packet is an expensive operation, depending on your use case you could for example sign one packet out of ten.
 ```c
 mam_api_bundle_write_packet(&api, message_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_SIG, true, bundle);
 ```
 
-You now have a MAM bundle ready to be sent and received to and from the Tangle.
+We now have a MAM bundle containing a full message (header + packet) ready to be sent and received to and from the Tangle.
 
-### Read packets
+### Read a packet from a bundle
 
 ```c
-mam_api_bundle_read(&api, bundle, &payload, &payload_size, &is_last_packet);
+retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle, tryte_t **const payload, size_t *const payload_size, bool *const is_last_packet);
 ```
+
+Now let's switch to the receiver side. We just fetched a bundle from the Tangle and we are ready to read it. It doesn't matter if the bundle contains only a header, a header and a first packet or only a packet, there is only one function to call and we need to provide:
+
+- the bundle
+- a payload that will either be filled with the payload or set to `NULL` if the bundle contained only a header.
+- a payload size that will either be set to the payload size or to `0` if the bundle contained only a header.
+- a boolean that will either be set to `true` if the packet was the last of the message or `false` otherwise. It will tell you if you should continue looking for packets.
+
+```c
+tryte_t *payload = NULL;
+size_t payload_size = 0;
+bool is_last_packet = false;
+
+mam_api_bundle_read(&api, bundle, &payload, &payload_size, &is_last_packet);
+free(payload);
+```
+
+The payload is allocated by the function so you must release it when you're done with it.
 
 ### Destroy the API
 
