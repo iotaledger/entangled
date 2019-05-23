@@ -11,7 +11,8 @@
 #include "cclient/api/extended/send_trytes.h"
 
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-                                    int const depth, int const mwm, bundle_transactions_t* const bundle) {
+                                    int const depth, int const mwm, flex_trit_t const* const reference,
+                                    bundle_transactions_t* const bundle) {
   retcode_t ret_code = RC_ERROR;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   iota_transaction_t* curr_tx = NULL;
@@ -30,7 +31,7 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, fle
         }
 
         // send trytes
-        ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, NULL, false, (transaction_array_t*)bundle);
+        ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, reference, false, (transaction_array_t*)bundle);
         if (ret_code != RC_OK) {
           log_error(client_extended_logger_id, "%s iota_client_send_trytes failed: %s\n", __func__,
                     error_2_string(ret_code));
