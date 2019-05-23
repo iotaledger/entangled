@@ -262,7 +262,6 @@ void bundle_set_messages(bundle_transactions_t *bundle, signature_fragments_t *m
   size_t index = 0;
   tryte_t **msg = NULL;
   size_t msg_len = 0;
-  tryte_t trytes_buff[NUM_TRYTES_SIGNATURE];
 
   BUNDLE_FOREACH(bundle, tx) {
     msg = signature_fragments_at(messages, index);
@@ -270,12 +269,9 @@ void bundle_set_messages(bundle_transactions_t *bundle, signature_fragments_t *m
       break;
     }
     msg_len = strlen((char *)*msg);
-    memcpy(trytes_buff, *msg, msg_len);
-    memset(trytes_buff + msg_len, '9', NUM_TRYTES_SIGNATURE - msg_len);
-
     // trytes to flex_trits
-    flex_trits_from_trytes(tx->data.signature_or_message, NUM_TRITS_SIGNATURE, trytes_buff, NUM_TRYTES_SIGNATURE,
-                           NUM_TRYTES_SIGNATURE);
+    flex_trits_from_trytes(tx->data.signature_or_message, NUM_TRITS_SIGNATURE, *msg, NUM_TRYTES_SIGNATURE, msg_len);
+    tx->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
     index++;
   }
 }

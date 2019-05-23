@@ -10,15 +10,21 @@
 
 UT_icd ut_transfer_icd = {sizeof(transfer_t), NULL, NULL, NULL};
 
-retcode_t transfer_message_set(transfer_t* tf, tryte_t const* const msg) {
-  size_t len = strlen((char*)msg) + 1;
-  tf->message = (tryte_t*)malloc(sizeof(tryte_t) * len);
+retcode_t transfer_message_set_trytes(transfer_t* tf, tryte_t const* const trytes, size_t length) {
+  tf->message = (tryte_t*)malloc(sizeof(tryte_t) * length);
   if (tf->message == NULL) {
     return RC_OOM;
   }
-  memcpy(tf->message, msg, len);
-  tf->message[len - 1] = '\0';
+  memcpy(tf->message, trytes, length);
+  tf->msg_len = length;
   return RC_OK;
+}
+
+retcode_t transfer_message_set_string(transfer_t* tf, char const* const str) {
+  size_t trytes_len = strlen(str) * 2;
+  tryte_t trytes_msg[trytes_len];
+  ascii_to_trytes(str, trytes_msg);
+  return transfer_message_set_trytes(tf, trytes_msg, trytes_len);
 }
 
 transfer_array_t* transfer_array_new() {

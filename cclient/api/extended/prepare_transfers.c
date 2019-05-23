@@ -148,19 +148,19 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
     // TODO validate transfer: check if the address is valid(with a trailing zero trit).
     int msg_chunks = 1;
     // count message length
-    size_t msg_len = strlen((char*)elm->message);
-    tryte_t msg_buff[NUM_TRYTES_MESSAGE];
-    msg_chunks += floor((double)msg_len / NUM_TRYTES_MESSAGE);
+    tryte_t msg_buff[NUM_TRYTES_MESSAGE + 1];
+    msg_chunks += floor((double)elm->msg_len / NUM_TRYTES_MESSAGE);
 
     for (size_t i = 0; i < (msg_chunks * NUM_TRYTES_MESSAGE); i += NUM_TRYTES_MESSAGE) {
       transaction_reset(&tx);
 
-      if (i + NUM_TRYTES_MESSAGE > msg_len) {
-        int last_chunk = msg_len - ((msg_chunks - 1) * NUM_TRYTES_MESSAGE);
+      if (i + NUM_TRYTES_MESSAGE > elm->msg_len) {
+        int last_chunk = elm->msg_len - ((msg_chunks - 1) * NUM_TRYTES_MESSAGE);
         strncpy((char*)msg_buff, (char*)elm->message + i, last_chunk);
         msg_buff[last_chunk] = '\0';
       } else {
         strncpy((char*)msg_buff, (char*)elm->message + i, NUM_TRYTES_MESSAGE);
+        msg_buff[NUM_TRYTES_MESSAGE] = '\0';
       }
 
       tag = elm->tag;
