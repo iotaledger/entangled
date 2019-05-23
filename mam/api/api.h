@@ -276,17 +276,18 @@ size_t mam_api_serialized_size(mam_api_t const *const api);
  *
  * @return return void
  */
-void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer);
+void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer);
 
 /**
  * Deserializes a buffer into API struct
  *
  * @param buffer - The buffer from where to deserialize [in]
+ * @param buffer_size - The size of the buffer [in]
  * @param api - The API [out]
  *
  * @return return code
  */
-retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api);
+retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api);
 
 /**
  * Saves an API into a file

@@ -714,22 +714,26 @@ size_t mam_api_serialized_size(mam_api_t const *const api) {
          mam_pks_serialized_size(api->trusted_endpoint_ids);
 }
 
-void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer) {
-  mam_prng_serialize(&api->prng, buffer);
-  mam_ntru_sks_serialize(api->ntru_sks, buffer);
-  mam_ntru_pks_serialize(api->ntru_pks, buffer);
-  mam_psks_serialize(api->psks, buffer);
-  mam_channels_serialize(api->channels, buffer);
-  pb3_encode_longtrint(api->channel_ord, buffer);
-  mam_api_write_ctx_map_serialize(&api->write_ctxs, buffer);
-  mam_api_read_ctx_map_serialize(&api->read_ctxs, buffer);
-  mam_pks_serialize(api->trusted_channel_ids, buffer);
-  mam_pks_serialize(api->trusted_endpoint_ids, buffer);
+void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer) {
+  trits_t trits = trits_from_rep(mam_api_serialized_size(api), buffer);
+
+  mam_prng_serialize(&api->prng, &trits);
+  mam_ntru_sks_serialize(api->ntru_sks, &trits);
+  mam_ntru_pks_serialize(api->ntru_pks, &trits);
+  mam_psks_serialize(api->psks, &trits);
+  mam_channels_serialize(api->channels, &trits);
+  pb3_encode_longtrint(api->channel_ord, &trits);
+  mam_api_write_ctx_map_serialize(&api->write_ctxs, &trits);
+  mam_api_read_ctx_map_serialize(&api->read_ctxs, &trits);
+  mam_pks_serialize(api->trusted_channel_ids, &trits);
+  mam_pks_serialize(api->trusted_endpoint_ids, &trits);
 }
 
-retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
+retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api) {
   retcode_t ret;
+  trits_t trits = trits_from_rep(buffer_size, buffer);
 
+  // TODO should we use mam_api_init here ?
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
@@ -739,16 +743,16 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
   api->trusted_channel_ids = NULL;
   api->trusted_endpoint_ids = NULL;
 
-  ERR_BIND_RETURN(mam_prng_deserialize(buffer, &api->prng), ret);
-  ERR_BIND_RETURN(mam_ntru_sks_deserialize(buffer, &api->ntru_sks), ret);
-  ERR_BIND_RETURN(mam_ntru_pks_deserialize(buffer, &api->ntru_pks), ret);
-  ERR_BIND_RETURN(mam_psks_deserialize(buffer, &api->psks), ret);
-  ERR_BIND_RETURN(mam_channels_deserialize(buffer, &api->prng, &api->channels), ret);
-  ERR_BIND_RETURN(pb3_decode_longtrint(&api->channel_ord, buffer), ret);
-  ERR_BIND_RETURN(mam_api_write_ctx_map_deserialize(buffer, &api->write_ctxs, api->channels), ret);
-  ERR_BIND_RETURN(mam_api_read_ctx_map_deserialize(buffer, &api->read_ctxs), ret);
-  ERR_BIND_RETURN(mam_pks_deserialize(buffer, &api->trusted_channel_ids), ret);
-  ERR_BIND_RETURN(mam_pks_deserialize(buffer, &api->trusted_endpoint_ids), ret);
+  ERR_BIND_RETURN(mam_prng_deserialize(&trits, &api->prng), ret);
+  ERR_BIND_RETURN(mam_ntru_sks_deserialize(&trits, &api->ntru_sks), ret);
+  ERR_BIND_RETURN(mam_ntru_pks_deserialize(&trits, &api->ntru_pks), ret);
+  ERR_BIND_RETURN(mam_psks_deserialize(&trits, &api->psks), ret);
+  ERR_BIND_RETURN(mam_channels_deserialize(&trits, &api->prng, &api->channels), ret);
+  ERR_BIND_RETURN(pb3_decode_longtrint(&api->channel_ord, &trits), ret);
+  ERR_BIND_RETURN(mam_api_write_ctx_map_deserialize(&trits, &api->write_ctxs, api->channels), ret);
+  ERR_BIND_RETURN(mam_api_read_ctx_map_deserialize(&trits, &api->read_ctxs), ret);
+  ERR_BIND_RETURN(mam_pks_deserialize(&trits, &api->trusted_channel_ids), ret);
+  ERR_BIND_RETURN(mam_pks_deserialize(&trits, &api->trusted_endpoint_ids), ret);
 
   return RC_OK;
 }
@@ -756,7 +760,7 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
 retcode_t mam_api_save(mam_api_t const *const api, char const *const filename) {
   retcode_t ret = RC_OK;
   size_t trits_size = 0;
-  trits_t trits = trits_null();
+  trit_t *trits = NULL;
   size_t bytes_size = 0;
   byte_t *bytes = NULL;
   FILE *file = NULL;
@@ -766,18 +770,17 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename) {
   }
 
   trits_size = mam_api_serialized_size(api);
-  if (trits_is_null(trits = trits_alloc(trits_size))) {
+  if ((trits = malloc(trits_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
-  mam_api_serialize(api, &trits);
-  trits = trits_pickup_all(trits);
+  mam_api_serialize(api, trits);
   bytes_size = MIN_BYTES(trits_size);
   if ((bytes = (byte_t *)malloc(bytes_size)) == NULL) {
     ret = RC_OOM;
     goto done;
   }
-  trits_to_bytes(trits.p + trits.d, bytes, trits_size);
+  trits_to_bytes(trits, bytes, trits_size);
   if ((file = fopen(filename, "w")) == NULL) {
     ret = RC_UTILS_FAILED_TO_OPEN_FILE;
     goto done;
@@ -788,7 +791,7 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename) {
   }
 
 done:
-  trits_free(trits);
+  free(trits);
   free(bytes);
   fclose(file);
 
@@ -797,7 +800,8 @@ done:
 
 retcode_t mam_api_load(char const *const filename, mam_api_t *const api) {
   retcode_t ret = RC_OK;
-  trits_t trits = trits_null();
+  size_t trits_size = 0;
+  trit_t *trits = NULL;
   size_t bytes_size = 0;
   byte_t *bytes = NULL;
   FILE *file = NULL;
@@ -824,20 +828,21 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api) {
     goto done;
   }
 
-  if (trits_is_null(trits = trits_alloc(bytes_size * NUMBER_OF_TRITS_IN_A_BYTE))) {
+  trits_size = bytes_size * NUMBER_OF_TRITS_IN_A_BYTE;
+  if ((trits = malloc(trits_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  bytes_to_trits(bytes, bytes_size, trits.p + trits.d, bytes_size * NUMBER_OF_TRITS_IN_A_BYTE);
+  bytes_to_trits(bytes, bytes_size, trits, bytes_size * NUMBER_OF_TRITS_IN_A_BYTE);
 
-  if ((ret = mam_api_deserialize(&trits, api)) != RC_OK) {
+  if ((ret = mam_api_deserialize(trits, trits_size, api)) != RC_OK) {
     goto done;
   }
 
 done:
   free(bytes);
-  trits_free(trits);
+  free(trits);
   fclose(file);
 
   return ret;
