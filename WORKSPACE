@@ -59,3 +59,29 @@ iota_deps()
 setup_toolchains()
 
 fetch_snapshot_files()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "emscripten_toolchain",
+    build_file = "//toolchain:emscripten-toolchain.BUILD",
+    strip_prefix = "emscripten-1.38.31",
+    url = "https://github.com/kripken/emscripten/archive/1.38.31.tar.gz",
+)
+
+http_archive(
+    name = "emscripten_clang",
+    build_file = "//toolchain:emscripten-clang.BUILD",
+    strip_prefix = "emscripten-llvm-e1.38.31",
+    url = "https://s3.amazonaws.com/mozilla-games/emscripten/packages/llvm/tag/linux_64bit/emscripten-llvm-e1.38.31.tar.gz",
+)
+
+http_archive(
+    name = "build_bazel_rules_nodejs",
+    sha256 = "1db950bbd27fb2581866e307c0130983471d4c3cd49c46063a2503ca7b6770a4",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.29.0/rules_nodejs-0.29.0.tar.gz"],
+)
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
+
+node_repositories()

@@ -2,3 +2,4 @@ import %workspace%/tools/bazel.rc
 import %workspace%/tools/remote.rc
 import %workspace%/tools/toolchains.rc
 try-import %workspace%/user.bazelrc
+
