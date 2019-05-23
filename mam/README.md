@@ -230,6 +230,38 @@ free(payload);
 
 The payload is allocated by the function so you must release it when you're done with it.
 
+### Save and load the API
+
+```c
+size_t mam_api_serialized_size(mam_api_t const *const api);
+void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer);
+retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api);
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
+```
+
+MAM being a stateful library, we need to keep the state alive from one execution to the other.
+
+By serializing and deserializing the state to and from trits, we are able to use any kind of storage layer.
+
+```c
+mam_api_t new_api;
+size_t serialized_size = mam_api_serialized_size(&api);
+trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
+
+mam_api_serialize(&api, buffer);
+mam_api_deserialize(buffer, serialized_size, &new_api);
+free(buffer);
+```
+
+Convenient functions to save and load the state to and from a file are also available (chosen method in  the example).
+```c
+mam_api_t new_api;
+
+mam_api_save(&api, "mam.state");
+mam_api_load("mam.state", &new_api);
+```
+
 ### Destroy the API
 
 ```c

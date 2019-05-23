@@ -72,6 +72,15 @@ int main() {
   free(payload);
 
   /**
+   * Save and load the API
+   */
+
+  mam_api_t new_api;
+
+  mam_api_save(&api, "mam.state");
+  mam_api_load("mam.state", &new_api);
+
+  /**
    * Destroy the API
    */
 
