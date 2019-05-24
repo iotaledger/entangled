@@ -5,6 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -358,4 +359,12 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len, const by
   memcpy(to_flex_trits, bytes, num_bytes);
 #endif
   return num_trits;
+}
+
+void flex_trit_print(flex_trit_t const *const flex_trits, size_t trits_len) {
+  size_t tryte_len = trits_len / 3;
+  tryte_t tryte_buff[tryte_len + 1];
+  flex_trits_to_trytes(tryte_buff, tryte_len, flex_trits, trits_len, trits_len);
+  tryte_buff[tryte_len] = '\0';
+  printf("%s", tryte_buff);
 }
