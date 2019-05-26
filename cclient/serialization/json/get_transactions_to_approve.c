@@ -11,7 +11,7 @@
 
 retcode_t json_get_transactions_to_approve_serialize_request(get_transactions_to_approve_req_t const *const obj,
                                                              char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -46,7 +46,7 @@ done:
 
 retcode_t json_get_transactions_to_approve_deserialize_request(char const *const obj,
                                                                get_transactions_to_approve_req_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
@@ -72,7 +72,7 @@ end:
 
 retcode_t json_get_transactions_to_approve_serialize_response(get_transactions_to_approve_res_t const *const obj,
                                                               char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -105,7 +105,7 @@ done:
 
 retcode_t json_get_transactions_to_approve_deserialize_response(char const *const obj,
                                                                 get_transactions_to_approve_res_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
