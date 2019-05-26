@@ -35,11 +35,14 @@ extern "C" {
  * @param[in] tail_hash Tail transaction hash
  * @param[in] depth The depth for getting transactions to approve
  * @param[in] mwm The Minimum Weight Magnitude for doing Proof-of-Work
+ * @param[in] reference Hash of transaction to start random-walk from. Can be <b>Null</b>, in that case the latest
+ * milestone is used as a reference.
  * @param[out] bundle Analyzed transaction objects.
  * @return #retcode_t
  */
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-                                    int const depth, int const mwm, bundle_transactions_t* const bundle);
+                                    int const depth, int const mwm, flex_trit_t const* const reference,
+                                    bundle_transactions_t* const bundle);
 
 #ifdef __cplusplus
 }
