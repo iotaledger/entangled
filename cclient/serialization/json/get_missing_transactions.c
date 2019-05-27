@@ -11,7 +11,7 @@
 
 retcode_t json_get_missing_transactions_serialize_response(get_missing_transactions_res_t const *const res,
                                                            char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
 
   cJSON *json_root = cJSON_CreateObject();

@@ -10,7 +10,7 @@
 #include "cclient/serialization/json/logger.h"
 
 retcode_t json_get_tips_serialize_request(char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *req_text = "{\"command\":\"getTips\"}";
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   ret = char_buffer_allocate(out, strlen(req_text));
@@ -21,7 +21,7 @@ retcode_t json_get_tips_serialize_request(char_buffer_t *out) {
 }
 
 retcode_t json_get_tips_serialize_response(get_tips_res_t const *const res, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
 
   cJSON *json_root = cJSON_CreateObject();
@@ -47,7 +47,7 @@ err:
 }
 
 retcode_t json_get_tips_deserialize_response(char const *const obj, get_tips_res_t *res) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
