@@ -10,7 +10,7 @@
 #include "cclient/serialization/json/logger.h"
 
 retcode_t json_store_transactions_serialize_request(store_transactions_req_t const *const req, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -39,7 +39,7 @@ retcode_t json_store_transactions_serialize_request(store_transactions_req_t con
 }
 
 retcode_t json_store_transactions_deserialize_request(char const *const obj, store_transactions_req_t *const out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
 
   if (out->trytes == NULL) {
     return RC_NULL_PARAM;
