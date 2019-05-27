@@ -11,7 +11,6 @@
 #include "cclient/request/requests.h"
 #include "cclient/response/responses.h"
 #include "cclient/serialization/json/json_serializer.h"
-#include "cclient/types/types.h"
 #include "ciri/api/api.h"
 #include "ciri/api/http/http.h"
 #include "utils/logger_helper.h"

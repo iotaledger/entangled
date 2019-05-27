@@ -17,7 +17,10 @@
 #ifndef CCLIENT_RESPONSE_GET_NEIGHBORS_H
 #define CCLIENT_RESPONSE_GET_NEIGHBORS_H
 
-#include "cclient/types/types.h"
+#include <stdint.h>
+
+#include "common/errors.h"
+#include "utarray.h"
 #include "utils/char_buffer.h"
 
 #ifdef __cplusplus

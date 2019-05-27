@@ -17,7 +17,9 @@
 #ifndef CCLIENT_RESPONSE_GET_NODE_INFO_H
 #define CCLIENT_RESPONSE_GET_NODE_INFO_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "common/trinary/flex_trit.h"
+#include "utarray.h"
 #include "utils/char_buffer.h"
 
 #ifdef __cplusplus

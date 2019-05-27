@@ -17,7 +17,6 @@
 #ifndef CCLIENT_RESPONSE_ERROR_H
 #define CCLIENT_RESPONSE_ERROR_H
 
-#include "cclient/types/types.h"
 #include "utils/char_buffer.h"
 
 #ifdef __cplusplus
