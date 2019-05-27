@@ -16,7 +16,7 @@ static const char *kTrytes = "trytes";
 static const char *kMwm = "minWeightMagnitude";
 
 retcode_t json_attach_to_tangle_serialize_request(const attach_to_tangle_req_t *const obj, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   size_t len = 0;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -60,7 +60,7 @@ done:
 }
 
 retcode_t json_attach_to_tangle_serialize_response(const attach_to_tangle_res_t *const obj, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   size_t len = 0;
   cJSON *json_root = cJSON_CreateObject();
@@ -88,7 +88,7 @@ done:
 }
 
 retcode_t json_attach_to_tangle_deserialize_request(const char *const obj, attach_to_tangle_req_t *const out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
 
   if (out->trytes == NULL) {
     out->trytes = hash8019_array_new();
@@ -118,7 +118,7 @@ done:
 }
 
 retcode_t json_attach_to_tangle_deserialize_response(const char *const obj, attach_to_tangle_res_t *const out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);

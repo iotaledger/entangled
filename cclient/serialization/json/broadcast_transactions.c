@@ -13,7 +13,7 @@ static const char *kCmdName = "broadcastTransactions";
 static const char *kTrytes = "trytes";
 
 retcode_t json_broadcast_transactions_serialize_request(broadcast_transactions_req_t *const req, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   size_t len = 0;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -47,7 +47,7 @@ retcode_t json_broadcast_transactions_serialize_request(broadcast_transactions_r
 
 retcode_t json_broadcast_transactions_deserialize_request(const char *const obj,
                                                           broadcast_transactions_req_t *const out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
 
   if (out->trytes == NULL) {
     out->trytes = hash8019_array_new();

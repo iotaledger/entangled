@@ -10,7 +10,7 @@
 #include "cclient/serialization/json/logger.h"
 
 retcode_t json_get_balances_serialize_request(get_balances_req_t const *const obj, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -45,7 +45,7 @@ err:
 }
 
 retcode_t json_get_balances_deserialize_request(char const *const obj, get_balances_req_t *const req) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
@@ -74,7 +74,7 @@ end:
 }
 
 retcode_t json_get_balances_serialize_response(get_balances_res_t const *const res, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
@@ -107,7 +107,7 @@ err:
 }
 
 retcode_t json_get_balances_deserialize_response(char const *const obj, get_balances_res_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
