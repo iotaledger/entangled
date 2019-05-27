@@ -17,7 +17,8 @@
 #ifndef CCLIENT_RESPONSE_GET_TIPS_H
 #define CCLIENT_RESPONSE_GET_TIPS_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utils/containers/hash/hash243_stack.h"
 
 #ifdef __cplusplus
 extern "C" {

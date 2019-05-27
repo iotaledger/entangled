@@ -17,7 +17,8 @@
 #ifndef CCLIENT_REQUEST_STORE_TRANSACTIONS_H
 #define CCLIENT_REQUEST_STORE_TRANSACTIONS_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utils/containers/hash/hash_array.h"
 
 #ifdef __cplusplus
 extern "C" {

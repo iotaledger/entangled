@@ -17,7 +17,7 @@
 #ifndef CCLIENT_RESPONSE_FIND_TRANSACTIONS_H
 #define CCLIENT_RESPONSE_FIND_TRANSACTIONS_H
 
-#include "cclient/types/types.h"
+#include "utils/containers/hash/hash243_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
