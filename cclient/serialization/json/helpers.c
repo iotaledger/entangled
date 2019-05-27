@@ -230,7 +230,7 @@ retcode_t json_get_uint64(cJSON const* const json_obj, char const* const obj_nam
 }
 
 retcode_t json_get_string(cJSON const* const json_obj, char const* const obj_name, char_buffer_t* const text) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   size_t str_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
@@ -307,7 +307,7 @@ retcode_t hash243_stack_to_json_array(hash243_stack_t stack, cJSON* const json_r
 }
 
 retcode_t json_array_to_hash243_queue(cJSON const* const obj, char const* const obj_name, hash243_queue_t* queue) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (!json_item) {
@@ -334,7 +334,7 @@ retcode_t json_array_to_hash243_queue(cJSON const* const obj, char const* const 
 }
 
 retcode_t json_array_to_hash243_stack(cJSON const* const obj, char const* const obj_name, hash243_stack_t* stack) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
@@ -384,7 +384,7 @@ retcode_t hash81_queue_to_json_array(hash81_queue_t queue, cJSON* const json_roo
 }
 
 retcode_t json_array_to_hash81_queue(cJSON const* const obj, char const* const obj_name, hash81_queue_t* queue) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   flex_trit_t hash[FLEX_TRIT_SIZE_81] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (!json_item) {
@@ -411,7 +411,7 @@ retcode_t json_array_to_hash81_queue(cJSON const* const obj, char const* const o
 }
 
 retcode_t json_array_to_hash8019_queue(cJSON const* const obj, char const* const obj_name, hash8019_queue_t* queue) {
-  retcode_t ret_code = RC_OK;
+  retcode_t ret_code = RC_ERROR;
   flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
@@ -450,7 +450,6 @@ retcode_t flex_trits_to_json_string(cJSON* const json_obj, char const* const key
 }
 
 retcode_t json_string_hash_to_flex_trits(cJSON const* const json_obj, char const* const key, flex_trit_t* hash) {
-  retcode_t ret = RC_OK;
   size_t trit_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);
   if (json_value == NULL) {
@@ -463,11 +462,11 @@ retcode_t json_string_hash_to_flex_trits(cJSON const* const json_obj, char const
     if (!trit_len) {
       return RC_CCLIENT_FLEX_TRITS;
     }
+    return RC_OK;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not string\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
-  return ret;
 }
 
 retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue, cJSON* const json_root, char const* const obj_name) {
@@ -558,7 +557,6 @@ retcode_t hash8019_array_to_json_array(hash8019_array_p array, cJSON* const json
 }
 
 retcode_t json_array_to_hash8019_array(cJSON const* const obj, char const* const obj_name, hash8019_array_p array) {
-  retcode_t ret_code = RC_OK;
   flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
@@ -574,5 +572,5 @@ retcode_t json_array_to_hash8019_array(cJSON const* const obj, char const* const
     log_error(json_logger_id, "[%s:%d] %s not array\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
-  return ret_code;
+  return RC_OK;
 }
