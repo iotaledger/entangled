@@ -42,10 +42,10 @@ IOTA_EXPORT trit_t* iota_sign_address_gen_trits(trit_t const* const seed, size_t
   memcpy(subseed, seed, HASH_LENGTH_TRIT);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset(subseed, 0, HASH_LENGTH_TRIT);
+  memset_safe(subseed, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
   iss_kerl_key_digest(key, key, key_length, &kerl);
   iss_kerl_address(key, address, security * HASH_LENGTH_TRIT, &kerl);
-  memset(key, 0, key_length * sizeof(trit_t));
+  memset_safe(key, key_length * sizeof(trit_t), 0, key_length * sizeof(trit_t));
   kerl_reset(&kerl);
   free(key);
 
@@ -70,7 +70,7 @@ IOTA_EXPORT char* iota_sign_address_gen_trytes(char const* const seed, size_t co
     free(address);
     return NULL;
   }
-  memset(seed_trits, 0, HASH_LENGTH_TRIT);
+  memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
   trits_to_trytes(address_trits, (tryte_t*)address, HASH_LENGTH_TRIT);
   free(address_trits);
 
@@ -96,7 +96,7 @@ IOTA_EXPORT flex_trit_t* iota_sign_address_gen_flex_trits(flex_trit_t const* con
     free(address);
     return NULL;
   }
-  memset(seed_trits, 0, HASH_LENGTH_TRIT);
+  memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
   flex_trits_from_trits(address, HASH_LENGTH_TRIT, address_trits, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   free(address_trits);
 
