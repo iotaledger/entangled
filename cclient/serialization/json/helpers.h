@@ -25,10 +25,16 @@ extern "C" {
 #include <stdlib.h>
 
 #include "cJSON.h"
-#include "utarray.h"
-
-#include "cclient/types/types.h"
 #include "common/errors.h"
+#include "utarray.h"
+#include "utils/char_buffer.h"
+#include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash243_stack.h"
+#include "utils/containers/hash/hash8019_queue.h"
+#include "utils/containers/hash/hash8019_stack.h"
+#include "utils/containers/hash/hash81_queue.h"
+#include "utils/containers/hash/hash_array.h"
+#include "utils/logger_helper.h"
 
 /**
  * @brief Checks if the JSON object is NULL and if containing an error or exception.

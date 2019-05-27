@@ -17,8 +17,6 @@
 #ifndef CCLIENT_RESPONSE_REMOVE_NEIGHBORS_H
 #define CCLIENT_RESPONSE_REMOVE_NEIGHBORS_H
 
-#include "cclient/types/types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/response/get_missing_transactions.h"
 
 get_missing_transactions_res_t* get_missing_transactions_res_new() {

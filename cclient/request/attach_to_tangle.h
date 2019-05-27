@@ -17,7 +17,9 @@
 #ifndef CCLIENT_REQUEST_ATTACH_TO_TANGLE_H
 #define CCLIENT_REQUEST_ATTACH_TO_TANGLE_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "common/model/transaction.h"
+#include "utils/containers/hash/hash_array.h"
 
 #ifdef __cplusplus
 extern "C" {

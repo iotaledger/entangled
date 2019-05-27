@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/response/add_neighbors.h"
 
 add_neighbors_res_t* add_neighbors_res_new() {

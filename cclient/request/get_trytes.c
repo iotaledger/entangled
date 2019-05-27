@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/request/get_trytes.h"
 
 get_trytes_req_t* get_trytes_req_new() {
