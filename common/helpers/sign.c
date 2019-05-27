@@ -34,6 +34,7 @@ IOTA_EXPORT trit_t* iota_sign_address_gen_trits(trit_t const* const seed, size_t
   }
 
   if ((address = (trit_t*)calloc(HASH_LENGTH_TRIT, sizeof(trit_t))) == NULL) {
+    memset_safe(key, key_length * sizeof(trit_t), 0, key_length * sizeof(trit_t));
     free(key);
     return NULL;
   }
@@ -67,6 +68,7 @@ IOTA_EXPORT char* iota_sign_address_gen_trytes(char const* const seed, size_t co
 
   trytes_to_trits((tryte_t*)seed, seed_trits, HASH_LENGTH_TRYTE);
   if ((address_trits = iota_sign_address_gen_trits(seed_trits, index, security)) == NULL) {
+    memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
     free(address);
     return NULL;
   }
@@ -93,6 +95,7 @@ IOTA_EXPORT flex_trit_t* iota_sign_address_gen_flex_trits(flex_trit_t const* con
 
   flex_trits_to_trits(seed_trits, HASH_LENGTH_TRIT, seed, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   if ((address_trits = iota_sign_address_gen_trits(seed_trits, index, security)) == NULL) {
+    memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
     free(address);
     return NULL;
   }
@@ -150,6 +153,7 @@ IOTA_EXPORT char* iota_sign_signature_gen_trytes(char const* const seed, size_t 
   trytes_to_trits((tryte_t*)seed, seed_trits, HASH_LENGTH_TRYTE);
   trytes_to_trits((tryte_t*)bundle_hash, bundle_hash_trits, HASH_LENGTH_TRYTE);
   if ((signature_trits = iota_sign_signature_gen_trits(seed_trits, index, security, bundle_hash_trits)) == NULL) {
+    memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
     free(signature);
     return NULL;
   }
@@ -180,6 +184,7 @@ IOTA_EXPORT flex_trit_t* iota_sign_signature_gen_flex_trits(flex_trit_t const* c
   flex_trits_to_trits(seed_trits, HASH_LENGTH_TRIT, seed, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   flex_trits_to_trits(bundle_hash_trits, HASH_LENGTH_TRIT, bundle_hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   if ((signature_trits = iota_sign_signature_gen_trits(seed_trits, index, security, bundle_hash_trits)) == NULL) {
+    memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
     free(signature);
     return NULL;
   }
