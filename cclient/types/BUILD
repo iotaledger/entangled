@@ -1,8 +1,5 @@
 cc_library(
     name = "types",
-    srcs = [
-        "types.c",
-    ],
     hdrs = [
         "types.h",
     ],

@@ -29,6 +29,7 @@ extern "C" {
 
 #include "cclient/types/types.h"
 #include "common/errors.h"
+#include "utils/char_buffer.h"
 
 /**
  * @brief Checks if the JSON object is NULL and if containing an error or exception.

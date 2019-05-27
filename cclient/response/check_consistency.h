@@ -18,6 +18,7 @@
 #define CCLIENT_RESPONSE_CHECK_CONSISTENCY_H
 
 #include "cclient/types/types.h"
+#include "utils/char_buffer.h"
 
 #ifdef __cplusplus
 extern "C" {
