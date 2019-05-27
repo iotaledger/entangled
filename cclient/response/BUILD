@@ -8,6 +8,11 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//cclient/types",
+        "//common:errors",
+        "//utils:char_buffer",
+        "//utils/containers/hash:hash243_queue",
+        "//utils/containers/hash:hash243_stack",
+        "//utils/containers/hash:hash8019_queue",
+        "//utils/containers/hash:hash_array",
     ],
 )

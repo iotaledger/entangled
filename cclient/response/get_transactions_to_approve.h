@@ -17,7 +17,7 @@
 #ifndef CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 #define CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 
-#include "cclient/types/types.h"
+#include "common/trinary/flex_trit.h"
 
 #ifdef __cplusplus
 extern "C" {

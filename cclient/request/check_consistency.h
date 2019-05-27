@@ -17,7 +17,8 @@
 #ifndef CCLIENT_REQUEST_CHECK_CONSISTENCY_H
 #define CCLIENT_REQUEST_CHECK_CONSISTENCY_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utils/containers/hash/hash243_queue.h"
 
 #ifdef __cplusplus
 extern "C" {

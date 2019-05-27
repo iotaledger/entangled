@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/request/get_inclusion_states.h"
 
 get_inclusion_states_req_t* get_inclusion_states_req_new() {

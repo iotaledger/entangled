@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/response/find_transactions.h"
 
 find_transactions_res_t* find_transactions_res_new() {

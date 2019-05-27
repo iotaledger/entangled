@@ -17,7 +17,8 @@
 #ifndef CCLIENT_RESPONSE_GET_TRYTES_H
 #define CCLIENT_RESPONSE_GET_TRYTES_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utils/containers/hash/hash8019_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
