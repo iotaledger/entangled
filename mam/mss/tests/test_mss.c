@@ -65,7 +65,8 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
       mam_mss_sign(mss1, hash, sig);
 
       store = trits_take(store_, mam_mss_serialized_size(mss1));
-      mam_mss_serialize(mss1, store);
+      mam_mss_serialize(mss1, &store);
+      store = trits_pickup_all(store);
       e = mam_mss_deserialize(&store, mss2);
       MAM_ASSERT(RC_OK == e);
       mam_mss_sign(mss2, hash, sig2);

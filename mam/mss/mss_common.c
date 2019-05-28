@@ -167,11 +167,11 @@ size_t mam_mss_serialized_size(mam_mss_t const *const mss) {
   return MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE + mss_mt_serialized_size(mss) + MAM_MSS_PK_SIZE;
 }
 
-void mam_mss_serialize(mam_mss_t const *const mss, trits_t buffer) {
+void mam_mss_serialize(mam_mss_t const *const mss, trits_t *const buffer) {
   MAM_ASSERT(mam_mss_serialized_size(mss) == trits_size(buffer));
 
-  mam_mss_skn(mss, trits_take(buffer, MAM_MSS_SKN_SIZE));
-  buffer = trits_drop(buffer, MAM_MSS_SKN_SIZE);
-  mss_mt_serialize(mss, &buffer);
-  pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, mss->root), &buffer);
+  mam_mss_skn(mss, trits_take(*buffer, MAM_MSS_SKN_SIZE));
+  trits_advance(buffer, MAM_MSS_SKN_SIZE);
+  mss_mt_serialize(mss, buffer);
+  pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, mss->root), buffer);
 }

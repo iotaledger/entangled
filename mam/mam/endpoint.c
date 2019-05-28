@@ -79,12 +79,9 @@ size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
 }
 
 void mam_endpoint_serialize(mam_endpoint_t const *const endpoint, trits_t *const buffer) {
-  size_t mss_size = mam_mss_serialized_size(&endpoint->mss);
-
-  pb3_encode_size_t(trits_size(endpoint->name), buffer);             // name size
-  pb3_encode_ntrytes(endpoint->name, buffer);                        // name
-  mam_mss_serialize(&endpoint->mss, trits_take(*buffer, mss_size));  // mss
-  trits_advance(buffer, mss_size);
+  pb3_encode_size_t(trits_size(endpoint->name), buffer);  // name size
+  pb3_encode_ntrytes(endpoint->name, buffer);             // name
+  mam_mss_serialize(&endpoint->mss, buffer);              // mss
 }
 
 retcode_t mam_endpoint_deserialize(trits_t *const buffer, trits_t const channel_name, mam_prng_t *const prng,
