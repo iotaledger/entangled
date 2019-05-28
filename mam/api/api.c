@@ -355,7 +355,7 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryt
   retcode_t ret = RC_OK;
   mam_channel_t channel;
   mam_pk_t channel_pk;
-  MAM_TRITS_DEF0(channel_ord, MAM_CHANNEL_NAME_SIZE);
+  MAM_TRITS_DEF(channel_ord, MAM_CHANNEL_NAME_SIZE);
   channel_ord = MAM_TRITS_INIT(channel_ord, MAM_CHANNEL_NAME_SIZE);
 
   if (api == NULL || channel_id == NULL) {
@@ -382,7 +382,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
   mam_channel_t *channel = NULL;
   mam_endpoint_t endpoint;
   mam_pk_t endpoint_pk;
-  MAM_TRITS_DEF0(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
+  MAM_TRITS_DEF(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
   endpoint_ord = MAM_TRITS_INIT(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
 
   if (api == NULL || channel_id == NULL || endpoint_id == NULL) {
@@ -463,7 +463,7 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const 
     trit_t tag[NUM_TRITS_TAG];
     trits_t packet = trits_null();
     size_t packet_size = 0;
-    MAM_TRITS_DEF0(payload_trits, payload_size * 3);
+    MAM_TRITS_DEF(payload_trits, payload_size * 3);
     payload_trits = MAM_TRITS_INIT(payload_trits, payload_size * 3);
     trits_from_str(payload_trits, (char const *)payload);
 

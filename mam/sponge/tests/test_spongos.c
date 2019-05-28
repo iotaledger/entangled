@@ -21,9 +21,9 @@ static void mam_spongos_test(void) {
 
   mam_spongos_init(&spongos);
 
-  MAM_TRITS_DEF0(x, 243);
-  MAM_TRITS_DEF0(y, 243);
-  MAM_TRITS_DEF0(z, 243);
+  MAM_TRITS_DEF(x, 243);
+  MAM_TRITS_DEF(y, 243);
+  MAM_TRITS_DEF(z, 243);
   x = MAM_TRITS_INIT(x, 243);
   y = MAM_TRITS_INIT(y, 243);
   z = MAM_TRITS_INIT(z, 243);
@@ -46,7 +46,7 @@ static void mam_spongos_test(void) {
   mam_spongos_absorb(&spongos, x);
   mam_spongos_commit(&spongos);
   mam_spongos_decr(&spongos, z, z);
-  MAM_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(&spongos));
+  MAM_TRITS_DEF(spongos_trits, mam_spongos_serialized_size(&spongos));
   spongos_trits = MAM_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(&spongos));
   mam_spongos_serialize(&spongos, &spongos_trits);
   spongos_trits = trits_pickup(spongos_trits, mam_spongos_serialized_size(&spongos));
