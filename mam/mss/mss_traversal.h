@@ -94,4 +94,8 @@ It is achieved by allocating one extra node:
 ```
 */
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif  // __MAM_MSS_MSS_TRAVERSAL_H__
