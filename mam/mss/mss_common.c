@@ -168,7 +168,7 @@ size_t mam_mss_serialized_size(mam_mss_t const *const mss) {
 }
 
 void mam_mss_serialize(mam_mss_t const *const mss, trits_t *const buffer) {
-  MAM_ASSERT(mam_mss_serialized_size(mss) == trits_size(buffer));
+  MAM_ASSERT(trits_size(*buffer) >= mam_mss_serialized_size(mss));
 
   mam_mss_skn(mss, trits_take(*buffer, MAM_MSS_SKN_SIZE));
   trits_advance(buffer, MAM_MSS_SKN_SIZE);
