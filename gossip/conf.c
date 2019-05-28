@@ -15,7 +15,6 @@ retcode_t iota_gossip_conf_init(iota_gossip_conf_t* const conf) {
 
   conf->mwm = DEFAULT_MWN;
   conf->neighbors = DEFAULT_NEIGHBORS;
-  conf->p_drop_cache_entry = DEFAULT_PROBABILITY_DROP_CACHE_ENTRY;
   conf->p_propagate_request = DEFAULT_PROBABILITY_PROPAGATE_REQUEST;
   conf->p_remove_request = DEFAULT_PROBABILITY_REMOVE_REQUEST;
   conf->p_reply_random_tip = DEFAULT_PROBABILITY_REPLY_RANDOM_TIP;

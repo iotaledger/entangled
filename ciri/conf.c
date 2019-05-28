@@ -192,9 +192,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       gossip_conf->neighbors = strdup(value);
       break;
-    case CONF_P_DROP_CACHE_ENTRY:  // --p-drop-cache-entry
-      ret = get_probability(value, &gossip_conf->p_drop_cache_entry);
-      break;
     case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
       ret = get_probability(value, &gossip_conf->p_propagate_request);
       break;

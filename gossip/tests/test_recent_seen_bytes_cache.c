@@ -30,7 +30,7 @@ void test_recent_seen_bytes_cache() {
   }
   transactions_deserialize(txs_trytes, txs, 4, true);
 
-  TEST_ASSERT(recent_seen_bytes_cache_init(&cache, 3, 0) == RC_OK);
+  TEST_ASSERT(recent_seen_bytes_cache_init(&cache, 3) == RC_OK);
 
   TEST_ASSERT(recent_seen_bytes_cache_size(&cache) == 0);
 
