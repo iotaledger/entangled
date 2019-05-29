@@ -93,9 +93,9 @@ typedef struct iota_transaction_fields_essence_s {
   // 9 trytes = 27 trits
   uint64_t timestamp;
   // 9 trytes = 27 trits
-  int64_t current_index;
+  uint64_t current_index;
   // 9 trytes = 27 trits
-  int64_t last_index;
+  uint64_t last_index;
   // 81 trytes = 243 trits
   flex_trit_t bundle[NUM_FLEX_TRITS_BUNDLE];
 } iota_transaction_fields_essence_t;
@@ -274,25 +274,25 @@ static inline void transaction_set_timestamp(iota_transaction_t *const transacti
 }
 
 // Get the transaction current index
-static inline int64_t transaction_current_index(iota_transaction_t const *const transaction) {
+static inline uint64_t transaction_current_index(iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask.essence & MASK_ESSENCE_CURRENT_INDEX);
   return transaction->essence.current_index;
 }
 
 // Set the transaction current index
-static inline void transaction_set_current_index(iota_transaction_t *const transaction, int64_t const index) {
+static inline void transaction_set_current_index(iota_transaction_t *const transaction, uint64_t const index) {
   transaction->essence.current_index = index;
   transaction->loaded_columns_mask.essence |= MASK_ESSENCE_CURRENT_INDEX;
 }
 
 // Get the transaction last index
-static inline int64_t transaction_last_index(iota_transaction_t const *const transaction) {
+static inline uint64_t transaction_last_index(iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask.essence & MASK_ESSENCE_LAST_INDEX);
   return transaction->essence.last_index;
 }
 
 // Set the transaction last index
-static inline void transaction_set_last_index(iota_transaction_t *const transaction, int64_t const index) {
+static inline void transaction_set_last_index(iota_transaction_t *const transaction, uint64_t const index) {
   transaction->essence.last_index = index;
   transaction->loaded_columns_mask.essence |= MASK_ESSENCE_LAST_INDEX;
 }

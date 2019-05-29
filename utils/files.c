@@ -120,7 +120,7 @@ done:
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
   retcode_t ret = RC_OK;
   FILE *fp = NULL;
-  long buffer_size;
+  size_t buffer_size = 0;
   size_t offset = 0;
 
   if (!iota_utils_file_exist(file_path)) {
