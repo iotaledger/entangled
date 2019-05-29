@@ -125,7 +125,8 @@ int main(int argc, char* argv[]) {
 
   // File configuration
 
-  if (iota_ciri_conf_file_init(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
+  if (iota_ciri_conf_file_init(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf, argc,
+                               argv) != RC_OK) {
     return EXIT_FAILURE;
   }
 
