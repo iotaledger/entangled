@@ -298,7 +298,7 @@ static void test_api_generic() {
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
-    MAM_TRITS_DEF0(ntru_nonce, 30);
+    MAM_TRITS_DEF(ntru_nonce, 30);
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
     TEST_ASSERT(ntru_sk_reset(ntru) == RC_OK);

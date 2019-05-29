@@ -462,8 +462,8 @@ std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(const std::ve
   return ret;
 }
 
-GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(const std::vector<std::string>& trans,
-                                                           const std::vector<std::string>& tips) {
+nonstd::optional<GetInclusionStatesResponse> IotaJsonAPI::getInclusionStates(const std::vector<std::string>& trans,
+                                                                             const std::vector<std::string>& tips) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getInclusionStates";
@@ -482,10 +482,11 @@ GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(const std::vector<std
     return {};
   }
 
-  return {response["states"].get<std::vector<bool>>()};
+  return nonstd::optional<GetInclusionStatesResponse>({response["states"].get<std::vector<bool>>()});
 }
 
-WereAddressesSpentFromResponse IotaJsonAPI::wereAddressesSpentFrom(const std::vector<std::string>& addresses) {
+nonstd::optional<WereAddressesSpentFromResponse> IotaJsonAPI::wereAddressesSpentFrom(
+    const std::vector<std::string>& addresses) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "wereAddressesSpentFrom";
@@ -503,7 +504,7 @@ WereAddressesSpentFromResponse IotaJsonAPI::wereAddressesSpentFrom(const std::ve
     return {};
   }
 
-  return {response["states"].get<std::vector<bool>>()};
+  return nonstd::optional<WereAddressesSpentFromResponse>({response["states"].get<std::vector<bool>>()});
 }
 
 template <typename T>

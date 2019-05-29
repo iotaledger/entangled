@@ -246,7 +246,7 @@ static void message_test_generic(mam_prng_t *prng_sender, mam_prng_t *prng_recei
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
     retcode_t e;
-    MAM_TRITS_DEF0(ntru_nonce, 30);
+    MAM_TRITS_DEF(ntru_nonce, 30);
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
@@ -266,7 +266,7 @@ static void message_test_generic(mam_prng_t *prng_sender, mam_prng_t *prng_recei
                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
   }
 
-  MAM_TRITS_DEF0(msg_id, MAM_MSG_ID_SIZE);
+  MAM_TRITS_DEF(msg_id, MAM_MSG_ID_SIZE);
   msg_id = MAM_TRITS_INIT(msg_id, MAM_MSG_ID_SIZE);
   trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
 
@@ -334,11 +334,11 @@ static void message_test_generic(mam_prng_t *prng_sender, mam_prng_t *prng_recei
 }
 
 void message_test() {
-  MAM_TRITS_DEF0(key_a, MAM_PRNG_SECRET_KEY_SIZE);
+  MAM_TRITS_DEF(key_a, MAM_PRNG_SECRET_KEY_SIZE);
   key_a = MAM_TRITS_INIT(key_a, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(key_a, TEST_PRNG_A_KEY);
 
-  MAM_TRITS_DEF0(key_b, MAM_PRNG_SECRET_KEY_SIZE);
+  MAM_TRITS_DEF(key_b, MAM_PRNG_SECRET_KEY_SIZE);
   key_b = MAM_TRITS_INIT(key_b, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(key_b, TEST_PRNG_B_KEY);
 
@@ -357,7 +357,7 @@ void serialize_write_ctx_test() {
   mam_spongos_init(&write_ctx.spongos);
   write_ctx.ord = 0;
 
-  MAM_TRITS_DEF0(ch_name, 3 * strlen(TEST_CHANNEL_NAME));
+  MAM_TRITS_DEF(ch_name, 3 * strlen(TEST_CHANNEL_NAME));
   ch_name = MAM_TRITS_INIT(ch_name, 3 * strlen(TEST_CHANNEL_NAME));
   trits_from_str(ch_name, TEST_CHANNEL_NAME);
 
@@ -367,11 +367,11 @@ void serialize_write_ctx_test() {
   memcpy(write_ctx.chid, trits_begin(mam_channel_id(&ch)), MAM_CHANNEL_ID_SIZE);
   write_ctx.mss = &chs->value.mss;
 
-  MAM_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
+  MAM_TRITS_DEF(rand_msg, strlen(TEST_PLAINTEXT1));
   rand_msg = MAM_TRITS_INIT(rand_msg, strlen(TEST_PLAINTEXT1));
   trits_from_str(rand_msg, TEST_PLAINTEXT1);
   mam_spongos_absorb(&write_ctx.spongos, rand_msg);
-  MAM_TRITS_DEF0(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
+  MAM_TRITS_DEF(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
   ctx_buffer = MAM_TRITS_INIT(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
   mam_msg_write_ctx_serialize(&write_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);
@@ -396,11 +396,11 @@ void serialize_read_ctx_test() {
     read_ctx.pk.key[i] = -1 + rand() % 3;
   }
 
-  MAM_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
+  MAM_TRITS_DEF(rand_msg, strlen(TEST_PLAINTEXT1));
   rand_msg = MAM_TRITS_INIT(rand_msg, strlen(TEST_PLAINTEXT1));
   trits_from_str(rand_msg, TEST_PLAINTEXT1);
   mam_spongos_absorb(&read_ctx.spongos, rand_msg);
-  MAM_TRITS_DEF0(ctx_buffer, mam_msg_read_ctx_serialized_size(&read_ctx));
+  MAM_TRITS_DEF(ctx_buffer, mam_msg_read_ctx_serialized_size(&read_ctx));
   ctx_buffer = MAM_TRITS_INIT(ctx_buffer, mam_msg_read_ctx_serialized_size(&read_ctx));
   mam_msg_read_ctx_serialize(&read_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);

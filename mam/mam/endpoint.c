@@ -102,7 +102,7 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer, trits_t const channel_
     return ret;
   }
 
-  MAM_TRITS_DEF0(ts, MAM_MSS_SKN_SIZE);
+  MAM_TRITS_DEF(ts, MAM_MSS_SKN_SIZE);
   ts = MAM_TRITS_INIT(ts, MAM_MSS_SKN_SIZE);
   trits_set_zero(ts);
 

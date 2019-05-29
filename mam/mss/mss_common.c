@@ -25,7 +25,7 @@ void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, trits_t pk) {
   mam_wots_t wots;
   mam_sponge_t sponge;
 
-  MAM_TRITS_DEF0(nonce_i, MAM_MSS_SKN_SIZE);
+  MAM_TRITS_DEF(nonce_i, MAM_MSS_SKN_SIZE);
   mam_sponge_init(&sponge);
   mam_wots_reset(&wots);
 
@@ -56,7 +56,7 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   mam_wots_reset(&wots);
   {
     // Generate the current (skn) secret key
-    MAM_TRITS_DEF0(nonce_i, MAM_MSS_SKN_SIZE);
+    MAM_TRITS_DEF(nonce_i, MAM_MSS_SKN_SIZE);
     nonce_i = MAM_TRITS_INIT(nonce_i, MAM_MSS_SKN_SIZE);
     trits_put18(nonce_i, mss->skn);
     mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
@@ -78,7 +78,7 @@ retcode_t mam_mss_sign_and_next(mam_mss_t *mss, trits_t hash, trits_t sig) {
 }
 
 void mam_mss_skn(mam_mss_t const *const mss, trits_t skn) {
-  MAM_TRITS_DEF0(trits, MAM_MSS_SKN_SIZE);
+  MAM_TRITS_DEF(trits, MAM_MSS_SKN_SIZE);
   trits = MAM_TRITS_INIT(trits, MAM_MSS_SKN_SIZE);
 
   MAM_ASSERT(trits_size(skn) == MAM_MSS_SKN_SIZE);
@@ -93,7 +93,7 @@ void mam_mss_skn(mam_mss_t const *const mss, trits_t skn) {
 bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_t pk) {
   mss_mt_height_t height;
   mss_mt_idx_t skn;
-  MAM_TRITS_DEF0(calculated_pk, MAM_MSS_MT_HASH_SIZE);
+  MAM_TRITS_DEF(calculated_pk, MAM_MSS_MT_HASH_SIZE);
   calculated_pk = MAM_TRITS_INIT(calculated_pk, MAM_MSS_MT_HASH_SIZE);
 
   MAM_ASSERT(trits_size(pk) == MAM_MSS_PK_SIZE);
@@ -116,7 +116,7 @@ bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_
 }
 
 bool mss_parse_skn(mss_mt_height_t *height, mss_mt_idx_t *skn, trits_t trits) {
-  MAM_TRITS_DEF0(ts, MAM_MSS_SKN_SIZE);
+  MAM_TRITS_DEF(ts, MAM_MSS_SKN_SIZE);
   ts = MAM_TRITS_INIT(ts, MAM_MSS_SKN_SIZE);
 
   MAM_ASSERT(MAM_MSS_SKN_SIZE == trits_size(trits));
