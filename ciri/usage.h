@@ -76,6 +76,7 @@ static struct cli_argument_s {
 
     // cIRI configuration
 
+    {"config", 'c', "Path to the configuration file.", REQUIRED_ARG},
     {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
     {"db-revalidate", CONF_DB_REVALIDATE,
      "Reloads milestones, state of the ledger and transactions metadata from the database.", REQUIRED_ARG},
@@ -201,7 +202,7 @@ static struct cli_argument_s {
 
 };
 
-static char* short_options = "hl:d:n:t:u:p:";
+static char* short_options = "c:d:hl:n:p:t:u:";
 
 #ifdef __cplusplus
 extern "C" {
