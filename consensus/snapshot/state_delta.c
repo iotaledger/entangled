@@ -207,8 +207,8 @@ retcode_t state_delta_serialize_str(state_delta_t const delta, char *const str) 
   uint32_t value_len;
 
   HASH_ITER(hh, delta, iter, tmp) {
-    if (flex_trits_to_trytes(str + offset, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS) !=
-        NUM_TRITS_ADDRESS) {
+    if (flex_trits_to_trytes((tryte_t *)(str + offset), NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_ADDRESS,
+                             NUM_TRITS_ADDRESS) != NUM_TRITS_ADDRESS) {
       return RC_SNAPSHOT_STATE_DELTA_FAILED_DESERIALIZING;
     }
     offset += NUM_TRYTES_ADDRESS;
@@ -237,8 +237,8 @@ retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *cons
   }
 
   while (token != NULL) {
-    if (flex_trits_from_trytes(curr_address, NUM_TRITS_ADDRESS, token, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS) !=
-        NUM_TRYTES_ADDRESS) {
+    if (flex_trits_from_trytes(curr_address, NUM_TRITS_ADDRESS, (tryte_t *)token, NUM_TRYTES_ADDRESS,
+                               NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
       return RC_SNAPSHOT_INVALID_FILE;
     }
 

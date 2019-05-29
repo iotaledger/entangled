@@ -45,14 +45,14 @@ bool states_eq(trit_t *state, t27_t *fstate) {
 }
 
 void test_absorb() {
-  int times = 729, rounds = 24, i, retval = 1;
+  int times = 729, rounds = 24, i;
   trit_t state[SLICES * SLICESIZE], in[729];
   memset(state, 0, SLICES * SLICESIZE * sizeof(trit_t));
   memset(in, 0, 729 * sizeof(trit_t));
   t27_t fstate[SLICES];
-  uint8_t fin[729];
+  trit_t fin[729];
   memset(fstate, 0, SLICESIZE * sizeof(t27_t));
-  memset(fin, 0, 729 * sizeof(uint8_t));
+  memset(fin, 0, 729 * sizeof(trit_t));
   for (i = 1; i < times; i++) {
     troika_absorb(state, 243, in, i, rounds);
     ftroika_absorb(fstate, 243, fin, i, rounds);
@@ -62,7 +62,7 @@ void test_absorb() {
   }
 }
 void test_permutations() {
-  int times = 1000, rounds = 24, i, retval = 1;
+  int times = 1000, rounds = 24, i;
   trit_t state[SLICES * SLICESIZE];
   memset(state, 0, SLICES * SLICESIZE * sizeof(trit_t));
   t27_t fstate[SLICES];
@@ -76,25 +76,26 @@ void test_permutations() {
 
 void test_repeated() {
   size_t times = 1000;
-  int i, retval = 1;
   trit_t in[243], out[243];
   memset(in, 0, 243 * sizeof(trit_t));
   memset(out, 0, 243 * sizeof(trit_t));
-  uint8_t fin[243], fout[243];
-  memset(fin, 0, 243 * sizeof(uint8_t));
-  memset(fout, 0, 243 * sizeof(uint8_t));
-  for (i = 0; i < times; i++) {
+  trit_t fin[243], fout[243];
+  memset(fin, 0, 243 * sizeof(trit_t));
+  memset(fout, 0, 243 * sizeof(trit_t));
+  for (size_t i = 0; i < times; i++) {
     troika(out, 243, in, 243);
     memcpy(in, out, 243 * sizeof(trit_t));
   }
   ftroika243_repeated(fout, fin, times);
-  TEST_ASSERT_EQUAL_INT(memcmp(fout, out, 243 * sizeof(uint8_t)), 0);
+  TEST_ASSERT_EQUAL_INT(memcmp(fout, out, 243 * sizeof(trit_t)), 0);
 }
 
 int main() {
   UNITY_BEGIN();
+
   RUN_TEST(test_absorb);
   RUN_TEST(test_permutations);
   RUN_TEST(test_repeated);
+
   return UNITY_END();
 }
