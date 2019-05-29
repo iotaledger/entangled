@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/request/get_balances.h"
 
 get_balances_req_t* get_balances_req_new() {

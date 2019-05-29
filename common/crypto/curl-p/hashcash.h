@@ -11,17 +11,11 @@
 #include "common/crypto/curl-p/pearl_diver.h"
 #include "common/crypto/curl-p/trit.h"
 
-typedef enum {
-  TAIL,
-  BODY,
-  HEAD,
-} SearchType;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-PearlDiverStatus hashcash(Curl *const ctx, SearchType const type, unsigned short const offset, unsigned short const end,
+PearlDiverStatus hashcash(Curl *const ctx, unsigned short const offset, unsigned short const end,
                           unsigned short const min_weight);
 
 #ifdef __cplusplus

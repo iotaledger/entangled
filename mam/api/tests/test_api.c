@@ -298,7 +298,7 @@ static void test_api_generic() {
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
-    MAM_TRITS_DEF0(ntru_nonce, 30);
+    MAM_TRITS_DEF(ntru_nonce, 30);
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
     TEST_ASSERT(ntru_sk_reset(ntru) == RC_OK);
@@ -405,12 +405,10 @@ static void test_api_multiple_packets() { test_api_multiple_packets_run(&api, 36
 static void test_api_serialization() {
   mam_api_t deserialized_api;
   size_t serialized_size = mam_api_serialized_size(&api);
-  MAM_TRITS_DEF0(buffer, serialized_size);
-  buffer = MAM_TRITS_INIT(buffer, serialized_size);
+  trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
-  mam_api_serialize(&api, &buffer);
-  buffer = trits_pickup_all(buffer);
-  TEST_ASSERT((mam_api_deserialize(&buffer, &deserialized_api) == RC_OK));
+  mam_api_serialize(&api, buffer);
+  TEST_ASSERT((mam_api_deserialize(buffer, serialized_size, &deserialized_api) == RC_OK));
 
   TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
@@ -424,6 +422,7 @@ static void test_api_serialization() {
   test_api_multiple_packets_run(&deserialized_api, 2);
 
   mam_api_destroy(&deserialized_api);
+  free(buffer);
 }
 
 static void test_api_save_load() {

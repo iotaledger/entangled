@@ -17,7 +17,10 @@
 #ifndef CCLIENT_RESPONSE_GET_INCLUSION_STATES_H
 #define CCLIENT_RESPONSE_GET_INCLUSION_STATES_H
 
-#include "cclient/types/types.h"
+#include <stdbool.h>
+
+#include "common/errors.h"
+#include "utarray.h"
 
 #ifdef __cplusplus
 extern "C" {

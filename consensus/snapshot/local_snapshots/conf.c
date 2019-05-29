@@ -5,8 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/snapshot/local_snapshots/conf.h"
+#include <string.h>
 
+#include "consensus/snapshot/local_snapshots/conf.h"
 #include "utils/logger_helper.h"
 
 #define LOCAL_SNAPSHOT_TRANSACTIONS_GROWTH_THRESHOLD 1000

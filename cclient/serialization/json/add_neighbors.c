@@ -10,7 +10,7 @@
 #include "cclient/serialization/json/logger.h"
 
 retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t *const req, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   size_t len = 0;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -43,7 +43,7 @@ retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t *const 
 }
 
 retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t *const res, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   size_t len = 0;
 
@@ -72,7 +72,7 @@ retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t *const
 }
 
 retcode_t json_add_neighbors_deserialize_request(const char *const obj, add_neighbors_req_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
@@ -87,7 +87,7 @@ retcode_t json_add_neighbors_deserialize_request(const char *const obj, add_neig
 }
 
 retcode_t json_add_neighbors_deserialize_response(const char *const obj, add_neighbors_res_t *out) {
-  retcode_t ret = RC_OK;
+  retcode_t ret = RC_ERROR;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 

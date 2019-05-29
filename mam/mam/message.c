@@ -58,7 +58,7 @@ static size_t mam_msg_wrap_mssig_size(mam_mss_t const *const m) {
 }
 
 static retcode_t mam_msg_wrap_mssig(mam_spongos_t *s, trits_t *b, mam_mss_t *m) {
-  MAM_TRITS_DEF0(mac, MAM_MSS_HASH_SIZE);
+  MAM_TRITS_DEF(mac, MAM_MSS_HASH_SIZE);
   size_t const sz = MAM_MSS_SIG_SIZE(m->height) / 3;
   mac = MAM_TRITS_INIT(mac, MAM_MSS_HASH_SIZE);
 
@@ -77,7 +77,7 @@ static retcode_t mam_msg_wrap_mssig(mam_spongos_t *s, trits_t *b, mam_mss_t *m) 
 static retcode_t mam_msg_unwrap_mssig(mam_spongos_t *s, trits_t *b, mam_spongos_t *ms, trits_t pk) {
   retcode_t e = RC_OK;
 
-  MAM_TRITS_DEF0(mac, MAM_MSS_HASH_SIZE);
+  MAM_TRITS_DEF(mac, MAM_MSS_HASH_SIZE);
   size_t sz;
   mac = MAM_TRITS_INIT(mac, MAM_MSS_HASH_SIZE);
 
@@ -253,7 +253,7 @@ static void mam_msg_wrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key, 
 static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key, bool *key_found,
                                             mam_psk_t_set_t p) {
   retcode_t e = RC_OK;
-  MAM_TRITS_DEF0(id, MAM_PSK_ID_SIZE);
+  MAM_TRITS_DEF(id, MAM_PSK_ID_SIZE);
   id = MAM_TRITS_INIT(id, MAM_PSK_ID_SIZE);
   trit_t key2_trits[MAM_SPONGE_KEY_SIZE];
   trits_t key2 = trits_from_rep(MAM_SPONGE_KEY_SIZE, key2_trits);
@@ -331,7 +331,7 @@ static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits
                                              mam_ntru_sk_t_set_t n, mam_spongos_t *ns) {
   retcode_t e = RC_OK;
   trits_t ekey;
-  MAM_TRITS_DEF0(id, 81);
+  MAM_TRITS_DEF(id, 81);
   id = MAM_TRITS_INIT(id, 81);
   trit_t key2_trits[MAM_SPONGE_KEY_SIZE];
   trits_t key2 = trits_from_rep(MAM_SPONGE_KEY_SIZE, key2_trits);
@@ -466,7 +466,7 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t co
   trit_t session_key_trits[MAM_SPONGE_KEY_SIZE];
   trits_t session_key = trits_from_rep(MAM_SPONGE_KEY_SIZE, session_key_trits);
 
-  MAM_TRITS_DEF0(skn, MAM_MSS_SKN_SIZE);
+  MAM_TRITS_DEF(skn, MAM_MSS_SKN_SIZE);
   skn = MAM_TRITS_INIT(skn, MAM_MSS_SKN_SIZE);
 
   MAM_ASSERT(ctx);

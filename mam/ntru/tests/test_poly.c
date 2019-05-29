@@ -216,7 +216,7 @@ static void poly_ntrufail_test(void) {
   MAM_POLY_DEF(h);
   MAM_POLY_DEF(t);
   MAM_POLY_DEF(s);
-  MAM_TRITS_DEF0(r, 1024);
+  MAM_TRITS_DEF(r, 1024);
   r = MAM_TRITS_INIT(r, 1024);
 
   trits_set1(r, 1);

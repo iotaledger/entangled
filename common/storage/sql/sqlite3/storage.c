@@ -19,6 +19,7 @@
 #include "common/storage/sql/statements.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 #include "utils/time.h"
 
 #define SQLITE3_LOGGER_ID "sqlite3"
@@ -26,6 +27,8 @@
 static logger_id_t logger_id;
 
 static void error_log_callback(void* const arg, int const err_code, char const* const message) {
+  UNUSED(arg);
+
   log_error(logger_id, "Failed with error code %d: %s\n", err_code, message);
 }
 

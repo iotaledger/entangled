@@ -28,7 +28,7 @@ void run_pd_test(CurlType type, unsigned short mwm) {
   trit_t hash[HASH_LENGTH_TRIT];
   curl_init(&curl);
   curl_absorb(&curl, trits, HASH_LENGTH_TRIT);
-  PearlDiverStatus result = hashcash(&curl, BODY, 0, HASH_LENGTH_TRIT, mwm);
+  PearlDiverStatus result = hashcash(&curl, 0, HASH_LENGTH_TRIT, mwm);
   curl_squeeze(&curl, hash, HASH_LENGTH_TRIT);
 
   TEST_ASSERT_EQUAL_INT8(PEARL_DIVER_SUCCESS, result);

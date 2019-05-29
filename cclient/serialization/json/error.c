@@ -10,7 +10,6 @@
 #include "cclient/serialization/json/logger.h"
 
 retcode_t json_error_serialize_response(error_res_t *const obj, char_buffer_t *out) {
-  retcode_t ret = RC_OK;
   char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
@@ -29,5 +28,5 @@ retcode_t json_error_serialize_response(error_res_t *const obj, char_buffer_t *o
   }
 
   cJSON_Delete(json_root);
-  return ret;
+  return RC_OK;
 }

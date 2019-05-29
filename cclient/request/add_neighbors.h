@@ -17,7 +17,8 @@
 #ifndef CCLIENT_REQUEST_ADD_NEIGHBORS_H
 #define CCLIENT_REQUEST_ADD_NEIGHBORS_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utarray.h"
 
 #ifdef __cplusplus
 extern "C" {
