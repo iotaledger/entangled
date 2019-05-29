@@ -142,7 +142,7 @@ static void mss_mt_deserialize(trits_t buffer, mam_mss_t *mss) {
   } while (height-- > 0);
 }
 
-retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss) {
+retcode_t mam_mss_deserialize(trits_t *const buffer, mam_mss_t *const mss) {
   retcode_t ret = RC_OK;
   mss_mt_height_t height;
   mss_mt_idx_t skn;
