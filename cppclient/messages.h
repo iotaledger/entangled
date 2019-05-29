@@ -44,12 +44,10 @@ struct GetNodeInfoResponse {
 
 struct GetInclusionStatesResponse {
   std::vector<bool> states;
-  nonstd::optional<std::string> error;
 };
 
 struct WereAddressesSpentFromResponse {
   std::vector<bool> states;
-  nonstd::optional<std::string> error;
 };
 }  // namespace cppclient
 
