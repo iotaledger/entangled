@@ -91,12 +91,13 @@ class IotaAPI {
 
   virtual bool storeTransactions(const std::vector<std::string>& trytes) = 0;
 
-  virtual GetInclusionStatesResponse getInclusionStates(const std::vector<std::string>& trans,
-                                                        const std::vector<std::string>& tips) = 0;
+  virtual nonstd::optional<GetInclusionStatesResponse> getInclusionStates(const std::vector<std::string>& trans,
+                                                                          const std::vector<std::string>& tips) = 0;
 
   virtual bool broadcastTransactions(const std::vector<std::string>& trytes) = 0;
 
-  virtual WereAddressesSpentFromResponse wereAddressesSpentFrom(const std::vector<std::string>& addresses) = 0;
+  virtual nonstd::optional<WereAddressesSpentFromResponse> wereAddressesSpentFrom(
+      const std::vector<std::string>& addresses) = 0;
 };
 }  // namespace cppclient
 
