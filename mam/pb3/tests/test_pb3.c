@@ -17,7 +17,7 @@ static bool pb3_size_t_test(size_t n) {
   bool ok = true;
   size_t k = pb3_sizeof_size_t(n);
   size_t m = 0;
-  MAM_TRITS_DEF0(b0, 3 * 14); /* 14 trytes max */
+  MAM_TRITS_DEF(b0, 3 * 14); /* 14 trytes max */
   trits_t b;
   b0 = MAM_TRITS_INIT(b0, 3 * 14); /* 14 trytes max */
 
@@ -35,7 +35,7 @@ static bool pb3_size_t_test(size_t n) {
 static bool pb3_test_size_t_overflow() {
   retcode_t e;
   size_t n;
-  MAM_TRITS_DEF0(x, 3 * (1 + 8));
+  MAM_TRITS_DEF(x, 3 * (1 + 8));
 
   x = MAM_TRITS_INIT(x, 3 * (1 + 8));
   trits_set1(x, 1);
