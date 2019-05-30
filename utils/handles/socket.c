@@ -74,7 +74,12 @@ int tls_socket_send(mbedtls_ctx_t *ctx, char const *data, size_t size) {
   return mbedtls_ssl_write(&ctx->ssl, (const unsigned char *)data, size);
 }
 
-int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size, uint64_t timeout) {
+int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size, uint32_t timeout) {
+  if (timeout != 0) {
+    mbedtls_ssl_config *ssl_conf = (mbedtls_ssl_config *)malloc(sizeof(mbedtls_ssl_config));
+    memcpy(ssl_conf, ctx->ssl.conf, sizeof(mbedtls_ssl_config));
+    mbedtls_ssl_conf_read_timeout(ssl_conf, timeout);
+  }
   return mbedtls_ssl_read(&ctx->ssl, (unsigned char *)data, size);
 }
 
