@@ -120,7 +120,7 @@ done:
 retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **const buffer) {
   retcode_t ret = RC_OK;
   FILE *fp = NULL;
-  size_t buffer_size = 0;
+  long buffer_size = 0;
   size_t offset = 0;
 
   if (!iota_utils_file_exist(file_path)) {
@@ -149,7 +149,7 @@ retcode_t iota_utils_read_file_into_buffer(char const *const file_path, char **c
       }
 
       /* Read the entire file into memory. */
-      while (offset < buffer_size) {
+      while (offset < (size_t)buffer_size) {
         offset += fread(*(buffer + offset), sizeof(char), buffer_size, fp);
         if (ferror(fp) != 0) {
           ret = RC_UTILS_FAILED_READ_FILE;

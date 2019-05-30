@@ -46,8 +46,8 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   size_t value_len;
   size_t offset = 0;
 
-  if (flex_trits_to_trytes(str + offset, NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
-      NUM_TRITS_HASH) {
+  if (flex_trits_to_trytes((tryte_t *)(str + offset), NUM_TRYTES_HASH, snapshot_metadata->hash, NUM_TRITS_HASH,
+                           NUM_TRITS_HASH) != NUM_TRITS_HASH) {
     return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
   }
 
@@ -60,8 +60,8 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   offset += value_len;
 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
-    if (flex_trits_to_trytes(str + offset, NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH) !=
-        NUM_TRITS_HASH) {
+    if (flex_trits_to_trytes((tryte_t *)(str + offset), NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH,
+                             NUM_TRITS_HASH) != NUM_TRITS_HASH) {
       return RC_SNAPSHOT_METADATA_FAILED_SERIALIZING;
     }
     offset += NUM_TRYTES_ADDRESS;
@@ -84,8 +84,8 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
   char const *ptr = str;
   char *token;
 
-  if (flex_trits_from_trytes(snapshot_metadata->hash, NUM_TRITS_HASH, ptr, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
-      NUM_TRYTES_HASH) {
+  if (flex_trits_from_trytes(snapshot_metadata->hash, NUM_TRITS_HASH, (tryte_t *)ptr, NUM_TRYTES_HASH,
+                             NUM_TRYTES_HASH) != NUM_TRYTES_HASH) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += NUM_TRYTES_HASH;
@@ -107,8 +107,8 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
 
   token = strtok(ptr, ";");
   while (token != NULL) {
-    if (flex_trits_from_trytes(curr_hash, NUM_TRITS_ADDRESS, token, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS) !=
-        NUM_TRYTES_ADDRESS) {
+    if (flex_trits_from_trytes(curr_hash, NUM_TRITS_ADDRESS, (tryte_t *)token, NUM_TRYTES_ADDRESS,
+                               NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
     }
 
