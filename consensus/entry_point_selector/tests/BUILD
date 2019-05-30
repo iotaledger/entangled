@@ -1,5 +1,6 @@
 cc_test(
     name = "test_entry_point_selector",
+    timeout = "short",
     srcs = ["test_entry_point_selector.c"],
     data = [":db_file"],
     visibility = ["//visibility:public"],

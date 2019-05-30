@@ -1,5 +1,6 @@
 cc_test(
     name = "test_psk",
+    timeout = "short",
     srcs = ["test_psk.c"],
     visibility = ["//visibility:private"],
     deps = [

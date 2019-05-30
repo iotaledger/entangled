@@ -1,5 +1,6 @@
 cc_test(
     name = "test_ptrit",
+    timeout = "short",
     srcs = ["test_trit_ptrit.c"],
     deps = [
         "//common/trinary:trit_ptrit",
@@ -9,6 +10,7 @@ cc_test(
 
 cc_test(
     name = "test_byte",
+    timeout = "short",
     srcs = ["test_trit_byte.c"],
     deps = [
         "//common/trinary:trit_byte",
@@ -18,6 +20,7 @@ cc_test(
 
 cc_test(
     name = "test_tryte",
+    timeout = "short",
     srcs = ["test_trit_tryte.c"],
     deps = [
         "//common/trinary:trit_tryte",
@@ -27,6 +30,7 @@ cc_test(
 
 cc_test(
     name = "test_long",
+    timeout = "short",
     srcs = ["test_trit_long.c"],
     deps = [
         "//common/trinary:trit_long",
@@ -36,6 +40,7 @@ cc_test(
 
 cc_test(
     name = "test_tryte_long",
+    timeout = "short",
     srcs = ["test_tryte_long.c"],
     deps = [
         "//common/trinary:tryte_long",
@@ -45,6 +50,7 @@ cc_test(
 
 cc_test(
     name = "test_tryte_ascii",
+    timeout = "short",
     srcs = ["test_tryte_ascii.c"],
     deps = [
         "//common/trinary:tryte_ascii",
@@ -54,6 +60,7 @@ cc_test(
 
 cc_test(
     name = "test_add",
+    timeout = "short",
     srcs = ["test_add.c"],
     deps = [
         "//common/trinary:add",
@@ -63,6 +70,7 @@ cc_test(
 
 cc_test(
     name = "test_flex_trit",
+    timeout = "short",
     srcs = ["test_flex_trit.c"],
     deps = [
         "//common/trinary:flex_trit",
@@ -72,6 +80,7 @@ cc_test(
 
 cc_test(
     name = "test_trit_array",
+    timeout = "short",
     srcs = ["test_trit_array.c"],
     deps = [
         "//common/trinary:trit_array",
@@ -81,6 +90,7 @@ cc_test(
 
 cc_test(
     name = "test_flex_trit_array",
+    timeout = "short",
     srcs = ["test_flex_trit_array.cc"],
     deps = [
         "//common/trinary:flex_trit_array",

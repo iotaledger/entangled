@@ -25,6 +25,7 @@ cc_library(
 
 cc_test(
     name = "common_test",
+    timeout = "short",
     srcs = ["tests/iri.cpp"],
     deps = [
         ":common",

@@ -1,5 +1,6 @@
 cc_test(
     name = "test_http",
+    timeout = "short",
     srcs = [
         "test_http.c",
     ],
