@@ -1,5 +1,6 @@
 cc_test(
     name = "test_sqlite3",
+    timeout = "moderate",
     srcs = [
         "test_sqlite3.c",
     ],
