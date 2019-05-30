@@ -8,6 +8,7 @@ genrule(
 
 cc_test(
     name = "test_milestone_tracker",
+    timeout = "moderate",
     srcs = ["test_milestone_tracker.c"],
     data = [":db_file"],
     visibility = ["//visibility:public"],

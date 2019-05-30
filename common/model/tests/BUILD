@@ -9,6 +9,7 @@ cc_library(
 
 cc_test(
     name = "test_bundle",
+    timeout = "short",
     srcs = ["test_bundle.c"],
     deps = [
         "//common/crypto/iss:normalize",
@@ -21,6 +22,7 @@ cc_test(
 
 cc_test(
     name = "test_transaction",
+    timeout = "short",
     srcs = ["test_transaction.c"],
     deps = [
         ":defs",
@@ -31,6 +33,7 @@ cc_test(
 
 cc_test(
     name = "test_tryte_transaction",
+    timeout = "short",
     srcs = ["test_tryte_transaction.cc"],
     deps = [
         ":defs",
@@ -42,6 +45,7 @@ cc_test(
 
 cc_test(
     name = "test_transfer",
+    timeout = "short",
     srcs = ["test_transfer.c"],
     deps = [
         ":defs",
@@ -54,6 +58,7 @@ cc_test(
 
 cc_test(
     name = "test_inputs",
+    timeout = "short",
     srcs = ["test_inputs.c"],
     deps = [
         ":defs",

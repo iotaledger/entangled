@@ -1,5 +1,6 @@
 cc_test(
     name = "test_exit_probability_randomizer",
+    timeout = "short",
     srcs = [
         "test_exit_probability_randomizer.c",
     ],

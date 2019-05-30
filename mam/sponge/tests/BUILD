@@ -1,5 +1,6 @@
 cc_test(
     name = "test_sponge",
+    timeout = "short",
     srcs = ["test_sponge.c"],
     deps = [
         "//mam/sponge",
@@ -9,6 +10,7 @@ cc_test(
 
 cc_test(
     name = "test_spongos",
+    timeout = "short",
     srcs = ["test_spongos.c"],
     deps = [
         "//mam/sponge:spongos",
