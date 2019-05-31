@@ -14,6 +14,8 @@
 #include "ciri/conf.h"
 #include "ciri/usage.h"
 
+static char* short_options = "c:d:hl:n:p:t:u:";
+
 /*
  * Private functions
  */
