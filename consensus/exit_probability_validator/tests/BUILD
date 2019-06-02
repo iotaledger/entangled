@@ -1,6 +1,6 @@
 cc_test(
     name = "test_exit_probability_validator",
-    timeout = "short",
+    timeout = "moderate",
     srcs = [
         "exit_probability_validator.c",
     ],
