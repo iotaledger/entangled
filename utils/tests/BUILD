@@ -2,6 +2,7 @@ load("//consensus:conf.bzl", "CONSENSUS_MAINNET_VARIABLES")
 
 cc_test(
     name = "test_merkle",
+    timeout = "moderate",
     srcs = ["test_merkle.c"],
     deps =
         [

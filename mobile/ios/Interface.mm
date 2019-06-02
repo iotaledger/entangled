@@ -61,7 +61,7 @@
   flex_trit_t flexTrunk[FLEX_TRIT_SIZE_243];
   flex_trit_t flexBranch[FLEX_TRIT_SIZE_243];
   NSMutableArray* outputTxsTrytes = [NSMutableArray array];
-  NSMutableString* outputTxsTrytesSerialized = @"";
+  NSMutableString* outputTxsTrytesSerialized = [NSMutableString string];
 
   flex_trits_from_trytes(flexTrunk, NUM_TRITS_TRUNK, (tryte_t*)[trunk cStringUsingEncoding:NSUTF8StringEncoding],
                          NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
@@ -85,7 +85,7 @@
     transaction_serialize_on_flex_trits(curTx, serializedFlexTrits);
     flex_trits_to_trytes((tryte_t*)serializedTrytes, NUM_TRYTES_SERIALIZED_TRANSACTION, serializedFlexTrits,
                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
-    outputTxsTrytesSerialized = [NSString stringWithFormat:@"%s", serializedTrytes];
+    outputTxsTrytesSerialized = [NSMutableString stringWithFormat:@"%s", serializedTrytes];
     [outputTxsTrytes addObject:outputTxsTrytesSerialized];
   }
 

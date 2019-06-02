@@ -1,5 +1,6 @@
 cc_test(
     name = "bundle_validator",
+    timeout = "moderate",
     srcs = [
         "bundle_validator.c",
     ],

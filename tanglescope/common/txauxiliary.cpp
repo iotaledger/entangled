@@ -34,12 +34,12 @@ boost::future<void> removeConfirmedTransactions(std::weak_ptr<cppclient::IotaAPI
                                                tips] { return clientSharedPtr->getInclusionStates(txs, tips); })
         .then([&](auto future) {
           auto response = future.get();
-          if (response.states.empty()) {
+          if (!response.has_value()) {
             txs.clear();
             return;
           }
 
-          auto states = std::move(response.states);
+          auto states = std::move(response.value().states);
           auto idx = 0;
           txs.erase(std::remove_if(txs.begin(), txs.end(), [&idx, &states](std::string hash) { return states[idx++]; }),
                     txs.end());

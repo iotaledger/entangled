@@ -355,7 +355,7 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryt
   retcode_t ret = RC_OK;
   mam_channel_t channel;
   mam_pk_t channel_pk;
-  MAM_TRITS_DEF0(channel_ord, MAM_CHANNEL_NAME_SIZE);
+  MAM_TRITS_DEF(channel_ord, MAM_CHANNEL_NAME_SIZE);
   channel_ord = MAM_TRITS_INIT(channel_ord, MAM_CHANNEL_NAME_SIZE);
 
   if (api == NULL || channel_id == NULL) {
@@ -382,7 +382,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
   mam_channel_t *channel = NULL;
   mam_endpoint_t endpoint;
   mam_pk_t endpoint_pk;
-  MAM_TRITS_DEF0(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
+  MAM_TRITS_DEF(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
   endpoint_ord = MAM_TRITS_INIT(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
 
   if (api == NULL || channel_id == NULL || endpoint_id == NULL) {
@@ -446,9 +446,13 @@ retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t con
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const msg_id, tryte_t const *const payload,
                                       size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
                                       bundle_transactions_t *const bundle) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   mam_msg_write_context_t *ctx = NULL;
   trit_t_to_mam_msg_write_context_t_map_entry_t *entry = NULL;
+  trit_t tag[NUM_TRITS_TAG];
+  trits_t packet = trits_null();
+  trits_t payload_trits = trits_null();
+  size_t packet_size = 0;
 
   if (api == NULL || msg_id == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
@@ -459,42 +463,42 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const 
   }
   ctx = entry->value;
 
-  {
-    trit_t tag[NUM_TRITS_TAG];
-    trits_t packet = trits_null();
-    size_t packet_size = 0;
-    MAM_TRITS_DEF0(payload_trits, payload_size * 3);
-    payload_trits = MAM_TRITS_INIT(payload_trits, payload_size * 3);
-    trits_from_str(payload_trits, (char const *)payload);
+  if (trits_is_null(payload_trits = trits_alloc(payload_size * 3))) {
+    ret = RC_OOM;
+    goto done;
+  }
+  trits_from_str(payload_trits, (char const *)payload);
 
-    packet_size = mam_msg_packet_size(checksum, ctx->mss, payload_size * 3);
-    if (trits_is_null(packet = trits_alloc(packet_size))) {
-      return RC_OOM;
-    }
-
-    if (is_last_packet) {
-      ctx->ord = -ctx->ord;
-    }
-
-    ERR_BIND_RETURN(mam_msg_write_packet(ctx, checksum, payload_trits, &packet), ret);
-    packet = trits_pickup(packet, packet_size);
-    mam_api_write_tag(tag, msg_id, ctx->ord);
-
-    if (!is_last_packet) {
-      ctx->ord++;
-    }
-    mam_api_bundle_wrap(bundle, ctx->chid, tag, packet);
-
-    trits_free(packet);
+  packet_size = mam_msg_packet_size(checksum, ctx->mss, payload_size * 3);
+  if (trits_is_null(packet = trits_alloc(packet_size))) {
+    ret = RC_OOM;
+    goto done;
   }
 
   if (is_last_packet) {
+    ctx->ord = -ctx->ord;
+  }
+
+  ERR_BIND_GOTO(mam_msg_write_packet(ctx, checksum, payload_trits, &packet), ret, done);
+  packet = trits_pickup(packet, packet_size);
+  mam_api_write_tag(tag, msg_id, ctx->ord);
+
+  if (!is_last_packet) {
+    ctx->ord++;
+  }
+  mam_api_bundle_wrap(bundle, ctx->chid, tag, packet);
+
+  if (is_last_packet) {
     if (!trit_t_to_mam_msg_write_context_t_map_remove(&api->write_ctxs, msg_id)) {
-      return RC_MAM_SEND_CTX_NOT_FOUND;
+      ret = RC_MAM_SEND_CTX_NOT_FOUND;
     }
   }
 
-  return RC_OK;
+done:
+  trits_free(packet);
+  trits_free(payload_trits);
+
+  return ret;
 }
 
 retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle, tryte_t **const payload,

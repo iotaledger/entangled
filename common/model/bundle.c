@@ -167,7 +167,7 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
 retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *const status) {
   retcode_t res = RC_OK;
   iota_transaction_t *curr_tx = NULL;
-  int64_t index = 0, last_index = 0;
+  uint64_t current_index = 0, last_index = 0;
   int64_t bundle_value = 0, tx_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool valid_sig = false;
@@ -203,7 +203,7 @@ retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *
       break;
     }
 
-    if (transaction_current_index(curr_tx) != index++ || transaction_last_index(curr_tx) != last_index) {
+    if (transaction_current_index(curr_tx) != current_index++ || transaction_last_index(curr_tx) != last_index) {
       *status = BUNDLE_INVALID_TX;
       break;
     }

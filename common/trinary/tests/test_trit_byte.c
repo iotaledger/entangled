@@ -41,7 +41,7 @@ void test_from_byte(void) {
   trit_t trits_out[trits_size];
   trit_t partial_trits[trits_size];
   size_t bytes_size = MIN_BYTES(trits_size);
-  for (int len = 0; len <= trits_size; len++) {
+  for (size_t len = 0; len <= trits_size; len++) {
     memset(trits_out, 0, trits_size);
     memset(partial_trits, 0, trits_size);
     memcpy(partial_trits, trits, len);

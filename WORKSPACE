@@ -40,7 +40,7 @@ android_ndk_repository(
 git_repository(
     name = "build_bazel_rules_apple",
     remote = "https://github.com/bazelbuild/rules_apple.git",
-    tag = "0.13.0",
+    tag = "0.16.1",
 )
 
 load(

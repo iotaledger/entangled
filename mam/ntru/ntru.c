@@ -128,8 +128,8 @@ retcode_t ntru_sk_reset(mam_ntru_sk_t *const ntru_sk) {
 }
 
 void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk, mam_prng_t const *const prng, trits_t const nonce) {
-  MAM_TRITS_DEF0(nonce_i, 81);
-  MAM_TRITS_DEF0(secret_key, 2 * MAM_NTRU_SK_SIZE);
+  MAM_TRITS_DEF(nonce_i, 81);
+  MAM_TRITS_DEF(secret_key, 2 * MAM_NTRU_SK_SIZE);
   nonce_i = MAM_TRITS_INIT(nonce_i, 81);
   secret_key = MAM_TRITS_INIT(secret_key, 2 * MAM_NTRU_SK_SIZE);
   MAM_POLY_DEF(g);
@@ -177,9 +177,9 @@ bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk, mam_spongos_t *const spong
   poly_coeff_t *f = NULL;
   MAM_POLY_DEF(s);
   MAM_POLY_DEF(r);
-  MAM_TRITS_DEF0(kt, MAM_NTRU_SK_SIZE);
-  MAM_TRITS_DEF0(rh, MAM_NTRU_EKEY_SIZE);
-  MAM_TRITS_DEF0(m, MAM_NTRU_SK_SIZE - MAM_NTRU_KEY_SIZE);
+  MAM_TRITS_DEF(kt, MAM_NTRU_SK_SIZE);
+  MAM_TRITS_DEF(rh, MAM_NTRU_EKEY_SIZE);
+  MAM_TRITS_DEF(m, MAM_NTRU_SK_SIZE - MAM_NTRU_KEY_SIZE);
   kt = MAM_TRITS_INIT(kt, MAM_NTRU_SK_SIZE);
   rh = MAM_TRITS_INIT(rh, MAM_NTRU_EKEY_SIZE);
   m = MAM_TRITS_INIT(m, MAM_NTRU_SK_SIZE - MAM_NTRU_KEY_SIZE);

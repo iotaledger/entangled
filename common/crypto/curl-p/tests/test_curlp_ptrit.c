@@ -19,7 +19,9 @@ void run_curl_p_test(PCurl *curl, ptrit_t *exp) {
   ptrit_curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
   ptrit_curl_reset(curl);
 
-  // TEST_ASSERT_EQUAL_MEMORY (exp, hash, sizeof(hash));
+  // TODO https://github.com/iotaledger/entangled/issues/1229
+  (void)exp;
+  // TEST_ASSERT_EQUAL_MEMORY(exp, hash, sizeof(hash));
 }
 
 void test_curl_p_27_works(void) {
