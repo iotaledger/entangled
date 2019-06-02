@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/response/get_tips.h"
 
 get_tips_res_t* get_tips_res_new() {

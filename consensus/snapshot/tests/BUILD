@@ -12,6 +12,7 @@ filegroup(
 
 cc_test(
     name = "test_snapshot",
+    timeout = "short",
     srcs = ["test_snapshot.c"],
     data = [
         ":snapshot_test_files",
@@ -26,6 +27,7 @@ cc_test(
 
 cc_test(
     name = "test_state_delta",
+    timeout = "short",
     srcs = ["test_state_delta.c"],
     data = [
         ":snapshot_test_files",
@@ -40,6 +42,7 @@ cc_test(
 
 cc_test(
     name = "test_snapshot_metadata",
+    timeout = "short",
     srcs = ["test_snapshot_metadata.c"],
     data = [
         ":snapshot_test_files",

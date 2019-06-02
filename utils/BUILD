@@ -90,3 +90,10 @@ cc_library(
     hdrs = ["memset_safe.h"],
     deps = ["//common:errors"],
 )
+
+cc_library(
+    name = "char_buffer",
+    srcs = ["char_buffer.c"],
+    hdrs = ["char_buffer.h"],
+    deps = ["//common:errors"],
+)

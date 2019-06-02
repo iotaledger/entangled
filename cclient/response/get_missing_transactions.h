@@ -17,7 +17,7 @@
 #ifndef CCLIENT_RESPONSE_GET_MISSING_TRANSACTIONS_H
 #define CCLIENT_RESPONSE_GET_MISSING_TRANSACTIONS_H
 
-#include "cclient/types/types.h"
+#include "utils/containers/hash/hash243_stack.h"
 
 #ifdef __cplusplus
 extern "C" {

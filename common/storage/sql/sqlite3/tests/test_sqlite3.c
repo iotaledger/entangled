@@ -19,7 +19,6 @@
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/files.h"
 
-static bool debug_mode = false;
 static char *test_db_path = "common/storage/sql/sqlite3/tests/test.db";
 static char *ciri_db_path = "common/storage/sql/sqlite3/tests/ciri.db";
 // TODO Remove after "Common definitions #329" is merged
@@ -373,7 +372,7 @@ void test_transactions_arrival_time(void) {
   hash_pack_reset(&pack);
   TEST_ASSERT(iota_stor_transaction_load_metadata(&connection, transaction_hash(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  int64_t test_tx_timestamp = transaction_arrival_timestamp(&tx);
+  uint64_t test_tx_timestamp = transaction_arrival_timestamp(&tx);
   hash_pack_reset(&pack);
   TEST_ASSERT(iota_stor_transaction_load_metadata(&connection, transaction_hash(&second_test_transaction), &pack) ==
               RC_OK);
@@ -382,17 +381,9 @@ void test_transactions_arrival_time(void) {
   transaction_free(test_tx);
 }
 
-int main(int argc, char *argv[]) {
+int main(void) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
-
-  if (argc >= 2) {
-    debug_mode = true;
-  }
-  if (debug_mode) {
-    test_db_path = "test.db";
-    ciri_db_path = "ciri.db";
-  }
 
   iota_utils_copy_file(test_db_path, ciri_db_path);
 

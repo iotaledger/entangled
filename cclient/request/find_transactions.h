@@ -17,7 +17,9 @@
 #ifndef CCLIENT_REQUEST_FIND_TRANSACTIONS_H
 #define CCLIENT_REQUEST_FIND_TRANSACTIONS_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash81_queue.h"
 
 #ifdef __cplusplus
 extern "C" {

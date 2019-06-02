@@ -12,7 +12,7 @@
 #include "Interface.h"
 
 extern "C" {
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(JNIEnv* env, jclass thiz, jstring jtrytes,
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(JNIEnv* env, jclass, jstring jtrytes,
                                                                            jint mwm) {
   char* foundNonce = NULL;
   char const* trytes = env->GetStringUTFChars(jtrytes, 0);
@@ -43,7 +43,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow_1trytes(JNIEn
  * Signature:
  * ([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)[Ljava/lang/String;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(JNIEnv* env, jclass thiz,
+JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(JNIEnv* env, jclass,
                                                                                 jobjectArray txsTrytes, jstring trunk,
                                                                                 jstring branch, jint mwm) {
   bundle_transactions_t* bundle = NULL;
@@ -102,7 +102,7 @@ done:
  * Method:    iota_sign_address_gen_trytes
  * Signature: (Ljava/lang/String;II)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(JNIEnv* env, jclass thiz,
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(JNIEnv* env, jclass,
                                                                                           jstring jseed, jint index,
                                                                                           jint security) {
   char* address = NULL;
@@ -127,7 +127,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1ge
  * Method:    iota_sign_address_gen_trits
  * Signature: ([Ljava/lang/Byte;II)[Ljava/lang/Byte;
  */
-JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(JNIEnv* env, jclass thiz,
+JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(JNIEnv* env, jclass,
                                                                                             jbyteArray jseed,
                                                                                             jint index, jint security) {
   trit_t* address = NULL;
@@ -153,7 +153,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1address_
  * Method:    iota_sign_signature_gen_trytes
  * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(JNIEnv* env, jclass thiz,
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(JNIEnv* env, jclass,
                                                                                             jstring jseed, jint index,
                                                                                             jint security,
                                                                                             jstring jBundleHash) {
@@ -182,7 +182,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1
  * Method:    iota_sign_signature_gen_trits
  * Signature: ([Ljava/lang/Byte;II[Ljava/lang/Byte;)[Ljava/lang/Byte;
  */
-JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(JNIEnv* env, jclass thiz,
+JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(JNIEnv* env, jclass,
                                                                                               jbyteArray jseed,
                                                                                               jint index, jint security,
                                                                                               jbyteArray jBundleHash) {
@@ -213,7 +213,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_iota_mobile_Interface_iota_1sign_1signatur
  * Method:    iota_digest
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(JNIEnv* env, jclass thiz, jstring jtrytes) {
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(JNIEnv* env, jclass, jstring jtrytes) {
   char* digest = NULL;
   char const* trytes = env->GetStringUTFChars(jtrytes, 0);
 

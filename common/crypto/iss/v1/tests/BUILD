@@ -1,5 +1,6 @@
 cc_test(
     name = "test_iss",
+    timeout = "short",
     srcs = [
         "test_iss.c",
     ],
@@ -13,6 +14,7 @@ cc_test(
 
 cc_test(
     name = "test_iss_curl",
+    timeout = "short",
     srcs = [
         "test_iss_curl.c",
     ],
@@ -25,6 +27,7 @@ cc_test(
 
 cc_test(
     name = "test_iss_kerl",
+    timeout = "short",
     srcs = [
         "test_iss_kerl.c",
     ],

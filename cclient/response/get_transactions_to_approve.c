@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/response/get_transactions_to_approve.h"
 
 get_transactions_to_approve_res_t* get_transactions_to_approve_res_new() {

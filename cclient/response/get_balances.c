@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "cclient/response/get_balances.h"
 
 static const UT_icd ut_uint64_icd = {sizeof(uint64_t), NULL, NULL, NULL};

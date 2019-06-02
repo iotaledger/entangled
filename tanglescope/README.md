@@ -28,18 +28,18 @@ Measuring transactions/bundles traffic data by listening to a list of zmq publis
 ```yaml
 statscollector:
 
-  #IP/Port that the Prometheus Exposer binds to
+#IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8081"
-  #URL of ZMQ publisher to connect to
+#URL of ZMQ publisher to connect to
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-  #histogram of bundle's confirmation duration granularity:
-  #(number of buckets = bundle_confirmation_histogram_range*1000 / bundle_confirmation_bucket_size)
+#histogram of bundle's confirmation duration granularity:
+#(number of buckets = bundle_confirmation_histogram_range * 1000 / bundle_confirmation_bucket_size)
 
-  #histogram's range  [seconds]
+#histogram's range  [seconds]
   bundle_confirmation_histogram_range: 240
-  #bucket's size [seconds]
+#bucket's size [seconds]
   bundle_confirmation_bucket_size: 2
 ```
 
@@ -84,22 +84,22 @@ Brief description of the logic:
 
 ```yaml
   echocollector:
-  #list of publishers to listen to. (they should return the echo)
+#list of publishers to listen to.(they should return the echo)
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-  #url of iri node
+#url of iri node
   iri_host: "iri01.testnet.iota.cafe"
   iri_port: 14265
-  #IP/Port that the Prometheus Exposer binds to
+#IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8080"
-  #MWM for transaction's POW
+#MWM for transaction's POW
   mwm: 9
-  #in-between transactions interval [seconds]
+#in - between transactions interval[seconds]
   broadcast_interval: 20
-  #how often should echocatcher discover "unseen" transactions [seconds]
-  #shouldn't be too frequent since it can incur in multiple api
-  #calls ..
+#how often should echocatcher discover "unseen" transactions[seconds]
+#shouldn't be too frequent since it can incur in multiple api
+#calls..
   discovery_interval: 5  
 ```
 
@@ -108,11 +108,11 @@ Also requires:
 ```yaml
 dbloader:
 
-  #URL of ZMQ publisher to connect to
+#URL of ZMQ publisher to connect to
   publisher: "tcp://zmq.testnet.iota.org:5556"
-  #TX's older than that age will be removed each cleanup_interval [seconds]
+#TX's older than that age will be removed each cleanup_interval [seconds]
   oldest_tx_age: 1800
-  #in - between cleanup interval[seconds]
+#in - between cleanup interval[seconds]
   cleanup_interval: 60
 ```
 
@@ -137,17 +137,17 @@ and ref counting transaction's direct approvers
 ```yaml
 blowballcollector:
 
-  #IP/Port that the Prometheus Exposer binds to
+#IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8082"
-  #URL of ZMQ publisher to connect to
+#URL of ZMQ publisher to connect to
   publisher: "tcp://zmq.testnet.iota.org:5556"
-  #interval between following snapshots (internal counters update)
+#interval between following snapshots(internal counters update)
   snapshot_interval: 60
 
-  #histogram granularity configuration
-  #histogram's bucket's size (refcount of tx approvers)
+#histogram granularity configuration
+#histogram 's bucket' s size(refcount of tx approvers)
   bucket_size: 1
-  #histogram's range (maximum value of refcount to report)
+#histogram's range (maximum value of refcount to report)
   histogram_range: 40up_interval: 60
 ```
 
@@ -166,21 +166,21 @@ Monitoring tip selection's algorithm behavior.
 ```yaml
 tipselectioncollector:
 
-  #IP / Port that the Prometheus Exposer binds to
+#IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8083"
-  #url of iri node
+#url of iri node
   iri_host : "iri01.testnet.iota.cafe"
   iri_port: 14265
-  #depth to give to "getTransactionsToApprove"
+#depth to give to "getTransactionsToApprove"
   depth: 10
-  #in - between samples interval[seconds]
+#in - between samples interval[seconds]
   sample_interval: 20
-  #of calls to getTransactionsToApprove in each sample
+#of calls to getTransactionsToApprove in each sample
   sample_size: 20
-  #histogram granularity configuration
-  #duration's histogram (time it took 'getTransactionsToApprove') bucket's size [ms]
+#histogram granularity configuration
+#duration 's histogram (time it took ' getTransactionsToApprove ') bucket' s size[ms]
   duration_bucket_size: 20
-  #duration's histogram range (maximum time it took 'getTransactionsToApprove')
+#duration 's histogram range (maximum time it took ' getTransactionsToApprove')
   duration_histogram_range: 1000
 ```
 
@@ -214,15 +214,15 @@ Measuring tangle width as defined below:
 ```yaml
 tanglewidthcollector:
 
-  #IP / Port that the Prometheus Exposer binds to
+#IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8084"
-  #The measure line base from the above definition, [seconds]
+#The measure line base from the above definition, [seconds]
   measure_line_base_age: 30
-  #The measure line max age [seconds]
+#The measure line max age[seconds]
   measure_line_max_age: 90
-  #Step from measure_line_base_age to measure_line_max_age, [seconds]
+#Step from measure_line_base_age to measure_line_max_age, [seconds]
   measure_line_age_step: 10
-  #interval between following snapshots (internal counters update)
+#interval between following snapshots(internal counters update)
   snapshot_interval: 10
 ```
 
@@ -231,11 +231,11 @@ Also requires:
 ```yaml
 dbloader:
 
-  #URL of ZMQ publisher to connect to
+#URL of ZMQ publisher to connect to
   publisher: "tcp://zmq.testnet.iota.org:5556"
-  #TX's older than that age will be removed each cleanup_interval [seconds]
+#TX's older than that age will be removed each cleanup_interval [seconds]
   oldest_tx_age: 1800
-  #in - between cleanup interval[seconds]
+#in - between cleanup interval[seconds]
   cleanup_interval: 60
 ```
 
@@ -258,30 +258,30 @@ Measuring transaction's confirmation rate
 
 ```yaml
 confirmationratecollector:
-  #list of publisher to listen to. (they should return the echo)
+#list of publisher to listen to.(they should return the echo)
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-  #url of iri node
+#url of iri node
   iri_host: "iri01.testnet.iota.cafe"
   iri_port: 14265
-  #IP/Port that the Prometheus Exposer binds to
+#IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8085"
-  #MWM for transaction's POW
+#MWM for transaction's POW
   mwm: 9
-  #in-between transactions interval [seconds]
+#in - between transactions interval[seconds]
   broadcast_interval: 3
 
-  #Time after which we should expect transaction to be approved
+#Time after which we should expect transaction to be approved
   measurement_upper_bound: 60
-  #Time after which if a transaction hasn't been approved, we give up
+#Time after which if a transaction hasn't been approved, we give up
   measurement_lower_bound: 360
-  #should calculate confirmation rate using API calls
+#should calculate confirmation rate using API calls
   enable_cr_from_api: true
-  #For checking the CR for various Latencies, define the latency in seconds,
-  #"step" means that for 10 seconds we will check latency of 10,20,30 seconds
+#For checking the CR for various Latencies, define the latency in seconds,
+#"step" means that for 10 seconds we will check latency of 10, 20, 30 seconds
   additional_latency_step_seconds: 10
-  #num different latencies to check
+#num different latencies to check
   additional_latency_num_steps: 3
 ```
 
@@ -290,6 +290,3 @@ confirmationratecollector:
 - confirmationratecollector_confirmation_rate_api (Confirmation rate ratio [0,1] as it is perceived by making api calls to "getInclusionStates") [Gauge]  
 
 - confirmationratecollector_confirmation_rate_zmq (Confirmation rate ratio [0,1] as it is perceived by inspecting the zmq stream) [Gauge]
-
-
-

@@ -17,7 +17,8 @@
 #ifndef CCLIENT_RESPONSE_ATTACH_TO_TANGLE_H
 #define CCLIENT_RESPONSE_ATTACH_TO_TANGLE_H
 
-#include "cclient/types/types.h"
+#include "common/errors.h"
+#include "utils/containers/hash/hash_array.h"
 
 #ifdef __cplusplus
 extern "C" {

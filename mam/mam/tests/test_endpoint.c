@@ -26,7 +26,7 @@ static bool mam_endpoint_t_set_cmp_test_endpoints(mam_endpoint_t_set_t const end
   mam_endpoint_t_set_entry_t *entry_2 = NULL;
   mam_endpoint_t_set_entry_t *tmp_2 = NULL;
   size_t match = 0;
-  MAM_TRITS_DEF0(hash, MAM_MSS_HASH_SIZE);
+  MAM_TRITS_DEF(hash, MAM_MSS_HASH_SIZE);
   hash = MAM_TRITS_INIT(hash, MAM_MSS_HASH_SIZE);
   trits_from_str(hash,
                  "ABCNKOZWYSDF9OABCNKOZWYSDF9"
@@ -41,8 +41,8 @@ static bool mam_endpoint_t_set_cmp_test_endpoints(mam_endpoint_t_set_t const end
     HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {
       if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root, MAM_ENDPOINT_ID_SIZE) == 0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
-        MAM_TRITS_DEF0(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
-        MAM_TRITS_DEF0(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
+        MAM_TRITS_DEF(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
+        MAM_TRITS_DEF(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
         sig1 = MAM_TRITS_INIT(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
         sig2 = MAM_TRITS_INIT(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
         TEST_ASSERT_EQUAL_INT(RC_OK, mam_mss_sign(&entry_1->value.mss, hash, sig1));
@@ -70,7 +70,7 @@ void test_endpoint(void) {
   tryte_t endpoint_name[ENDPOINT_NAME_SIZE];
   trits_t endpoint_name_trits = trits_alloc(ENDPOINT_NAME_SIZE * 3);
 
-  MAM_TRITS_DEF0(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
+  MAM_TRITS_DEF(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
   prng_key = MAM_TRITS_INIT(prng_key, MAM_PRNG_SECRET_KEY_SIZE);
   trits_from_str(prng_key,
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
