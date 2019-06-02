@@ -91,7 +91,6 @@ cc_library(
         ":uint64_t_to_flex_trit_t_map",
         "//common:errors",
         "//common/trinary:flex_trit",
-        "//utils/handles:rand",
         "//utils/handles:rw_lock",
         "@xxhash",
     ],

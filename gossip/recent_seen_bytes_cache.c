@@ -6,16 +6,13 @@
  */
 
 #include "gossip/recent_seen_bytes_cache.h"
-#include "utils/handles/rand.h"
 
-retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, size_t const capacity,
-                                       double const drop_rate) {
+retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, size_t const capacity) {
   if (cache == NULL) {
     return RC_NULL_PARAM;
   }
 
   cache->capacity = capacity;
-  cache->drop_rate = drop_rate;
   cache->miss = 0;
   cache->hit = 0;
   rw_lock_handle_init(&cache->lock);
@@ -45,14 +42,8 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
   rw_lock_handle_wrlock(&cache->lock);
 
   if ((*found = uint64_t_to_flex_trit_t_map_find(&cache->map, &digest, &entry))) {
-    if (rand_handle_probability() < cache->drop_rate) {
-      ret = uint64_t_to_flex_trit_t_map_remove_entry(&cache->map, entry);
-      *found = false;
-      cache->miss++;
-    } else {
-      memcpy(hash, entry->value, FLEX_TRIT_SIZE_243);
-      cache->hit++;
-    }
+    memcpy(hash, entry->value, FLEX_TRIT_SIZE_243);
+    cache->hit++;
   } else {
     cache->miss++;
   }
