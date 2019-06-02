@@ -1,5 +1,6 @@
 cc_test(
     name = "test_iss_curl",
+    timeout = "short",
     srcs = [
         "test_iss_curl.c",
     ],

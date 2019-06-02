@@ -18,7 +18,7 @@ static void trits_put_get_test(void) {
   trit_t t0, t;
   size_t i;
 
-  MAM_TRITS_DEF0(x, 1);
+  MAM_TRITS_DEF(x, 1);
 
   x = MAM_TRITS_INIT(x, 1);
   trits_set_zero(x);
@@ -131,7 +131,7 @@ static void trits_test(void) {
   char t[6 * 4];
   trits_t x;
 
-  MAM_TRITS_DEF0(y, 3 * 6 * 4);
+  MAM_TRITS_DEF(y, 3 * 6 * 4);
   y = MAM_TRITS_INIT(y, 3 * 6 * 4);
 
   for (size_t n = 0; n <= 6 * 4; ++n) {

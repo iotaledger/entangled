@@ -14,6 +14,8 @@
 #include "ciri/conf.h"
 #include "ciri/usage.h"
 
+static char* short_options = "c:d:hl:n:p:t:u:";
+
 /*
  * Private functions
  */
@@ -160,6 +162,12 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
 
   switch (key) {
     // cIRI configuration
+    case 'c':  // --config
+      if (strlen(optarg) == 0) {
+        return RC_CONF_INVALID_ARGUMENT;
+      }
+      strncpy(ciri_conf->conf_path, optarg, sizeof(ciri_conf->conf_path));
+      break;
     case CONF_DB_REVALIDATE:  // --db-revalidate
       ret = get_true_false(value, &ciri_conf->db_revalidate);
       break;
@@ -346,11 +354,12 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
                                       iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
 
-  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
+  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
     return RC_NULL_PARAM;
   }
 
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
+  strncpy(ciri_conf->conf_path, DEFAULT_CONF_PATH, sizeof(ciri_conf->conf_path));
   strncpy(ciri_conf->db_path, DEFAULT_DB_PATH, sizeof(ciri_conf->db_path));
   strncpy(consensus_conf->db_path, DEFAULT_DB_PATH, sizeof(consensus_conf->db_path));
   strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
@@ -373,7 +382,8 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
 }
 
 retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                   iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
+                                   iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
+                                   char** argv) {
   retcode_t ret = RC_OK;
   yaml_parser_t parser;
   yaml_token_t token;
@@ -381,9 +391,11 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
   int key = 0;
   char* arg = NULL;
   int state = 0;
+  struct option* long_options = build_options();
 
-  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
-    return RC_NULL_PARAM;
+  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+    ret = RC_NULL_PARAM;
+    goto done;
   }
 
   if (!yaml_parser_initialize(&parser)) {
@@ -391,7 +403,24 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
     goto done;
   }
 
-  if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
+  // Looping through the CLI arguments a first time to find the configuration file path
+  while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
+    if (key == ':') {
+      ret = RC_CONF_MISSING_ARGUMENT;
+      goto done;
+    } else if (key == '?') {
+      ret = RC_CONF_UNKNOWN_OPTION;
+      goto done;
+    } else if (key == 'c') {  // configure file path
+      if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
+        goto done;
+      }
+    }
+  }
+  // Resetting the CLI arguments for the second loop where they are actually analyzed
+  optind = 1;
+
+  if ((file = fopen(ciri_conf->conf_path, "r")) == NULL) {
     ret = RC_OK;
     goto done;
   }
@@ -436,6 +465,7 @@ done:
   yaml_token_delete(&token);
   yaml_parser_delete(&parser);
   fclose(file);
+  free(long_options);
 
   return ret;
 }
@@ -446,6 +476,11 @@ retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t* const ciri_conf, iota_consen
   int key = 0;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
+
+  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+    ret = RC_NULL_PARAM;
+    goto done;
+  }
 
   while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
     if (key == ':') {
@@ -459,12 +494,15 @@ retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t* const ciri_conf, iota_consen
     }
   }
 
+done:
+
   if (ret == RC_CONF_INVALID_ARGUMENT) {
     print_invalid_argument(key);
   }
   free(long_options);
+
   return ret;
-};
+}
 
 retcode_t iota_ciri_conf_destroy(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
                                  iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {

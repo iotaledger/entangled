@@ -35,7 +35,7 @@ void ftroika_shift_lanes(t27_t *state);
 void ftroika_add_column_parity(t27_t *state);
 void ftroika_print_round_constants();
 void ftroika_add_round_constant(t27_t *state, int round);
-void ftroika_permutation(t27_t *state, unsigned long long num_rounds);
+void ftroika_permutation(t27_t *state, size_t const num_rounds);
 void ftroika_nullify_state(t27_t *state);
 void ftroika_nullify_rate(t27_t *state);
 void ftroika_nullify_capacity(t27_t *state);

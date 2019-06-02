@@ -74,7 +74,7 @@ int tls_socket_send(mbedtls_ctx_t *ctx, char const *data, size_t size) {
   return mbedtls_ssl_write(&ctx->ssl, (const unsigned char *)data, size);
 }
 
-int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size, uint64_t timeout) {
+int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size) {
   return mbedtls_ssl_read(&ctx->ssl, (unsigned char *)data, size);
 }
 

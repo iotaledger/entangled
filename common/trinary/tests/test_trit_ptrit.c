@@ -17,7 +17,7 @@ void test_trit_to_ptrit(void) {
   trit_t trits[] = {TRITS_IN};
   ptrit_t exp[] = {ptrit_EXP};
 
-  ptrit_t ptrit[3] = {0};
+  ptrit_t ptrit[3] = {{0, 0}};
   trit_t trit_o[3] = {0};
 
   for (size_t i = 0; i < 64; i++) {

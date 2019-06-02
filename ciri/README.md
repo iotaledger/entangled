@@ -63,6 +63,7 @@ http-port: 14265
 
 Long option | Short option | Description | Example input
 --- | --- | --- | ---
+`--config` | `-c` | Path to the configuration file. | `--config ciri/conf.yml`
 `--db-path` | `-d` | Path to the database file. | `-d ciri/db/ciri-mainnet.db`
 `--db-revalidate` | | Reloads milestones, state of the ledger and transactions metadata from the database. | `--db-revalidate false`
 `--help` | `-h` | Displays the usage. |

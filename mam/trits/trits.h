@@ -41,13 +41,9 @@ typedef struct trits_s {
 
 #define MAM_TRITS_DECL(X, k) trit_t X##_p[k]
 
-#define MAM_TRITS_DEF0(X, k) \
-  MAM_TRITS_DECL(X, k);      \
+#define MAM_TRITS_DEF(X, k) \
+  MAM_TRITS_DECL(X, k);     \
   trits_t X
-
-#if 0
-#define MAM_TRITS_DEF(X, key) MAM_TRITS_DEF0(X, key) = MAM_TRITS_INIT(X, key)
-#endif
 
 static inline trit_t *trits_begin(trits_t x) { return x.p + x.d; }
 static inline trit_t *trits_end(trits_t x) { return x.p + x.d + x.n; }

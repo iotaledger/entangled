@@ -93,14 +93,14 @@ void CRCollector::calcConfirmationRateAPICall() {
   }
 
   auto resp = _api->getInclusionStates(transactions, tips);
-  if (resp.error.has_value() || resp.states.size() != transactions.size()) {
+  if (!resp.has_value() || resp.value().states.size() != transactions.size()) {
     return;
   }
   std::set<std::string> confirmedTransactions;
   uint32_t idx = 0;
   std::copy_if(transactions.begin(), transactions.end(),
                std::inserter(confirmedTransactions, confirmedTransactions.begin()),
-               [&](const std::string& hash) { return resp.states[idx++]; });
+               [&](const std::string& hash) { return resp.value().states[idx++]; });
 
   calcAndExposeImpl(confirmedTransactions, CONFIRMATION_RATE_API);
 }

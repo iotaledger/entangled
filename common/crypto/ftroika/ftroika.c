@@ -381,10 +381,10 @@ void ftroika_add_round_constant(t27_t *state, int round) {
   }
 }
 
-void ftroika_permutation(t27_t *state, unsigned long long num_rounds) {
+void ftroika_permutation(t27_t *state, size_t const num_rounds) {
   assert(num_rounds <= NUM_ROUNDS);
   // PrintTroikaState(state);
-  for (int round = 0; round < num_rounds; round++) {
+  for (size_t round = 0; round < num_rounds; round++) {
     ftroika_sub_trytes(state);
     ftroika_shift_rows(state);
     ftroika_shift_lanes(state);

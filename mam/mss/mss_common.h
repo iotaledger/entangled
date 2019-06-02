@@ -214,7 +214,7 @@ size_t mam_mss_serialized_size(mam_mss_t const *const mss);
  * @return void
  */
 
-void mam_mss_serialize(mam_mss_t const *const mss, trits_t buffer);
+void mam_mss_serialize(mam_mss_t const *const mss, trits_t *const buffer);
 
 /**
  * Deerialize Merkle tree.
@@ -224,7 +224,7 @@ void mam_mss_serialize(mam_mss_t const *const mss, trits_t buffer);
  *
  * @return void
  */
-retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss);
+retcode_t mam_mss_deserialize(trits_t *const buffer, mam_mss_t *const mss);
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,8 @@
 #ifndef __UTILS_MACROS_H__
 #define __UTILS_MACROS_H__
 
+#define UNUSED(...) (void)(__VA_ARGS__)
+
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
