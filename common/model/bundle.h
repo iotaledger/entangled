@@ -51,6 +51,21 @@ static inline size_t bundle_transactions_size(bundle_transactions_t const *const
   return utarray_len(bundle);
 }
 
+/**
+ * @brief Get bundle hash from a bundle transaction object
+ *
+ * @param bundle The bundle transaction object
+ * @return The bundle hash
+ */
+static inline flex_trit_t *const bundle_transactions_bundle_hash(bundle_transactions_t const *const bundle) {
+  if (bundle) {
+    if (utarray_len(bundle) > 0) {
+      return transaction_bundle((iota_transaction_t *)(utarray_eltptr(bundle, 0)));
+    }
+  }
+  return NULL;
+}
+
 void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl, flex_trit_t *out);
 void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
 retcode_t bundle_validate(bundle_transactions_t *const bundle, bundle_status_t *const status);

@@ -258,6 +258,14 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len, const flex_trit_t *flex
 size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len, const byte_t *bytes, size_t len,
                              size_t num_trits);
 
+/**
+ * @brief Print flex trits through stdout
+ *
+ * @param trits A pointer to flex trits
+ * @param trits_len Number of trit
+ */
+void flex_trit_print(flex_trit_t const *const trits, size_t trits_len);
+
 #endif
 #ifdef __cplusplus
 }
