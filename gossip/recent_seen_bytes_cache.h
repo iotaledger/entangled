@@ -24,14 +24,12 @@ extern "C" {
 typedef struct recent_seen_bytes_cache_s {
   uint64_t_to_flex_trit_t_map_t map;
   size_t capacity;
-  double drop_rate;
   uint64_t miss;
   uint64_t hit;
   rw_lock_handle_t lock;
 } recent_seen_bytes_cache_t;
 
-retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, size_t const capacity,
-                                       double const drop_rate);
+retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, size_t const capacity);
 retcode_t recent_seen_bytes_cache_destroy(recent_seen_bytes_cache_t *const cache);
 retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, uint64_t const digest,
                                       flex_trit_t *const hash, bool *const found);

@@ -16,7 +16,6 @@
 
 #define DEFAULT_MWN MWM
 #define DEFAULT_NEIGHBORS NULL
-#define DEFAULT_PROBABILITY_DROP_CACHE_ENTRY 0.02
 #define DEFAULT_PROBABILITY_PROPAGATE_REQUEST 0.01
 #define DEFAULT_PROBABILITY_REMOVE_REQUEST 0.01
 #define DEFAULT_PROBABILITY_REPLY_RANDOM_TIP 0.66
@@ -47,8 +46,6 @@ typedef struct iota_gossip_conf_s {
   uint8_t request_hash_size_trit;
   // URIs of neighbouring nodes, separated by a space
   char* neighbors;
-  // Probability of dropping recently seen transactions out of the network cache. Value must be in [0,1]
-  double p_drop_cache_entry;
   // Probability of propagating the request of a transaction to a neighbor node
   // if it can't be found. This should be low since we don't want to propagate
   // non-existing transactions that spam the network. Value must be in [0,1]

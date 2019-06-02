@@ -20,7 +20,6 @@ typedef enum cli_arg_value_e {
   // Gossip configuration
 
   CONF_MWM,
-  CONF_P_DROP_CACHE_ENTRY,
   CONF_P_PROPAGATE_REQUEST,
   CONF_P_REMOVE_REQUEST,
   CONF_P_REPLY_RANDOM_TIP,
@@ -94,9 +93,6 @@ static struct cli_argument_s {
      "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
-    {"p-drop-cache-entry", CONF_P_DROP_CACHE_ENTRY,
-     "Probability of dropping recently seen transactions out of the network cache. Value must be in [0,1].",
-     REQUIRED_ARG},
     {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
      "Probability of propagating the request of a transaction to a neighbor "
      "node if it can't be found. This should be low since we don't want to "
