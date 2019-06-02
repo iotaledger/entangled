@@ -202,8 +202,6 @@ static struct cli_argument_s {
 
 };
 
-static char* short_options = "c:d:hl:n:p:t:u:";
-
 #ifdef __cplusplus
 extern "C" {
 #endif

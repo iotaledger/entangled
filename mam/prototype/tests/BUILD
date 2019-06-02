@@ -13,6 +13,7 @@ cc_test(
 
 cc_test(
     name = "test_mask",
+    timeout = "short",
     srcs = ["test_mask.c"],
     deps =
         [

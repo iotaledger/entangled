@@ -61,7 +61,7 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, i
   }
 
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) == false) {
+    if (tcp_send(&neighbor->endpoint, packet) == false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {

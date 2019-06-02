@@ -32,9 +32,13 @@ retcode_t tcp_sender_endpoint_init(endpoint_t *const endpoint) {
   return RC_OK;
 }
 
-retcode_t tcp_sender_endpoint_destroy(endpoint_t *const endpoint) { return RC_OK; }
+retcode_t tcp_sender_endpoint_destroy(endpoint_t *const endpoint) {
+  delete endpoint->opaque_inetaddr;
+  endpoint->opaque_inetaddr = NULL;
+  return RC_OK;
+}
 
-bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint, iota_packet_t const *const packet) {
+bool tcp_send(endpoint_t *const endpoint, iota_packet_t const *const packet) {
   if (endpoint == NULL) {
     return false;
   } else if (endpoint->opaque_inetaddr == NULL) {
