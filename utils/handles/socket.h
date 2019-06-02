@@ -64,7 +64,7 @@ typedef struct mbedtls_ctx_s {
 int tls_socket_connect(mbedtls_ctx_t *tls_ctx, char const *host, uint16_t port, char const *ca_pem,
                        char const *client_cert_pem, char const *client_pk_pem, retcode_t *error);
 int tls_socket_send(mbedtls_ctx_t *ctx, char const *data, size_t size);
-int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size, uint64_t timeout);
+int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size);
 void tls_socket_close(mbedtls_ctx_t *tls_ctx);
 
 #ifdef __cplusplus

@@ -64,7 +64,7 @@ static retcode_t validate_signature(char const *const signature_filename, flex_t
   iss_curl_address(sig_digests, root, sizeof(sig_digests), &curl);
   if ((read = getline(&line, &len, fp)) > 0) {
     line[--read] = '\0';
-    if (read != depth * HASH_LENGTH_TRYTE) {
+    if ((size_t)read != depth * HASH_LENGTH_TRYTE) {
       ret = RC_UTILS_INVALID_SIG_FILE;
       goto done;
     }
