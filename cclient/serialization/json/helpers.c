@@ -326,6 +326,7 @@ retcode_t json_array_to_hash243_queue(cJSON const* const obj, char const* const 
         }
       }
     }
+    ret_code = RC_OK;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not array\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
@@ -349,6 +350,7 @@ retcode_t json_array_to_hash243_stack(cJSON const* const obj, char const* const 
         }
       }
     }
+    ret_code = RC_OK;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not array\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
