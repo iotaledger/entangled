@@ -44,14 +44,12 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
                   error_2_string(ret_code));
         goto done;
       }
-      ret_code = hash243_queue_push(&find_tx_req->addresses, tmp_addr);
-      if (ret_code) {
+      if ((ret_code = hash243_queue_push(&find_tx_req->addresses, tmp_addr)) != RC_OK) {
         log_error(client_extended_logger_id, "%s hash243_queue_push failed: %s\n", __func__, error_2_string(ret_code));
         goto done;
       }
 
-      ret_code = iota_client_find_transactions(serv, find_tx_req, find_tx_res);
-      if (!ret_code) {
+      if ((ret_code = iota_client_find_transactions(serv, find_tx_req, find_tx_res)) == RC_OK) {
         tx_num = hash243_queue_count(find_tx_res->hashes);
         if (tx_num) {
           // appending address
@@ -104,8 +102,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
     out_account->balance = 0;
     balances_req->threshold = 100;  // currently `100` should be used
     balances_req->addresses = out_account->addresses;
-    ret_code = iota_client_get_balances(serv, balances_req, balances_res);
-    if (!ret_code) {
+    if ((ret_code = iota_client_get_balances(serv, balances_req, balances_res)) == RC_OK) {
       // count all balances
       for (size_t i = 0; i < get_balances_res_balances_num(balances_res); i++) {
         out_account->balance += get_balances_res_balances_at(balances_res, i);
