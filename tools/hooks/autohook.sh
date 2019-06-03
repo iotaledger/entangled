@@ -5,22 +5,22 @@
 # Author:   Nik Kantar <http://nkantar.com>
 # Version:  2.1.1
 # Website:  https://github.com/nkantar/Autohook
-# License: MIT - 
+# License: MIT -
 
 # MIT License
-# 
+#
 # Copyright (c) 2017 Nikola Kantar
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -58,12 +58,12 @@ install() {
 
     repo_root=$(git rev-parse --show-toplevel)
     hooks_dir="$repo_root/.git/hooks"
-    autohook_filename="$repo_root/hooks/autohook.sh"
+    autohook_filename="$repo_root/tools/hooks/autohook.sh"
     autohook_path=$(realpath $autohook_filename)
     for hook_type in "${hook_types[@]}"
     do
         hook_symlink="$hooks_dir/$hook_type"
-        ln -s $autohook_path $hook_symlink
+        ln -sf $autohook_path $hook_symlink
     done
 }
 
@@ -81,7 +81,7 @@ main() {
     else
         repo_root=$(git rev-parse --show-toplevel)
         hook_type=$calling_file
-        symlinks_dir="$repo_root/hooks/$hook_type"
+        symlinks_dir="$repo_root/tools/hooks/$hook_type"
         files=("$symlinks_dir"/*)
         number_of_symlinks="${#files[@]}"
         tmpfile=$(mktemp)
@@ -102,7 +102,7 @@ main() {
                 eval $file > $tmpfile
                 ret=$?
                 if [[ $ret -ne 0 ]]
-                then 
+                then
                   cat $tmpfile
                   rm $tmpfile
                   exit $ret
