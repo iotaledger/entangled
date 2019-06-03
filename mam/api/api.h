@@ -294,21 +294,23 @@ retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_si
  *
  * @param api - The API [in]
  * @param filename - The file name where to serialize the API into [in]
+ * @param encryption_key - The encryption key [in] (optional - can set to trits_null())
 
  *
  * @return return code
  */
-retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, trits_t encryption_key);
 
 /**
  * Loads an API into a file
  *
  * @param filename - The file name where the API is serialized [in]
  * @param api - The API [out]
+ * @param encryption_key - The encryption key [in] (optional - can set to trits_null() if wallet is not encrypted)
  *
  * @return return code
  */
-retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api, trits_t encryption_key);
 
 #ifdef __cplusplus
 }

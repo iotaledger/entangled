@@ -428,8 +428,15 @@ static void test_api_serialization() {
 static void test_api_save_load() {
   mam_api_t loaded_api;
 
-  TEST_ASSERT(mam_api_save(&api, "mam-api.bin") == RC_OK);
-  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api) == RC_OK);
+  MAM_TRITS_DEF(encryption_key, MAM_SPONGE_KEY_SIZE);
+  encryption_key = MAM_TRITS_INIT(encryption_key, MAM_SPONGE_KEY_SIZE);
+  trits_from_str(encryption_key,
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+
+  TEST_ASSERT(mam_api_save(&api, "mam-api.bin", encryption_key) == RC_OK);
+  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api, encryption_key) == RC_OK);
 
   TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &api.ntru_sks));
@@ -445,6 +452,32 @@ static void test_api_save_load() {
   mam_api_destroy(&loaded_api);
 }
 
+static void test_api_save_load_wrong_key() {
+  mam_api_t loaded_api;
+
+  MAM_TRITS_DEF(encryption_key, MAM_SPONGE_KEY_SIZE);
+  encryption_key = MAM_TRITS_INIT(encryption_key, MAM_SPONGE_KEY_SIZE);
+  trits_from_str(encryption_key,
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+
+  MAM_TRITS_DEF(decryption_key, MAM_SPONGE_KEY_SIZE);
+  decryption_key = MAM_TRITS_INIT(decryption_key, MAM_SPONGE_KEY_SIZE);
+  // Very slightly different key
+  trits_from_str(decryption_key,
+                 "MOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+
+  TEST_ASSERT(mam_api_save(&api, "mam-api.bin", encryption_key) == RC_OK);
+  // Theoretically, wrong key can lead to decrypting a ciphertext to wrong values
+  // which are not necessarely invalid, but chance is slim (RC_MAM_INVALID_VALUE)
+  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api, decryption_key) != RC_OK);
+
+  mam_api_destroy(&loaded_api);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -453,6 +486,7 @@ int main(void) {
   RUN_TEST(test_api_generic);
   RUN_TEST(test_api_serialization);
   RUN_TEST(test_api_save_load);
+  RUN_TEST(test_api_save_load_wrong_key);
   TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
   TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);

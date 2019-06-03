@@ -29,7 +29,7 @@ int main(int ac, char **av) {
   }
 
   // Loading or creating MAM API
-  if ((ret = mam_api_load(MAM_FILE, &api)) == RC_UTILS_FAILED_TO_OPEN_FILE) {
+  if ((ret = mam_api_load(MAM_FILE, &api, trits_null())) == RC_UTILS_FAILED_TO_OPEN_FILE) {
     if ((ret = mam_api_init(&api, (tryte_t *)av[3])) != RC_OK) {
       fprintf(stderr, "mam_api_init failed with err %d\n", ret);
       return EXIT_FAILURE;
@@ -81,7 +81,7 @@ int main(int ac, char **av) {
   }
 
   // Saving and destroying MAM API
-  if ((ret = mam_api_save(&api, MAM_FILE)) != RC_OK) {
+  if ((ret = mam_api_save(&api, MAM_FILE, trits_null())) != RC_OK) {
     fprintf(stderr, "mam_api_save failed with err %d\n", ret);
   }
   if ((ret = mam_api_destroy(&api)) != RC_OK) {

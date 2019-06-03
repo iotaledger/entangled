@@ -760,30 +760,45 @@ retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_si
   return RC_OK;
 }
 
-retcode_t mam_api_save(mam_api_t const *const api, char const *const filename) {
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, trits_t encryption_key) {
   retcode_t ret = RC_OK;
-  size_t trits_size = 0;
-  trit_t *trits = NULL;
+  size_t trits_buffer_size = 0;
+  trit_t *trits_buffer = NULL;
+  trit_t *trits_buffer_ciphertext = trits_buffer;
   size_t bytes_size = 0;
   byte_t *bytes = NULL;
   FILE *file = NULL;
+  mam_sponge_t sponge;
 
   if (api == NULL || filename == NULL) {
     return RC_NULL_PARAM;
   }
 
-  trits_size = mam_api_serialized_size(api);
-  if ((trits = malloc(trits_size * sizeof(trit_t))) == NULL) {
+  trits_buffer_size = mam_api_serialized_size(api);
+  MAM_TRITS_DEF(plain_text, trits_buffer_size);
+  MAM_TRITS_DEF(cipher_text, trits_buffer_size);
+  cipher_text = MAM_TRITS_INIT(cipher_text, trits_buffer_size);
+
+  if ((trits_buffer = malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
-  mam_api_serialize(api, trits);
-  bytes_size = MIN_BYTES(trits_size);
+  mam_api_serialize(api, trits_buffer);
+
+  if (!trits_is_null(encryption_key)) {
+    plain_text = trits_from_rep(trits_buffer_size, trits_buffer);
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
+    mam_sponge_encr(&sponge, plain_text, cipher_text);
+    trits_buffer_ciphertext = trits_begin(cipher_text);
+  }
+
+  bytes_size = MIN_BYTES(trits_buffer_size);
   if ((bytes = (byte_t *)malloc(bytes_size)) == NULL) {
     ret = RC_OOM;
     goto done;
   }
-  trits_to_bytes(trits, bytes, trits_size);
+  trits_to_bytes(trits_buffer_ciphertext, bytes, trits_buffer_size);
   if ((file = fopen(filename, "w")) == NULL) {
     ret = RC_UTILS_FAILED_TO_OPEN_FILE;
     goto done;
@@ -794,20 +809,22 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename) {
   }
 
 done:
-  free(trits);
+  free(trits_buffer);
   free(bytes);
   fclose(file);
 
   return ret;
 }
 
-retcode_t mam_api_load(char const *const filename, mam_api_t *const api) {
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api, trits_t encryption_key) {
   retcode_t ret = RC_OK;
-  size_t trits_size = 0;
-  trit_t *trits = NULL;
+  size_t trits_buffer_size = 0;
+  trit_t *trits_buffer = NULL;
+  trit_t *trits_buffer_plaintext = trits_buffer;
   size_t bytes_size = 0;
   byte_t *bytes = NULL;
   FILE *file = NULL;
+  mam_sponge_t sponge;
 
   if (filename == NULL || api == NULL) {
     return RC_NULL_PARAM;
@@ -821,6 +838,11 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api) {
   bytes_size = ftell(file);
   fseek(file, 0, SEEK_SET);
 
+  trits_buffer_size = bytes_size * NUMBER_OF_TRITS_IN_A_BYTE;
+  MAM_TRITS_DEF(plain_text, trits_buffer_size);
+  plain_text = MAM_TRITS_INIT(plain_text, trits_buffer_size);
+  MAM_TRITS_DEF(cipher_text, trits_buffer_size);
+
   if ((bytes = (byte_t *)malloc(bytes_size)) == NULL) {
     ret = RC_OOM;
     goto done;
@@ -831,21 +853,28 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api) {
     goto done;
   }
 
-  trits_size = bytes_size * NUMBER_OF_TRITS_IN_A_BYTE;
-  if ((trits = malloc(trits_size * sizeof(trit_t))) == NULL) {
+  if ((trits_buffer = malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  bytes_to_trits(bytes, bytes_size, trits, bytes_size * NUMBER_OF_TRITS_IN_A_BYTE);
+  bytes_to_trits(bytes, bytes_size, trits_buffer, bytes_size * NUMBER_OF_TRITS_IN_A_BYTE);
 
-  if ((ret = mam_api_deserialize(trits, trits_size, api)) != RC_OK) {
+  if (!trits_is_null(encryption_key)) {
+    cipher_text = trits_from_rep(trits_buffer_size, trits_buffer);
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
+    mam_sponge_decr(&sponge, cipher_text, plain_text);
+    trits_buffer_plaintext = trits_begin(plain_text);
+  }
+
+  if ((ret = mam_api_deserialize(trits_buffer_plaintext, trits_buffer_size, api)) != RC_OK) {
     goto done;
   }
 
 done:
   free(bytes);
-  free(trits);
+  free(trits_buffer);
   fclose(file);
 
   return ret;
