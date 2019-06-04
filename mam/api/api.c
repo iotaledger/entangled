@@ -717,8 +717,14 @@ size_t mam_api_serialized_size(mam_api_t const *const api) {
          mam_pks_serialized_size(api->trusted_endpoint_ids);
 }
 
-void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer) {
-  trits_t trits = trits_from_rep(mam_api_serialized_size(api), buffer);
+void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, trits_t encryption_key) {
+  size_t trits_buffer_size = mam_api_serialized_size(api);
+  MAM_TRITS_DEF(plain_text, trits_buffer_size);
+  MAM_TRITS_DEF(cipher_text, trits_buffer_size);
+  cipher_text = MAM_TRITS_INIT(cipher_text, trits_buffer_size);
+  mam_sponge_t sponge;
+
+  trits_t trits = trits_from_rep(trits_buffer_size, buffer);
 
   mam_prng_serialize(&api->prng, &trits);
   mam_ntru_sks_serialize(api->ntru_sks, &trits);
@@ -730,11 +736,32 @@ void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer) {
   mam_api_read_ctx_map_serialize(&api->read_ctxs, &trits);
   mam_pks_serialize(api->trusted_channel_ids, &trits);
   mam_pks_serialize(api->trusted_endpoint_ids, &trits);
+
+  if (!trits_is_null(encryption_key)) {
+    plain_text = trits_from_rep(trits_buffer_size, buffer);
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
+    mam_sponge_encr(&sponge, plain_text, cipher_text);
+    trits_copy(cipher_text, trits_from_rep(trits_buffer_size, buffer));
+  }
 }
 
-retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api) {
+retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api,
+                              trits_t encryption_key) {
   retcode_t ret;
   trits_t trits = trits_from_rep(buffer_size, buffer);
+  mam_sponge_t sponge;
+  MAM_TRITS_DEF(plain_text, buffer_size);
+  plain_text = MAM_TRITS_INIT(plain_text, buffer_size);
+  MAM_TRITS_DEF(cipher_text, buffer_size);
+
+  if (!trits_is_null(encryption_key)) {
+    cipher_text = trits_from_rep(buffer_size, buffer);
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
+    mam_sponge_decr(&sponge, cipher_text, plain_text);
+    trits_copy(plain_text, trits_from_rep(buffer_size, buffer));
+  }
 
   // TODO should we use mam_api_init here ?
   api->ntru_sks = NULL;
@@ -760,37 +787,34 @@ retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_si
   return RC_OK;
 }
 
-retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, trits_t encryption_key) {
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, tryte_t const *const encr_key_trytes,
+                       size_t encr_key_trytes_size) {
   retcode_t ret = RC_OK;
   size_t trits_buffer_size = 0;
   trit_t *trits_buffer = NULL;
-  trit_t *trits_buffer_ciphertext = trits_buffer;
+
   size_t bytes_size = 0;
   byte_t *bytes = NULL;
   FILE *file = NULL;
-  mam_sponge_t sponge;
 
   if (api == NULL || filename == NULL) {
     return RC_NULL_PARAM;
   }
 
   trits_buffer_size = mam_api_serialized_size(api);
-  MAM_TRITS_DEF(plain_text, trits_buffer_size);
-  MAM_TRITS_DEF(cipher_text, trits_buffer_size);
-  cipher_text = MAM_TRITS_INIT(cipher_text, trits_buffer_size);
 
   if ((trits_buffer = malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
-  mam_api_serialize(api, trits_buffer);
 
-  if (!trits_is_null(encryption_key)) {
-    plain_text = trits_from_rep(trits_buffer_size, trits_buffer);
-    mam_sponge_init(&sponge);
-    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
-    mam_sponge_encr(&sponge, plain_text, cipher_text);
-    trits_buffer_ciphertext = trits_begin(cipher_text);
+  if (encr_key_trytes != NULL && encr_key_trytes_size > 0) {
+    MAM_TRITS_DEF(encrypt_key_trits, encr_key_trytes_size * NUMBER_OF_TRITS_IN_A_TRYTE);
+    encrypt_key_trits = MAM_TRITS_INIT(encrypt_key_trits, encr_key_trytes_size * NUMBER_OF_TRITS_IN_A_TRYTE);
+    trytes_to_trits(encr_key_trytes, trits_begin(encrypt_key_trits), encr_key_trytes_size);
+    mam_api_serialize(api, trits_buffer, encrypt_key_trits);
+  } else {
+    mam_api_serialize(api, trits_buffer, trits_null());
   }
 
   bytes_size = MIN_BYTES(trits_buffer_size);
@@ -798,7 +822,7 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, t
     ret = RC_OOM;
     goto done;
   }
-  trits_to_bytes(trits_buffer_ciphertext, bytes, trits_buffer_size);
+  trits_to_bytes(trits_buffer, bytes, trits_buffer_size);
   if ((file = fopen(filename, "w")) == NULL) {
     ret = RC_UTILS_FAILED_TO_OPEN_FILE;
     goto done;
@@ -816,15 +840,14 @@ done:
   return ret;
 }
 
-retcode_t mam_api_load(char const *const filename, mam_api_t *const api, trits_t encryption_key) {
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api, tryte_t const *const decr_key_trytes,
+                       size_t decr_key_trytes_size) {
   retcode_t ret = RC_OK;
   size_t trits_buffer_size = 0;
   trit_t *trits_buffer = NULL;
-  trit_t *trits_buffer_plaintext = trits_buffer;
   size_t bytes_size = 0;
   byte_t *bytes = NULL;
   FILE *file = NULL;
-  mam_sponge_t sponge;
 
   if (filename == NULL || api == NULL) {
     return RC_NULL_PARAM;
@@ -839,9 +862,6 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api, trits_t
   fseek(file, 0, SEEK_SET);
 
   trits_buffer_size = bytes_size * NUMBER_OF_TRITS_IN_A_BYTE;
-  MAM_TRITS_DEF(plain_text, trits_buffer_size);
-  plain_text = MAM_TRITS_INIT(plain_text, trits_buffer_size);
-  MAM_TRITS_DEF(cipher_text, trits_buffer_size);
 
   if ((bytes = (byte_t *)malloc(bytes_size)) == NULL) {
     ret = RC_OOM;
@@ -860,16 +880,17 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api, trits_t
 
   bytes_to_trits(bytes, bytes_size, trits_buffer, bytes_size * NUMBER_OF_TRITS_IN_A_BYTE);
 
-  if (!trits_is_null(encryption_key)) {
-    cipher_text = trits_from_rep(trits_buffer_size, trits_buffer);
-    mam_sponge_init(&sponge);
-    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
-    mam_sponge_decr(&sponge, cipher_text, plain_text);
-    trits_buffer_plaintext = trits_begin(plain_text);
-  }
-
-  if ((ret = mam_api_deserialize(trits_buffer_plaintext, trits_buffer_size, api)) != RC_OK) {
-    goto done;
+  if (decr_key_trytes != NULL && decr_key_trytes_size > 0) {
+    MAM_TRITS_DEF(decrypt_key_trits, decr_key_trytes_size * NUMBER_OF_TRITS_IN_A_TRYTE);
+    decrypt_key_trits = MAM_TRITS_INIT(decrypt_key_trits, decr_key_trytes_size * NUMBER_OF_TRITS_IN_A_TRYTE);
+    trytes_to_trits(decr_key_trytes, trits_begin(decrypt_key_trits), decr_key_trytes_size);
+    if ((ret = mam_api_deserialize(trits_buffer, trits_buffer_size, api, decrypt_key_trits)) != RC_OK) {
+      goto done;
+    }
+  } else {
+    if ((ret = mam_api_deserialize(trits_buffer, trits_buffer_size, api, trits_null())) != RC_OK) {
+      goto done;
+    }
   }
 
 done:

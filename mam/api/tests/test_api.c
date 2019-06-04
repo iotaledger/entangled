@@ -407,8 +407,8 @@ static void test_api_serialization() {
   size_t serialized_size = mam_api_serialized_size(&api);
   trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
-  mam_api_serialize(&api, buffer);
-  TEST_ASSERT((mam_api_deserialize(buffer, serialized_size, &deserialized_api) == RC_OK));
+  mam_api_serialize(&api, buffer, trits_null());
+  TEST_ASSERT((mam_api_deserialize(buffer, serialized_size, &deserialized_api, trits_null()) == RC_OK));
 
   TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
@@ -428,15 +428,13 @@ static void test_api_serialization() {
 static void test_api_save_load() {
   mam_api_t loaded_api;
 
-  MAM_TRITS_DEF(encryption_key, MAM_SPONGE_KEY_SIZE);
-  encryption_key = MAM_TRITS_INIT(encryption_key, MAM_SPONGE_KEY_SIZE);
-  trits_from_str(encryption_key,
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+  tryte_t encryption_key_trytes[81] = {
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"};
 
-  TEST_ASSERT(mam_api_save(&api, "mam-api.bin", encryption_key) == RC_OK);
-  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api, encryption_key) == RC_OK);
+  TEST_ASSERT(mam_api_save(&api, "mam-api.bin", encryption_key_trytes, 81) == RC_OK);
+  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api, encryption_key_trytes, 81) == RC_OK);
 
   TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &api.ntru_sks));
@@ -455,25 +453,21 @@ static void test_api_save_load() {
 static void test_api_save_load_wrong_key() {
   mam_api_t loaded_api;
 
-  MAM_TRITS_DEF(encryption_key, MAM_SPONGE_KEY_SIZE);
-  encryption_key = MAM_TRITS_INIT(encryption_key, MAM_SPONGE_KEY_SIZE);
-  trits_from_str(encryption_key,
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+  tryte_t encryption_key_trytes[81] = {
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"};
 
-  MAM_TRITS_DEF(decryption_key, MAM_SPONGE_KEY_SIZE);
-  decryption_key = MAM_TRITS_INIT(decryption_key, MAM_SPONGE_KEY_SIZE);
   // Very slightly different key
-  trits_from_str(decryption_key,
-                 "MOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+  tryte_t decryption_key_trytes[81] = {
+      "MOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"};
 
-  TEST_ASSERT(mam_api_save(&api, "mam-api.bin", encryption_key) == RC_OK);
+  TEST_ASSERT(mam_api_save(&api, "mam-api.bin", encryption_key_trytes, 81) == RC_OK);
   // Theoretically, wrong key can lead to decrypting a ciphertext to wrong values
   // which are not necessarely invalid, but chance is slim (RC_MAM_INVALID_VALUE)
-  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api, decryption_key) != RC_OK);
+  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api, decryption_key_trytes, 81) != RC_OK);
 
   mam_api_destroy(&loaded_api);
 }

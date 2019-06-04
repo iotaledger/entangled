@@ -273,10 +273,11 @@ size_t mam_api_serialized_size(mam_api_t const *const api);
  * Serializes an API struct into a buffer
  * @param api - The API [in]
  * @param buffer - The buffer to serialize the api into [out]
+ * @param encryption_key - The encryption key [in] (optional - can set to trits_null())
  *
  * @return return void
  */
-void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer);
+void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, trits_t encryption_key);
 
 /**
  * Deserializes a buffer into API struct
@@ -284,33 +285,38 @@ void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer);
  * @param buffer - The buffer from where to deserialize [in]
  * @param buffer_size - The size of the buffer [in]
  * @param api - The API [out]
+ * @param encryption_key - The encryption key [in] (optional - can set to trits_null() if wallet is not encrypted)
  *
  * @return return code
  */
-retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api);
+retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api,
+                              trits_t encryption_key);
 
 /**
  * Saves an API into a file
  *
  * @param api - The API [in]
  * @param filename - The file name where to serialize the API into [in]
- * @param encryption_key - The encryption key [in] (optional - can set to trits_null())
-
+ * @param encr_key_trytes - The encryption key [in] (optional - can set null)
+ * @param encr_key_trytes_size - The encryption key size[in]
  *
  * @return return code
  */
-retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, trits_t encryption_key);
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, tryte_t const *const encr_key_trytes,
+                       size_t encr_key_trytes_size);
 
 /**
  * Loads an API into a file
  *
  * @param filename - The file name where the API is serialized [in]
  * @param api - The API [out]
- * @param encryption_key - The encryption key [in] (optional - can set to trits_null() if wallet is not encrypted)
+ * @param decr_key_trytes - The decryption key (encryption as well) [in] (optional - can set null)
+ * @param decr_key_trytes_size - The encryption key size[in]
  *
  * @return return code
  */
-retcode_t mam_api_load(char const *const filename, mam_api_t *const api, trits_t encryption_key);
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api, tryte_t const *const decr_key_trytes,
+                       size_t decr_key_trytes_size);
 
 #ifdef __cplusplus
 }
