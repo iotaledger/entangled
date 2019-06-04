@@ -722,7 +722,7 @@ void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, trits_t
   MAM_TRITS_DEF(plain_text, trits_buffer_size);
   MAM_TRITS_DEF(cipher_text, trits_buffer_size);
   cipher_text = MAM_TRITS_INIT(cipher_text, trits_buffer_size);
-  mam_sponge_t sponge;
+  mam_spongos_t spongos;
 
   trits_t trits = trits_from_rep(trits_buffer_size, buffer);
 
@@ -739,9 +739,9 @@ void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, trits_t
 
   if (!trits_is_null(encryption_key)) {
     plain_text = trits_from_rep(trits_buffer_size, buffer);
-    mam_sponge_init(&sponge);
-    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
-    mam_sponge_encr(&sponge, plain_text, cipher_text);
+    mam_spongos_init(&spongos);
+    mam_spongos_absorb(&spongos, encryption_key);
+    mam_spongos_encr(&spongos, plain_text, cipher_text);
     trits_copy(cipher_text, trits_from_rep(trits_buffer_size, buffer));
   }
 }
@@ -750,16 +750,16 @@ retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_si
                               trits_t encryption_key) {
   retcode_t ret;
   trits_t trits = trits_from_rep(buffer_size, buffer);
-  mam_sponge_t sponge;
+  mam_spongos_t spongos;
   MAM_TRITS_DEF(plain_text, buffer_size);
   plain_text = MAM_TRITS_INIT(plain_text, buffer_size);
   MAM_TRITS_DEF(cipher_text, buffer_size);
 
   if (!trits_is_null(encryption_key)) {
     cipher_text = trits_from_rep(buffer_size, buffer);
-    mam_sponge_init(&sponge);
-    mam_sponge_absorb(&sponge, MAM_SPONGE_CTL_KEY, encryption_key);
-    mam_sponge_decr(&sponge, cipher_text, plain_text);
+    mam_spongos_init(&spongos);
+    mam_spongos_absorb(&spongos, encryption_key);
+    mam_spongos_decr(&spongos, cipher_text, plain_text);
     trits_copy(plain_text, trits_from_rep(buffer_size, buffer));
   }
 
