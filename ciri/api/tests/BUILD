@@ -37,7 +37,7 @@ cc_test(
 
 cc_test(
     name = "test_broadcast_transactions",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_broadcast_transactions.c"],
     data = [":db_file"],
     deps = [
@@ -75,7 +75,7 @@ cc_test(
 
 cc_test(
     name = "test_get_missing_transactions",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_get_missing_transactions.c"],
     data = [":db_file"],
     deps = [
@@ -97,7 +97,7 @@ cc_test(
 
 cc_test(
     name = "test_get_node_info",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_get_node_info.c"],
     data = [":db_file"],
     deps = [
@@ -119,7 +119,7 @@ cc_test(
 
 cc_test(
     name = "test_get_transactions_to_approve",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_get_transactions_to_approve.c"],
     data = [":db_file"],
     deps = [
@@ -154,7 +154,7 @@ cc_test(
 
 cc_test(
     name = "test_store_transactions",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_store_transactions.c"],
     data = [":db_file"],
     deps = [
