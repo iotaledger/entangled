@@ -41,7 +41,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
     // expect balance value is in order.
     input_t tmp_input = {};
     CDL_FOREACH(balances_req->addresses, q_iter) {
-      if (out_inputs->total_balance < threshold) {
+      if (out_inputs->total_balance < (int64_t)threshold) {
         tmp_input.balance = get_balances_res_balances_at(balances_res, counter);
         tmp_input.key_index = counter;
         tmp_input.security = addr_opt.security;
@@ -54,7 +54,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
       counter++;
     }
     // check if balance is sufficient
-    if (out_inputs->total_balance < threshold) {
+    if (out_inputs->total_balance < (int64_t)threshold) {
       ret_code = RC_CCLIENT_INSUFFICIENT_BALANCE;
       log_warning(client_extended_logger_id, "insufficient balance\n");
     }

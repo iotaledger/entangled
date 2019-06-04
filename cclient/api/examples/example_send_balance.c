@@ -77,7 +77,7 @@ void example_send_balance(iota_client_service_t *s) {
 
   printf("send transfer %s\n", error_2_string(ret_code));
   if (ret_code == RC_OK) {
-    flex_trit_t *bundle_hash = bundle_transactions_bundle_hash(bundle);
+    flex_trit_t const *bundle_hash = bundle_transactions_bundle_hash(bundle);
     printf("bundle hash: ");
     flex_trit_print(bundle_hash, NUM_TRITS_HASH);
     printf("\n");

@@ -20,7 +20,6 @@ void example_prepare_transfer(iota_client_service_t *s) {
 
   // my seed
   flex_trit_t seed[FLEX_TRIT_SIZE_243];
-  flex_trit_t remainder_addr[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(seed, NUM_TRITS_ADDRESS, MY_SEED, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
 
   // receiver
@@ -33,10 +32,12 @@ void example_prepare_transfer(iota_client_service_t *s) {
   tf.value = 1;  // send 1i out
   transfer_array_add(transfers, &tf);
 
-  // no remainder and inputs
+#if 1  // no remainder and inputs
   ret_code = iota_client_prepare_transfers(s, seed, 2, transfers, NULL, NULL, false, 0, bundle);
-  // no inputs
-  // ret_code = iota_client_prepare_transfers(s, seed, 2, transfers, remainder_addr, NULL, false, 0, bundle);
+#else  // no inputs
+  flex_trit_t remainder_addr[FLEX_TRIT_SIZE_243];
+  ret_code = iota_client_prepare_transfers(s, seed, 2, transfers, remainder_addr, NULL, false, 0, bundle);
+#endif
 
 #if 0  // send with input
   inputs_t input_list = {};

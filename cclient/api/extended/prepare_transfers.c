@@ -110,7 +110,7 @@ static retcode_t check_balances(iota_client_service_t const* const serv, inputs_
   if ((ret = iota_client_get_balances(serv, balances_req, balances_res)) == RC_OK) {
     size_t index = 0;
     INPUTS_FOREACH(inputs->input_array, input_elm) {
-      if (input_elm->balance != get_balances_res_balances_at(balances_res, index)) {
+      if (input_elm->balance != (int64_t)get_balances_res_balances_at(balances_res, index)) {
         *passed = false;
         log_error(client_extended_logger_id, "balance is not match\n");
         goto end;
@@ -151,7 +151,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
     tryte_t msg_buff[NUM_TRYTES_MESSAGE + 1];
     msg_chunks += floor((double)elm->msg_len / NUM_TRYTES_MESSAGE);
 
-    for (size_t i = 0; i < (msg_chunks * NUM_TRYTES_MESSAGE); i += NUM_TRYTES_MESSAGE) {
+    for (size_t i = 0; i < (size_t)(msg_chunks * NUM_TRYTES_MESSAGE); i += NUM_TRYTES_MESSAGE) {
       transaction_reset(&tx);
 
       if (i + NUM_TRYTES_MESSAGE > elm->msg_len) {

@@ -31,8 +31,8 @@ void example_get_latest_inclusion(iota_client_service_t *s) {
   hash243_queue_push(&txs, trits_243);
 
   if ((ret = iota_client_get_latest_inclusion(s, txs, inclustion_res)) == RC_OK) {
-    for (int i = 0; i < get_inclusion_states_res_states_count(inclustion_res); i++) {
-      printf("[%d]:%s\n", i, get_inclusion_states_res_states_at(inclustion_res, i) ? "true" : "false");
+    for (size_t i = 0; i < get_inclusion_states_res_states_count(inclustion_res); i++) {
+      printf("[%zu]:%s\n", i, get_inclusion_states_res_states_at(inclustion_res, i) ? "true" : "false");
     }
   } else {
     printf("Error: %s\n", error_2_string(ret));
