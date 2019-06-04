@@ -25,9 +25,6 @@
 #include "mam/sponge/spongos.h"
 #include "mam/trits/trits.h"
 
-// Maximal value of PB3 size_t value = (27^13-1)/2
-#define MAM_PB3_SIZE_MAX 2026277576509488133ULL
-
 #ifdef __cplusplus
 extern "C" {
 #endif

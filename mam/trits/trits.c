@@ -105,7 +105,7 @@ trits_t trits_advance(trits_t *b, size_t n) {
 }
 
 static size_t trits_size_t_trytes(size_t const n) {
-  MAM_ASSERT(n <= MAM_PB3_SIZE_MAX);
+  MAM_ASSERT(n <= MAM_TRITS_SIZE_MAX);
 
   size_t const max_d = MAM_TRITS_MAX_SIZE_T_TRYTES;
   size_t d = 0, m = 1;
@@ -127,7 +127,7 @@ size_t trits_sizeof_size_t(size_t n) {
 }
 
 void trits_encode_size_t(size_t n, trits_t *const buffer) {
-  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_size_t(n)));
+  MAM_ASSERT(buffer && !(trits_size(*buffer) < trits_sizeof_size_t(n)));
 
   size_t d = trits_size_t_trytes(n);
   MAM_ASSERT(d < 14);

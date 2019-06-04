@@ -72,7 +72,7 @@ static void pb3_size_t_tests(void) {
   } else {
     /* this should be the case on a 64-bit platform */
     /*n = SIZE_MAX;*/
-    n = (size_t)MAM_PB3_SIZE_MAX;
+    n = (size_t)MAM_TRITS_SIZE_MAX;
     n -= 99;
     for (k = 0; k < 100; ++k) {
       TEST_ASSERT_TRUE(pb3_size_t_test(n++));
