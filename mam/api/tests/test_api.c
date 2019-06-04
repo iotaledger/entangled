@@ -407,8 +407,8 @@ static void test_api_serialization() {
   size_t serialized_size = mam_api_serialized_size(&api);
   trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
-  mam_api_serialize(&api, buffer, trits_null());
-  TEST_ASSERT((mam_api_deserialize(buffer, serialized_size, &deserialized_api, trits_null()) == RC_OK));
+  mam_api_serialize(&api, buffer, NULL, 0);
+  TEST_ASSERT((mam_api_deserialize(buffer, serialized_size, &deserialized_api, NULL, 0) == RC_OK));
 
   TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng, MAM_PRNG_SECRET_KEY_SIZE);
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
