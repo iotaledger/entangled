@@ -742,6 +742,7 @@ void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, tryte_t
     trits = trits_pickup_all(trits);
     mam_spongos_init(&spongos);
     mam_spongos_absorb(&spongos, encrypt_key_trits);
+    mam_spongos_commit(&spongos);
     mam_spongos_encr(&spongos, trits, trits);
   }
 }
@@ -759,6 +760,7 @@ retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_si
     trits = trits_pickup_all(trits);
     mam_spongos_init(&spongos);
     mam_spongos_absorb(&spongos, decrypt_key_trits);
+    mam_spongos_commit(&spongos);
     mam_spongos_decr(&spongos, trits, trits);
   }
 
