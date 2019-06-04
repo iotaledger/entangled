@@ -91,12 +91,61 @@ trits_t trits_pickup_all(trits_t x) {
   return x;
 }
 
+trits_t trits_dropped_all(trits_t x) {
+  x.n = x.d;
+  return trits_pickup_all(x);
+}
+
 trits_t trits_advance(trits_t *b, size_t n) {
   trits_t t;
   MAM_ASSERT(b);
   t = trits_take(*b, n);
   *b = trits_drop(*b, n);
   return t;
+}
+
+static size_t trits_size_t_trytes(size_t const n) {
+  MAM_ASSERT(n <= MAM_PB3_SIZE_MAX);
+
+  size_t const max_d = MAM_TRITS_MAX_SIZE_T_TRYTES;
+  size_t d = 0, m = 1;
+
+  for (; d < max_d && (n > (m - 1) / 2);) {
+    m *= 27;
+    ++d;
+  }
+
+  return d;
+}
+
+size_t trits_sizeof_size_t(size_t n) {
+  size_t d = trits_size_t_trytes(n);
+  MAM_ASSERT(d < 14);
+
+  /* one extra tryte to encode `d` */
+  return 3 * (d + 1);
+}
+
+void trits_encode_size_t(size_t n, trits_t *const buffer) {
+  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_size_t(n)));
+
+  size_t d = trits_size_t_trytes(n);
+  MAM_ASSERT(d < 14);
+
+  trits_put3(trits_advance(buffer, 3), (tryte_t)d);
+
+  if (n > 27) {
+    /* explicitly unroll the first iteration safely */
+    --d;
+    trits_put3(trits_advance(buffer, 3), (tryte_t)MAM_MODS(n - 27, 27, 27));
+    n = 1 + MAM_DIVS(n - 27, 27, 27);
+  }
+
+  for (; d--; n = MAM_DIVS(n, 27, 27)) {
+    trits_put3(trits_advance(buffer, 3), (tryte_t)MAM_MODS(n, 27, 27));
+  }
+
+  MAM_ASSERT(0 == n);
 }
 
 trint1_t trits_get1(trits_t x) {

@@ -56,9 +56,9 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
     sig2 = trits_take(sig2_, MAM_MSS_SIG_SIZE(curr_height));
 
     mam_mss_create(mss1, curr_height);
-    mam_mss_init(mss1, prng, curr_height, nonce, trits_null());
+    mam_mss_init(mss1, prng, curr_height, nonce, trits_null(), trits_null(), trits_null());
     mam_mss_create(mss2, curr_height);
-    mam_mss_init(mss2, prng, curr_height, nonce, trits_null());
+    mam_mss_init(mss2, prng, curr_height, nonce, trits_null(), trits_null(), trits_null());
     mam_mss_gen(mss1);
 
     while (mam_mss_num_remaining_sks(mss1) > 0) {
@@ -115,7 +115,7 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, m
     trits_t sig_apath = trits_drop(sig, MAM_MSS_SKN_SIZE + MAM_WOTS_SIGNATURE_SIZE);
 
     mam_mss_create(mss, curr_height);
-    mam_mss_init(mss, prng, curr_height, nonce, trits_null());
+    mam_mss_init(mss, prng, curr_height, nonce, trits_null(), trits_null(), trits_null());
     mam_mss_gen(mss);
 
     trits_t pk = trits_from_rep(MAM_MSS_PK_SIZE, mss->root);

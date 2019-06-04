@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 typedef struct mam_channel_s {
+  trits_t name_size;
   trits_t name;
   trit_t msg_ord[MAM_CHANNEL_MSG_ORD_SIZE];
   mam_mss_t mss;
@@ -56,6 +57,15 @@ typedef struct mam_pk_s {
  * @return the channel's id
  */
 trits_t mam_channel_id(mam_channel_t const *const channel);
+
+/**
+ * Gets a channel's name size
+ *
+ * @param channel The channel
+ *
+ * @return the channel's name size
+ */
+trits_t mam_channel_name_size(mam_channel_t const *const channel);
 
 /**
  * Gets a channel's name

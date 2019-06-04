@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 typedef struct mam_endpoint_s {
+  trits_t name_size;
   trits_t name;
   mam_mss_t mss;
 } mam_endpoint_t;
@@ -48,13 +49,13 @@ typedef mam_endpoint_t_set_entry_t *mam_endpoint_t_set_t;
 trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint);
 
 /**
- * Gets an endpoint channel's name
+ * Gets an endpoint's name size
  *
  * @param endpoint The endpoint
  *
- * @return the endpoint channel's name
+ * @return the endpoint's name size
  */
-trits_t mam_endpoint_channel_name(mam_endpoint_t const *const endpoint);
+trits_t mam_endpoint_name_size(mam_endpoint_t const *const endpoint);
 
 /**
  * Gets an endpoint's name
@@ -71,14 +72,15 @@ trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
  * @param allocator A MAM allocator
  * @param prng A shared PRNG interface used to generate WOTS private keys
  * @param height MSS MT height
+ * @param channel_name_size The channel name size
  * @param channel_name The channel name
  * @param endpoint_name The endpoint name
  * @param endpoint The endpoint
  *
  * @return a status code
  */
-retcode_t mam_endpoint_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const channel_name,
-                              trits_t const endpoint_name, mam_endpoint_t *const endpoint);
+retcode_t mam_endpoint_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const channel_name_size,
+                              trits_t const channel_name, trits_t const endpoint_name, mam_endpoint_t *const endpoint);
 
 /**
  * Returns the number of remaining secret keys (unused leaves on merkle tree)
@@ -102,15 +104,15 @@ size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint);
 
 void mam_endpoint_serialize(mam_endpoint_t const *const endpoint, trits_t *const buffer);
 
-retcode_t mam_endpoint_deserialize(trits_t *const buffer, trits_t const channel_name, mam_prng_t *const prng,
-                                   mam_endpoint_t *const endpoint);
+retcode_t mam_endpoint_deserialize(trits_t *const buffer, trits_t const channel_name_size, trits_t const channel_name,
+                                   mam_prng_t *const prng, mam_endpoint_t *const endpoint);
 
 size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints);
 
 void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints, trits_t *const buffer);
 
-retcode_t mam_endpoints_deserialize(trits_t *const buffer, trits_t const channel_name, mam_prng_t *const prng,
-                                    mam_endpoint_t_set_t *const endpoints);
+retcode_t mam_endpoints_deserialize(trits_t *const buffer, trits_t const channel_name_size, trits_t const channel_name,
+                                    mam_prng_t *const prng, mam_endpoint_t_set_t *const endpoints);
 
 #ifdef __cplusplus
 }

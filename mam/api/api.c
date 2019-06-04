@@ -392,7 +392,9 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
   }
 
   trits_put18(endpoint_ord, channel->endpoint_ord);
-  ERR_BIND_RETURN(mam_endpoint_create(&api->prng, height, mam_channel_name(channel), endpoint_ord, &endpoint), ret);
+  ERR_BIND_RETURN(mam_endpoint_create(&api->prng, height, mam_channel_name_size(channel), mam_channel_name(channel),
+                                      endpoint_ord, &endpoint),
+                  ret);
   if ((ret = mam_endpoint_t_set_add(&channel->endpoints, &endpoint)) != RC_OK) {
     mam_endpoint_destroy(&endpoint);
     return ret;
