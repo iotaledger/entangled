@@ -8,7 +8,7 @@ genrule(
 
 cc_test(
     name = "test_tangle",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_tangle.c"],
     data = [":db_file"],
     deps = [
