@@ -97,7 +97,6 @@ void bundle_transactions_new(bundle_transactions_t **const bundle) { utarray_new
 
 void bundle_transactions_free(bundle_transactions_t **const bundle) {
   if (bundle && *bundle) {
-    utarray_clear(*bundle);
     utarray_free(*bundle);
   }
   *bundle = NULL;
