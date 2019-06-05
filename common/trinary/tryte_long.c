@@ -15,7 +15,7 @@ size_t min_trytes(int64_t const value) {
   size_t num = 1;
   int64_t v_abs = value < 0 ? -value : value;
   // As long as value is > than (27^2)/2, need one more tryte
-  while (v_abs > pow(TRYTE_SPACE, num) / 2) {
+  while (v_abs > pow(TRYTE_SPACE_SIZE, num) / 2) {
     num++;
   }
   return num;
@@ -33,10 +33,10 @@ int64_t trytes_to_long(tryte_t const *const trytes, size_t const length) {
     tryte = tryte - '@';
     // For indexes > 13 the value is negative
     if (tryte > TRYTE_VALUE_MAX) {
-      tryte = tryte - TRYTE_SPACE;
+      tryte = tryte - TRYTE_SPACE_SIZE;
     }
     // Accumulate the tryte values
-    value += tryte * pow(TRYTE_SPACE, j);
+    value += tryte * pow(TRYTE_SPACE_SIZE, j);
   }
   return value;
 }
@@ -53,7 +53,7 @@ size_t long_to_trytes(int64_t const value, tryte_t *const trytes) {
     v_abs = negative ? -v_abs : v_abs;
     // int64_t v_abs = negative ? -value : value;
     // Precalculate the current power order (27^i)
-    int64_t radix_pow = pow(TRYTE_SPACE, i);
+    int64_t radix_pow = pow(TRYTE_SPACE_SIZE, i);
     // Find out the highest order tryte for this value
     int64_t tryte = (v_abs + radix_pow / 2ULL) / radix_pow;
     // Store the remainder of value minus the value of the highest order tryte
@@ -61,7 +61,7 @@ size_t long_to_trytes(int64_t const value, tryte_t *const trytes) {
     // If the original value was negative, the tryte value should also be
     // negative
     if (negative) {
-      tryte = tryte ? TRYTE_SPACE - tryte : tryte;
+      tryte = tryte ? TRYTE_SPACE_SIZE - tryte : tryte;
       v_abs = -v_abs;
     }
     trytes[i] = TRYTE_ALPHABET[tryte];

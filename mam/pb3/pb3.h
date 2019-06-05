@@ -41,12 +41,6 @@ void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer);
 retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer);
 
 #define pb3_sizeof_oneof pb3_sizeof_tryte
-#define pb3_encode_oneof pb3_encode_tryte
-#define pb3_decode_oneof pb3_decode_tryte
-
-#define pb3_sizeof_optional pb3_sizeof_tryte
-#define pb3_encode_optional pb3_encode_tryte
-#define pb3_decode_optional pb3_decode_tryte
 
 size_t pb3_sizeof_trint();
 void pb3_encode_trint(trint9_t const trint, trits_t *const buffer);
@@ -61,8 +55,6 @@ void pb3_encode_size_t(size_t n, trits_t *const buffer);
 retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer);
 
 #define pb3_sizeof_repeated pb3_sizeof_size_t
-#define pb3_encode_repeated pb3_encode_size_t
-#define pb3_decode_repeated pb3_decode_size_t
 
 size_t pb3_sizeof_ntrytes(size_t const n);
 void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer);

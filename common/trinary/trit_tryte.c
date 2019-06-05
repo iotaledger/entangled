@@ -9,7 +9,7 @@
 
 #include "common/trinary/trit_tryte.h"
 
-static const trit_t TRYTES_TRITS_LUT[TRYTE_SPACE][NUMBER_OF_TRITS_IN_A_TRYTE] = {
+static const trit_t TRYTES_TRITS_LUT[TRYTE_SPACE_SIZE][NUMBER_OF_TRITS_IN_A_TRYTE] = {
     {0, 0, 0},  {1, 0, 0},  {-1, 1, 0},  {0, 1, 0},  {1, 1, 0},  {-1, -1, 1},  {0, -1, 1},  {1, -1, 1},  {-1, 0, 1},
     {0, 0, 1},  {1, 0, 1},  {-1, 1, 1},  {0, 1, 1},  {1, 1, 1},  {-1, -1, -1}, {0, -1, -1}, {1, -1, -1}, {-1, 0, -1},
     {0, 0, -1}, {1, 0, -1}, {-1, 1, -1}, {0, 1, -1}, {1, 1, -1}, {-1, -1, 0},  {0, -1, 0},  {1, -1, 0},  {-1, 0, 0}};
@@ -43,7 +43,7 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t const ind
   trits[uindex] = trit;
   tryte = trits[0] + trits[1] * 3 + trits[2] * 9;
   if (tryte < 0) {
-    tryte += TRYTE_SPACE;
+    tryte += TRYTE_SPACE_SIZE;
   }
   trytes[tindex] = TRYTE_ALPHABET[(size_t)tryte];
   return 1;
@@ -59,7 +59,7 @@ void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes, size_t co
       k += trits[i + l];
     }
     if (k < 0) {
-      k += TRYTE_SPACE;
+      k += TRYTE_SPACE_SIZE;
     }
     trytes[j] = TRYTE_ALPHABET[k];
   }

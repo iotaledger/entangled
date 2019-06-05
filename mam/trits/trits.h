@@ -22,6 +22,7 @@
 
 #include <string.h>
 
+#include "common/errors.h"
 #include "mam/defs.h"
 
 #ifdef __cplusplus
@@ -142,6 +143,7 @@ bool trits_from_str(trits_t x, char const *s);
 
 size_t trits_sizeof_size_t(size_t n);
 void trits_encode_size_t(size_t n, trits_t *b);
+retcode_t trits_decode_size_t(size_t *const n, trits_t *const buffer);
 
 /*! \brief Set zero trits: `x` := t^n. */
 static inline void trits_set1(trits_t x, trit_t t) {

@@ -11,7 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common/defs.h"
+#include "common/trinary/trit_long.h"
 #include "mam/trits/trits.h"
+
+#define MAX_TRYTES_FOR_SIZE_T ((5 * sizeof(size_t) + 2) / 3)
 
 static char const trinary_alphabet[] = "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"; /* [-13..13] */
 
@@ -129,23 +133,41 @@ size_t trits_sizeof_size_t(size_t n) {
 void trits_encode_size_t(size_t n, trits_t *const buffer) {
   MAM_ASSERT(buffer && !(trits_size(*buffer) < trits_sizeof_size_t(n)));
 
+  trits_set_zero(*buffer);
+
   size_t d = trits_size_t_trytes(n);
-  MAM_ASSERT(d < 14);
+  MAM_ASSERT(d < MAX_TRYTES_FOR_SIZE_T);
 
   trits_put3(trits_advance(buffer, 3), (tryte_t)d);
 
-  if (n > 27) {
-    /* explicitly unroll the first iteration safely */
-    --d;
-    trits_put3(trits_advance(buffer, 3), (tryte_t)MAM_MODS(n - 27, 27, 27));
-    n = 1 + MAM_DIVS(n - 27, 27, 27);
+  if (n > 0) {
+    long_to_trits(n, trits_begin(*buffer));
+    trits_advance(buffer, d * NUMBER_OF_TRITS_IN_A_TRYTE);
+  }
+}
+
+retcode_t trits_decode_size_t(size_t *const n, trits_t *const buffer) {
+  MAM_ASSERT(n != 0);
+
+  tryte_t d;
+
+  if (trits_size(*buffer) < 3) {
+    return RC_MAM_PB3_EOF;
   }
 
-  for (; d--; n = MAM_DIVS(n, 27, 27)) {
-    trits_put3(trits_advance(buffer, 3), (tryte_t)MAM_MODS(n, 27, 27));
+  d = trits_get3(*buffer);
+  *buffer = trits_drop(*buffer, 3);
+  if (d < 0 || d > 13) {
+    return RC_MAM_INVALID_VALUE;
+  }
+  if (trits_size(*buffer) < 3 * (size_t)d) {
+    return RC_MAM_PB3_EOF;
   }
 
-  MAM_ASSERT(0 == n);
+  *n = trits_to_long(trits_begin(*buffer), d * NUMBER_OF_TRITS_IN_A_TRYTE);
+  trits_advance(buffer, d * NUMBER_OF_TRITS_IN_A_TRYTE);
+
+  return RC_OK;
 }
 
 trint1_t trits_get1(trits_t x) {

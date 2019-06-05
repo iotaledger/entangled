@@ -9,6 +9,10 @@
  */
 
 #include "mam/pb3/pb3.h"
+#include "common/defs.h"
+#include "common/trinary/trit_long.h"
+
+#define MAX_TRYTES_FOR_SIZE_T ((5 * sizeof(size_t) + 2) / 3)
 
 trits_t pb3_trits_take(trits_t *const b, size_t const n) { return trits_advance(b, n); }
 
@@ -81,60 +85,9 @@ size_t pb3_sizeof_size_t(size_t const n) { return trits_sizeof_size_t(n); }
 
 void pb3_encode_size_t(size_t n, trits_t *const buffer) { trits_encode_size_t(n, buffer); }
 
-retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
-  MAM_ASSERT(n != 0);
+retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) { return trits_decode_size_t(n, buffer); }
 
-  tryte_t d;
-
-  if (trits_size(*buffer) < 3) {
-    return RC_MAM_PB3_EOF;
-  }
-
-  d = trits_get3(*buffer);
-  *buffer = trits_drop(*buffer, 3);
-  if (d < 0 || d > 13) {
-    return RC_MAM_INVALID_VALUE;
-  }
-  if (trits_size(*buffer) < 3 * (size_t)d) {
-    return RC_MAM_PB3_EOF;
-  }
-
-  /* move pointer to the end */
-  *buffer = trits_drop(*buffer, 3 * (size_t)d);
-
-  *n = 0;
-  if (0 < d) {
-    tryte_t t;
-    trits_t s = *buffer;
-    uint64_t m;
-
-    --d;
-    s = trits_pickup(s, 3);
-    /* higher tryte in the representation */
-    t = trits_get3(s);
-    /* can't be 0 or negative */
-    if (t <= 0) {
-      return RC_MAM_INVALID_VALUE;
-    }
-    m = (size_t)t;
-
-    for (; d--;) {
-      s = trits_pickup(s, 3);
-      t = trits_get3(s);
-      m *= 27;
-      m += (uint64_t)t;
-    }
-    /* value may be truncated here */
-    *n = (size_t)m;
-    if (m != (uint64_t)*n) {
-      return RC_MAM_PB3_SIZE_T_NOT_SUPPORTED;
-    }
-  }
-
-  return RC_OK;
-}
-
-size_t pb3_sizeof_ntrytes(size_t const n) { return 3 * n; }
+size_t pb3_sizeof_ntrytes(size_t const n) { return NUMBER_OF_TRITS_IN_A_TRYTE * n; }
 
 void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
