@@ -154,26 +154,6 @@ retcode_t pb3_unwrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const b
   return ret;
 }
 
-void pb3_wrap_absorb_longtrint(mam_spongos_t *const spongos, trits_t *const buffer, trint18_t const trint) {
-  trits_t b0 = *buffer;
-
-  pb3_encode_longtrint(trint, buffer);
-  mam_spongos_absorb(spongos, trits_diff(b0, *buffer));
-}
-
-retcode_t pb3_unwrap_absorb_longtrint(mam_spongos_t *const spongos, trits_t *const buffer, trint18_t *const trint) {
-  retcode_t ret = RC_OK;
-  trits_t b0;
-
-  b0 = *buffer;
-  if ((ret = pb3_decode_longtrint(trint, buffer)) != RC_OK) {
-    return ret;
-  }
-  mam_spongos_absorb(spongos, trits_diff(b0, *buffer));
-
-  return ret;
-}
-
 void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t const t) {
   trits_t b0 = *buffer;
 

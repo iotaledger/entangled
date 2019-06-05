@@ -70,9 +70,6 @@ retcode_t pb3_unwrap_absorb_tryte(mam_spongos_t *const spongos, trits_t *const b
 void pb3_wrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const buffer, trint9_t const trint);
 retcode_t pb3_unwrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const buffer, trint9_t *const trint);
 
-void pb3_wrap_absorb_longtrint(mam_spongos_t *const spongos, trits_t *const buffer, trint18_t const trint);
-retcode_t pb3_unwrap_absorb_longtrint(mam_spongos_t *const spongos, trits_t *const buffer, trint18_t *const trint);
-
 void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t const t);
 retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t *const t);
 
