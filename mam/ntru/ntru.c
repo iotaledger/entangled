@@ -15,6 +15,9 @@
 #include "mam/pb3/pb3.h"
 #include "utils/memset_safe.h"
 
+static retcode_t ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk, mam_spongos_t *const spongos, trits_t const r,
+                                trits_t const session_key, trits_t encrypted_session_key);
+
 /*
  * NTRU public key
  */
