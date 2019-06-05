@@ -46,7 +46,9 @@ typedef mam_endpoint_t_set_entry_t *mam_endpoint_t_set_t;
  *
  * @return the endpoint's id
  */
-trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint);
+static inline trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint) {
+  return trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->mss.root);
+}
 
 /**
  * Gets an endpoint's name size
@@ -55,7 +57,7 @@ trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint);
  *
  * @return the endpoint's name size
  */
-trits_t mam_endpoint_name_size(mam_endpoint_t const *const endpoint);
+static inline trits_t mam_endpoint_name_size(mam_endpoint_t const *const endpoint) { return endpoint->name_size; }
 
 /**
  * Gets an endpoint's name
@@ -64,7 +66,7 @@ trits_t mam_endpoint_name_size(mam_endpoint_t const *const endpoint);
  *
  * @return the endpoint's name
  */
-trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
+static inline trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint) { return endpoint->name; }
 
 /**
  * Allocates memory for internal objects and generates MSS public key

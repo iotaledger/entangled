@@ -13,14 +13,6 @@
 #include "mam/mam/mam_endpoint_t_set.h"
 #include "mam/pb3/pb3.h"
 
-trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint) {
-  return trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->mss.root);
-}
-
-trits_t mam_endpoint_name_size(mam_endpoint_t const *const endpoint) { return endpoint->name_size; }
-
-trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint) { return endpoint->name; }
-
 retcode_t mam_endpoint_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const channel_name_size,
                               trits_t const channel_name, trits_t const name, mam_endpoint_t *const endpoint) {
   MAM_ASSERT(endpoint);
@@ -127,7 +119,7 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer, trits_t const channel_
     goto done;
   }
 
-  if (trits_is_null(endpoint->name = trits_alloc(size * 3))) {
+  if (trits_is_null(endpoint->name = trits_alloc(size * NUMBER_OF_TRITS_IN_A_TRYTE))) {
     ret = RC_OOM;
     goto done;
   }

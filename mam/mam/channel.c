@@ -13,18 +13,6 @@
 #include "mam/mam/mam_channel_t_set.h"
 #include "mam/pb3/pb3.h"
 
-trits_t mam_channel_id(mam_channel_t const *const channel) {
-  return trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->mss.root);
-}
-
-trits_t mam_channel_name_size(mam_channel_t const *const channel) { return channel->name_size; }
-
-trits_t mam_channel_name(mam_channel_t const *const channel) { return channel->name; }
-
-trits_t mam_channel_msg_ord(mam_channel_t const *const channel) {
-  return trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord);
-}
-
 retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const name,
                              mam_channel_t *const channel) {
   MAM_ASSERT(channel);
@@ -142,7 +130,7 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
     goto done;
   }
 
-  if (trits_is_null(channel->name = trits_alloc(size * 3))) {
+  if (trits_is_null(channel->name = trits_alloc(size * NUMBER_OF_TRITS_IN_A_TRYTE))) {
     ret = RC_OOM;
     goto done;
   }

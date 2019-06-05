@@ -56,7 +56,9 @@ typedef struct mam_pk_s {
  *
  * @return the channel's id
  */
-trits_t mam_channel_id(mam_channel_t const *const channel);
+static inline trits_t mam_channel_id(mam_channel_t const *const channel) {
+  return trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->mss.root);
+}
 
 /**
  * Gets a channel's name size
@@ -65,7 +67,7 @@ trits_t mam_channel_id(mam_channel_t const *const channel);
  *
  * @return the channel's name size
  */
-trits_t mam_channel_name_size(mam_channel_t const *const channel);
+static inline trits_t mam_channel_name_size(mam_channel_t const *const channel) { return channel->name_size; }
 
 /**
  * Gets a channel's name
@@ -74,7 +76,7 @@ trits_t mam_channel_name_size(mam_channel_t const *const channel);
  *
  * @return the channel's name
  */
-trits_t mam_channel_name(mam_channel_t const *const channel);
+static inline trits_t mam_channel_name(mam_channel_t const *const channel) { return channel->name; }
 
 /**
  * Gets a channel's msg_ord
@@ -83,7 +85,9 @@ trits_t mam_channel_name(mam_channel_t const *const channel);
  *
  * @return the channel's msg_ord
  */
-trits_t mam_channel_msg_ord(mam_channel_t const *const channel);
+static inline trits_t mam_channel_msg_ord(mam_channel_t const *const channel) {
+  return trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord);
+}
 
 /**
  * Allocates memory for internal objects, and generates MSS public key
