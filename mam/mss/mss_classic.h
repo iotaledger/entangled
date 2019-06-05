@@ -36,11 +36,11 @@ extern "C" {
 
 /*! \brief MSS interface used to generate public key and sign. */
 typedef struct mam_mss_s {
-  mss_mt_height_t height; /*!< Merkle tree height. */
-  mss_mt_idx_t skn;       /*!< Current WOTS private key number. */
-  mam_prng_t *prng;       /*!< PRNG interface used to generate WOTS private keys. */
-  trit_t *mt;             /*!< Buffer storing complete Merkle-tree. */
-  trits_t nonce1, nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
+  mss_mt_height_t height;                 /*!< Merkle tree height. */
+  mss_mt_idx_t skn;                       /*!< Current WOTS private key number. */
+  mam_prng_t *prng;                       /*!< PRNG interface used to generate WOTS private keys. */
+  trit_t *mt;                             /*!< Buffer storing complete Merkle-tree. */
+  trits_t nonce1, nonce2, nonce3, nonce4; /*!< Nonce = `N1`||`N2`||`N3`||`N4`, stored pointers only, NOT copies. */
   trit_t root[MAM_MSS_PK_SIZE];
 } mam_mss_t;
 

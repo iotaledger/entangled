@@ -77,6 +77,8 @@ trits_t trits_pickup(trits_t x, size_t n);
 
 trits_t trits_pickup_all(trits_t x);
 
+trits_t trits_dropped_all(trits_t x);
+
 trits_t trits_advance(trits_t *b, size_t n);
 
 /*! \brief Get the first trit. */
@@ -132,6 +134,14 @@ void trits_to_str(trits_t x, char *s);
 Size of `s` must be equal `trits_size(x)/3`.
 */
 bool trits_from_str(trits_t x, char const *s);
+
+/* \brief Maximal value of size_t value = (27^13-1)/2. */
+#define MAM_TRITS_SIZE_MAX 2026277576509488133ull
+#define MAM_TRITS_MAX_SIZE_T_TRYTES ((5 * sizeof(size_t) + 2) / 3)
+#define MAM_TRITS_MAX_SIZEOF_SIZE_T (3 * (MAM_TRITS_MAX_SIZE_T_TRYTES + 1))
+
+size_t trits_sizeof_size_t(size_t n);
+void trits_encode_size_t(size_t n, trits_t *b);
 
 /*! \brief Set zero trits: `x` := t^n. */
 static inline void trits_set1(trits_t x, trit_t t) {

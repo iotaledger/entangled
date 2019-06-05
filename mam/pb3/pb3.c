@@ -77,49 +77,9 @@ retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
   return RC_OK;
 }
 
-static size_t pb3_size_t_trytes(size_t const n) {
-  MAM_ASSERT(n <= MAM_PB3_SIZE_MAX);
+size_t pb3_sizeof_size_t(size_t const n) { return trits_sizeof_size_t(n); }
 
-  size_t const max_d = (5 * sizeof(size_t) + 2) / 3;
-  size_t d = 0, m = 1;
-
-  for (; d < max_d && (n > (m - 1) / 2);) {
-    m *= 27;
-    ++d;
-  }
-
-  return d;
-}
-
-size_t pb3_sizeof_size_t(size_t const n) {
-  size_t d = pb3_size_t_trytes(n);
-  MAM_ASSERT(d < 14);
-
-  /* one extra tryte to encode `d` */
-  return 3 * (d + 1);
-}
-
-void pb3_encode_size_t(size_t n, trits_t *const buffer) {
-  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_size_t(n)));
-
-  size_t d = pb3_size_t_trytes(n);
-  MAM_ASSERT(d < 14);
-
-  pb3_encode_tryte((tryte_t)d, buffer);
-
-  if (n > 27) {
-    /* explicitly unroll the first iteration safely */
-    --d;
-    pb3_encode_tryte((tryte_t)MAM_MODS(n - 27, 27, 27), buffer);
-    n = 1 + MAM_DIVS(n - 27, 27, 27);
-  }
-
-  for (; d--; n = MAM_DIVS(n, 27, 27)) {
-    pb3_encode_tryte((tryte_t)MAM_MODS(n, 27, 27), buffer);
-  }
-
-  MAM_ASSERT(0 == n);
-}
+void pb3_encode_size_t(size_t n, trits_t *const buffer) { trits_encode_size_t(n, buffer); }
 
 retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
   MAM_ASSERT(n != 0);

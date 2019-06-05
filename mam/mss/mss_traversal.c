@@ -232,7 +232,8 @@ static void mss_mt_rewind(mam_mss_t *mss, mss_mt_idx_t skn) {
   }
 }
 
-void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height, trits_t nonce1, trits_t nonce2) {
+void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height, trits_t nonce1, trits_t nonce2,
+                  trits_t nonce3, trits_t nonce4) {
   MAM_ASSERT(mss);
   MAM_ASSERT(prng);
   MAM_ASSERT(0 <= height && height <= MAM_MSS_MAX_D);
@@ -242,6 +243,8 @@ void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height
   mss->prng = prng;
   mss->nonce1 = nonce1;
   mss->nonce2 = nonce2;
+  mss->nonce3 = nonce3;
+  mss->nonce4 = nonce4;
   mss_mt_init(mss);
 }
 

@@ -81,11 +81,13 @@ void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, trits_t pk);
  * @param height [in] Merkle-tree height
  * @param nonce1 [in] first nonce
  * @param nonce2 [in] second nonce
+ * @param nonce3 [in] third nonce
+ * @param nonce4 [in] fourth nonce
  *
  * @return void
  */
-
-void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height, trits_t nonce1, trits_t nonce2);
+void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng, mss_mt_height_t height, trits_t nonce1, trits_t nonce2,
+                  trits_t nonce3, trits_t nonce4);
 /**
  * Generate MSS keys, stores current and next auth_path
  *

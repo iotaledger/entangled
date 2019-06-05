@@ -485,7 +485,8 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t co
   if (psks == NULL && ntru_pks == NULL) {  // public
     trits_set_zero(session_key);
   } else {
-    mam_prng_gen3(prng, MAM_PRNG_DST_SEC_KEY, mam_channel_name(ch), ep ? mam_endpoint_name(ep) : trits_null(), skn,
+    mam_prng_gen5(prng, MAM_PRNG_DST_SEC_KEY, mam_channel_name_size(ch), mam_channel_name(ch),
+                  ep ? mam_endpoint_name_size(ep) : trits_null(), ep ? mam_endpoint_name(ep) : trits_null(), skn,
                   session_key);
   }
 

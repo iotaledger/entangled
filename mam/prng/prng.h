@@ -74,6 +74,24 @@ static inline retcode_t mam_prng_reset(mam_prng_t *const prng) {
 }
 
 /**
+ * @brief Generates pseudo random trits with five nonces
+ *
+ * @param[in] prng A PRNG
+ * @param[in] destination A destination tryte
+ * @param[in] nonce1 The first nonce
+ * @param[in] nonce2 The second nonce
+ * @param[in] nonce3 The third nonce
+ * @param[in] nonce4 The fourth nonce
+ * @param[in] nonce5 The fifth nonce
+ * @param[out] output The pseudo random trits
+ *
+ * @return a status code
+ */
+retcode_t mam_prng_gen5(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
+                        trits_t const nonce1, trits_t const nonce2, trits_t const nonce3, trits_t const nonce4,
+                        trits_t const nonce5, trits_t output);
+
+/**
  * @brief Generates pseudo random trits with three nonces
  *
  * @param[in] prng A PRNG
@@ -85,8 +103,11 @@ static inline retcode_t mam_prng_reset(mam_prng_t *const prng) {
  *
  * @return a status code
  */
-retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
-                        trits_t const nonce1, trits_t const nonce2, trits_t const nonce3, trits_t output);
+static inline retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
+                                      trits_t const nonce1, trits_t const nonce2, trits_t const nonce3,
+                                      trits_t output) {
+  return mam_prng_gen5(prng, destination, nonce1, nonce2, nonce3, trits_null(), trits_null(), output);
+}
 
 /**
  * @brief Generates pseudo random trits with two nonces
@@ -101,7 +122,7 @@ retcode_t mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte
  */
 static inline retcode_t mam_prng_gen2(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
                                       trits_t const nonce1, trits_t const nonce2, trits_t output) {
-  return mam_prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
+  return mam_prng_gen5(prng, destination, nonce1, nonce2, trits_null(), trits_null(), trits_null(), output);
 }
 
 /**
@@ -116,7 +137,7 @@ static inline retcode_t mam_prng_gen2(mam_prng_t const *const prng, mam_prng_des
  */
 static inline retcode_t mam_prng_gen(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination,
                                      trits_t const nonce, trits_t output) {
-  return mam_prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
+  return mam_prng_gen5(prng, destination, nonce, trits_null(), trits_null(), trits_null(), trits_null(), output);
 }
 
 /**

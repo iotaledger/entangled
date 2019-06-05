@@ -34,7 +34,7 @@ void mss_mt_gen_leaf(mam_mss_t *mss, mss_mt_idx_t i, trits_t pk) {
 
   /* gen sk from current leaf index */
   trits_put18(nonce_i, i);
-  mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
+  mam_wots_gen_sk5(&wots, mss->prng, mss->nonce1, mss->nonce2, mss->nonce3, mss->nonce4, nonce_i);
   /* gen pk & push hash */
   mam_wots_gen_pk(&wots, pk);
 }
@@ -59,7 +59,7 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
     MAM_TRITS_DEF(nonce_i, MAM_MSS_SKN_SIZE);
     nonce_i = MAM_TRITS_INIT(nonce_i, MAM_MSS_SKN_SIZE);
     trits_put18(nonce_i, mss->skn);
-    mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
+    mam_wots_gen_sk5(&wots, mss->prng, mss->nonce1, mss->nonce2, mss->nonce3, mss->nonce4, nonce_i);
   }
 
   mam_wots_sign(&wots, hash, trits_take(sig, MAM_WOTS_SIGNATURE_SIZE));
