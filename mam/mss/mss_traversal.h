@@ -67,8 +67,8 @@ typedef struct mam_mss_s {
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
   trit_t *nodes_hashes; /*!< Buffer storing hash-values of auxiliary nodes; MAM_MSS_MT_NODES(d) hash-values in total. */
   mss_mt_node_t *nodes; /*<! Auxiliary node infos. */
-  mss_mt_stack_t *stacks; /*<! Stacks used by traversal algorithm. */
-  trits_t nonce1, nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
+  mss_mt_stack_t *stacks;                 /*<! Stacks used by traversal algorithm. */
+  trits_t nonce1, nonce2, nonce3, nonce4; /*!< Nonce = `N1`||`N2`||`N3`||`N4`, stored pointers only, NOT copies. */
   trit_t root[MAM_MSS_PK_SIZE];
 } mam_mss_t;
 

@@ -192,7 +192,7 @@ static void message_test_create_channels(mam_prng_t *prng, mam_channel_t **const
       *epa = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *epa);
       memset(*epa, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(prng, d, mam_channel_name(*cha), epa_name, *epa);
+      e = mam_endpoint_create(prng, d, mam_channel_name_size(*cha), mam_channel_name(*cha), epa_name, *epa);
       TEST_ASSERT(RC_OK == e);
       trits_free(epa_name);
     }
@@ -203,7 +203,7 @@ static void message_test_create_channels(mam_prng_t *prng, mam_channel_t **const
       *ep1 = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *ep1);
       memset(*ep1, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(prng, d, mam_channel_name(*cha), ep1a_name, *ep1);
+      e = mam_endpoint_create(prng, d, mam_channel_name_size(*cha), mam_channel_name(*cha), ep1a_name, *ep1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }

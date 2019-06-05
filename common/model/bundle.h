@@ -57,7 +57,7 @@ static inline size_t bundle_transactions_size(bundle_transactions_t const *const
  * @param bundle The bundle transaction object
  * @return The bundle hash
  */
-static inline flex_trit_t *const bundle_transactions_bundle_hash(bundle_transactions_t const *const bundle) {
+static inline flex_trit_t const *bundle_transactions_bundle_hash(bundle_transactions_t const *const bundle) {
   if (bundle) {
     if (utarray_len(bundle) > 0) {
       return transaction_bundle((iota_transaction_t *)(utarray_eltptr(bundle, 0)));
