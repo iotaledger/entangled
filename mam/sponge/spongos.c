@@ -112,8 +112,3 @@ void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext, trits_t 
     spongos_update(spongos, n);
   }
 }
-
-void mam_spongos_copy(mam_spongos_t const *const src, mam_spongos_t *const dst) {
-  memcpy(dst->sponge.state, src->sponge.state, MAM_SPONGE_WIDTH);
-  dst->pos = src->pos;
-}
