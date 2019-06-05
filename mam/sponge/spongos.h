@@ -121,14 +121,6 @@ void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext, trits_t c
  */
 void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext, trits_t plaintext);
 
-/**
- * Copy spongos from src to dst
- *
- * @param src The source
- * @param dst The destination
- */
-void mam_spongos_copy(mam_spongos_t const *const src, mam_spongos_t *const dst);
-
 #ifdef __cplusplus
 }
 #endif

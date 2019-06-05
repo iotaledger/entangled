@@ -74,20 +74,6 @@ retcode_t ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk, mam_prng_t const *con
                        trits_t const nonce, trits_t const session_key, trits_t encrypted_session_key);
 
 /**
- * NTRU encryption of a session key
- *
- * @param public_key A NTRU public key
- * @param spongos A spongos interface
- * @param r Pseudo-random trits
- * @param session_key A session symmetric key to be encrypted
- * @param encrypted_session_key The encrypted session key
- *
- * @return a status code
- */
-retcode_t ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk, mam_spongos_t *const spongos, trits_t const r,
-                         trits_t const session_key, trits_t encrypted_session_key);
-
-/**
  * Gets the size of a serialized set of NTRU public keys
  *
  * @param ntru_pks The set of NTRU public keys
