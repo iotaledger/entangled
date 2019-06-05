@@ -105,7 +105,7 @@ bool mam_mss_verify(mam_spongos_t *mt_spongos, trits_t hash, trits_t sig, trits_
   }
 
   sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
-  if (trits_size(sig) != (MAM_MSS_SIG_SIZE(height) - MAM_MSS_SKN_SIZE)) return false;
+  if (trits_size(sig) != (size_t)(MAM_MSS_SIG_SIZE(height) - MAM_MSS_SKN_SIZE)) return false;
 
   mam_wots_recover(hash, trits_take(sig, MAM_WOTS_SIGNATURE_SIZE), calculated_pk);
   sig = trits_drop(sig, MAM_WOTS_SIGNATURE_SIZE);
@@ -129,7 +129,7 @@ bool mss_parse_skn(mss_mt_height_t *height, mss_mt_idx_t *skn, trits_t trits) {
   trits_copy(trits_drop(trits, MAM_MSS_SKN_TREE_DEPTH_SIZE), trits_take(ts, MAM_MSS_SKN_KEY_NUMBER_SIZE));
   *skn = trits_get18(ts);
 
-  if (*height < 0 || *skn < 0 || *skn > MAM_MSS_MAX_SKN(*height)) return 0;
+  if (*height > MAM_MSS_MAX_D || *skn > MAM_MSS_MAX_SKN(*height)) return 0;
 
   return 1;
 }

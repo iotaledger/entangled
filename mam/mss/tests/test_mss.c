@@ -18,12 +18,10 @@
 
 static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, mss_mt_height_t max_height) {
   bool r = true;
-  retcode_t e;
   mss_mt_height_t curr_height;
   MAM_TRITS_DEF(key, MAM_PRNG_SECRET_KEY_SIZE);
   MAM_TRITS_DEF(nonce, 24);
   MAM_TRITS_DEF(hash, MAM_MSS_HASH_SIZE);
-  MAM_TRITS_DEF(pk2, MAM_MSS_PK_SIZE);
   MAM_TRITS_DEF(sig_, MAM_MSS_SIG_SIZE(5));
   MAM_TRITS_DEF(sig2_, MAM_MSS_SIG_SIZE(5));
   MAM_TRITS_DEF(store_, MAM_MSS_MAX_STORED_SIZE(5));
@@ -32,7 +30,6 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
   key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 24);
   hash = MAM_TRITS_INIT(hash, MAM_MSS_HASH_SIZE);
-  pk2 = MAM_TRITS_INIT(pk2, MAM_MSS_PK_SIZE);
   sig_ = MAM_TRITS_INIT(sig_, MAM_MSS_SIG_SIZE(5));
   sig2_ = MAM_TRITS_INIT(sig2_, MAM_MSS_SIG_SIZE(5));
   store_ = MAM_TRITS_INIT(store_, MAM_MSS_MAX_STORED_SIZE(5));
@@ -67,8 +64,7 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
       store = trits_take(store_, mam_mss_serialized_size(mss1));
       mam_mss_serialize(mss1, &store);
       store = trits_pickup_all(store);
-      e = mam_mss_deserialize(&store, mss2);
-      MAM_ASSERT(RC_OK == e);
+      TEST_ASSERT(mam_mss_deserialize(&store, mss2) == RC_OK);
       mam_mss_sign(mss2, hash, sig2);
 
       r = r && trits_cmp_eq(sig, sig2);
@@ -87,13 +83,11 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, m
   mss_mt_height_t curr_height;
   MAM_TRITS_DEF(nonce, 24);
   MAM_TRITS_DEF(hash, MAM_MSS_HASH_SIZE);
-  MAM_TRITS_DEF(pk, MAM_MSS_PK_SIZE);
   trits_t sig_;
 
   key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 24);
   hash = MAM_TRITS_INIT(hash, MAM_MSS_HASH_SIZE);
-  pk = MAM_TRITS_INIT(pk, MAM_MSS_PK_SIZE);
   sig_ = trits_alloc(MAM_MSS_SIG_SIZE(max_height));
 
   trits_from_str(key,
