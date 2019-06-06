@@ -77,7 +77,7 @@ int main() {
   // example_get_balance(&serv);
   // example_get_inclustion_states(&serv);
   // example_get_tips(&serv);
-  // example_get_transaction_to_approve(&serv);
+  // example_get_transactions_to_approve(&serv);
   // example_get_trytes(&serv);
   example_node_info(&serv);
   // example_prepare_transfer(&serv);
@@ -91,7 +91,7 @@ int main() {
   // example_is_promotable(&serv);
   // example_get_latest_inclusion(&serv);
   // example_send_trytes(&serv);
-  // example_travers_bundle(&serv);
+  // example_traverse_bundle(&serv);
   // example_get_bundle(&serv);
   // example_replay_bundle(&serv);
 

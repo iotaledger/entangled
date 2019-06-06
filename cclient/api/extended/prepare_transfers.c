@@ -71,7 +71,7 @@ static retcode_t add_remainder(iota_client_service_t const* const serv, flex_tri
           return bundle_sign(bundle, seed, inputs, kerl);
         }
         // get address failed
-        log_error(client_extended_logger_id, "get address failed\n");
+        log_error(client_extended_logger_id, "Getting addresses failed\n");
         hash243_queue_free(&new_addresses);
         return ret;
       } else {
@@ -102,7 +102,7 @@ static retcode_t check_balances(iota_client_service_t const* const serv, inputs_
   balances_req->threshold = 100;
   INPUTS_FOREACH(inputs->input_array, input_elm) {
     if ((ret = get_balances_req_address_add(balances_req, input_elm->address)) != RC_OK) {
-      log_error(client_extended_logger_id, "add address to request failed.\n");
+      log_error(client_extended_logger_id, "Adding addresses to request is failed.\n");
       goto end;
     }
   }
@@ -112,7 +112,7 @@ static retcode_t check_balances(iota_client_service_t const* const serv, inputs_
     INPUTS_FOREACH(inputs->input_array, input_elm) {
       if (input_elm->balance != (int64_t)get_balances_res_balances_at(balances_res, index)) {
         *passed = false;
-        log_error(client_extended_logger_id, "balance is not match\n");
+        log_error(client_extended_logger_id, "The given balance does not match with the Tangle\n");
         goto end;
       }
       index++;
@@ -146,12 +146,12 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
   iota_transaction_t tx;
   TRANSFER_FOREACH(transfers, elm) {
     // TODO validate transfer: check if the address is valid(with a trailing zero trit).
-    int msg_chunks = 1;
+    size_t msg_chunks = 1;
     // count message length
     tryte_t msg_buff[NUM_TRYTES_MESSAGE + 1];
     msg_chunks += floor((double)elm->msg_len / NUM_TRYTES_MESSAGE);
 
-    for (size_t i = 0; i < (size_t)(msg_chunks * NUM_TRYTES_MESSAGE); i += NUM_TRYTES_MESSAGE) {
+    for (size_t i = 0; i < (msg_chunks * NUM_TRYTES_MESSAGE); i += NUM_TRYTES_MESSAGE) {
       transaction_reset(&tx);
 
       if (i + NUM_TRYTES_MESSAGE > elm->msg_len) {

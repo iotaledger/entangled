@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "cclient_exmaples",
+    name = "cclient_examples",
     srcs = glob([
         "*.c",
         "*.h",

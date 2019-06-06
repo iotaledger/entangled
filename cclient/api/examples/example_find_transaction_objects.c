@@ -52,7 +52,7 @@ void example_find_transaction_objects(iota_client_service_t *s) {
     iota_transaction_t *tx1 = transaction_array_at(out_tx_objs, 1);
     if (tx1) {
       printf("dump first transaction:\n");
-      printf("value = %lu, curr_index = %lu, last_index = %lu\n", transaction_value(tx1),
+      printf("value = %" PRId64 ", curr_index = %" PRIu64 ", last_index = %" PRIu64 "\n", transaction_value(tx1),
              transaction_current_index(tx1), transaction_last_index(tx1));
       printf("addr: ");
       flex_trit_print(transaction_address(tx1), NUM_TRITS_ADDRESS);

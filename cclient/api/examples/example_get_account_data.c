@@ -36,7 +36,7 @@ void example_get_account_data(iota_client_service_t *s) {
 #endif
 
     // dump balance
-    printf("total balance: %zu\n", account.balance);
+    printf("total balance: %" PRIu64 "\n", account.balance);
 
     // dump unused address
     printf("unused address: ");

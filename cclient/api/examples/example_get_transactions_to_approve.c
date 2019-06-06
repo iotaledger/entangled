@@ -10,7 +10,7 @@
 static tryte_t const *const REF_HASH =
     (tryte_t *)"VOPPIXFBHNNEFAAZJLLKTTFMMVJZPHQCTROSU99KYHYBGLJYMCPGIQGSUW9NQQ9TOVTEOKFDCAJLXA999";
 
-void example_get_transaction_to_approve(iota_client_service_t *s) {
+void example_get_transactions_to_approve(iota_client_service_t *s) {
   printf("\n[%s]\n", __FUNCTION__);
   retcode_t ret = RC_ERROR;
   flex_trit_t reference[FLEX_TRIT_SIZE_243];

@@ -16,7 +16,7 @@ static tryte_t const *const TAIL_HASH =
     (tryte_t *)"MSCLHBTCRSKURU9ITGQLBHUTTAOWJYLCKSZCL9HCUMDLKSVMKNVCRJTIHRGTVCGPMIKCZZEBAH9UPG999";
 #endif
 
-void example_travers_bundle(iota_client_service_t *s) {
+void example_traverse_bundle(iota_client_service_t *s) {
   printf("\n [%s]\n", __FUNCTION__);
   retcode_t ret = RC_OK;
   flex_trit_t tail_hash[FLEX_TRIT_SIZE_243] = {};
