@@ -119,6 +119,8 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
                 consistency_res->info->data);
   }
 
+  // TODO: return out_bundle
+  (void)out_bundle;
 done:
   check_consistency_req_free(&consistency_req);
   check_consistency_res_free(&consistency_res);
