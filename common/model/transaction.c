@@ -233,7 +233,7 @@ iota_transaction_t *transaction_new(void) {
   iota_transaction_t *transaction;
   transaction = (iota_transaction_t *)malloc(sizeof(iota_transaction_t));
   if (!transaction) {
-    // errno = IOTA_OUT_OF_MEMORY
+    return NULL;
   }
   transaction_reset(transaction);
   return transaction;
