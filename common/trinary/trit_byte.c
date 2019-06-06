@@ -16,7 +16,7 @@
 #ifndef NO_BYTES_TRITS_LUT
 
 // Values are ordered like this: 0, 1, ... 120, 121, -121, -120, ... -2, -1
-static trit_t const BYTES_TRITS_LUT[BYTE_SPACE][NUMBER_OF_TRITS_IN_A_BYTE] = {
+static trit_t const BYTES_TRITS_LUT[BYTE_SPACE_SIZE][NUMBER_OF_TRITS_IN_A_BYTE] = {
     {0, 0, 0, 0, 0},     {1, 0, 0, 0, 0},     {-1, 1, 0, 0, 0},     {0, 1, 0, 0, 0},     {1, 1, 0, 0, 0},
     {-1, -1, 1, 0, 0},   {0, -1, 1, 0, 0},    {1, -1, 1, 0, 0},     {-1, 0, 1, 0, 0},    {0, 0, 1, 0, 0},
     {1, 0, 1, 0, 0},     {-1, 1, 1, 0, 0},    {0, 1, 1, 0, 0},      {1, 1, 1, 0, 0},     {-1, -1, -1, 1, 0},
@@ -105,7 +105,7 @@ void byte_to_trits(byte_t const byte, trit_t *const trits, size_t const num_trit
   }
 
 #ifndef NO_BYTES_TRITS_LUT
-  memcpy(trits, BYTES_TRITS_LUT[byte < 0 ? BYTE_SPACE + byte : byte], num_trits);
+  memcpy(trits, BYTES_TRITS_LUT[byte < 0 ? BYTE_SPACE_SIZE + byte : byte], num_trits);
 #else
   size_t j = NUMBER_OF_TRITS_IN_A_BYTE - 1;
   size_t i = num_trits - 1;
