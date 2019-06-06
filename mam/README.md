@@ -16,7 +16,7 @@ Using MAM you can:
 
 ### Versions
 
-A lot of names have been used in the past, either by the Iota Foundation or by the community, to refer to two iterations of the MAM project. You may have heard, for example: MAM prototype, MAM, MAM0, MAM1, MAM2, MAM+...
+Many names have been used in the past, either by the Iota Foundation or by the community, to refer to two iterations of the MAM project. You may have heard, for example: MAM prototype, MAM, MAM0, MAM1, MAM2, MAM+...
 
 As of now, the name MAM is referring to this current implementation.
 
@@ -70,7 +70,7 @@ Let's say you generated the seed `MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXA
 
 > **WARNING**: Do not use your regular token seed for MAM !
 
-> **WARNING**: Do not give access to your seed to anyone !
+> **WARNING**: Do not share your seed to anyone !
 
 ### Initialize the API
 
@@ -187,7 +187,7 @@ We need to provide:
 - a payload and its size, they both need to be in trytes. If your data is not in trytes (ASCII, trits, bytes...), you will first need to convert it using one of the functions provided [here](https://github.com/iotaledger/entangled/tree/develop/common/trinary)
 - a checksum method between none, MAC and signature
 - a boolean value to tell if this is an intermediate packet (`false`) or the last packet of the message (`true`). If this is the last packet, all contexts related to this message will be removed on the sender side as well as the receiver side and it won't be possible to write new packets to this message anymore
-- the bundle you wish to write the packet in
+- the bundle you wish to write the packet into
 
 With no checksum.
 ```c
@@ -218,7 +218,7 @@ We need to provide:
 - the bundle
 - a payload that will either be filled with the payload or set to `NULL` if the bundle contained only a header.
 - a payload size that will either be set to the payload size or to `0` if the bundle contained only a header.
-- a boolean that will either be set to `true` if the packet was the last of the message or `false` otherwise. It will tell you if you should continue looking for packets.
+- a boolean that will either be set to `true` if the packet was the last of the message or `false` otherwise.
 
 ```c
 tryte_t *payload = NULL;
