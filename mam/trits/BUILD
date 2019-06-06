@@ -15,6 +15,8 @@ cc_library(
     srcs = ["trits.c"],
     hdrs = ["trits.h"],
     deps = [
+        "//common:errors",
+        "//common/trinary:trit_long",
         "//common/trinary:trit_tryte",
         "//mam:defs",
     ],

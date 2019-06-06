@@ -16,8 +16,8 @@
 
 // Conversion definitions
 
-#define TRYTE_SPACE 27
-#define BYTE_SPACE 243
+#define TRYTE_SPACE_SIZE 27
+#define BYTE_SPACE_SIZE 243
 
 #define TRYTE_VALUE_MAX 13
 #define BYTE_VALUE_MAX 121

@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["pb3.h"],
     deps = [
         "//common:errors",
+        "//common/trinary:trit_long",
         "//mam/sponge:spongos",
     ],
 )
