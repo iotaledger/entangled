@@ -15,8 +15,6 @@
 #include "common/trinary/trit_long.h"
 #include "mam/trits/trits.h"
 
-#define MAX_TRYTES_FOR_SIZE_T ((5 * sizeof(size_t) + 2) / 3)
-
 static char const trinary_alphabet[] = "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"; /* [-13..13] */
 
 bool tryte_from_char(tryte_t *t, char c) {
@@ -115,7 +113,7 @@ static size_t trits_size_t_trytes(size_t const n) {
   size_t d = 0, m = 1;
 
   for (; d < max_d && (n > (m - 1) / 2);) {
-    m *= 27;
+    m *= TRYTE_SPACE_SIZE;
     ++d;
   }
 
@@ -124,7 +122,7 @@ static size_t trits_size_t_trytes(size_t const n) {
 
 size_t trits_sizeof_size_t(size_t n) {
   size_t d = trits_size_t_trytes(n);
-  MAM_ASSERT(d < 14);
+  MAM_ASSERT(d <= MAM_TRITS_MAX_SIZE_T_TRYTES);
 
   /* one extra tryte to encode `d` */
   return 3 * (d + 1);
@@ -136,7 +134,7 @@ void trits_encode_size_t(size_t n, trits_t *const buffer) {
   trits_set_zero(*buffer);
 
   size_t d = trits_size_t_trytes(n);
-  MAM_ASSERT(d < MAX_TRYTES_FOR_SIZE_T);
+  MAM_ASSERT(d <= MAM_TRITS_MAX_SIZE_T_TRYTES);
 
   trits_put3(trits_advance(buffer, 3), (tryte_t)d);
 
@@ -150,21 +148,26 @@ retcode_t trits_decode_size_t(size_t *const n, trits_t *const buffer) {
   MAM_ASSERT(n != 0);
 
   tryte_t d;
+  uint64_t size;
 
-  if (trits_size(*buffer) < 3) {
+  if (trits_size(*buffer) < NUMBER_OF_TRITS_IN_A_TRYTE) {
     return RC_MAM_PB3_EOF;
   }
 
   d = trits_get3(*buffer);
-  *buffer = trits_drop(*buffer, 3);
+  *buffer = trits_drop(*buffer, NUMBER_OF_TRITS_IN_A_TRYTE);
   if (d < 0 || d > 13) {
     return RC_MAM_INVALID_VALUE;
   }
-  if (trits_size(*buffer) < 3 * (size_t)d) {
+  if (trits_size(*buffer) < NUMBER_OF_TRITS_IN_A_TRYTE * (size_t)d) {
     return RC_MAM_PB3_EOF;
   }
 
-  *n = trits_to_long(trits_begin(*buffer), d * NUMBER_OF_TRITS_IN_A_TRYTE);
+  size = trits_to_long(trits_begin(*buffer), d * NUMBER_OF_TRITS_IN_A_TRYTE);
+  if (size != (size_t)size) {
+    return RC_MAM_TRITS_SIZE_T_NOT_SUPPORTED;
+  }
+  *n = size;
   trits_advance(buffer, d * NUMBER_OF_TRITS_IN_A_TRYTE);
 
   return RC_OK;
