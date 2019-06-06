@@ -27,12 +27,12 @@ MAM uses a set of interconnected algorithms called layers. The following table i
 | Name | Description | Dependencies | Sources |
 |------|-------------|--------------|---------|
 | API | The API layer supports high-level operations that translates MAM messages to/from IOTA bundles. | MAM | [/mam/api](https://github.com/iotaledger/entangled/tree/develop/mam/api) |
-| MAM | The MAM layer supports high-level operations of the MAM protocol like writing and reading messages. | MSS, NTRU, PB3, PRNG, PSK | [/mam/mam](https://github.com/iotaledger/entangled/tree/develop/mam/mam) |
+| MAM | The MAM layer supports high-level operations of the MAM protocol like wrapping and unwrapping messages. | MSS, NTRU, PB3, PRNG, PSK | [/mam/mam](https://github.com/iotaledger/entangled/tree/develop/mam/mam) |
 | MSS | The MSS layer supports Merkle-tree Signature Scheme. | Sponge, WOTS | [/mam/mss](https://github.com/iotaledger/entangled/tree/develop/mam/mss) |
 | NTRU | The NTRU layer supports an NTRU-style public key encryption scheme. | PRNG, Sponge | [/mam/ntru](https://github.com/iotaledger/entangled/tree/develop/mam/ntru) |
 | PB3 | The Protobuf3 layer supports encoding, decoding and cryptographic processing of structured data. | Sponge | [/mam/pb3](https://github.com/iotaledger/entangled/tree/develop/mam/pb3) |
 | PRNG | The PRNG layer supports the generation of cryptographically strong pseudorandom array of trits. | Sponge | [/mam/prng](https://github.com/iotaledger/entangled/tree/develop/mam/prng) |
-| PSK | The PSK layer supports Authenticated Encryption with the means of a Pre-Shared Key. | | [/mam/psk](https://github.com/iotaledger/entangled/tree/develop/mam/psk) |
+| PSK | The PSK layer supports Pre-Shared Key generation. | | [/mam/psk](https://github.com/iotaledger/entangled/tree/develop/mam/psk) |
 | Sponge | The sponge layer supports operations based on a sponge function. | Troika | [/mam/sponge](https://github.com/iotaledger/entangled/tree/develop/mam/sponge) |
 | Troika | The troika layer supports a trinary hash function used as underlying function of the sponge layer. | | [/mam/troika](https://github.com/iotaledger/entangled/tree/develop/mam/troika) |
 | WOTS | The WOTS layer supports Winternitz One-Time Signatures. | PRNG, Sponge | [/mam/wots](https://github.com/iotaledger/entangled/tree/develop/mam/wots) |
@@ -48,11 +48,11 @@ MAM is a library that read and write IOTA bundles. It must be paired with a clie
 
 ### Anatomy of a MAM message
 
-## How to use MAM ?
+## How to use MAM API ?
 
 The following is a step by step guide to help you understand and use the core features of MAM.
 
-You can follow it by copying the code snippets step after step. The full example is available [here](https://github.com/iotaledger/entangled/blob/develop/mam/examples/readme.c) and you can try it with the command `bazel run -c opt //mam/examples:readme`.
+You can follow it by copying the code snippets step by step. The full example is available [here](https://github.com/iotaledger/entangled/blob/develop/mam/examples/readme.c) and you can try it with the command `bazel run -c opt //mam/examples:readme`.
 
 MAM is a library that allows you to read and write bundles. Sending and receiving bundles to and from the Tangle is out of the scope of MAM so we won't cover that part. To send and receive bundles in C, please refer to [cclient](https://github.com/iotaledger/entangled/tree/develop/cclient).
 
@@ -150,7 +150,7 @@ We need to provide:
 - the channel ID
 - the endpoint ID (only when using the endpoint)
 - a set of Pre-Shared Keys
-- a set of NTRU public keys
+- a set of recipient NTRU public keys
 - a new bundle
 - a trit array to store the new message ID. This message ID uniquely identifies the message inside the channel and will be needed to write packets in the message.
 
@@ -212,8 +212,9 @@ We now have a MAM bundle containing a full message (header + packet) ready to be
 retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle, tryte_t **const payload, size_t *const payload_size, bool *const is_last_packet);
 ```
 
-Now let's switch to the receiver side. We just fetched a bundle from the Tangle and we are ready to read it. It doesn't matter if the bundle contains only a header, a header and a first packet or only a packet, there is only one function to call and we need to provide:
+Now let's switch to the receiver side. We just fetched a bundle from the Tangle and we are ready to read it. It doesn't matter if the bundle contains only a header, a header and a first packet or only a packet, there is only one function to call.
 
+We need to provide:
 - the bundle
 - a payload that will either be filled with the payload or set to `NULL` if the bundle contained only a header.
 - a payload size that will either be set to the payload size or to `0` if the bundle contained only a header.
@@ -234,10 +235,10 @@ The payload is allocated by the function so you must release it when you're done
 
 ```c
 size_t mam_api_serialized_size(mam_api_t const *const api);
-void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer);
-retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api);
-retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
-retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
+void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, tryte_t const *const encr_key_trytes, size_t encr_key_trytes_size);
+retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api, tryte_t const *const decr_key_trytes, size_t decr_key_trytes_size);
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, tryte_t const *const encr_key_trytes, size_t encr_key_trytes_size);
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api, tryte_t const *const decr_key_trytes, size_t decr_key_trytes_size);
 ```
 
 MAM being a stateful library, we need to keep the state alive from one execution to the other.
@@ -249,8 +250,8 @@ mam_api_t new_api;
 size_t serialized_size = mam_api_serialized_size(&api);
 trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
-mam_api_serialize(&api, buffer);
-mam_api_deserialize(buffer, serialized_size, &new_api);
+mam_api_serialize(&api, buffer, (tryte_t *)"ENCRYPTIONKEY", 17);
+mam_api_deserialize(buffer, serialized_size, &new_api, (tryte_t *)"ENCRYPTIONKEY", 17);
 free(buffer);
 ```
 
@@ -258,9 +259,11 @@ Convenient functions to save and load the state to and from a file are also avai
 ```c
 mam_api_t new_api;
 
-mam_api_save(&api, "mam.state");
-mam_api_load("mam.state", &new_api);
+mam_api_save(&api, "mam.state", (tryte_t *)"ENCRYPTIONKEY", 17);
+mam_api_load("mam.state", &new_api, (tryte_t *)"ENCRYPTIONKEY", 17);
 ```
+
+Both versions take an ecryption key to encrypt/decrypt the state. You can choose to not encrypt/decrypt it by providing a NULL pointer and/or a 0 size to them.
 
 ### Destroy the API
 
