@@ -121,7 +121,7 @@ poly_coeff_t poly_coeff_from_trint9(trint9_t const t) {
   poly_coeff_t c;
   MAM_ASSERT(-(MAM_POLY_Q - 1) / 2 <= t && t <= (MAM_POLY_Q - 1) / 2);
 
-  d = t < 0 ? (poly_dcoeff_t)t + MAM_POLY_Q : t;
+  d = t < 0 ? (poly_dcoeff_t)t + MAM_POLY_Q : (poly_dcoeff_t)t;
   c = (d << MAM_POLY_MRED_R_LOG) % MAM_POLY_Q;
 
   return c;
