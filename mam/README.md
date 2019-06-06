@@ -3,13 +3,13 @@
 ## Contents
 
 - [Glossary](#glossary)
-- [What is MAM ?](#what-is-mam)
+- [What is MAM ?](#what-is-mam-)
   - [Definition](#definition)
   - [Versions](#versions)
   - [Layers](#layers)
 - [Transport over the Tangle](#transport-over-the-Tangle)
   - [Anatomy of a MAM message](#anatomy-of-a-mam-message)
-- [How to use MAM API ?](#how-to-use-mam-api)
+- [How to use MAM API ?](#how-to-use-mam-api-)
   - [Create a seed](#create-a-seed)
   - [Initialize the API](#initialize-the-api)
   - [Create a channel](#create-a-channel)
