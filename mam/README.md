@@ -19,8 +19,26 @@
   - [Read a packet from a bundle](#read-a-packet-from-a-bundle)
   - [Save and load the API](#save-and-load-the-api)
   - [Destroy the API](#destroy-the-api)
+- [Security considerations](#security-considerations)
 
 ## Glossary
+
+- Seed: [what-is-a-seed](https://docs.iota.org/docs/getting-started/0.1/introduction/what-is-a-seed) and/or [create-a-seed](https://docs.iota.org/docs/getting-started/0.1/tutorials/create-a-seed).
+- Channel
+- Endpoint
+- PSKs
+- Public key (it should be noted that there are different PKs: NTRUpk, chid, epid, IOTA address)
+- Integrity
+- Privacy
+- Authenticity
+- AE
+- Hash
+- Sponge
+- NTRU
+- MSS
+- WOTS
+- Message
+- Packet
 
 ## What is MAM ?
 
@@ -30,11 +48,11 @@ Masked Authenticated Messaging (MAM) is a second layer data communication protoc
 
 Using MAM you can:
 
-- create channels for broadcasting messages
-- create channel endpoints for protecting messages during broadcasting
-- protect messages in different ways, for example, turn on / off encryption / authentication
-- split messages into parts (packets), protect and transmit each part almost independently
-- set message recipients and provide them with key material in different ways
+- create channels for broadcasting messages;
+- create channel endpoints for protecting messages during broadcasting;
+- protect messages in different ways, for example, turn on / off encryption / authentication;
+- split messages into parts (packets), protect and transmit each part almost independently;
+- set message recipients and provide them with key material in different ways;
 
 ### Versions
 
@@ -55,18 +73,13 @@ MAM uses a set of interconnected algorithms called layers. The following table i
 | PB3 | The Protobuf3 layer supports encoding, decoding and cryptographic processing of structured data. | Sponge | [/mam/pb3](https://github.com/iotaledger/entangled/tree/develop/mam/pb3) |
 | PRNG | The PRNG layer supports the generation of cryptographically strong pseudorandom array of trits. | Sponge | [/mam/prng](https://github.com/iotaledger/entangled/tree/develop/mam/prng) |
 | PSK | The PSK layer supports Pre-Shared Key generation. | | [/mam/psk](https://github.com/iotaledger/entangled/tree/develop/mam/psk) |
-| Sponge | The sponge layer supports operations based on a sponge function. | Troika | [/mam/sponge](https://github.com/iotaledger/entangled/tree/develop/mam/sponge) |
+| Sponge | The Sponge layer implements Authenticated Encryption and Hash using sponge construction. | Troika | [/mam/sponge](https://github.com/iotaledger/entangled/tree/develop/mam/sponge) |
 | Troika | The troika layer supports a trinary hash function used as underlying function of the sponge layer. | | [/mam/troika](https://github.com/iotaledger/entangled/tree/develop/mam/troika) |
 | WOTS | The WOTS layer supports Winternitz One-Time Signatures. | PRNG, Sponge | [/mam/wots](https://github.com/iotaledger/entangled/tree/develop/mam/wots) |
 
 ## Transport over the Tangle
 
-MAM is a library that read and write IOTA bundles. It must be paired with a client library to actually receive and send them over the Tangle.
-
-3.4 channel: a source of messages. Belongs to an entity. Identified by a public key, called chid, corresponding to which private keys are used to sign either endpoints (main functionality) or messages;
-
-3.5 endpoint: a transmitter of messages. Belongs to a channel. Identified by a public key, called epid, corresponding to which private keys are used to sign messages;
-3.6 central endpoint: an endpoint which epid is equal to chid of the corresponding channel;
+MAM uses IOTA bundles as transport layer. It must be paired with a client library to actually receive and send them over the Tangle.
 
 ### Anatomy of a MAM message
 
@@ -80,13 +93,13 @@ MAM is a library that allows you to read and write bundles. Sending and receivin
 
 ### Create a seed
 
-To start using MAM, you will need a seed. If you don't know what a seed is or how to generate one, please refer to [what-is-a-seed](https://docs.iota.org/docs/getting-started/0.1/introduction/what-is-a-seed) and/or [create-a-seed](https://docs.iota.org/docs/getting-started/0.1/tutorials/create-a-seed).
+To start using MAM, you will need a seed. If you don't know what a seed is or how to generate one, please refer to the [Glossary](#glossary).
 
-With MAM, the following keys will be derived from your seed.
-- Session keys
-- NTRU private keys
-- Pre-Shared Keys
-- WOTS private keys
+With MAM, the following keys will be derived from your seed:
+- Session keys;
+- NTRU private keys and corresponding public keys;
+- Pre-Shared Keys;
+- MSS private keys and corresponding public keys;
 
 Let's say you generated the seed `MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLE9`.
 
@@ -109,12 +122,12 @@ mam_api_init(&api, (tryte_t *)"MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPL
 
 MAM is a stateful library. The API instance is holding your MAM account information.
 
-- Your channels and their endpoints
-- Your own NTRU private keys
-- NTRU public keys of your peers
-- Pre-Shared Keys
-- Contexts of messages you are sending
-- Contexts of messages you are receiving
+- Your channels and their endpoints;
+- Your own NTRU private keys;
+- NTRU public keys of your peers;
+- Pre-Shared Keys;
+- Contexts of messages you are sending;
+- Contexts of messages you are receiving;
 
 ### Create a channel
 
@@ -123,10 +136,10 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryt
 ```
 
 We create a new MAM channel by providing:
-- the desired height of the underlying merkle tree which will determine how many signatures we can generate with this channel central endpoint
-- a tryte array to store the new channel ID which is the address where messages created through this channel will be sent to
+- the desired height of the underlying merkle tree which will determine how many signatures we can generate with this channel central endpoint;
+- a tryte array to store the new channel ID which is the address where messages created through this channel will be sent to;
 
-Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 messages with this channel central endpoint.
+Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 packets with this channel central endpoint.
 
 ```c
 tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
@@ -143,11 +156,11 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
 ```
 
 We create a new MAM endpoint that belongs to the previously created channel by providing:
-- the desired height of the underlying merkle tree which will determine how many signatures we can generate with this endpoint
-- the channel ID
-- a tryte array to store the new endpoint ID. Messages created through this endpoint will still be sent to the address of the channel, the channel ID.
+- the desired height of the underlying merkle tree which will determine how many signatures we can generate with this endpoint;
+- the channel ID;
+- a tryte array to store the new endpoint ID. Messages created through this endpoint will still be sent to the address of the channel, the channel ID;
 
-Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 messages with this endpoint.
+Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 packets with this endpoint.
 
 ```c
 tryte_t endpoint_id[MAM_ENDPOINT_ID_SIZE];
@@ -169,12 +182,12 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
 Now that we have a channel and an endpoint, we are ready to initiate our first message by writing a header to a bundle. We can do that directly through the central endpoint of the channel, or through the created endpoint. In both cases, the message will be sent to the channel address.
 
 We need to provide:
-- the channel ID
-- the endpoint ID (only when using the endpoint)
-- a set of Pre-Shared Keys
-- a set of recipient NTRU public keys
-- a new bundle
-- a trit array to store the new message ID. This message ID uniquely identifies the message inside the channel and will be needed to write packets in the message.
+- the channel ID;
+- the endpoint ID (only when using the endpoint);
+- a set of Pre-Shared Keys;
+- a set of recipient NTRU public keys;
+- a new bundle;
+- a trit array to store the new message ID. This message ID uniquely identifies the message inside the channel and will be needed to write packets in the message;
 
 To create the message through the central endpoint
 ```c
@@ -205,11 +218,11 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const 
 We are now going to write the first (and only) packet of the message to the same bundle that already contains the header.
 
 We need to provide:
-- the message ID that uniquely identifies the message
-- a payload and its size, they both need to be in trytes. If your data is not in trytes (ASCII, trits, bytes...), you will first need to convert it using one of the functions provided [here](https://github.com/iotaledger/entangled/tree/develop/common/trinary)
-- a checksum method between none, MAC and signature
-- a boolean value to tell if this is an intermediate packet (`false`) or the last packet of the message (`true`). If this is the last packet, all contexts related to this message will be removed on the sender side as well as the receiver side and it won't be possible to write new packets to this message anymore
-- the bundle you wish to write the packet into
+- the message ID that uniquely identifies the message;
+- a payload and its size, they both need to be in trytes. If your data is not in trytes (ASCII, trits, bytes...), you will first need to convert it using one of the functions provided [here](https://github.com/iotaledger/entangled/tree/develop/common/trinary);
+- a checksum method between none, MAC and signature;
+- a boolean value to tell if this is an intermediate packet (`false`) or the last packet of the message (`true`). If this is the last packet, all contexts related to this message will be removed on the sender side as well as the receiver side and it won't be possible to write new packets to this message anymore;
+- the bundle you wish to write the packet into;
 
 With no checksum.
 ```c
@@ -237,10 +250,10 @@ retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const 
 Now let's switch to the receiver side. We just fetched a bundle from the Tangle and we are ready to read it. It doesn't matter if the bundle contains only a header, a header and a first packet or only a packet, there is only one function to call.
 
 We need to provide:
-- the bundle
-- a payload that will either be filled with the payload or set to `NULL` if the bundle contained only a header.
-- a payload size that will either be set to the payload size or to `0` if the bundle contained only a header.
-- a boolean that will either be set to `true` if the packet was the last of the message or `false` otherwise.
+- the bundle;
+- a payload that will either be filled with the payload or set to `NULL` if the bundle contained only a header;
+- a payload size that will either be set to the payload size or to `0` if the bundle contained only a header;
+- a boolean that will either be set to `true` if the packet was the last of the message or `false` otherwise;
 
 ```c
 tryte_t *payload = NULL;
@@ -298,3 +311,7 @@ When you are done using MAM, you must destroy the API to release resources it wa
 ```c
 mam_api_destroy(&api);
 ```
+
+## Security considerations
+
+describe how keys should be generated, stored, distributed, destroyed; describe threats in case these operations are carried out incorrectly.
