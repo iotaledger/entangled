@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/utils/tangle_traversals.h"
+#include "consensus/tangle/traversal.h"
 #include "common/storage/defs.h"
 #include "common/storage/pack.h"
 #include "utils/containers/hash/hash243_stack.h"

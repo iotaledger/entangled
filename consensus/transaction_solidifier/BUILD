@@ -9,7 +9,7 @@ cc_library(
         "//consensus:conf",
         "//consensus/snapshot:snapshots_provider",
         "//consensus/tangle",
-        "//consensus/utils:tangle_traversals",
+        "//consensus/tangle:traversal",
         "//gossip:tips_cache",
         "//gossip/components:transaction_requester",
         "//utils:logger_helper",
