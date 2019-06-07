@@ -101,11 +101,14 @@ With MAM, the following keys will be derived from your seed:
 - Pre-Shared Keys;
 - MSS private keys and corresponding public keys;
 
-Let's say you generated the seed `MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLE9`.
+For the sake of the example, let's say you generated the seed:
+```c
+tryte_t *seed = (tryte_t*)"MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLE9";
+```
 
-> **WARNING**: Do not use your regular token seed for MAM !
+> **WARNING**: Avoid using your regular token seed for MAM!
 
-> **WARNING**: Do not share your seed to anyone !
+> **WARNING**: Do not share your seed to anyone!
 
 ### Initialize the API
 
@@ -117,7 +120,7 @@ We begin by declaring and initializing an API instance.
 ```c
 mam_api_t api;
 
-mam_api_init(&api, (tryte_t *)"MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLE9");
+mam_api_init(&api, seed);
 ```
 
 MAM is a stateful library. The API instance is holding your MAM account information.
@@ -315,3 +318,5 @@ mam_api_destroy(&api);
 ## Security considerations
 
 describe how keys should be generated, stored, distributed, destroyed; describe threats in case these operations are carried out incorrectly.
+
+- Add warning: The API instance should not be lost; although it can be partially restored from the Seed, the message contexts will be lost and reusing restored API instance from the Seed can lead to key reuse and MAM keys can be compromised.

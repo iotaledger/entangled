@@ -4,12 +4,18 @@
 
 int main() {
   /**
+   * Create a seed
+   */
+
+  tryte_t *seed = (tryte_t *)"MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLE9";
+
+  /**
    * Initialize the API
    */
 
   mam_api_t api;
 
-  mam_api_init(&api, (tryte_t *)"MAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLEMAMEXAMPLE9");
+  mam_api_init(&api, seed);
 
   /**
    * Create a channel
