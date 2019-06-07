@@ -291,8 +291,8 @@ mam_api_t new_api;
 size_t serialized_size = mam_api_serialized_size(&api);
 trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
-mam_api_serialize(&api, buffer, (tryte_t *)"ENCRYPTIONKEY", 17);
-mam_api_deserialize(buffer, serialized_size, &new_api, (tryte_t *)"ENCRYPTIONKEY", 17);
+mam_api_serialize(&api, buffer, (tryte_t *)"ENCRYPTIONKEY", 13);
+mam_api_deserialize(buffer, serialized_size, &new_api, (tryte_t *)"ENCRYPTIONKEY", 13);
 free(buffer);
 ```
 
@@ -300,11 +300,11 @@ Convenient functions to save and load the state to and from a file are also avai
 ```c
 mam_api_t new_api;
 
-mam_api_save(&api, "mam.state", (tryte_t *)"ENCRYPTIONKEY", 17);
-mam_api_load("mam.state", &new_api, (tryte_t *)"ENCRYPTIONKEY", 17);
+mam_api_save(&api, "mam.state", (tryte_t *)"ENCRYPTIONKEY", 13);
+mam_api_load("mam.state", &new_api, (tryte_t *)"ENCRYPTIONKEY", 13);
 ```
 
-Both versions take an ecryption key to encrypt/decrypt the state. You can choose to not encrypt/decrypt it by providing a NULL pointer and/or a 0 size to them.
+Both versions take an ecryption key to encrypt/decrypt the state. You can choose to not encrypt/decrypt it by providing a `NULL` pointer and/or a 0 size to them.
 
 ### Destroy the API
 

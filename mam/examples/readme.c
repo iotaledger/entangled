@@ -83,14 +83,15 @@ int main() {
 
   mam_api_t new_api;
 
-  mam_api_save(&api, "mam.state", (tryte_t *)"ENCRYPTIONKEY", 17);
-  mam_api_load("mam.state", &new_api, (tryte_t *)"ENCRYPTIONKEY", 17);
+  mam_api_save(&api, "mam.state", (tryte_t *)"ENCRYPTIONKEY", 13);
+  mam_api_load("mam.state", &new_api, (tryte_t *)"ENCRYPTIONKEY", 13);
 
   /**
    * Destroy the API
    */
 
   mam_api_destroy(&api);
+  mam_api_destroy(&new_api);
 
   return EXIT_SUCCESS;
 }
