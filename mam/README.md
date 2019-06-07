@@ -123,8 +123,9 @@ mam_api_t api;
 mam_api_init(&api, seed);
 ```
 
-MAM is a stateful library. The API instance is holding your MAM account information.
+MAM being a stateful library, this API instance will be holding your MAM account information during execution.
 
+The state if composed of:
 - Your channels and their endpoints;
 - Your own NTRU private keys;
 - NTRU public keys of your peers;
