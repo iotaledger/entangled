@@ -155,7 +155,7 @@ void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn, trits_t auth_p
   }
 }
 
-size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss) {
+size_t mam_mss_remaining_sks(mam_mss_t const *const mss) {
   if (mss->skn > MAM_MSS_MAX_SKN(mss->height)) {
     return 0;
   }

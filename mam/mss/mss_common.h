@@ -156,9 +156,9 @@ bool mam_mss_next(mam_mss_t *mss);
  *
  * @param mss [in] MSS interface
  *
- * @return The number of remaining signatures
+ * @return The number of remaining secret keys
  */
-size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss);
+size_t mam_mss_remaining_sks(mam_mss_t const *const mss);
 
 /**
  * Verifies MSS signature.

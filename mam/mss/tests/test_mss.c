@@ -47,7 +47,7 @@ static void mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
     mam_mss_init(mss2, prng, curr_height, nonce, trits_null(), trits_null(), trits_null());
     mam_mss_gen(mss1);
 
-    while (mam_mss_num_remaining_sks(mss1) > 0) {
+    while (mam_mss_remaining_sks(mss1) > 0) {
       store = trits_take(store_, mam_mss_serialized_size(mss1));
       mam_mss_serialize(mss1, &store);
       store = trits_pickup_all(store);
