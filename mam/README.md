@@ -151,7 +151,7 @@ tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
 mam_api_create_channel(&api, 5, channel_id);
 ```
 
-`channel_id` should be equal to `TZXYUDVIOVZPWIOQRNX9KCYIANVD9MRDINPQBCAQLZAX9JKBWRHHNJQSVVTQRTMXSXSQ9ZTJXDRGHJQGQ`.
+`channel_id` should be equal to `CE9ITOJZBNDXOPU9F9WLOHYICXSAJDAQIINCIS9BQRWHWRLHQXDSXRUIINVQLBUIEZZNXKHTMLWYOKWPB`.
 
 ### Create an endpoint
 
@@ -162,7 +162,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
 We create a new MAM endpoint that belongs to the previously created channel by providing:
 - the desired height of the underlying merkle tree which will determine how many signatures we can generate with this endpoint;
 - the channel ID;
-- a tryte array to store the new endpoint ID. Messages created through this endpoint will still be sent to the address of the channel, the channel ID;
+- a tryte array to store the new endpoint ID;
 
 Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 packets with this endpoint.
 
@@ -172,7 +172,9 @@ tryte_t endpoint_id[MAM_ENDPOINT_ID_SIZE];
 mam_api_create_endpoint(&api, 5, channel_id, endpoint_id);
 ```
 
-`endpoint_id` should be equal to `TPRN9JYPHPUOWEOCBLBAGHXYLICDKJSSJYUFNFQVJ9RUKMZATUT9CHOVJCOBDIEYQNKRINODKHARLE9PG`.
+`endpoint_id` should be equal to `JHAMIP9PTLUTLRCKSYBTPDWIGTAVXFMJW9FYINDBXYIYJPLILUGGMZCSSSFWYUX9YCJZNOYUR9K9TALEA`.
+
+Messages created through this endpoint will still be sent to the address of the channel, the channel ID.
 
 ### Write a header to a bundle
 
