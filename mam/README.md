@@ -253,12 +253,12 @@ We now have a MAM bundle containing a full message (header + packet) ready to be
 retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle, tryte_t **const payload, size_t *const payload_size, bool *const is_last_packet);
 ```
 
-Now let's switch to the receiver side. We just fetched a bundle from the Tangle and we are ready to read it. It doesn't matter if the bundle contains only a header, a header and a first packet or only a packet, there is only one function to call.
+Now let's imagine we are on the receiver side, we just fetched a bundle from the Tangle and we are ready to read it. It doesn't matter if the bundle contains only a header, a header and a first packet or only a packet, there is only one function to call.
 
 We need to provide:
 - the bundle;
-- a payload that will either be filled with the payload or set to `NULL` if the bundle contained only a header;
-- a payload size that will either be set to the payload size or to `0` if the bundle contained only a header;
+- a payload that will either be filled with the read payload or set to `NULL` if the bundle contained only a header;
+- a payload size that will either be set to the read payload size or to `0` if the bundle contained only a header;
 - a boolean that will either be set to `true` if the packet was the last of the message or `false` otherwise;
 
 ```c
@@ -270,7 +270,7 @@ mam_api_bundle_read(&api, bundle, &payload, &payload_size, &is_last_packet);
 free(payload);
 ```
 
-The payload is allocated by the function so you must release it when you're done with it.
+> **WARNING**: The payload being allocated by the function, it must released when you're done with it.
 
 ### Save and load the API
 
