@@ -17,3 +17,17 @@ cc_library(
         "@com_github_uthash//:uthash",
     ],
 )
+
+cc_library(
+    name = "traversal",
+    srcs = ["traversal.c"],
+    hdrs = ["traversal.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/model:transaction",
+        "//common/storage:pack",
+        "//consensus/tangle",
+        "//utils/containers/hash:hash243_set",
+        "//utils/containers/hash:hash243_stack",
+    ],
+)
