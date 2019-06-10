@@ -14,8 +14,8 @@
  * @brief
  *
  */
-#ifndef CCLIENT_API_WERE_ASSRESSES_SPENT_FROM_H
-#define CCLIENT_API_WERE_ASSRESSES_SPENT_FROM_H
+#ifndef CCLIENT_API_WERE_ADDRESSES_SPENT_FROM_H
+#define CCLIENT_API_WERE_ADDRESSES_SPENT_FROM_H
 
 #include "cclient/http/http.h"
 #include "cclient/request/were_addresses_spent_from.h"
@@ -26,12 +26,11 @@ extern "C" {
 #endif
 
 /**
- * @brief Store transactions in an IRI node's local storage.
- *
- * The trytes must be validated by #iota_client_attach_to_tangle
+ * @brief Check if a list of addresses was ever spent from, in the current epoch, or in previous epochs.
  *
  * @param[in] service client service
- * @param[in] req List of transaction trytes
+ * @param[in] req A list of address hash that you want to query for the status.
+ * @param[in,out] res A list of address state.
  * @return #retcode_t
  */
 retcode_t iota_client_were_addresses_spent_from(iota_client_service_t const* const service,
@@ -42,6 +41,6 @@ retcode_t iota_client_were_addresses_spent_from(iota_client_service_t const* con
 }
 #endif
 
-#endif  // CCLIENT_API_WERE_ASSRESSES_SPENT_FROM_H
+#endif  // CCLIENT_API_WERE_ADDRESSES_SPENT_FROM_H
 
 /** @} */
