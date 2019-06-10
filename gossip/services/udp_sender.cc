@@ -37,6 +37,8 @@ bool udp_endpoint_destroy(endpoint_t *const endpoint) {
   boost::asio::ip::udp::endpoint *destination =
       reinterpret_cast<boost::asio::ip::udp::endpoint *>(endpoint->opaque_inetaddr);
   delete destination;
+  endpoint->opaque_inetaddr = NULL;
+
   return true;
 }
 
