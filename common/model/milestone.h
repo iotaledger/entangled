@@ -10,9 +10,6 @@
 
 #include "common/trinary/flex_trit.h"
 
-// Forward declarations
-typedef struct _trit_array *trit_array_p;
-
 typedef struct iota_milestone_s {
   uint64_t index;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
