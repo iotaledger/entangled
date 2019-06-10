@@ -346,7 +346,7 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
 }
 
 bool mam_mss_next(mam_mss_t *mss) {
-  size_t sks = mam_mss_num_remaining_sks(mss);
+  size_t sks = mam_mss_remaining_sks(mss);
 
   if (sks == 0) {
     return false;

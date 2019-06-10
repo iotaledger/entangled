@@ -60,7 +60,7 @@ static void mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, m
     }
 
     TEST_ASSERT_EQUAL_INT(sks, 1 << curr_height);
-    TEST_ASSERT_EQUAL_INT(mam_mss_num_remaining_sks(mss1), 0);
+    TEST_ASSERT_EQUAL_INT(mam_mss_remaining_sks(mss1), 0);
     TEST_ASSERT(mam_mss_sign_and_next(mss1, hash, sig) == RC_MAM_MSS_EXHAUSTED);
     TEST_ASSERT(mam_mss_sign_and_next(mss2, hash, sig2) == RC_MAM_MSS_EXHAUSTED);
 
@@ -107,7 +107,7 @@ static void mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, m
 
     trits_t pk = trits_from_rep(MAM_MSS_PK_SIZE, mss->root);
 
-    while (mam_mss_num_remaining_sks(mss) > 0) {
+    while (mam_mss_remaining_sks(mss) > 0) {
       TEST_ASSERT(mam_mss_sign_and_next(mss, hash, sig) == RC_OK);
 
       TEST_ASSERT_TRUE(mam_mss_verify(spongos, hash, sig, pk));
@@ -141,7 +141,7 @@ static void mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, m
     }
 
     TEST_ASSERT_EQUAL_INT(sks, 1 << curr_height);
-    TEST_ASSERT_EQUAL_INT(mam_mss_num_remaining_sks(mss), 0);
+    TEST_ASSERT_EQUAL_INT(mam_mss_remaining_sks(mss), 0);
     TEST_ASSERT(mam_mss_sign_and_next(mss, hash, sig) == RC_MAM_MSS_EXHAUSTED);
 
     mam_mss_destroy(mss);
