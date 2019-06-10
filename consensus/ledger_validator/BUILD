@@ -20,7 +20,7 @@ cc_library(
         "//consensus/snapshot",
         "//consensus/snapshot:snapshots_provider",
         "//consensus/tangle",
-        "//consensus/utils:tangle_traversals",
+        "//consensus/tangle:traversal",
         "//utils:hash_maps",
         "//utils/containers/hash:hash243_stack",
     ],

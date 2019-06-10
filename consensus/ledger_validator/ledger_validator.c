@@ -13,7 +13,7 @@
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
-#include "consensus/utils/tangle_traversals.h"
+#include "consensus/tangle/traversal.h"
 #include "utils/logger_helper.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "ledger_validator"

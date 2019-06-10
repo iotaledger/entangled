@@ -6,7 +6,7 @@
  */
 
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
-#include "consensus/utils/tangle_traversals.h"
+#include "consensus/tangle/traversal.h"
 #include "utils/logger_helper.h"
 
 #define TRANSACTION_SOLIDIFIER_LOGGER_ID "transaction_solidifier"

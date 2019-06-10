@@ -5,10 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/snapshot/snapshots_service.h"
 #include <inttypes.h>
 #include <stdlib.h>
-#include "consensus/utils/tangle_traversals.h"
+
+#include "consensus/snapshot/snapshots_service.h"
+#include "consensus/tangle/traversal.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
