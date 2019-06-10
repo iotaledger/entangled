@@ -25,7 +25,7 @@ retcode_t mam_example_announce_new_channel(mam_api_t* const api, tryte_t const* 
     }
   }
 
-  ERR_BIND_RETURN(mam_api_create_channel(api, MAM_EXAMPLES_MSS_HEIGHT, new_channel_id), ret);
+  ERR_BIND_RETURN(mam_api_channel_create(api, MAM_EXAMPLES_MSS_HEIGHT, new_channel_id), ret);
 
   if ((ret = mam_api_bundle_announce_new_channel(api, channel_id, new_channel_id, psks, NULL, bundle, msg_id)) !=
       RC_OK) {
@@ -62,7 +62,7 @@ retcode_t mam_example_announce_new_endpoint(mam_api_t* const api, tryte_t const*
     }
   }
 
-  ERR_BIND_RETURN(mam_api_create_endpoint(api, MAM_EXAMPLES_MSS_HEIGHT, channel_id, new_endpoint_id), ret);
+  ERR_BIND_RETURN(mam_api_endpoint_create(api, MAM_EXAMPLES_MSS_HEIGHT, channel_id, new_endpoint_id), ret);
 
   if ((ret = mam_api_bundle_announce_new_endpoint(api, channel_id, new_endpoint_id, psks, NULL, bundle, msg_id)) !=
       RC_OK) {

@@ -51,8 +51,8 @@ int main(int ac, char **av) {
   msg_pubkey = (mam_msg_pubkey_t)msg_pubkey_int;
 
   // Creating channel
-  if ((ret = mam_example_create_channel(&api, channel_id)) != RC_OK) {
-    fprintf(stderr, "mam_example_create_channel failed with err %d\n", ret);
+  if ((ret = mam_example_channel_create(&api, channel_id)) != RC_OK) {
+    fprintf(stderr, "mam_example_channel_create failed with err %d\n", ret);
     return EXIT_FAILURE;
   }
 
