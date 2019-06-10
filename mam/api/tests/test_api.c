@@ -398,7 +398,6 @@ static void test_api_multiple_packets_run(mam_api_t *const param_api, size_t con
   tryte_t *payload_out = NULL;
   size_t payload_out_size = 0;
   bool is_last_packet;
-  size_t remaining_sks;
 
   // write and read header
   {
@@ -412,8 +411,9 @@ static void test_api_multiple_packets_run(mam_api_t *const param_api, size_t con
 
   // write and read packets
   for (size_t i = 0; i < num_packets; i++) {
+    size_t remaining_sks = mam_api_channel_remaining_sks(param_api, ch_id);
+
     bundle_transactions_new(&bundle);
-    remaining_sks = mam_api_channel_remaining_sks(param_api, ch_id);
     TEST_ASSERT(mam_api_bundle_write_packet(param_api, msg_id, payload_in, payload_in_size, (mam_msg_checksum_t)(i % 3),
                                             i == (num_packets - 1) ? true : false, bundle) == RC_OK);
     if (i == (int)MAM_MSG_CHECKSUM_SIG) {
