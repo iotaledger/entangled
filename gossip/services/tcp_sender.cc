@@ -33,8 +33,15 @@ retcode_t tcp_sender_endpoint_init(endpoint_t *const endpoint) {
 }
 
 retcode_t tcp_sender_endpoint_destroy(endpoint_t *const endpoint) {
-  delete endpoint->opaque_inetaddr;
+  if (endpoint == NULL) {
+    return RC_OK;
+  }
+
+  boost::asio::ip::tcp::endpoint *destination =
+      reinterpret_cast<boost::asio::ip::tcp::endpoint *>(endpoint->opaque_inetaddr);
+  delete destination;
   endpoint->opaque_inetaddr = NULL;
+
   return RC_OK;
 }
 
