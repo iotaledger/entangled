@@ -36,6 +36,7 @@ void example_get_trytes(iota_client_service_t *s);
 void example_node_info(iota_client_service_t *s);
 void example_prepare_transfer(iota_client_service_t *s);
 void example_store_transactions(iota_client_service_t *s);
+void example_were_addresses_spent_from(iota_client_service_t *s);
 
 void example_get_new_address(iota_client_service_t *s);
 void example_get_inputs(iota_client_service_t *s);
