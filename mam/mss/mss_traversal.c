@@ -346,11 +346,13 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
 }
 
 bool mam_mss_next(mam_mss_t *mss) {
-  if (mss->skn == MAM_MSS_MAX_SKN(mss->height)) {
+  size_t sks = mam_mss_num_remaining_sks(mss);
+
+  if (sks == 0) {
     return false;
   }
 
-  if (mss->skn < MAM_MSS_MAX_SKN(mss->height)) {
+  if (sks != 1) {
     mss_mt_refresh(mss);
     mss_mt_build_stacks(mss);
   }
