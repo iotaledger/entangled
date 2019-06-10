@@ -130,8 +130,8 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryt
 /**
  * Returns the number of remaining secret keys of a channel
  *
- * @param api - The API [in]
- * @param channel_id - The channel id [in]
+ * @param[in] api - The API
+ * @param[in] channel_id - The channel id
  *
  * @return the number of remaining secret keys of the channel
  */
@@ -153,9 +153,9 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
 /**
  * Returns the number of remaining secret keys of an endpoint
  *
- * @param api - The API [in]
- * @param channel_id - The associated channel id [in]
- * @param endpoint_id - The endpoint id [in]
+ * @param[in] api - The API
+ * @param[in] channel_id - The associated channel id
+ * @param[in] endpoint_id - The endpoint id
  *
  * @return the number of remaining secret keys of the endpoint
  */
