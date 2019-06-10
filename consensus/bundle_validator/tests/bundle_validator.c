@@ -240,10 +240,10 @@ void test_bundle_invalid_hash_with_wrong_obsolete_tag() {
                                     TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
 
   transactions_deserialize(trytes, txs, 4, true);
-  flex_trits_to_trits(obsolete_tag, NUM_TRITS_OBSOLETE_TAG, transaction_obsolete_tag(txs[1]), NUM_TRITS_OBSOLETE_TAG, 
+  flex_trits_to_trits(obsolete_tag, NUM_TRITS_OBSOLETE_TAG, transaction_obsolete_tag(txs[1]), NUM_TRITS_OBSOLETE_TAG,
                       NUM_TRITS_OBSOLETE_TAG);
   obsolete_tag[0] = -1;
-  flex_trits_from_trits(transaction_obsolete_tag(txs[0]), NUM_TRITS_OBSOLETE_TAG, obsolete_tag, NUM_TRITS_OBSOLETE_TAG, 
+  flex_trits_from_trits(transaction_obsolete_tag(txs[0]), NUM_TRITS_OBSOLETE_TAG, obsolete_tag, NUM_TRITS_OBSOLETE_TAG,
                         NUM_TRITS_OBSOLETE_TAG);
 
   TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
