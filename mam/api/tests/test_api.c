@@ -243,11 +243,11 @@ static void test_api_write_header(mam_api_t *const api, mam_psk_t const *const p
     TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(api, ch_id, ep_id, psks, ntru_pks, bundle, msg_id) == RC_OK);
   } else if (MAM_MSG_PUBKEY_CHID1 == pubkey) {
     size_t remaining_sks = mam_api_channel_remaining_sks(api, ch_id);
-    TEST_ASSERT(mam_api_bundle_announce_new_channel(api, ch_id, ch1_id, psks, ntru_pks, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_announce_channel(api, ch_id, ch1_id, psks, ntru_pks, bundle, msg_id) == RC_OK);
     TEST_ASSERT_EQUAL_INT(mam_api_channel_remaining_sks(api, ch_id), remaining_sks - 1);
   } else if (MAM_MSG_PUBKEY_EPID1 == pubkey) {
     size_t remaining_sks = mam_api_channel_remaining_sks(api, ch_id);
-    TEST_ASSERT(mam_api_bundle_announce_new_endpoint(api, ch_id, ep1_id, psks, ntru_pks, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_announce_endpoint(api, ch_id, ep1_id, psks, ntru_pks, bundle, msg_id) == RC_OK);
     TEST_ASSERT_EQUAL_INT(mam_api_channel_remaining_sks(api, ch_id), remaining_sks - 1);
   } else {
     TEST_ASSERT(mam_api_bundle_write_header_on_channel(api, ch_id, psks, ntru_pks, bundle, msg_id) == RC_OK);
@@ -552,7 +552,7 @@ static void test_api_trust() {
   bundle_transactions_new(&bundle);
 
   // We trust the endpoint by announcing it
-  TEST_ASSERT(mam_api_bundle_announce_new_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_announce_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
 
   bundle_transactions_free(&bundle);
@@ -578,7 +578,7 @@ static void test_api_trust() {
   bundle_transactions_new(&bundle);
 
   // We trust the channel by announcing it
-  TEST_ASSERT(mam_api_bundle_announce_new_channel(&sender_api, ch_id, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_announce_channel(&sender_api, ch_id, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
 
   bundle_transactions_free(&bundle);

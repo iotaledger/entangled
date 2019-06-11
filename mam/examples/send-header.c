@@ -70,8 +70,8 @@ int main(int ac, char **av) {
     } else if (msg_pubkey == MAM_MSG_PUBKEY_EPID) {
       tryte_t new_endpoint_id[MAM_ENDPOINT_ID_SIZE];
 
-      if ((ret = mam_example_announce_new_endpoint(&api, channel_id, bundle, msg_id, new_endpoint_id)) != RC_OK) {
-        fprintf(stderr, "mam_example_announce_new_endpoint failed with err %d\n", ret);
+      if ((ret = mam_example_announce_endpoint(&api, channel_id, bundle, msg_id, new_endpoint_id)) != RC_OK) {
+        fprintf(stderr, "mam_example_announce_endpoint failed with err %d\n", ret);
         return EXIT_FAILURE;
       }
       // Sending bundle
@@ -92,15 +92,15 @@ int main(int ac, char **av) {
 
       bundle_transactions_free(&bundle);
       bundle_transactions_new(&bundle);
-      if ((ret = mam_example_announce_new_endpoint(&api, channel_id, bundle, msg_id, new_endpoint_id)) != RC_OK) {
-        fprintf(stderr, "mam_example_announce_new_endpoint failed with err %d\n", ret);
+      if ((ret = mam_example_announce_endpoint(&api, channel_id, bundle, msg_id, new_endpoint_id)) != RC_OK) {
+        fprintf(stderr, "mam_example_announce_endpoint failed with err %d\n", ret);
         return EXIT_FAILURE;
       }
     } else if (msg_pubkey == MAM_MSG_PUBKEY_CHID1) {
       tryte_t new_channel_id[MAM_CHANNEL_ID_SIZE];
 
-      if ((ret = mam_example_announce_new_channel(&api, channel_id, bundle, msg_id, new_channel_id)) != RC_OK) {
-        fprintf(stderr, "mam_example_announce_new_endpoint failed with err %d\n", ret);
+      if ((ret = mam_example_announce_channel(&api, channel_id, bundle, msg_id, new_channel_id)) != RC_OK) {
+        fprintf(stderr, "mam_example_announce_endpoint failed with err %d\n", ret);
         return EXIT_FAILURE;
       }
       // Sending bundle

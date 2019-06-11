@@ -212,8 +212,7 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
                                                   trit_t *const msg_id);
 
 /**
- * Writes an announcement of a new channel (keyloads (session keys) +
- * potential packet) into a bundle
+ * Writes an announcement of a channel (keyloads (session keys) + potential packet) into a bundle
  *
  * @param api - The API [in,out]
  * @param ch_id - A known channel ID [in]
@@ -227,14 +226,12 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t const *const ch_id,
-                                              tryte_t const *const ch1_id, mam_psk_t_set_t psks,
-                                              mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                              trit_t *const msg_id);
+retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *const ch_id, tryte_t const *const ch1_id,
+                                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
+                                          bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
- * Writes an announcement of a new endpoint (keyloads (session keys) +
- * potential packet) into a bundle
+ * Writes an announcement of a endpoint (keyloads (session keys) + potential packet) into a bundle
  *
  * @param api - The API [in,out]
  * @param ch_id - A known channel ID [in]
@@ -248,10 +245,10 @@ retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t cons
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                               tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                               mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                               trit_t *const msg_id);
+retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                           tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+                                           mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                           trit_t *const msg_id);
 
 /**
  * Writes MAM packet into a bundle
