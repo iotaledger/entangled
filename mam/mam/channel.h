@@ -109,7 +109,9 @@ retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const heigh
  *
  * @return number of remaining secret keys
  */
-size_t mam_channel_num_remaining_sks(mam_channel_t const *const channel);
+static inline size_t mam_channel_remaining_sks(mam_channel_t const *const channel) {
+  return channel ? mam_mss_remaining_sks(&channel->mss) : 0;
+}
 
 /**
  * Deallocates memory for internal objects

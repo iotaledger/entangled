@@ -374,6 +374,10 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryt
   return ret;
 }
 
+size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id) {
+  return mam_channel_remaining_sks(mam_api_get_channel(api, channel_id));
+}
+
 retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id) {
   retcode_t ret = RC_OK;
@@ -405,6 +409,11 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
   channel->endpoint_ord++;
 
   return ret;
+}
+
+size_t mam_api_endpoint_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id,
+                                      tryte_t const *const endpoint_id) {
+  return mam_endpoint_remaining_sks(mam_api_get_endpoint(api, channel_id, endpoint_id));
 }
 
 void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t const ord) {

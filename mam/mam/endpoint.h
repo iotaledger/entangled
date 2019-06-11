@@ -90,7 +90,9 @@ retcode_t mam_endpoint_create(mam_prng_t *const prng, mss_mt_height_t const heig
  *
  * @return number of remaining secret keys
  */
-size_t mam_endpoint_num_remaining_sks(mam_endpoint_t const *const endpoint);
+static inline size_t mam_endpoint_remaining_sks(mam_endpoint_t const *const endpoint) {
+  return endpoint ? mam_mss_remaining_sks(&endpoint->mss) : 0;
+}
 
 /**
  * Deallocates memory for internal objects
