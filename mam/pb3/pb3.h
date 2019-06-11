@@ -20,6 +20,7 @@
 #ifndef __MAM_PB3_PB3_H__
 #define __MAM_PB3_PB3_H__
 
+#include "common/defs.h"
 #include "common/errors.h"
 #include "mam/defs.h"
 #include "mam/sponge/spongos.h"
@@ -47,7 +48,7 @@ trits_t pb3_trits_take(trits_t *const buffer, size_t const n);
  *
  * @return return the number of trits in a tryte
  */
-size_t pb3_sizeof_tryte();
+static inline size_t pb3_sizeof_tryte() { return NUMBER_OF_TRITS_IN_A_TRYTE; }
 
 /**
  * Encodes a tryte into trits buffer
@@ -74,7 +75,7 @@ retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer);
  *
  * @return return the number of trits in a trint
  */
-size_t pb3_sizeof_trint();
+static inline size_t pb3_sizeof_trint() { return 9; }
 
 /**
  * Encodes a trint into trits buffer
@@ -101,7 +102,7 @@ retcode_t pb3_decode_trint(trint9_t *const trint, trits_t *const buffer);
  *
  * @return return the number of trits in a long trint
  */
-size_t pb3_sizeof_longtrint();
+static inline size_t pb3_sizeof_longtrint() { return 18; }
 
 /**
  * Encodes a long trint into trits buffer
@@ -155,7 +156,7 @@ retcode_t pb3_decode_size_t(size_t *const size, trits_t *const buffer);
  *
  * @return return the number of trits in 'n' trytes
  */
-size_t pb3_sizeof_ntrytes(size_t const n);
+static inline size_t pb3_sizeof_ntrytes(size_t const n) { return NUMBER_OF_TRITS_IN_A_TRYTE * n; }
 
 /**
  * Encodes 'n' trytes into trits buffer
