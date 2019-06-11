@@ -43,8 +43,8 @@ typedef struct mam_api_s {
   trint18_t channel_ord;
   trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
   trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
-  mam_pk_t_set_t trusted_channel_ids;
-  mam_pk_t_set_t trusted_endpoint_ids;
+  mam_pk_t_set_t trusted_channel_pks;
+  mam_pk_t_set_t trusted_endpoint_pks;
 } mam_api_t;
 
 /**
