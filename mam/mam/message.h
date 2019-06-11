@@ -55,6 +55,7 @@ typedef enum mam_msg_type_e {
 } mam_msg_type_t;
 
 typedef enum mam_msg_keyload_e {
+  MAM_MSG_KEYLOAD_PUBLIC = 0,
   MAM_MSG_KEYLOAD_PSK = 1,
   MAM_MSG_KEYLOAD_NTRU = 2,
 } mam_msg_keyload_t;
