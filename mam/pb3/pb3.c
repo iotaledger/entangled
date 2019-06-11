@@ -12,8 +12,6 @@
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 
-#define MAX_TRYTES_FOR_SIZE_T ((5 * sizeof(size_t) + 2) / 3)
-
 trits_t pb3_trits_take(trits_t *const b, size_t const n) { return trits_advance(b, n); }
 
 /**
