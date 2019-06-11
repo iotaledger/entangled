@@ -17,6 +17,9 @@ cc_library(
     ],
 )
 
+# Build command:
+# bazel build --spawn_strategy=local --define=workspace=$(bazel info workspace)  --define=output_base=$(bazel info output_base) --crosstool_top='@iota_toolchains//tools/emscripten:toolchain' --cpu=emscripten --host_crosstool_top='@bazel_tools//tools/cpp:toolchain' //mam/api:api.js
+
 emcc_binary(
     name = "api.js",
     linkopts = ["-s LINKABLE=1 -s EXPORT_ALL=1"],
