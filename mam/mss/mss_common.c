@@ -44,7 +44,7 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   mam_sponge_t sponge;
   MAM_ASSERT(trits_size(sig) == MAM_MSS_SIG_SIZE(mss->height));
 
-  if (mam_mss_num_remaining_sks(mss) == 0) {
+  if (mam_mss_remaining_sks(mss) == 0) {
     return RC_MAM_MSS_EXHAUSTED;
   }
 
@@ -155,7 +155,7 @@ void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn, trits_t auth_p
   }
 }
 
-size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss) {
+size_t mam_mss_remaining_sks(mam_mss_t const *const mss) {
   if (mss->skn > MAM_MSS_MAX_SKN(mss->height)) {
     return 0;
   }
