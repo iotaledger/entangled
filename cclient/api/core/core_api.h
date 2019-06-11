@@ -23,5 +23,6 @@
 #include "cclient/api/core/get_trytes.h"
 #include "cclient/api/core/remove_neighbors.h"
 #include "cclient/api/core/store_transactions.h"
+#include "cclient/api/core/were_addresses_spent_from.h"
 
 #endif  // CCLIENT_API_CORE_API_H

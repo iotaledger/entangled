@@ -19,5 +19,6 @@
 #include "cclient/request/get_trytes.h"
 #include "cclient/request/remove_neighbors.h"
 #include "cclient/request/store_transactions.h"
+#include "cclient/request/were_addresses_spent_from.h"
 
 #endif  // CCLIENT_REQUEST_REQUESTS_H
