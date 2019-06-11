@@ -12,7 +12,7 @@
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 
-trits_t pb3_trits_take(trits_t *const b, size_t const n) { return trits_advance(b, n); }
+trits_t pb3_trits_take(trits_t *const buffer, size_t const n) { return trits_advance(buffer, n); }
 
 /**
  * Protobuf3 primitive types
@@ -81,9 +81,9 @@ retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
 
 size_t pb3_sizeof_size_t(size_t const n) { return trits_sizeof_size_t(n); }
 
-void pb3_encode_size_t(size_t n, trits_t *const buffer) { trits_encode_size_t(n, buffer); }
+void pb3_encode_size_t(size_t size, trits_t *const buffer) { trits_encode_size_t(size, buffer); }
 
-retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) { return trits_decode_size_t(n, buffer); }
+retcode_t pb3_decode_size_t(size_t *const size, trits_t *const buffer) { return trits_decode_size_t(size, buffer); }
 
 size_t pb3_sizeof_ntrytes(size_t const n) { return NUMBER_OF_TRITS_IN_A_TRYTE * n; }
 
@@ -152,19 +152,19 @@ retcode_t pb3_unwrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const b
   return ret;
 }
 
-void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t const t) {
+void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t const size) {
   trits_t b0 = *buffer;
 
-  pb3_encode_size_t(t, buffer);
+  pb3_encode_size_t(size, buffer);
   mam_spongos_absorb(spongos, trits_diff(b0, *buffer));
 }
 
-retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t *const t) {
+retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t *const size) {
   retcode_t ret = RC_OK;
   trits_t b0;
 
   b0 = *buffer;
-  if ((ret = pb3_decode_size_t(t, buffer)) != RC_OK) {
+  if ((ret = pb3_decode_size_t(size, buffer)) != RC_OK) {
     return ret;
   }
   mam_spongos_absorb(spongos, trits_diff(b0, *buffer));
