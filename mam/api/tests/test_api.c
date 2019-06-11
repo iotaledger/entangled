@@ -325,7 +325,7 @@ static void test_api_generic() {
   bundle_transactions_t *bundle = NULL;
   trit_t msg_id[MAM_MSG_ID_SIZE];
   char *payload2 = NULL;
-  mam_ntru_sk_t ntru[1];
+  mam_ntru_sk_t ntru;
   mam_psk_t pska, pskb;
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
@@ -333,9 +333,9 @@ static void test_api_generic() {
     MAM_TRITS_DEF(ntru_nonce, 30);
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
-    TEST_ASSERT(ntru_sk_reset(ntru) == RC_OK);
-    ntru_sk_gen(ntru, &sender_api.prng, ntru_nonce);
-    TEST_ASSERT(mam_api_add_ntru_sk(&sender_api, ntru) == RC_OK);
+    TEST_ASSERT(ntru_sk_reset(&ntru) == RC_OK);
+    ntru_sk_gen(&ntru, &sender_api.prng, ntru_nonce);
+    TEST_ASSERT(mam_api_add_ntru_sk(&sender_api, &ntru) == RC_OK);
   }
 
   /* gen psk */
@@ -359,7 +359,7 @@ static void test_api_generic() {
         bundle_transactions_new(&bundle);
 
         /* write header and packet */
-        test_api_write_header(&sender_api, &pska, &pskb, &ntru->public_key, pubkey, keyload, bundle, msg_id);
+        test_api_write_header(&sender_api, &pska, &pskb, &ntru.public_key, pubkey, keyload, bundle, msg_id);
         test_api_write_packet(&sender_api, bundle, msg_id, checksum, PAYLOAD, true, pubkey);
 
         /* read header and packet */
@@ -515,6 +515,87 @@ static void test_api_save_load_wrong_key() {
   mam_api_destroy(&loaded_api);
 }
 
+static void test_api_trust() {
+  mam_api_t receiver_api;
+  bundle_transactions_t *bundle = NULL;
+  trit_t msg_id[MAM_MSG_ID_SIZE];
+  tryte_t *payload = NULL;
+  size_t payload_size = 0;
+  bool is_last_packet;
+
+  TEST_ASSERT(mam_api_init(&receiver_api, API_SEED) == RC_OK);
+
+  bundle_transactions_new(&bundle);
+
+  // We check that the read fails due to the channel not being trusted
+  TEST_ASSERT(mam_api_bundle_write_header_on_channel(&sender_api, ch_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
+                                          bundle) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) ==
+              RC_MAM_CHANNEL_NOT_TRUSTED);
+
+  // We trust the channel and check that the read now succeeds
+  TEST_ASSERT(mam_api_add_trusted_channel_pk(&receiver_api, ch_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  // We check that the read fails due to the endpoint not being trusted
+  TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
+                                          bundle) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) ==
+              RC_MAM_ENDPOINT_NOT_TRUSTED);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  // We trust the endpoint by announcing it
+  TEST_ASSERT(mam_api_bundle_announce_new_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  // The test now succeeds
+  TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
+                                          bundle) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  // We check that the read fails due to the channel not being trusted
+  TEST_ASSERT(mam_api_bundle_write_header_on_channel(&sender_api, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
+                                          bundle) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) ==
+              RC_MAM_CHANNEL_NOT_TRUSTED);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  // We trust the channel by announcing it
+  TEST_ASSERT(mam_api_bundle_announce_new_channel(&sender_api, ch_id, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  // The test now succeeds
+  TEST_ASSERT(mam_api_bundle_write_header_on_channel(&sender_api, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
+                                          bundle) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+
+  bundle_transactions_free(&bundle);
+  bundle_transactions_new(&bundle);
+
+  TEST_ASSERT(mam_api_destroy(&receiver_api) == RC_OK);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -524,6 +605,7 @@ int main(void) {
   RUN_TEST(test_api_serialization);
   RUN_TEST(test_api_save_load);
   RUN_TEST(test_api_save_load_wrong_key);
+  RUN_TEST(test_api_trust);
   TEST_ASSERT(mam_api_destroy(&sender_api) == RC_OK);
 
   TEST_ASSERT(mam_api_init(&sender_api, API_SEED) == RC_OK);
