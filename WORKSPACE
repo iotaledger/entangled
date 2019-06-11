@@ -10,7 +10,7 @@ git_repository(
 
 git_repository(
     name = "iota_toolchains",
-    commit = "4db38d66f8ce719f7b88728abd1271b8d380bf43",
+    commit = "63303bbe0df6210017d70d228cc3b6961789c8a5",
     remote = "https://github.com/iotaledger/toolchains.git",
 )
 
@@ -44,11 +44,18 @@ load(
 apple_rules_dependencies()
 
 load("@rules_iota//:defs.bzl", "iota_deps")
-load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
 load("//tools:snapshot.bzl", "fetch_snapshot_files")
 
 iota_deps()
 
-setup_toolchains()
-
 fetch_snapshot_files()
+
+load("@iota_toolchains//:toolchains.bzl", "setup_initial_deps")
+
+setup_initial_deps()
+
+load("@iota_toolchains//:defs.bzl", "setup_toolchains_repositories")
+
+setup_toolchains_repositories()
+
+load("@iota_toolchains//tools/emscripten:defs.bzl", "emcc_binary")
