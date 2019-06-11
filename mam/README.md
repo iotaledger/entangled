@@ -136,7 +136,7 @@ The state if composed of:
 ### Create a channel
 
 ```c
-retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
+retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 ```
 
 We create a new MAM channel by providing:
@@ -148,7 +148,7 @@ Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 pack
 ```c
 tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
 
-mam_api_create_channel(&api, 5, channel_id);
+mam_api_channel_create(&api, 5, channel_id);
 ```
 
 `channel_id` should be equal to `CE9ITOJZBNDXOPU9F9WLOHYICXSAJDAQIINCIS9BQRWHWRLHQXDSXRUIINVQLBUIEZZNXKHTMLWYOKWPB`.
@@ -156,7 +156,7 @@ mam_api_create_channel(&api, 5, channel_id);
 ### Create an endpoint
 
 ```c
-retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id, tryte_t *const endpoint_id);
+retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, tryte_t const *const channel_id, tryte_t *const endpoint_id);
 ```
 
 We create a new MAM endpoint that belongs to the previously created channel by providing:
@@ -169,7 +169,7 @@ Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 pack
 ```c
 tryte_t endpoint_id[MAM_ENDPOINT_ID_SIZE];
 
-mam_api_create_endpoint(&api, 5, channel_id, endpoint_id);
+mam_api_endpoint_create(&api, 5, channel_id, endpoint_id);
 ```
 
 `endpoint_id` should be equal to `JHAMIP9PTLUTLRCKSYBTPDWIGTAVXFMJW9FYINDBXYIYJPLILUGGMZCSSSFWYUX9YCJZNOYUR9K9TALEA`.
