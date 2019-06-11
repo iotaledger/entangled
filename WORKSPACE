@@ -57,5 +57,3 @@ setup_initial_deps()
 load("@iota_toolchains//:defs.bzl", "setup_toolchains_repositories")
 
 setup_toolchains_repositories()
-
-load("@iota_toolchains//tools/emscripten:defs.bzl", "emcc_binary")

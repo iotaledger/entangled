@@ -42,4 +42,3 @@ build:ubsan --copt -fsanitize=undefined
 build:ubsan --copt -fno-omit-frame-pointer
 build:ubsan --linkopt -fsanitize=undefined
 build:ubsan --linkopt -lubsan
-
