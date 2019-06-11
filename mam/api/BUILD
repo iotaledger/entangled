@@ -1,7 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//utils/containers:map_generator.bzl", "map_generate")
-load("@iota_toolchains//tools/emscripten:defs.bzl", "emcc_binary")
 
 cc_library(
     name = "api",
@@ -15,16 +14,6 @@ cc_library(
         "//mam/mam:message",
         "//utils:time",
     ],
-)
-
-# Build command:
-# bazel clean (recommended)
-# bazel build --spawn_strategy=local --define=workspace=$(bazel info workspace)  --define=output_base=$(bazel info output_base) --config=emscripten //mam/api:api.js
-
-emcc_binary(
-    name = "api.js",
-    linkopts = ["-s LINKABLE=1 -s EXPORT_ALL=1"],
-    deps = [":api"],
 )
 
 map_generate(
