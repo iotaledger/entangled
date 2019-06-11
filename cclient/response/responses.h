@@ -22,5 +22,6 @@
 #include "cclient/response/get_transactions_to_approve.h"
 #include "cclient/response/get_trytes.h"
 #include "cclient/response/remove_neighbors.h"
+#include "cclient/response/were_addresses_spent_from.h"
 
 #endif  // CCLIENT_RESPONSE_RESPONSES_H

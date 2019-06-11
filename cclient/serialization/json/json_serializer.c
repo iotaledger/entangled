@@ -30,6 +30,7 @@
 #include "cclient/serialization/json/get_trytes.h"
 #include "cclient/serialization/json/remove_neighbors.h"
 #include "cclient/serialization/json/store_transactions.h"
+#include "cclient/serialization/json/were_addresses_spent_from.h"
 
 static serializer_vtable json_vtable = {
     .add_neighbors_serialize_request = json_add_neighbors_serialize_request,
@@ -99,6 +100,10 @@ static serializer_vtable json_vtable = {
     .store_transactions_serialize_request = json_store_transactions_serialize_request,
     .store_transactions_deserialize_request = json_store_transactions_deserialize_request,
 
+    .were_addresses_spent_from_serialize_request = json_were_addresses_spent_from_serialize_request,
+    .were_addresses_spent_from_deserialize_request = json_were_addresses_spent_from_deserialize_request,
+    .were_addresses_spent_from_serialize_response = json_were_addresses_spent_from_serialize_response,
+    .were_addresses_spent_from_deserialize_response = json_were_addresses_spent_from_deserialize_response,
 };
 
 void init_json_serializer(serializer_t *serializer) { serializer->vtable = json_vtable; }
