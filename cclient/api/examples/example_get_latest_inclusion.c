@@ -15,8 +15,8 @@ void example_get_latest_inclusion(iota_client_service_t *s) {
   retcode_t ret = RC_ERROR;
   flex_trit_t trits_243[FLEX_TRIT_SIZE_243];
   hash243_queue_t txs = NULL;
-  get_inclusion_states_res_t *inclustion_res = get_inclusion_states_res_new();
-  if (!inclustion_res) {
+  get_inclusion_states_res_t *inclusion_res = get_inclusion_states_res_new();
+  if (!inclusion_res) {
     printf("Error: OOM\n");
     return;
   }
@@ -30,15 +30,15 @@ void example_get_latest_inclusion(iota_client_service_t *s) {
   hash243_queue_push(&txs, trits_243);
   hash243_queue_push(&txs, trits_243);
 
-  if ((ret = iota_client_get_latest_inclusion(s, txs, inclustion_res)) == RC_OK) {
-    for (size_t i = 0; i < get_inclusion_states_res_states_count(inclustion_res); i++) {
-      printf("[%zu]:%s\n", i, get_inclusion_states_res_states_at(inclustion_res, i) ? "true" : "false");
+  if ((ret = iota_client_get_latest_inclusion(s, txs, inclusion_res)) == RC_OK) {
+    for (size_t i = 0; i < get_inclusion_states_res_states_count(inclusion_res); i++) {
+      printf("[%zu]:%s\n", i, get_inclusion_states_res_states_at(inclusion_res, i) ? "true" : "false");
     }
   } else {
     printf("Error: %s\n", error_2_string(ret));
   }
 
 done:
-  get_inclusion_states_res_free(&inclustion_res);
+  get_inclusion_states_res_free(&inclusion_res);
   hash243_queue_free(&txs);
 }

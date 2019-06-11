@@ -17,3 +17,7 @@ build:x86_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 build:esp32_64 --crosstool_top=@iota_toolchains//tools/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0:toolchain
 build:esp32_64 --cpu=xtensa
 build:esp32_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+
+build:emscripten --crosstool_top=@iota_toolchains//tools/emscripten:toolchain
+build:emscripten --cpu=emscripten
+build:emscripten --host_crosstool_top=@bazel_tools//tools/cpp:toolchain

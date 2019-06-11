@@ -178,3 +178,14 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "were_addresses_spent_from",
+    timeout = "short",
+    srcs = ["were_addresses_spent_from.c"],
+    deps = [
+        ":shared",
+        "//cclient/serialization:serializer_json",
+        "@unity",
+    ],
+)

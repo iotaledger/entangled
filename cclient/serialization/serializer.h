@@ -111,6 +111,14 @@ typedef struct {
   retcode_t (*store_transactions_serialize_request)(store_transactions_req_t const* const obj, char_buffer_t* out);
   retcode_t (*store_transactions_deserialize_request)(char const* const obj, store_transactions_req_t* const out);
 
+  retcode_t (*were_addresses_spent_from_serialize_request)(were_addresses_spent_from_req_t const* const obj,
+                                                           char_buffer_t* out);
+  retcode_t (*were_addresses_spent_from_deserialize_request)(char const* const obj,
+                                                             were_addresses_spent_from_req_t* const out);
+  retcode_t (*were_addresses_spent_from_serialize_response)(were_addresses_spent_from_res_t const* const obj,
+                                                            char_buffer_t* out);
+  retcode_t (*were_addresses_spent_from_deserialize_response)(char const* const obj,
+                                                              were_addresses_spent_from_res_t* const out);
 } serializer_vtable;
 
 typedef struct serializer_base {

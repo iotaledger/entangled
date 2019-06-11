@@ -69,19 +69,26 @@ int main() {
   iota_client_core_init(&serv);
   iota_client_extended_init();
 
+#ifdef _USE_HTTP_
+  printf("Connecting to node: http://%s:%u\n", serv.http.host, serv.http.port);
+#else
+  printf("Connecting to node: https://%s:%u\n", serv.http.host, serv.http.port);
+#endif
+
   /* Core APIs */
   // example_attach_to_tangle(&serv);
   // example_broadcast_transactions(&serv);
   // example_check_consistency(&serv);
   // example_find_transactions(&serv);
   // example_get_balance(&serv);
-  // example_get_inclustion_states(&serv);
+  // example_get_inclusion_states(&serv);
   // example_get_tips(&serv);
   // example_get_transactions_to_approve(&serv);
   // example_get_trytes(&serv);
   example_node_info(&serv);
   // example_prepare_transfer(&serv);
   // example_store_transactions(&serv);
+  // example_were_addresses_spent_from(&serv);
 
   /* Extended APIs */
   // example_get_new_address(&serv);
