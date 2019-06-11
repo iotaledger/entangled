@@ -14,6 +14,7 @@
 #include "ciri/api/api.h"
 #include "ciri/api/http/http.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define API_HTTP_LOGGER_ID "api_http"
 
@@ -247,6 +248,7 @@ static inline retcode_t process_get_missing_transactions_request(iota_api_http_t
   retcode_t ret = RC_OK;
   get_missing_transactions_res_t *res = get_missing_transactions_res_new();
   error_res_t *error = NULL;
+  UNUSED(payload);
 
   if (res == NULL) {
     ret = RC_OOM;
@@ -270,6 +272,7 @@ static inline retcode_t process_get_neighbors_request(iota_api_http_t *const htt
   retcode_t ret = RC_OK;
   get_neighbors_res_t *res = get_neighbors_res_new();
   error_res_t *error = NULL;
+  UNUSED(payload);
 
   if (res == NULL) {
     ret = RC_OOM;
@@ -293,6 +296,7 @@ static inline retcode_t process_get_node_info_request(iota_api_http_t *const htt
   retcode_t ret = RC_OK;
   get_node_info_res_t *res = get_node_info_res_new();
   error_res_t *error = NULL;
+  UNUSED(payload);
 
   if (res == NULL) {
     ret = RC_OOM;
@@ -316,6 +320,7 @@ static inline retcode_t process_get_tips_request(iota_api_http_t *const http, ch
   retcode_t ret = RC_OK;
   get_tips_res_t *res = get_tips_res_new();
   error_res_t *error = NULL;
+  UNUSED(payload);
 
   if (res == NULL) {
     ret = RC_OOM;
@@ -505,6 +510,7 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char
 
 static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind, const char *key, const char *value) {
   iota_api_http_session_t *sess = cls;
+  UNUSED(kind);
 
   if (0 == strcmp(MHD_HTTP_HEADER_CONTENT_TYPE, key)) {
     sess->valid_content_type = !strcmp("application/json", value);
@@ -524,6 +530,8 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
   cJSON *json_obj = NULL, *json_item = NULL;
   char_buffer_t *response_buf = NULL;
   error_res_t *error = NULL;
+  UNUSED(url);
+  UNUSED(version);
 
   if (strncmp(method, MHD_HTTP_METHOD_POST, 4) != 0) {
     return MHD_NO;
