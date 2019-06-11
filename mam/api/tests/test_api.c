@@ -537,6 +537,8 @@ static void test_api_trust() {
   // We trust the channel and check that the read now succeeds
   TEST_ASSERT(mam_api_add_trusted_channel_pk(&receiver_api, ch_id) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+  free(payload);
+  payload = NULL;
 
   bundle_transactions_free(&bundle);
   bundle_transactions_new(&bundle);
@@ -563,6 +565,8 @@ static void test_api_trust() {
   TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
                                           bundle) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+  free(payload);
+  payload = NULL;
 
   bundle_transactions_free(&bundle);
   bundle_transactions_new(&bundle);
@@ -589,9 +593,10 @@ static void test_api_trust() {
   TEST_ASSERT(mam_api_bundle_write_packet(&sender_api, msg_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_NONE, true,
                                           bundle) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
+  free(payload);
+  payload = NULL;
 
   bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
 
   TEST_ASSERT(mam_api_destroy(&receiver_api) == RC_OK);
 }
