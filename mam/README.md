@@ -240,7 +240,7 @@ With MAC checksum you add integrity to your packet. Due to the underlying sponge
 mam_api_bundle_write_packet(&api, message_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_MAC, true, bundle);
 ```
 
-With signature (chosen method in the example) you add integrity and authenticity to your packet. The integrity part is due to the fact that the signed hash is actually the MAC checksum. For the same reasons, by signing a packet you add authentication to all previous packets of the message. Signing a packet is an expensive operation, depending on your use case you could for example sign one packet out of ten.
+With signature (chosen method in the example) you add integrity and authenticity to your packet. The integrity part is due to the fact that the signed hash is actually the MAC checksum. For the same reasons, by signing a packet you add authenticity to all previous packets of the message. Signing a packet is an expensive operation, depending on your use case you could for example sign one packet out of ten.
 ```c
 mam_api_bundle_write_packet(&api, message_id, (tryte_t *)"PAYLOAD", 7, MAM_MSG_CHECKSUM_SIG, true, bundle);
 ```
