@@ -125,7 +125,7 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
  *
  * @return return code
  */
-retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
+retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 
 /**
  * Returns the number of remaining secret keys of a channel
@@ -147,7 +147,7 @@ size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const 
  *
  * @return return code
  */
-retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
+retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id);
 
 /**

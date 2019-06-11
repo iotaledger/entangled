@@ -26,9 +26,9 @@ mam_psk_t const psk = {
             1,  0,  1,  -1, 0,  0,  -1, 1,  -1, 1,  1,  1,  -1, 0,  1,  1,  0,  0,  -1, -1, -1, 0,  0,  1,  0,
             1,  0,  -1, 1,  -1, 0,  1,  0,  -1, 1,  1,  -1, -1, 0,  0,  -1, 0,  -1}};
 
-retcode_t mam_example_create_channel(mam_api_t *const api, tryte_t *const channel_id) {
+retcode_t mam_example_channel_create(mam_api_t *const api, tryte_t *const channel_id) {
   if (mam_channel_t_set_size(api->channels) == 0) {
-    mam_api_create_channel(api, TEST_MSS_DEPTH, channel_id);
+    mam_api_channel_create(api, TEST_MSS_DEPTH, channel_id);
   } else {
     mam_channel_t *channel = &api->channels->value;
     trits_to_trytes(trits_begin(mam_channel_id(channel)), channel_id, NUM_TRITS_ADDRESS);

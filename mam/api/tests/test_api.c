@@ -311,13 +311,13 @@ static void test_api_read_msg(mam_api_t *const api, bundle_transactions_t *const
 static void test_api_create_channels(mam_api_t *api, mss_mt_height_t depth) {
   mss_mt_height_t d = depth;
 
-  TEST_ASSERT(mam_api_create_channel(api, d, ch_id) == RC_OK);
+  TEST_ASSERT(mam_api_channel_create(api, d, ch_id) == RC_OK);
   TEST_ASSERT_EQUAL_INT(mam_api_channel_remaining_sks(api, ch_id), MAM_MSS_MAX_SKN(d) + 1);
-  TEST_ASSERT(mam_api_create_endpoint(api, d, ch_id, ep_id) == RC_OK);
+  TEST_ASSERT(mam_api_endpoint_create(api, d, ch_id, ep_id) == RC_OK);
   TEST_ASSERT_EQUAL_INT(mam_api_endpoint_remaining_sks(api, ch_id, ep_id), MAM_MSS_MAX_SKN(d) + 1);
-  TEST_ASSERT(mam_api_create_endpoint(api, d, ch_id, ep1_id) == RC_OK);
+  TEST_ASSERT(mam_api_endpoint_create(api, d, ch_id, ep1_id) == RC_OK);
   TEST_ASSERT_EQUAL_INT(mam_api_endpoint_remaining_sks(api, ch_id, ep1_id), MAM_MSS_MAX_SKN(d) + 1);
-  TEST_ASSERT(mam_api_create_channel(api, d, ch1_id) == RC_OK);
+  TEST_ASSERT(mam_api_channel_create(api, d, ch1_id) == RC_OK);
   TEST_ASSERT_EQUAL_INT(mam_api_channel_remaining_sks(api, ch1_id), MAM_MSS_MAX_SKN(d) + 1);
 }
 
@@ -414,6 +414,7 @@ static void test_api_multiple_packets_run(mam_api_t *const param_api, size_t con
     size_t remaining_sks = mam_api_channel_remaining_sks(param_api, ch_id);
 
     bundle_transactions_new(&bundle);
+    remaining_sks = mam_api_channel_remaining_sks(param_api, ch_id);
     TEST_ASSERT(mam_api_bundle_write_packet(param_api, msg_id, payload_in, payload_in_size, (mam_msg_checksum_t)(i % 3),
                                             i == (num_packets - 1) ? true : false, bundle) == RC_OK);
     if (i == (int)MAM_MSG_CHECKSUM_SIG) {

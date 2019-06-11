@@ -79,7 +79,7 @@ static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle, 
  *
  * @return a pointer to the channel or NULL if not found
  */
-static mam_channel_t *mam_api_get_channel(mam_api_t const *const api, tryte_t const *const channel_id) {
+static mam_channel_t *mam_api_channel_get(mam_api_t const *const api, tryte_t const *const channel_id) {
   trit_t channel_id_trits[MAM_CHANNEL_ID_SIZE];
   mam_channel_t_set_entry_t *entry = NULL;
   mam_channel_t_set_entry_t *tmp = NULL;
@@ -108,12 +108,12 @@ static mam_channel_t *mam_api_get_channel(mam_api_t const *const api, tryte_t co
  *
  * @return a pointer to the endpoint or NULL if not found
  */
-static mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api, tryte_t const *const channel_id,
+static mam_endpoint_t *mam_api_endpoint_get(mam_api_t const *const api, tryte_t const *const channel_id,
                                             tryte_t const *const endpoint_id) {
   trit_t endpoint_id_trits[MAM_ENDPOINT_ID_SIZE];
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
-  mam_channel_t *parent_channel = mam_api_get_channel(api, channel_id);
+  mam_channel_t *parent_channel = mam_api_channel_get(api, channel_id);
 
   if (endpoint_id == NULL || parent_channel == NULL) {
     return NULL;
@@ -169,19 +169,19 @@ static retcode_t mam_api_bundle_write_header(mam_api_t *const api, tryte_t const
     return RC_MAM_BUNDLE_NOT_EMPTY;
   }
 
-  if ((ch = mam_api_get_channel(api, ch_id)) == NULL) {
+  if ((ch = mam_api_channel_get(api, ch_id)) == NULL) {
     return RC_MAM_CHANNEL_NOT_FOUND;
   }
 
-  if (ch1_id && (ch1 = mam_api_get_channel(api, ch1_id)) == NULL) {
+  if (ch1_id && (ch1 = mam_api_channel_get(api, ch1_id)) == NULL) {
     return RC_MAM_CHANNEL_NOT_FOUND;
   }
 
-  if (ep_id && (ep = mam_api_get_endpoint(api, ch_id, ep_id)) == NULL) {
+  if (ep_id && (ep = mam_api_endpoint_get(api, ch_id, ep_id)) == NULL) {
     return RC_MAM_ENDPOINT_NOT_FOUND;
   }
 
-  if (ep1_id && (ep1 = mam_api_get_endpoint(api, ch_id, ep1_id)) == NULL) {
+  if (ep1_id && (ep1 = mam_api_endpoint_get(api, ch_id, ep1_id)) == NULL) {
     return RC_MAM_ENDPOINT_NOT_FOUND;
   }
 
@@ -349,7 +349,7 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
   return mam_psk_t_set_add(&api->psks, psk);
 }
 
-retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id) {
+retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryte_t *const channel_id) {
   retcode_t ret = RC_OK;
   mam_channel_t channel;
   mam_pk_t channel_pk;
@@ -375,10 +375,10 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryt
 }
 
 size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id) {
-  return mam_channel_remaining_sks(mam_api_get_channel(api, channel_id));
+  return mam_channel_remaining_sks(mam_api_channel_get(api, channel_id));
 }
 
-retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
+retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id) {
   retcode_t ret = RC_OK;
   mam_channel_t *channel = NULL;
@@ -391,7 +391,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
     return RC_NULL_PARAM;
   }
 
-  if ((channel = mam_api_get_channel(api, channel_id)) == NULL) {
+  if ((channel = mam_api_channel_get(api, channel_id)) == NULL) {
     return RC_MAM_CHANNEL_NOT_FOUND;
   }
 
@@ -413,7 +413,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, try
 
 size_t mam_api_endpoint_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id,
                                       tryte_t const *const endpoint_id) {
-  return mam_endpoint_remaining_sks(mam_api_get_endpoint(api, channel_id, endpoint_id));
+  return mam_endpoint_remaining_sks(mam_api_endpoint_get(api, channel_id, endpoint_id));
 }
 
 void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t const ord) {
