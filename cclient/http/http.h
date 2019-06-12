@@ -49,7 +49,8 @@ extern const char* khttp_ApplicationFormUrlencoded;
  * @param response the response from server
  * @return An error code
  */
-retcode_t iota_service_query(const void* const service_opaque, char_buffer_t* obj, char_buffer_t* response);
+retcode_t iota_service_query(void const* const service_opaque, char_buffer_t const* const obj,
+                             char_buffer_t* const response);
 
 #ifdef __cplusplus
 }

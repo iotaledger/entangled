@@ -189,7 +189,8 @@ static retcode_t https_response_read(mbedtls_ctx_t* ctx, char_buffer_t* response
   return RC_OK;
 }
 
-retcode_t iota_service_query(const void* const service_opaque, char_buffer_t* obj, char_buffer_t* response) {
+retcode_t iota_service_query(void const* const service_opaque, char_buffer_t const* const obj,
+                             char_buffer_t* const response) {
   int sockfd = -1;
   retcode_t result = RC_ERROR;
   const iota_client_service_t* const service = (const iota_client_service_t* const)service_opaque;

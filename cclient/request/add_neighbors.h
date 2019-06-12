@@ -57,7 +57,7 @@ void add_neighbors_req_free(add_neighbors_req_t** req);
  * @param[in] uri An URI string. see \ref add_neighbors_req_t.uris
  * @return #retcode_t
  */
-retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, const char* uri);
+retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, char const* const uri);
 
 /**
  * @brief Get an URI string from the URI list.
