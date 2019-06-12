@@ -177,14 +177,14 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_SPENT_ADDRESSES_DB_PATH:  // --spent-addresses-db-path
       if (strlen(value) == 0) {
-        return RC_CIRI_CONF_INVALID_ARGUMENT;
+        return RC_CONF_INVALID_ARGUMENT;
       }
       strncpy(ciri_conf->spent_addresses_db_path, value, sizeof(ciri_conf->spent_addresses_db_path));
       strncpy(consensus_conf->spent_addresses_db_path, value, sizeof(consensus_conf->spent_addresses_db_path));
       break;
     case CONF_TANGLE_DB_PATH:  // --tangle-db-path
       if (strlen(value) == 0) {
-        return RC_CIRI_CONF_INVALID_ARGUMENT;
+        return RC_CONF_INVALID_ARGUMENT;
       }
       strncpy(ciri_conf->tangle_db_path, value, sizeof(ciri_conf->tangle_db_path));
       strncpy(consensus_conf->tangle_db_path, value, sizeof(consensus_conf->tangle_db_path));

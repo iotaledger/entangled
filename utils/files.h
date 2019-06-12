@@ -8,6 +8,8 @@
 #ifndef __UTILS_FILES_H__
 #define __UTILS_FILES_H__
 
+#include <stdbool.h>
+
 #include "common/errors.h"
 
 #define FILE_PATH_SIZE 128

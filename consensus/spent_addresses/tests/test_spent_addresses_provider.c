@@ -16,13 +16,13 @@ static connection_config_t config;
 static spent_addresses_provider_t sap;
 
 void setUp(void) {
-  TEST_ASSERT(copy_file(test_db_path, spent_addresses_db_path) == RC_OK);
+  TEST_ASSERT(iota_utils_copy_file(test_db_path, spent_addresses_db_path) == RC_OK);
   TEST_ASSERT(iota_spent_addresses_provider_init(&sap, &config) == RC_OK);
 }
 
 void tearDown(void) {
   TEST_ASSERT(iota_spent_addresses_provider_destroy(&sap) == RC_OK);
-  TEST_ASSERT(remove_file(test_db_path) == RC_OK);
+  TEST_ASSERT(iota_utils_remove_file(test_db_path) == RC_OK);
 }
 
 void test_spent_addresses_provider_store() {
