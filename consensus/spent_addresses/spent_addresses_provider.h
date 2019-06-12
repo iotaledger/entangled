@@ -22,8 +22,8 @@ typedef struct spent_addresses_provider_s {
 /**
  * Initializes a spent addresses provider
  *
- * @param sap The spent addresses provider
- * @param conf A connection configuration
+ * @param[in] sap   The spent addresses provider
+ * @param[in] conf  A connection configuration
  *
  * @return a status code
  */
@@ -33,7 +33,7 @@ retcode_t iota_spent_addresses_provider_init(spent_addresses_provider_t *const s
 /**
  * Destroys a spent addresses provider
  *
- * @param sap The spent addresses provider
+ * @param[in] sap The spent addresses provider
  *
  * @return a status code
  */
@@ -42,8 +42,8 @@ retcode_t iota_spent_addresses_provider_destroy(spent_addresses_provider_t *cons
 /**
  * Stores a spent address in a provider
  *
- * @param sap The spent addresses provider
- * @param address The spent address
+ * @param[in] sap     The spent addresses provider
+ * @param[in] address The spent address
  *
  * @return a status code
  */
@@ -53,8 +53,8 @@ retcode_t iota_spent_addresses_provider_store(spent_addresses_provider_t const *
 /**
  * Stores spent addresses in a provider
  *
- * @param sap The spent addresses provider
- * @param addresses The spent addresses
+ * @param[in] sap       The spent addresses provider
+ * @param[in] addresses The spent addresses
  *
  * @return a status code
  */
@@ -63,9 +63,9 @@ retcode_t iota_spent_addresses_provider_batch_store(spent_addresses_provider_t c
 /**
  * Checks if a spent address exists in a provider
  *
- * @param sap The spent addresses provider
- * @param address The spent address
- * @param exist Whether the spent address exists or not
+ * @param[in]   sap     The spent addresses provider
+ * @param[in]   address The spent address
+ * @param[out]  exist   Whether the spent address exists or not
  *
  * @return a status code
  */
@@ -73,14 +73,14 @@ retcode_t iota_spent_addresses_provider_exist(spent_addresses_provider_t const *
                                               flex_trit_t const *const address, bool *const exist);
 
 /**
- * Stores previous spent addresses read from a file
+ * Imports spent addresses from a file
  *
- * @param sap The spent addresses provider
- * @param file The file
+ * @param[in] sap   The spent addresses provider
+ * @param[in] file  The file
  *
  * @return a status code
  */
-retcode_t iota_spent_addresses_provider_read_file(spent_addresses_provider_t const *const sap, char const *const file);
+retcode_t iota_spent_addresses_provider_import(spent_addresses_provider_t const *const sap, char const *const file);
 
 #ifdef __cplusplus
 }

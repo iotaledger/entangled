@@ -40,7 +40,7 @@ retcode_t iota_spent_addresses_provider_exist(spent_addresses_provider_t const *
   return iota_stor_spent_address_exist(&sap->connection, address, exist);
 }
 
-retcode_t iota_spent_addresses_provider_read_file(spent_addresses_provider_t const *const sap, char const *const file) {
+retcode_t iota_spent_addresses_provider_import(spent_addresses_provider_t const *const sap, char const *const file) {
   retcode_t ret = RC_OK;
   char *line = NULL;
   size_t len = 0;

@@ -1,8 +1,6 @@
 filegroup(
     name = "spent_addresses_test_file",
-    srcs = [
-        "spent_addresses_test.txt",
-    ],
+    srcs = ["spent_addresses_test.txt"],
     visibility = ["//visibility:public"],
 )
 

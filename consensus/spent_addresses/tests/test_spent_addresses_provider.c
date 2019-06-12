@@ -85,7 +85,7 @@ void test_spent_addresses_provider_batch_store() {
   }
 }
 
-void test_spent_addresses_provider_read_file() {
+void test_spent_addresses_provider_import() {
   bool exist = true;
   tryte_t address_trytes[HASH_LENGTH_TRYTE];
   flex_trit_t address_trits[FLEX_TRIT_SIZE_243];
@@ -101,8 +101,8 @@ void test_spent_addresses_provider_read_file() {
     address_trytes[0]++;
   }
 
-  TEST_ASSERT(iota_spent_addresses_provider_read_file(
-                  &sap, "consensus/spent_addresses/tests/spent_addresses_test.txt") == RC_OK);
+  TEST_ASSERT(iota_spent_addresses_provider_import(&sap, "consensus/spent_addresses/tests/spent_addresses_test.txt") ==
+              RC_OK);
 
   address_trytes[0] = 'A';
 
@@ -121,7 +121,7 @@ void test_spent_addresses_provider_read_file() {
   }
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
 
   RUN_TEST(test_spent_addresses_provider_store);
   RUN_TEST(test_spent_addresses_provider_batch_store);
-  RUN_TEST(test_spent_addresses_provider_read_file);
+  RUN_TEST(test_spent_addresses_provider_import);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();

@@ -23,10 +23,9 @@ typedef struct spent_addresses_service_s {
 
 /**
  * Initializes a spent addresses service
- * Reads previous spent addresses from files
  *
- * @param sas The spent addresses service
- * @param conf Consensus configuration
+ * @param[in] sas   The spent addresses service
+ * @param[in] conf  Consensus configuration
  *
  * @return a status code
  */
@@ -35,7 +34,7 @@ retcode_t iota_spent_addresses_service_init(spent_addresses_service_t *const sas
 /**
  * Destroys a spent addresses service
  *
- * @param sas The spent addresses service
+ * @param[in] sas The spent addresses service
  *
  * @return a status code
  */
@@ -44,11 +43,11 @@ retcode_t iota_spent_addresses_service_destroy(spent_addresses_service_t *const 
 /**
  * Checks whether an address is associated with a valid signed output
  *
- * @param sas The spent addresses service
- * @param sap A spent addresses provider
- * @param tangle A tangle
- * @param address The address
- * @param spent True if the address was spent from, false otherwise
+ * @param[in]   sas     The spent addresses service
+ * @param[in]   sap     A spent addresses provider
+ * @param[in]   tangle  A tangle
+ * @param[in]   address The address
+ * @param[out]  spent   True if the address was spent from, false otherwise
  *
  * @return a status code
  */
