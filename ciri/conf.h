@@ -14,6 +14,7 @@
 #include "common/errors.h"
 #include "consensus/conf.h"
 #include "gossip/conf.h"
+#include "utils/files.h"
 #include "utils/logger_helper.h"
 
 #define DEFAULT_CONF_PATH "ciri/conf.yml"
@@ -29,7 +30,7 @@ extern "C" {
 // This structure contains all configuration variables needed to operate cIRI
 typedef struct iota_ciri_conf_s {
   // Path to the configuration file
-  char conf_path[128];
+  char conf_path[FILE_PATH_SIZE];
   // Valid log levels: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
