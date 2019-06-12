@@ -9,10 +9,10 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t *const req, char_buffer_t *out) {
+retcode_t json_add_neighbors_serialize_request(add_neighbors_req_t const *const req, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  const char *json_text = NULL;
-  size_t len = 0;
+  char const *json_text = NULL;
+
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -30,11 +30,7 @@ retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t *const 
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
@@ -44,8 +40,7 @@ retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t *const 
 
 retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t *const res, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  const char *json_text = NULL;
-  size_t len = 0;
+  char const *json_text = NULL;
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
@@ -59,11 +54,7 @@ retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t *const
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 

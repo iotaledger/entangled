@@ -10,14 +10,9 @@
 #include "cclient/serialization/json/logger.h"
 
 retcode_t json_get_tips_serialize_request(char_buffer_t *out) {
-  retcode_t ret = RC_ERROR;
-  const char *req_text = "{\"command\":\"getTips\"}";
+  char const *req_text = "{\"command\":\"getTips\"}";
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
-  ret = char_buffer_allocate(out, strlen(req_text));
-  if (ret == RC_OK) {
-    strcpy(out->data, req_text);
-  }
-  return ret;
+  return char_buffer_set(out, req_text);
 }
 
 retcode_t json_get_tips_serialize_response(get_tips_res_t const *const res, char_buffer_t *out) {

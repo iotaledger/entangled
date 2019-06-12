@@ -52,7 +52,7 @@ retcode_t json_check_consistency_serialize_response(check_consistency_res_t *con
  * @param[out] out A check consistency request object.
  * @return #retcode_t
  */
-retcode_t json_check_consistency_deserialize_request(const char *const obj, check_consistency_req_t *out);
+retcode_t json_check_consistency_deserialize_request(char const *const obj, check_consistency_req_t *out);
 
 /**
  * @brief Converts a JSON string to a check consistency response.
@@ -61,7 +61,7 @@ retcode_t json_check_consistency_deserialize_request(const char *const obj, chec
  * @param[out] out A check consistency response object.
  * @return #retcode_t
  */
-retcode_t json_check_consistency_deserialize_response(const char *const obj, check_consistency_res_t *out);
+retcode_t json_check_consistency_deserialize_response(char const *const obj, check_consistency_res_t *out);
 
 #ifdef __cplusplus
 }

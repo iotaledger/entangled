@@ -52,7 +52,7 @@ retcode_t json_get_balances_deserialize_request(char const* const obj, get_balan
  * @param[out] out A JSON string.
  * @return #retcode_t
  */
-retcode_t json_get_balances_serialize_response(const get_balances_res_t* const res, char_buffer_t* out);
+retcode_t json_get_balances_serialize_response(get_balances_res_t const* const res, char_buffer_t* out);
 
 /**
  * @brief Converts a JSON string to a get balances response.
@@ -61,7 +61,7 @@ retcode_t json_get_balances_serialize_response(const get_balances_res_t* const r
  * @param[out] res A get balances response object.
  * @return #retcode_t
  */
-retcode_t json_get_balances_deserialize_response(const char* const obj, get_balances_res_t* const res);
+retcode_t json_get_balances_deserialize_response(char const* const obj, get_balances_res_t* const res);
 
 #ifdef __cplusplus
 }
