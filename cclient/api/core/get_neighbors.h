@@ -31,7 +31,7 @@ extern "C" {
  * @param[out] res A list of neighbors.
  * @return #retcode_t
  */
-retcode_t iota_client_get_neighbors(const iota_client_service_t* const service, get_neighbors_res_t* const res);
+retcode_t iota_client_get_neighbors(iota_client_service_t const* const service, get_neighbors_res_t* const res);
 
 #ifdef __cplusplus
 }

@@ -8,8 +8,7 @@
 #include "consensus/snapshot/snapshots_provider.h"
 #include <stdlib.h>
 
-retcode_t iota_snapshots_provider_init(snapshots_provider_t *snapshots_provider,
-                                       iota_consensus_conf_t const *const conf) {
+retcode_t iota_snapshots_provider_init(snapshots_provider_t *snapshots_provider, iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
 
   ERR_BIND_GOTO(iota_snapshot_reset(&snapshots_provider->inital_snapshot, conf), ret, cleanup);
@@ -35,8 +34,7 @@ retcode_t iota_snapshots_provider_destroy(snapshots_provider_t *const snapshots_
   return RC_OK;
 }
 
-retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshot_t const *const snapshot,
-                                                         char const *const file_path_base) {
+retcode_t iota_snapshots_provider_write_snapshot_to_file(snapshot_t *const snapshot, char const *const file_path_base) {
   retcode_t ret = RC_OK;
   iota_snapshot_read_lock(snapshot);
 

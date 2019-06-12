@@ -34,7 +34,7 @@ extern "C" {
  * @param[out] out A JSON string.
  * @return #retcode_t
  */
-retcode_t json_attach_to_tangle_serialize_request(const attach_to_tangle_req_t *const obj, char_buffer_t *out);
+retcode_t json_attach_to_tangle_serialize_request(attach_to_tangle_req_t const *const obj, char_buffer_t *out);
 
 /**
  * @brief Converts an attach to tangle response to a JSON string.
@@ -43,7 +43,7 @@ retcode_t json_attach_to_tangle_serialize_request(const attach_to_tangle_req_t *
  * @param[out] out A JSON string.
  * @return #retcode_t
  */
-retcode_t json_attach_to_tangle_serialize_response(const attach_to_tangle_res_t *const obj, char_buffer_t *out);
+retcode_t json_attach_to_tangle_serialize_response(attach_to_tangle_res_t const *const obj, char_buffer_t *out);
 
 /**
  * @brief Converts a JSON string to an attach to tangle request.
@@ -52,7 +52,7 @@ retcode_t json_attach_to_tangle_serialize_response(const attach_to_tangle_res_t 
  * @param[out] out An attach to tangle request object.
  * @return #retcode_t
  */
-retcode_t json_attach_to_tangle_deserialize_request(const char *const obj, attach_to_tangle_req_t *const out);
+retcode_t json_attach_to_tangle_deserialize_request(char const *const obj, attach_to_tangle_req_t *const out);
 
 /**
  * @brief Converts a JSON string to an attach to tangle response.
@@ -61,7 +61,7 @@ retcode_t json_attach_to_tangle_deserialize_request(const char *const obj, attac
  * @param[out] out An attach to tangle response object.
  * @return #retcode_t
  */
-retcode_t json_attach_to_tangle_deserialize_response(const char *const obj, attach_to_tangle_res_t *const out);
+retcode_t json_attach_to_tangle_deserialize_response(char const *const obj, attach_to_tangle_res_t *const out);
 
 #ifdef __cplusplus
 }

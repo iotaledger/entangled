@@ -11,6 +11,7 @@
 #include "consensus/snapshot/snapshots_service.h"
 #include "consensus/tangle/traversal.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 #include "utils/time.h"
 
 #define SNAPSHOTS_SERVICE_LOGGER_ID "snapshots_service"
@@ -67,7 +68,10 @@ retcode_t iota_snapshots_service_init(snapshots_service_t *snapshots_service,
 }
 
 retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_service) {
+  UNUSED(snapshots_service);
+
   logger_helper_release(logger_id);
+
   return RC_OK;
 }
 

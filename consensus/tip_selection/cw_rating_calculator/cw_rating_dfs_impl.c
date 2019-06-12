@@ -12,6 +12,7 @@
 #include "utils/containers/bitset.h"
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "cw_rating_calculator"
 
@@ -21,8 +22,7 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static retcode_t cw_rating_dfs_do_dfs_from_db(cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-                                              flex_trit_t const *const entry_point,
+static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_t const *const entry_point,
                                               hash_to_indexed_hash_set_map_t *tx_to_approvers, uint64_t *subtangle_size,
                                               int64_t subtangle_before_timestamp) {
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
@@ -137,6 +137,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   uint64_t sub_tangle_size = 0;
   uint64_t max_subtangle_size = 0;
   uint64_t bitset_size = 0;
+  UNUSED(cw_calc);
 
   out->cw_ratings = NULL;
   out->tx_to_approvers = NULL;
@@ -145,8 +146,8 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
     return RC_NULL_PARAM;
   }
 
-  if ((ret = cw_rating_dfs_do_dfs_from_db(cw_calc, tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size,
-                                          0)) != RC_OK) {
+  if ((ret = cw_rating_dfs_do_dfs_from_db(tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size, 0)) !=
+      RC_OK) {
     log_error(logger_id, "Failed in DFS from DB, error code is: %" PRIu64 "\n", ret);
     return RC_CW_FAILED_IN_DFS_FROM_DB;
   }

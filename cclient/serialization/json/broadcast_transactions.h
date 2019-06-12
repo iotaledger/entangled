@@ -42,7 +42,7 @@ retcode_t json_broadcast_transactions_serialize_request(broadcast_transactions_r
  * @param[out] out A broadacst transactions response object.
  * @return #retcode_t
  */
-retcode_t json_broadcast_transactions_deserialize_request(const char *const obj,
+retcode_t json_broadcast_transactions_deserialize_request(char const *const obj,
                                                           broadcast_transactions_req_t *const out);
 
 #ifdef __cplusplus

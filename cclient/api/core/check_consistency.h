@@ -36,8 +36,8 @@ extern "C" {
  * @param[out] res Consistency state of given transaction or co-consistency of given transactions.
  * @return #retcode_t
  */
-retcode_t iota_client_check_consistency(const iota_client_service_t* const service, check_consistency_req_t* const req,
-                                        check_consistency_res_t* res);
+retcode_t iota_client_check_consistency(iota_client_service_t const* const service,
+                                        check_consistency_req_t const* const req, check_consistency_res_t* res);
 
 #ifdef __cplusplus
 }

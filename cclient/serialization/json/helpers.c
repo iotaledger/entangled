@@ -231,7 +231,6 @@ retcode_t json_get_uint64(cJSON const* const json_obj, char const* const obj_nam
 
 retcode_t json_get_string(cJSON const* const json_obj, char const* const obj_name, char_buffer_t* const text) {
   retcode_t ret = RC_ERROR;
-  size_t str_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
     log_error(json_logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__, STR_CCLIENT_JSON_KEY, obj_name);
@@ -239,14 +238,11 @@ retcode_t json_get_string(cJSON const* const json_obj, char const* const obj_nam
   }
 
   if (cJSON_IsString(json_value) && (json_value->valuestring != NULL)) {
-    str_len = strlen(json_value->valuestring);
-    ret = char_buffer_allocate(text, str_len);
+    ret = char_buffer_set(text, json_value->valuestring);
     if (ret != RC_OK) {
       log_error(json_logger_id, "[%s:%d] memory allocation failed.\n", __func__, __LINE__);
       return ret;
     }
-
-    strcpy(text->data, json_value->valuestring);
   } else {
     log_error(json_logger_id, "[%s:%d] %s not string\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;

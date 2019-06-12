@@ -41,8 +41,8 @@ extern "C" {
  * @param[out] res Number of neighbors that were removed.
  * @return #retcode_t
  */
-retcode_t iota_client_remove_neighbors(const iota_client_service_t* const service,
-                                       const remove_neighbors_req_t* const req, remove_neighbors_res_t* res);
+retcode_t iota_client_remove_neighbors(iota_client_service_t const* const service,
+                                       remove_neighbors_req_t const* const req, remove_neighbors_res_t* res);
 
 #ifdef __cplusplus
 }
