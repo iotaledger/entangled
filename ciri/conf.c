@@ -375,7 +375,7 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
           sizeof(ciri_conf->spent_addresses_db_path));
   strncpy(consensus_conf->spent_addresses_db_path, DEFAULT_SPENT_ADDRESSES_DB_PATH,
           sizeof(consensus_conf->spent_addresses_db_path));
-  ciri_conf->tangle_db_revalidate = DEFAULT_DB_PREVALIDATE;
+  ciri_conf->tangle_db_revalidate = DEFAULT_TANGLE_DB_REVALIDATE;
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;
