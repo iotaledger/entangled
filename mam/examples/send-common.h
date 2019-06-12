@@ -20,7 +20,7 @@ extern "C" {
 #define MAM_EXAMPLES_MSS_HEIGHT 3
 
 /**
- * Creates and announce a new Channel (Header only)
+ * Creates and announce a channel (Header only)
  *
  * @param api - The API [in,out]
  * @param channel_id - A known channel ID [in]
@@ -30,12 +30,12 @@ extern "C" {
  *
  * @return return code
  */
-retcode_t mam_example_announce_new_channel(mam_api_t* const api, tryte_t const* const channel_id,
-                                           bundle_transactions_t* const bundle, trit_t* const msg_id,
-                                           tryte_t* const new_channel_id);
+retcode_t mam_example_announce_channel(mam_api_t* const api, tryte_t const* const channel_id,
+                                       bundle_transactions_t* const bundle, trit_t* const msg_id,
+                                       tryte_t* const new_channel_id);
 
 /**
- * Creates and announce a new endpoint (Header only)
+ * Creates and announce a endpoint (Header only)
  *
  * @param api - The API [in,out]
  * @param channel_id - A known channel ID [in]
@@ -45,9 +45,9 @@ retcode_t mam_example_announce_new_channel(mam_api_t* const api, tryte_t const* 
  *
  * @return return code
  */
-retcode_t mam_example_announce_new_endpoint(mam_api_t* const api, tryte_t const* const channel_id,
-                                            bundle_transactions_t* const bundle, trit_t* const msg_id,
-                                            tryte_t* const new_endpoint_id);
+retcode_t mam_example_announce_endpoint(mam_api_t* const api, tryte_t const* const channel_id,
+                                        bundle_transactions_t* const bundle, trit_t* const msg_id,
+                                        tryte_t* const new_endpoint_id);
 
 /**
  * Writes a header only bundle on a channel
