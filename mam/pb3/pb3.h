@@ -36,8 +36,8 @@ extern "C" {
 /**
  * Advances trits buffer by 'n'
  *
- * @param buffer - The buffer [in, out]
- * @param n - The number of trits to advance [in]
+ * @param buffer - The buffer @param[in, out]
+ * @param n - The number of trits to advance @param[in]
  *
  * @return return the advanced buffer
  */
@@ -53,8 +53,8 @@ static inline size_t pb3_sizeof_tryte() { return NUMBER_OF_TRITS_IN_A_TRYTE; }
 /**
  * Encodes a tryte into trits buffer
  *
- * @param tryte - The tryte [in]
- * @param buffer - The buffer [in, out]
+ * @param tryte - The tryte @param[in]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return
  */
@@ -63,8 +63,8 @@ void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer);
 /**
  * Decodes a tryte from a trits buffer
  *
- * @param tryte - The tryte [out]
- * @param buffer - The buffer [in, out]
+ * @param tryte - The tryte @param[out]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return error code
  */
@@ -80,8 +80,8 @@ static inline size_t pb3_sizeof_trint() { return 9; }
 /**
  * Encodes a trint into trits buffer
  *
- * @param trint - The trint [in]
- * @param buffer - The buffer [in, out]
+ * @param trint - The trint @param[in]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return
  */
@@ -90,8 +90,8 @@ void pb3_encode_trint(trint9_t const trint, trits_t *const buffer);
 /**
  * Decodes a trint from a trits buffer
  *
- * @param trint - The trint [out]
- * @param buffer - The buffer [in, out]
+ * @param trint - The trint @param[out]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return error code
  */
@@ -107,8 +107,8 @@ static inline size_t pb3_sizeof_longtrint() { return 18; }
 /**
  * Encodes a long trint into trits buffer
  *
- * @param trint - The trint [in]
- * @param buffer - The buffer [in, out]
+ * @param trint - The trint @param[in]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return
  */
@@ -117,8 +117,8 @@ void pb3_encode_longtrint(trint18_t const trint, trits_t *const buffer);
 /**
  * Decodes a long trint from a trits buffer
  *
- * @param trint - The trint [out]
- * @param buffer - The buffer [in, out]
+ * @param trint - The trint @param[out]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return error code
  */
@@ -134,8 +134,8 @@ size_t pb3_sizeof_size_t(size_t const n);
 /**
  * Encodes a size_t into trits buffer
  *
- * @param size - The size [in]
- * @param buffer - The buffer [in, out]
+ * @param size - The size @param[in]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return
  */
@@ -144,8 +144,8 @@ void pb3_encode_size_t(size_t size, trits_t *const buffer);
 /**
  * Decodes a size_t from a trits buffer
  *
- * @param size - The size [out]
- * @param buffer - The buffer [in, out]
+ * @param size - The size @param[out]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return error code
  */
@@ -161,8 +161,8 @@ static inline size_t pb3_sizeof_ntrytes(size_t const n) { return NUMBER_OF_TRITS
 /**
  * Encodes 'n' trytes into trits buffer
  *
- * @param ntrytes - The trytes [in]
- * @param buffer - The buffer [in, out]
+ * @param ntrytes - The trytes @param[in]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return
  */
@@ -171,8 +171,8 @@ void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer);
 /**
  * Decodes 'n' trytes from a trits buffer
  *
- * @param ntrytes - The trytes [out]
- * @param buffer - The buffer [in, out]
+ * @param ntrytes - The trytes @param[out]
+ * @param buffer - The buffer @param[in, out]
  *
  * @return error code
  */
@@ -185,9 +185,9 @@ retcode_t pb3_decode_ntrytes(trits_t const ntrytes, trits_t *const buffer);
 /**
  * Encodes a tryte into buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [out]
- * @param tryte - The tryte [in]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[out]
+ * @param tryte - The tryte @param[in]
  *
  * @return
  */
@@ -196,9 +196,9 @@ void pb3_wrap_absorb_tryte(mam_spongos_t *const spongos, trits_t *const buffer, 
 /**
  * Decodes a tryte from buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [in, out]
- * @param tryte - The tryte [out]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[in, out]
+ * @param tryte - The tryte @param[out]
  *
  * @return error code
  */
@@ -207,9 +207,9 @@ retcode_t pb3_unwrap_absorb_tryte(mam_spongos_t *const spongos, trits_t *const b
 /**
  * Encodes a trint into buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [out]
- * @param trint - The tryte [in]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[out]
+ * @param trint - The tryte @param[in]
  *
  * @return
  */
@@ -218,9 +218,9 @@ void pb3_wrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const buffer, 
 /**
  * Decodes a trint from buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [in, out]
- * @param trint - The tryte [out]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[in, out]
+ * @param trint - The tryte @param[out]
  *
  * @return error code
  */
@@ -229,9 +229,9 @@ retcode_t pb3_unwrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const b
 /**
  * Encodes a size_t into buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [out]
- * @param size - The size [in]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[out]
+ * @param size - The size @param[in]
  *
  * @return
  */
@@ -240,9 +240,9 @@ void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer,
 /**
  * Decodes a size_t from buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [in, out]
- * @param size - The size [out]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[in, out]
+ * @param size - The size @param[out]
  *
  * @return error code
  */
@@ -251,9 +251,9 @@ retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const 
 /**
  * Encodes 'n' trytes into buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [out]
- * @param trits - The trytes as trits [in]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[out]
+ * @param trits - The trytes as trits @param[in]
  *
  * @return
  */
@@ -262,9 +262,9 @@ void pb3_wrap_absorb_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer
 /**
  * Decodes 'n' trytes from buffer and absorbs its trits into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [in, out]
- * @param trits - The trytes as trits [out]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[in, out]
+ * @param trits - The trytes as trits @param[out]
  *
  * @return error code
  */
@@ -273,9 +273,9 @@ retcode_t pb3_unwrap_absorb_ntrytes(mam_spongos_t *const spongos, trits_t *const
 /**
  * Encrypts 'n' trytes into buffer and alters spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [out]
- * @param trits - The trytes as trits [in]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[out]
+ * @param trits - The trytes as trits @param[in]
  *
  * @return
  */
@@ -284,9 +284,9 @@ void pb3_wrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer,
 /**
  * Decrypts 'n' trytes from a buffer and alters spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [in, out]
- * @param trits - The trytes as trits [out]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[in, out]
+ * @param trits - The trytes as trits @param[out]
  *
  * @return error code
  */
@@ -295,9 +295,9 @@ retcode_t pb3_unwrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const 
 /**
  * Squeezes 'n' trytes into buffer and alters spongos state
  *
- * @param spongos - The spongos state [out]
- * @param buffer - The buffer [out]
- * @param n - The number of trytes to squeeze [in]
+ * @param spongos - The spongos state @param[out]
+ * @param buffer - The buffer @param[out]
+ * @param n - The number of trytes to squeeze @param[in]
  *
  * @return
  */
@@ -306,9 +306,9 @@ void pb3_wrap_squeeze_ntrytes(mam_spongos_t *const spongos, trits_t *const buffe
 /**
  * Squeezes 'n' trytes from spongos state and compares with first 'n' trytes in buffer
  *
- * @param spongos - The spongos state [in, out]
- * @param buffer - The buffer [in]
- * @param n - The number of trytes to squeeze [in]
+ * @param spongos - The spongos state @param[in, out]
+ * @param buffer - The buffer @param[in]
+ * @param n - The number of trytes to squeeze @param[in]
  *
  * @return error code, error will occur if squeezed state is not equal to buffer's n first trytes
  */
@@ -317,8 +317,8 @@ retcode_t pb3_unwrap_squeeze_ntrytes(mam_spongos_t *const spongos, trits_t *cons
 /**
  * Absorbs 'n' trytes into spongos state
  *
- * @param spongos - The spongos state [out]
- * @param trits - The trits to absorb [in]
+ * @param spongos - The spongos state @param[out]
+ * @param trits - The trits to absorb @param[in]
  *
  * @return
  */
@@ -327,8 +327,8 @@ void pb3_absorb_external_ntrytes(mam_spongos_t *const spongos, trits_t const tri
 /**
  * Squeezes 'n' trytes into buffer
  *
- * @param spongos - The spongos state [in, out]
- * @param trits - The trits to absorb [out]
+ * @param spongos - The spongos state @param[in, out]
+ * @param trits - The trits to absorb @param[out]
  *
  * @return
  */
