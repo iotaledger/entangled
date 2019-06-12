@@ -34,7 +34,7 @@ void tearDown() {
   TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
 }
 
-void test_prepare_4txs(iota_transaction_t *txs) {
+static void test_prepare_4txs(iota_transaction_t *txs) {
   tryte_t const *const trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   transactions_deserialize(trytes, txs, 4, true);
