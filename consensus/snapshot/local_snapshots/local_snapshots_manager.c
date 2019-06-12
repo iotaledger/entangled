@@ -21,22 +21,24 @@ static logger_id_t logger_id;
 
 static void *local_snapshots_manager_routine(void *arg) {
   local_snapshots_manager_t *lsm = (local_snapshots_manager_t *)arg;
-  lock_handle_t lock_cond;
   retcode_t err;
   size_t exponential_delay_factor = 1;
   uint64_t start_timestamp, end_timestamp;
+  bool skip_check = false;
+  tangle_t tangle;
+  lock_handle_t lock_cond;
+
+  {
+    connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
+
+    if ((err = iota_tangle_init(&tangle, &db_conf))) {
+      log_critical(logger_id, "Failed in initializing db\n");
+      return NULL;
+    }
+  }
 
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
-
-  tangle_t tangle;
-  connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
-  if ((err = iota_tangle_init(&tangle, &db_conf))) {
-    log_critical(logger_id, "Failed in initializing db\n");
-    return NULL;
-  }
-
-  bool skip_check = false;
 
   while (lsm->running) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
