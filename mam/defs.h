@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#if defined(MAM_EXPORT_JS)
+#if defined __EMSCRIPTEN__
 #include <emscripten.h>
 #define MAM_EXPORT EMSCRIPTEN_KEEPALIVE
 #else
