@@ -24,8 +24,6 @@
 static tangle_t tangle;
 static connection_config_t config;
 
-static bool debug_mode = false;
-
 static char *test_db_path = "consensus/tip_selection/exit_probability_validator/tests/test.db";
 static char *ciri_db_path = "consensus/tip_selection/exit_probability_validator/tests/ciri.db";
 static char *snapshot_path = "consensus/tip_selection/exit_probability_validator/tests/snapshot.txt";
@@ -237,19 +235,9 @@ void test_transaction_valid() {
   destroy_epv(&epv);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
-
-  if (argc >= 2) {
-    debug_mode = true;
-  }
-  if (debug_mode) {
-    test_db_path = "test.db";
-    ciri_db_path = "ciri.db";
-    snapshot_path = "snapshot.txt";
-    snapshot_conf_path = "snapshot_conf.json";
-  }
 
   config.db_path = test_db_path;
 

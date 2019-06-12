@@ -13,7 +13,8 @@
 #include "utils/handles/rand.h"
 #include "utils/time.h"
 
-#define TEST_NULL_HASH_TRYTES "999999999999999999999999999999999999999999999999999999999999999999999999999999999"
+static tryte_t *TEST_NULL_HASH_TRYTES =
+    (tryte_t *)"999999999999999999999999999999999999999999999999999999999999999999999999999999999";
 
 void test_metadata_serialization() {
   snapshot_metadata_t metadata_orig, metadata_deserialized;
@@ -33,9 +34,8 @@ void test_metadata_serialization() {
                                      "9999999999999999999999999999",
                            NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
-  strcpy(current_address_trytes,
-         "A9999999999999999999999999999999999999999999999999999"
-         "9999999999999999999999999999");
+  strcpy((char *)current_address_trytes,
+         "A99999999999999999999999999999999999999999999999999999999999999999999999999999999");
   for (index = 0; index < 20; ++index) {
     flex_trits_from_trytes(current_address, NUM_TRITS_HASH, current_address_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
     hash_to_uint64_t_map_add(&metadata_orig.solid_entry_points, current_address, index);
@@ -59,7 +59,7 @@ void test_metadata_serialization() {
   free(buffer);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
 
   RUN_TEST(test_metadata_serialization);

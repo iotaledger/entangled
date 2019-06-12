@@ -21,9 +21,6 @@
 static tangle_t tangle;
 static connection_config_t config;
 
-// gdb --args ./test_cw_ratings_dfs 1
-static bool debug_mode = false;
-
 static char *test_db_path = "consensus/bundle_validator/tests/test.db";
 static char *ciri_db_path = "consensus/bundle_validator/tests/ciri.db";
 
@@ -333,17 +330,9 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   transactions_free(txs, 4);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
-
-  if (argc >= 2) {
-    debug_mode = true;
-  }
-  if (debug_mode) {
-    test_db_path = "test.db";
-    ciri_db_path = "ciri.db";
-  }
 
   config.db_path = test_db_path;
 

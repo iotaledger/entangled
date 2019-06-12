@@ -32,9 +32,6 @@ static tangle_t tangle;
 static connection_config_t config;
 static iota_consensus_conf_t conf;
 
-// gdb --args ./test_cw_ratings_dfs 1
-static bool debug_mode = false;
-
 static char *test_db_path = "consensus/tip_selection/exit_probability_randomizer/tests/test.db";
 static char *ciri_db_path = "consensus/tip_selection/exit_probability_randomizer/tests/ciri.db";
 static char *snapshot_path = "consensus/tip_selection/exit_probability_randomizer/tests/snapshot.txt";
@@ -106,8 +103,8 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
                           ep_randomizer_t *const ep_randomizer) {
   hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
   hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
-  int64_t num_approvers = 50;
-  int64_t num_txs = num_approvers + 1;
+  size_t num_approvers = 50;
+  size_t num_txs = num_approvers + 1;
 
   init_epv(&epv);
 
@@ -124,7 +121,7 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
   txs[0] = *tx;
   txs[0].consensus.hash[0] += 1;
   transaction_set_branch(&txs[0], transaction_hash(tx));
-  for (int i = 1; i < num_approvers; i++) {
+  for (size_t i = 1; i < num_approvers; i++) {
     txs[i] = *tx;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -180,7 +177,7 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
   uint16_t selected_tip_counts[num_approvers];
   memset(selected_tip_counts, 0, sizeof(selected_tip_counts));
 
-  int selections = 200;
+  size_t selections = 200;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(ep_randomizer, &tangle, &epv, &out, ep, tip_trits) == RC_OK);
 
@@ -335,7 +332,7 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
 
   iota_transaction_t txs[num_txs];
   txs[0] = *test_tx;
-  for (int i = 1; i < num_txs; i++) {
+  for (size_t i = 1; i < num_txs; i++) {
     txs[i] = *test_tx;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -349,7 +346,7 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
   transaction_set_branch(&txs[3], transaction_hash(&txs[1]));
   transaction_set_trunk(&txs[3], transaction_hash(&txs[2]));
 
-  for (int i = 0; i < num_txs; i++) {
+  for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i].consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i].consensus.hash, max_depth) == RC_OK);
@@ -361,7 +358,7 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
 
   cw_calc_result out;
 
-  for (int i = 0; i < num_txs; i++) {
+  for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH, transaction_hash(&txs[i]), &exist) ==
                 RC_OK);
     TEST_ASSERT(exist);
@@ -439,7 +436,7 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_impleme
   iota_transaction_t txs[num_txs];
   txs[0] = *test_tx;
 
-  for (int i = 1; i < num_txs; i++) {
+  for (size_t i = 1; i < num_txs; i++) {
     txs[i] = *test_tx;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -456,7 +453,7 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_impleme
   transaction_set_branch(&txs[4], transaction_hash(&txs[3]));
   transaction_set_trunk(&txs[4], transaction_hash(&txs[3]));
 
-  for (int i = 0; i < num_txs; i++) {
+  for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i].consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i].consensus.hash, max_depth) == RC_OK);
@@ -468,7 +465,7 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_impleme
 
   cw_calc_result out;
 
-  for (int i = 0; i < num_txs; i++) {
+  for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH, transaction_hash(&txs[i]), &exist) ==
                 RC_OK);
     TEST_ASSERT(exist);
@@ -709,7 +706,7 @@ void test_1_bundle(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *cons
   /// Select the tip
 
   size_t selected_tip_count = 0;
-  int selections = 100;
+  size_t selections = 100;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(ep_randomizer, &tangle, &epv, &out, ep, tip_trits) == RC_OK);
     if (memcmp(tip_trits, transaction_hash(txs[0]), FLEX_TRIT_SIZE_243) == 0) {
@@ -803,7 +800,7 @@ void test_2_chained_bundles(ep_randomizer_implementation_t ep_impl, ep_randomize
   init_epv(&epv);
   /// Select the tip
   size_t selected_tip_count = 0;
-  int selections = 10;
+  size_t selections = 10;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(ep_randomizer, &tangle, &epv, &out, ep, tip_trits) == RC_OK);
     if (memcmp(tip_trits, transaction_hash(txs[0]), FLEX_TRIT_SIZE_243) == 0) {
@@ -836,19 +833,9 @@ void test_sum_probabilities_1_ep_mapping(ep_randomizer_t *const ep_randomizer, f
   hash_to_double_map_free(&hash_to_trans_probs);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
-
-  if (argc >= 2) {
-    debug_mode = true;
-  }
-  if (debug_mode) {
-    test_db_path = "test.db";
-    ciri_db_path = "ciri.db";
-    snapshot_path = "snapshot.txt";
-    snapshot_conf_path = "snapshot_conf.json";
-  }
 
   config.db_path = test_db_path;
 
