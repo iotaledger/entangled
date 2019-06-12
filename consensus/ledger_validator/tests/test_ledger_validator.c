@@ -40,9 +40,6 @@ static tangle_t tangle;
 static connection_config_t config;
 static iota_consensus_conf_t conf;
 
-// gdb --args ./test_cw_ratings_dfs 1
-static bool debug_mode = false;
-
 static char *test_db_path = "consensus/ledger_validator/tests/test.db";
 static char *ciri_db_path = "consensus/ledger_validator/tests/ciri.db";
 static char *snapshot_path = "consensus/ledger_validator/tests/snapshot.txt";
@@ -81,7 +78,7 @@ static void init_test_structs() {
   conf.local_snapshots.local_snapshots_is_enabled = false;
   conf.local_snapshots.min_depth = 1;
   conf.snapshot_signature_index = 0;
-  strcpy(conf.local_snapshots.local_snapshots_path_base, debug_mode ? "local_snapshot" : local_snapshot_path_base);
+  strcpy(conf.local_snapshots.local_snapshots_path_base, local_snapshot_path_base);
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   flex_trits_from_trytes(g_seed, NUM_TRITS_HASH, (tryte_t *)TEST_SEED, NUM_TRITS_HASH, NUM_TRYTES_HASH);
 
@@ -90,7 +87,7 @@ static void init_test_structs() {
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&transaction_solidifier, &conf, NULL, &snapshots_provider,
                                                          NULL) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &transaction_solidifier) == RC_OK);
-  TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &mt, &conf) == RC_OK);
+  TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &milestone_service, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &conf) == RC_OK);
 }
 
@@ -182,20 +179,9 @@ static void test_replay_several_milestones() {
   destroy_test_structs();
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
-
-  if (argc >= 2) {
-    debug_mode = true;
-  }
-  if (debug_mode) {
-    test_db_path = "test.db";
-    ciri_db_path = "ciri.db";
-    snapshot_path = "snapshot.txt";
-    snapshot_conf_path = "snapshot_conf.json";
-    local_snapshot_path_base = "local_snapshot";
-  }
 
   config.db_path = test_db_path;
 

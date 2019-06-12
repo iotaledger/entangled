@@ -5,11 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/milestone/milestone_service.h"
 #include <inttypes.h>
 #include <stdlib.h>
+
 #include "common/model/milestone.h"
+#include "consensus/milestone/milestone_service.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define MILESTONE_SERVICE_LOGGER_ID "milestone_service"
 
@@ -23,7 +25,10 @@ retcode_t iota_milestone_service_init(milestone_service_t *const milestone_servi
 }
 
 retcode_t iota_milestone_service_destroy(milestone_service_t *const milestone_service) {
+  UNUSED(milestone_service);
+
   logger_helper_release(logger_id);
+
   return RC_OK;
 }
 
@@ -34,6 +39,7 @@ retcode_t iota_milestone_service_replay_milestones(milestone_service_t *const mi
   state_delta_t current_delta = NULL;
   iota_milestone_t *last_applied_milestone = NULL;
   DECLARE_PACK_SINGLE_MILESTONE(current_milestone, current_milestone_ptr, pack);
+  UNUSED(milestone_service);
 
   for (uint64_t current_milestone_index = snapshot->metadata.index; current_milestone_index < index;
        ++current_milestone_index) {

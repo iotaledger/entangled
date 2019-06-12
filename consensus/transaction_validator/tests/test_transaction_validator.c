@@ -170,7 +170,7 @@ void transaction_is_valid() {
   transaction_free(tx1);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
 
   iota_consensus_conf_init(&conf);

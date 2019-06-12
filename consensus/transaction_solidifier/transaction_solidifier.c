@@ -133,7 +133,7 @@ static void *spawn_solid_transactions_propagation(void *arg) {
 retcode_t iota_consensus_transaction_solidifier_init(transaction_solidifier_t *const ts,
                                                      iota_consensus_conf_t *const conf,
                                                      transaction_requester_t *const transaction_requester,
-                                                     snapshots_provider_t const *const snapshots_provider,
+                                                     snapshots_provider_t *const snapshots_provider,
                                                      tips_cache_t *const tips) {
   ts->conf = conf;
   ts->transaction_requester = transaction_requester;

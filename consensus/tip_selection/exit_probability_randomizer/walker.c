@@ -55,9 +55,8 @@ static retcode_t select_approver(ep_randomizer_t const *const exit_probability_r
   return RC_OK;
 }
 
-static retcode_t find_tail_if_valid(ep_randomizer_t const *const exit_probability_randomizer, tangle_t *const tangle,
-                                    exit_prob_transaction_validator_t *const epv, flex_trit_t *const tx_hash,
-                                    bool *const has_valid_tail) {
+static retcode_t find_tail_if_valid(tangle_t *const tangle, exit_prob_transaction_validator_t *const epv,
+                                    flex_trit_t *const tx_hash, bool *const has_valid_tail) {
   retcode_t ret = RC_OK;
 
   *has_valid_tail = false;
@@ -97,7 +96,7 @@ static retcode_t random_walker_select_approver_tail(ep_randomizer_t const *const
       return ret;
     }
 
-    if ((ret = find_tail_if_valid(exit_probability_randomizer, tangle, epv, approver, has_approver_tail)) != RC_OK) {
+    if ((ret = find_tail_if_valid(tangle, epv, approver, has_approver_tail)) != RC_OK) {
       return ret;
     }
     if (!(*has_approver_tail)) {

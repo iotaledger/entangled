@@ -38,7 +38,7 @@ static bool is_milestone_bundle_structure_valid(bundle_transactions_t const* con
     return false;
   }
 
-  for (int i = 0; i < security_level; i++) {
+  for (size_t i = 0; i < security_level; i++) {
     if ((tx = (iota_transaction_t*)utarray_eltptr(bundle, i)) == NULL) {
       return false;
     }
@@ -68,7 +68,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
                       NUM_TRITS_SIGNATURE);
   sponge_init(&sponge, mt->conf->coordinator_signature_type);
   normalize_flex_hash_to_trits(transaction_hash(tx), signed_hash);
-  for (int i = 0; i < mt->conf->coordinator_security_level; i++) {
+  for (size_t i = 0; i < mt->conf->coordinator_security_level; i++) {
     tx = (iota_transaction_t*)utarray_eltptr(bundle, i);
     flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE, transaction_signature(tx), NUM_TRITS_SIGNATURE,
                         NUM_TRITS_SIGNATURE);

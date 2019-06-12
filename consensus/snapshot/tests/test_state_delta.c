@@ -34,7 +34,7 @@ void test_delta_serialization() {
   free(buffer);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   UNITY_BEGIN();
 
   iota_consensus_conf_init(&conf);
