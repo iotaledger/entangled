@@ -18,12 +18,11 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-#if defined(IOTA_MAINNET)
 static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service_t *const sas) {
   retcode_t ret = RC_OK;
   spent_addresses_provider_t sap;
   connection_config_t db_conf = {.db_path = sas->conf->spent_addresses_db_path};
-  char *spent_addresses_files[] = {SPENT_ADDRESSES_FILES, NULL};
+  char *spent_addresses_files[] = {NULL};
 
   if ((ret = iota_spent_addresses_provider_init(&sap, &db_conf)) != RC_OK) {
     log_error(logger_id, "Initializing spent addresses database connection failed\n");
@@ -42,7 +41,6 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
 
   return ret;
 }
-#endif
 
 static retcode_t iota_spent_addresses_service_was_tx_spent_from(tangle_t const *const tangle,
                                                                 iota_transaction_t const *const tx, bool *const spent) {
@@ -89,11 +87,9 @@ retcode_t iota_spent_addresses_service_init(spent_addresses_service_t *const sas
   sas->conf = conf;
   logger_id = logger_helper_enable(SPENT_ADDRESSES_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
 
-#if defined(IOTA_MAINNET)
   if ((ret = iota_spent_addresses_service_read_files(sas)) != RC_OK) {
     log_critical(logger_id, "Reading previous spent addresses files failed\n");
   }
-#endif
 
   return ret;
 }
