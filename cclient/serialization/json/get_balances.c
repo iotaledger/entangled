@@ -11,7 +11,7 @@
 
 retcode_t json_get_balances_serialize_request(get_balances_req_t const *const obj, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  const char *json_text = NULL;
+  char const *json_text = NULL;
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -75,7 +75,7 @@ end:
 
 retcode_t json_get_balances_serialize_response(get_balances_res_t const *const res, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  const char *json_text = NULL;
+  char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {

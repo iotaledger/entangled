@@ -34,7 +34,7 @@ extern "C" {
  * @param[out] out A JSON string.
  * @return #retcode_t
  */
-retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t* const obj, char_buffer_t* out);
+retcode_t json_add_neighbors_serialize_request(add_neighbors_req_t const* const obj, char_buffer_t* out);
 
 /**
  * @brief Converts an add neighbors response object to a JSON string
@@ -43,7 +43,7 @@ retcode_t json_add_neighbors_serialize_request(const add_neighbors_req_t* const 
  * @param[out] out A JSON string.
  * @return #retcode_t
  */
-retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t* const obj, char_buffer_t* out);
+retcode_t json_add_neighbors_serialize_response(add_neighbors_res_t const* const obj, char_buffer_t* out);
 
 /**
  * @brief Converts a JSON string to an add neighbors request.
@@ -52,7 +52,7 @@ retcode_t json_add_neighbors_serialize_response(const add_neighbors_res_t* const
  * @param[out] out An add neighbors request object.
  * @return #retcode_t
  */
-retcode_t json_add_neighbors_deserialize_request(const char* const obj, add_neighbors_req_t* out);
+retcode_t json_add_neighbors_deserialize_request(char const* const obj, add_neighbors_req_t* out);
 
 /**
  * @brief Converts a JSON string to an add neighbors response.
@@ -61,7 +61,7 @@ retcode_t json_add_neighbors_deserialize_request(const char* const obj, add_neig
  * @param[out] out An add neighbors response object.
  * @return #retcode_t
  */
-retcode_t json_add_neighbors_deserialize_response(const char* const obj, add_neighbors_res_t* out);
+retcode_t json_add_neighbors_deserialize_response(char const* const obj, add_neighbors_res_t* out);
 
 #ifdef __cplusplus
 }

@@ -8,7 +8,7 @@
 #include "cclient/api/core/get_tips.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_get_tips(const iota_client_service_t* const service, get_tips_res_t* res) {
+retcode_t iota_client_get_tips(iota_client_service_t const* const service, get_tips_res_t* const res) {
   retcode_t result = RC_ERROR;
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();

@@ -31,7 +31,7 @@ extern "C" {
  * @param[out] res
  * @return #retcode_t
  */
-retcode_t iota_client_get_tips(const iota_client_service_t* const service, get_tips_res_t* res);
+retcode_t iota_client_get_tips(iota_client_service_t const* const service, get_tips_res_t* const res);
 
 #ifdef __cplusplus
 }
