@@ -1,18 +1,7 @@
-filegroup(
-    name = "previous_epochs_spent_addresses_files",
-    srcs = [
-        "@previous_epochs_spent_addresses_1//file",
-        "@previous_epochs_spent_addresses_2//file",
-        "@previous_epochs_spent_addresses_3//file",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 cc_library(
     name = "spent_addresses_provider",
     srcs = ["spent_addresses_provider.c"],
     hdrs = ["spent_addresses_provider.h"],
-    data = [":previous_epochs_spent_addresses_files"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
