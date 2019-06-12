@@ -33,7 +33,7 @@ extern "C" {
  * @param[in] req The list of transaction trytes to broadcast
  * @return #retcode_t
  */
-retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const service,
+retcode_t iota_client_broadcast_transactions(iota_client_service_t const* const service,
                                              broadcast_transactions_req_t* req);
 
 #ifdef __cplusplus

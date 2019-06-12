@@ -34,7 +34,7 @@ extern "C" {
  * @param[out] out A JSON string.
  * @return #retcode_t
  */
-retcode_t json_check_consistency_serialize_request(check_consistency_req_t *const obj, char_buffer_t *out);
+retcode_t json_check_consistency_serialize_request(check_consistency_req_t const *const obj, char_buffer_t *out);
 
 /**
  * @brief Converts a check consistency response to a JSON string.

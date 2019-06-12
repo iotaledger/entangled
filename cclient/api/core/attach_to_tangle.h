@@ -50,8 +50,8 @@ extern "C" {
  * @param[out] res Array of transaction trytes with nonce and attachment timestamps
  * @return #retcode_t
  */
-retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const service,
-                                       const attach_to_tangle_req_t* const req, attach_to_tangle_res_t* res);
+retcode_t iota_client_attach_to_tangle(iota_client_service_t const* const service,
+                                       attach_to_tangle_req_t const* const req, attach_to_tangle_res_t* res);
 
 #ifdef __cplusplus
 }

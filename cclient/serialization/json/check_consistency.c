@@ -14,7 +14,7 @@ static const char *kTails = "tails";
 static const char *kInfo = "info";
 static const char *kState = "state";
 
-retcode_t json_check_consistency_serialize_request(check_consistency_req_t *const obj, char_buffer_t *out) {
+retcode_t json_check_consistency_serialize_request(check_consistency_req_t const *const obj, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
   const char *json_text = NULL;
   size_t len = 0;

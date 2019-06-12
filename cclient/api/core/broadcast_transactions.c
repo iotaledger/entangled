@@ -8,7 +8,7 @@
 #include "cclient/api/core/broadcast_transactions.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const service,
+retcode_t iota_client_broadcast_transactions(iota_client_service_t const* const service,
                                              broadcast_transactions_req_t* req) {
   retcode_t result = RC_ERROR;
   char_buffer_t* res_buff = char_buffer_new();

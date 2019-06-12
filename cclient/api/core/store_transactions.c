@@ -8,7 +8,7 @@
 #include "cclient/api/core/store_transactions.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_store_transactions(const iota_client_service_t* const service,
+retcode_t iota_client_store_transactions(iota_client_service_t const* const service,
                                          store_transactions_req_t const* const req) {
   retcode_t result = RC_ERROR;
   char_buffer_t* res_buff = char_buffer_new();

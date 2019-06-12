@@ -43,8 +43,9 @@ extern "C" {
  * @param[out] res A list of inclusion state.
  * @return #retcode_t
  */
-retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const service,
-                                           get_inclusion_states_req_t* const req, get_inclusion_states_res_t* res);
+retcode_t iota_client_get_inclusion_states(iota_client_service_t const* const service,
+                                           get_inclusion_states_req_t const* const req,
+                                           get_inclusion_states_res_t* res);
 
 #ifdef __cplusplus
 }

@@ -8,7 +8,7 @@
 #include "cclient/api/core/add_neighbors.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_add_neighbors(const iota_client_service_t* const service, const add_neighbors_req_t* const req,
+retcode_t iota_client_add_neighbors(iota_client_service_t const* const service, add_neighbors_req_t const* const req,
                                     add_neighbors_res_t* res) {
   retcode_t result = RC_ERROR;
 
