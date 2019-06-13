@@ -55,6 +55,7 @@ typedef enum cli_arg_value_e {
   CONF_SNAPSHOT_SIGNATURE_PUBKEY,
   CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION,
   CONF_SNAPSHOT_TIMESTAMP,
+  CONF_SPENT_ADDRESSES_FILES,
 
   // Local snapshots
 
@@ -184,6 +185,8 @@ static struct cli_argument_s {
     {"snapshot-signature-skip-validation", CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION,
      "Skip validation of snapshot signature. Must be \"true\" or \"false\".", REQUIRED_ARG},
     {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP, "Epoch time of the last snapshot.", REQUIRED_ARG},
+    {"spent-addresses-files", CONF_SPENT_ADDRESSES_FILES,
+     "List of space separated files that contains spent addresses to be merged into the database.", REQUIRED_ARG},
 
     // Local snapshots configuration
 

@@ -47,3 +47,4 @@
 # snapshot-signature-pubkey: "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC"
 # snapshot-signature-skip-validation: false
 # snapshot-timestamp: 1554904800
+# spent-addresses-files: "/absolute/path/to/file0 /absolute/path/to/file1"
