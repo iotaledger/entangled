@@ -55,7 +55,7 @@ typedef struct mam_api_s {
  *
  * @return return code
  */
-retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
+MAM_EXPORT retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
 
 /**
  * Destroys an API
@@ -64,7 +64,7 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
  *
  * @return return code
  */
-retcode_t mam_api_destroy(mam_api_t *const api);
+MAM_EXPORT retcode_t mam_api_destroy(mam_api_t *const api);
 
 /**
  * Add a trusted channel id into the api's trusted channels set
@@ -74,7 +74,7 @@ retcode_t mam_api_destroy(mam_api_t *const api);
  *
  * @return return code
  */
-retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api, tryte_t const *const pk);
+MAM_EXPORT retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api, tryte_t const *const pk);
 
 /**
  * Add a trusted endpoint id into the api's trusted endpoints set
@@ -84,7 +84,7 @@ retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api, tryte_t const *co
  *
  * @return return code
  */
-retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api, tryte_t const *const pk);
+MAM_EXPORT retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api, tryte_t const *const pk);
 
 /**
  * Add a NTRU secret key to api's NTRU sks set
@@ -94,7 +94,7 @@ retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api, tryte_t const *c
  *
  * @return return code
  */
-retcode_t mam_api_add_ntru_sk(mam_api_t *const api, mam_ntru_sk_t const *const ntru_sk);
+MAM_EXPORT retcode_t mam_api_add_ntru_sk(mam_api_t *const api, mam_ntru_sk_t const *const ntru_sk);
 
 /**
  * Add a NTRU public key to api's NTRU pks set
@@ -104,7 +104,7 @@ retcode_t mam_api_add_ntru_sk(mam_api_t *const api, mam_ntru_sk_t const *const n
  *
  * @return return code
  */
-retcode_t mam_api_add_ntru_pk(mam_api_t *const api, mam_ntru_pk_t const *const ntru_pk);
+MAM_EXPORT retcode_t mam_api_add_ntru_pk(mam_api_t *const api, mam_ntru_pk_t const *const ntru_pk);
 
 /**
  * Add a pre shared key to api's psks set
@@ -114,7 +114,7 @@ retcode_t mam_api_add_ntru_pk(mam_api_t *const api, mam_ntru_pk_t const *const n
  *
  * @return return code
  */
-retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
+MAM_EXPORT retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 
 /**
  * Creates and adds a channel to the API
@@ -125,7 +125,7 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
  *
  * @return return code
  */
-retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
+MAM_EXPORT retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 
 /**
  * Returns the number of remaining secret keys of a channel
@@ -135,7 +135,7 @@ retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryt
  *
  * @return the number of remaining secret keys of the channel
  */
-size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id);
+MAM_EXPORT size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id);
 
 /**
  * Creates and adds an endpoint to the API
@@ -147,8 +147,8 @@ size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const 
  *
  * @return return code
  */
-retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
-                                  tryte_t *const endpoint_id);
+MAM_EXPORT retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
+                                             tryte_t *const endpoint_id);
 
 /**
  * Returns the number of remaining secret keys of an endpoint
@@ -159,8 +159,8 @@ retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, try
  *
  * @return the number of remaining secret keys of the endpoint
  */
-size_t mam_api_endpoint_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id,
-                                      tryte_t const *const endpoint_id);
+MAM_EXPORT size_t mam_api_endpoint_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id,
+                                                 tryte_t const *const endpoint_id);
 
 /**
  * Creates a MAM tag that can be used in IOTA transactions
@@ -169,7 +169,7 @@ size_t mam_api_endpoint_remaining_sks(mam_api_t *const api, tryte_t const *const
  * @param msg_id - The message ID [in]
  * @param ord - The packet ord [in]
  */
-void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t const ord);
+MAM_EXPORT void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t const ord);
 
 /**
  * Writes MAM header on a channel(keyloads (session keys) + potential packet)
@@ -186,9 +186,9 @@ void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t 
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
-                                                 mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                                 trit_t *const msg_id);
+MAM_EXPORT retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id,
+                                                            mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
+                                                            bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
  * Writes MAM header on an endpoint(keyloads (session keys) + potential packet)
@@ -206,10 +206,10 @@ retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t c
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                                  tryte_t const *const ep_id, mam_psk_t_set_t psks,
-                                                  mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                                  trit_t *const msg_id);
+MAM_EXPORT retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                                             tryte_t const *const ep_id, mam_psk_t_set_t psks,
+                                                             mam_ntru_pk_t_set_t ntru_pks,
+                                                             bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
  * Writes an announcement of a channel (keyloads (session keys) + potential packet) into a bundle
@@ -226,9 +226,10 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *const ch_id, tryte_t const *const ch1_id,
-                                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
-                                          bundle_transactions_t *const bundle, trit_t *const msg_id);
+MAM_EXPORT retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *const ch_id,
+                                                     tryte_t const *const ch1_id, mam_psk_t_set_t psks,
+                                                     mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                                     trit_t *const msg_id);
 
 /**
  * Writes an announcement of a endpoint (keyloads (session keys) + potential packet) into a bundle
@@ -245,11 +246,10 @@ retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *c
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                           tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                           mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                           trit_t *const msg_id);
-
+MAM_EXPORT retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                                      tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+                                                      mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                                      trit_t *const msg_id);
 /**
  * Writes MAM packet into a bundle
  *
@@ -262,9 +262,10 @@ retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const msg_id, tryte_t const *const payload,
-                                      size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
-                                      bundle_transactions_t *const bundle);
+MAM_EXPORT retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const msg_id,
+                                                 tryte_t const *const payload, size_t const payload_size,
+                                                 mam_msg_checksum_t checksum, bool is_last_packet,
+                                                 bundle_transactions_t *const bundle);
 
 /**
  * Reads MAM's session key and potentially the first packet using NTRU secret
@@ -277,8 +278,9 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const 
  *
  * @return return code
  */
-retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle, tryte_t **const payload,
-                              size_t *const payload_size, bool *const is_last_packet);
+MAM_EXPORT retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle,
+                                         tryte_t **const payload, size_t *const payload_size,
+                                         bool *const is_last_packet);
 
 /**
  * Gets the number of trits needed for an API serialization
@@ -286,7 +288,7 @@ retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const 
  *
  * @return return the size
  */
-size_t mam_api_serialized_size(mam_api_t const *const api);
+MAM_EXPORT size_t mam_api_serialized_size(mam_api_t const *const api);
 
 /**
  * Serializes an API struct into a buffer
@@ -297,8 +299,8 @@ size_t mam_api_serialized_size(mam_api_t const *const api);
  *
  * @return return void
  */
-void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, tryte_t const *const encr_key_trytes,
-                       size_t encr_key_trytes_size);
+MAM_EXPORT void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer,
+                                  tryte_t const *const encr_key_trytes, size_t encr_key_trytes_size);
 
 /**
  * Deserializes a buffer into API struct
@@ -311,8 +313,8 @@ void mam_api_serialize(mam_api_t const *const api, trit_t *const buffer, tryte_t
  *
  * @return return code
  */
-retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api,
-                              tryte_t const *const decr_key_trytes, size_t decr_key_trytes_size);
+MAM_EXPORT retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_size, mam_api_t *const api,
+                                         tryte_t const *const decr_key_trytes, size_t decr_key_trytes_size);
 
 /**
  * Saves an API into a file
@@ -324,8 +326,8 @@ retcode_t mam_api_deserialize(trit_t const *const buffer, size_t const buffer_si
  *
  * @return return code
  */
-retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, tryte_t const *const encr_key_trytes,
-                       size_t encr_key_trytes_size);
+MAM_EXPORT retcode_t mam_api_save(mam_api_t const *const api, char const *const filename,
+                                  tryte_t const *const encr_key_trytes, size_t encr_key_trytes_size);
 
 /**
  * Loads an API into a file
@@ -337,8 +339,8 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, t
  *
  * @return return code
  */
-retcode_t mam_api_load(char const *const filename, mam_api_t *const api, tryte_t const *const decr_key_trytes,
-                       size_t decr_key_trytes_size);
+MAM_EXPORT retcode_t mam_api_load(char const *const filename, mam_api_t *const api,
+                                  tryte_t const *const decr_key_trytes, size_t decr_key_trytes_size);
 
 #ifdef __cplusplus
 }
