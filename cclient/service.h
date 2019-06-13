@@ -31,11 +31,11 @@ extern "C" {
  *
  */
 typedef struct {
-  const char* host;         /**< Host name */
-  const char* path;         /**< The path of HTTP/HTTPS request */
-  const char* content_type; /**< Content type of request */
-  const char* accept;       /**< Accept content type of response */
-  const char* ca_pem;       /**< String of root ca */
+  char const* host;         /**< Host name */
+  char const* path;         /**< The path of HTTP/HTTPS request */
+  char const* content_type; /**< Content type of request */
+  char const* accept;       /**< Accept content type of response */
+  char const* ca_pem;       /**< String of root ca */
   uint16_t port;            /**< Port number of the host*/
   int api_version;          /**< Number of IOTA API version */
 } http_info_t;

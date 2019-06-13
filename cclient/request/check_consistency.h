@@ -57,7 +57,7 @@ void check_consistency_req_free(check_consistency_req_t** req);
  * @return #retcode_t
  */
 static inline retcode_t check_consistency_req_tails_add(check_consistency_req_t* const req,
-                                                        const flex_trit_t* const hash) {
+                                                        flex_trit_t const* const hash) {
   return hash243_queue_push(&req->tails, hash);
 }
 

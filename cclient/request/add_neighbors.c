@@ -16,7 +16,7 @@ add_neighbors_req_t* add_neighbors_req_new() {
   return req;
 }
 
-retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, const char* uri) {
+retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, char const* const uri) {
   if (!req->uris) {
     utarray_new(req->uris, &ut_str_icd);
   }

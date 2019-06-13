@@ -25,9 +25,6 @@ static tangle_t tangle;
 static milestone_tracker_t mt;
 connection_config_t config;
 
-// gdb --args ./test_cw_ratings_dfs 1
-static bool debug_mode = false;
-
 static char* test_db_path = "consensus/tip_selection/entry_point_selector/tests/test.db";
 static char* ciri_db_path = "consensus/tip_selection/entry_point_selector/tests/ciri.db";
 
@@ -58,17 +55,9 @@ void test_entry_point() {
   TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
 }
 
-int main(int argc, char* argv[]) {
+int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
-
-  if (argc >= 2) {
-    debug_mode = true;
-  }
-  if (debug_mode) {
-    test_db_path = "test.db";
-    ciri_db_path = "ciri.db";
-  }
 
   config.db_path = test_db_path;
 

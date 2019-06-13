@@ -55,6 +55,7 @@ typedef enum mam_msg_type_e {
 } mam_msg_type_t;
 
 typedef enum mam_msg_keyload_e {
+  MAM_MSG_KEYLOAD_PUBLIC = 0,
   MAM_MSG_KEYLOAD_PSK = 1,
   MAM_MSG_KEYLOAD_NTRU = 2,
 } mam_msg_keyload_t;
@@ -149,14 +150,14 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx, mam_msg_check
  * @param psks - The set of pre-shared-keys[in]
  * @param ntru_sks - The set of the NTRU secret keys[in]
  * @param msg_id - The msg_id[out]
- * @param trusted_channels_pks - The set of trusted channels pks [in, out]
- * @param trusted_endpoints_pks - The set of trusted endpoint pks [in, out]
+ * @param trusted_channel_pks - The set of trusted channel pks [in, out]
+ * @param trusted_endpoint_pks - The set of trusted endpoint pks [in, out]
  *
  * @return return error code
  */
 retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const msg, mam_psk_t_set_t const psks,
                               mam_ntru_sk_t_set_t const ntru_sks, trits_t msg_id,
-                              mam_pk_t_set_t *const trusted_channels_pks, mam_pk_t_set_t *const trusted_endpoints_pks);
+                              mam_pk_t_set_t *const trusted_channel_pks, mam_pk_t_set_t *const trusted_endpoint_pks);
 
 /**
  * Reads a packet

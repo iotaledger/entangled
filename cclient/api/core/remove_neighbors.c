@@ -8,8 +8,8 @@
 #include "cclient/api/core/remove_neighbors.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_remove_neighbors(const iota_client_service_t* const service,
-                                       const remove_neighbors_req_t* const req, remove_neighbors_res_t* res) {
+retcode_t iota_client_remove_neighbors(iota_client_service_t const* const service,
+                                       remove_neighbors_req_t const* const req, remove_neighbors_res_t* res) {
   retcode_t result = RC_ERROR;
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();

@@ -34,7 +34,12 @@ retcode_t char_buffer_allocate(char_buffer_t* in, const size_t n) {
 retcode_t char_buffer_set(char_buffer_t* in, char const* const str) {
   size_t size = strlen(str);
 
-  in->data = (char*)realloc(in->data, sizeof(char) * (size + 1));
+  if (in->data == NULL) {
+    in->data = (char*)malloc(sizeof(char) * (size + 1));
+  } else {
+    in->data = (char*)realloc(in->data, sizeof(char) * (size + 1));
+  }
+
   if (in->data == NULL) {
     return RC_OOM;
   }

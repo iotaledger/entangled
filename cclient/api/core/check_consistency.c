@@ -8,8 +8,8 @@
 #include "cclient/api/core/check_consistency.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_check_consistency(const iota_client_service_t* const service, check_consistency_req_t* const req,
-                                        check_consistency_res_t* res) {
+retcode_t iota_client_check_consistency(iota_client_service_t const* const service,
+                                        check_consistency_req_t const* const req, check_consistency_res_t* res) {
   retcode_t result = RC_ERROR;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();

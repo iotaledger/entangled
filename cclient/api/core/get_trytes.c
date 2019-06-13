@@ -8,7 +8,7 @@
 #include "cclient/api/core/get_trytes.h"
 #include "cclient/api/core/logger.h"
 
-retcode_t iota_client_get_trytes(const iota_client_service_t* const service, get_trytes_req_t* const req,
+retcode_t iota_client_get_trytes(iota_client_service_t const* const service, get_trytes_req_t const* const req,
                                  get_trytes_res_t* res) {
   retcode_t result = RC_ERROR;
   char_buffer_t* res_buff = char_buffer_new();

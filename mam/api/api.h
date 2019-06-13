@@ -43,8 +43,8 @@ typedef struct mam_api_s {
   trint18_t channel_ord;
   trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
   trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
-  mam_pk_t_set_t trusted_channel_ids;
-  mam_pk_t_set_t trusted_endpoint_ids;
+  mam_pk_t_set_t trusted_channel_pks;
+  mam_pk_t_set_t trusted_endpoint_pks;
 } mam_api_t;
 
 /**
@@ -125,7 +125,7 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
  *
  * @return return code
  */
-retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
+retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 
 /**
  * Returns the number of remaining secret keys of a channel
@@ -147,7 +147,7 @@ size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const 
  *
  * @return return code
  */
-retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
+retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id);
 
 /**
@@ -212,8 +212,7 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
                                                   trit_t *const msg_id);
 
 /**
- * Writes an announcement of a new channel (keyloads (session keys) +
- * potential packet) into a bundle
+ * Writes an announcement of a channel (keyloads (session keys) + potential packet) into a bundle
  *
  * @param api - The API [in,out]
  * @param ch_id - A known channel ID [in]
@@ -227,14 +226,12 @@ retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t 
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t const *const ch_id,
-                                              tryte_t const *const ch1_id, mam_psk_t_set_t psks,
-                                              mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                              trit_t *const msg_id);
+retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *const ch_id, tryte_t const *const ch1_id,
+                                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
+                                          bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
- * Writes an announcement of a new endpoint (keyloads (session keys) +
- * potential packet) into a bundle
+ * Writes an announcement of a endpoint (keyloads (session keys) + potential packet) into a bundle
  *
  * @param api - The API [in,out]
  * @param ch_id - A known channel ID [in]
@@ -248,10 +245,10 @@ retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t cons
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                               tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                               mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                               trit_t *const msg_id);
+retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                           tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+                                           mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                           trit_t *const msg_id);
 
 /**
  * Writes MAM packet into a bundle
