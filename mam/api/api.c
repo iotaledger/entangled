@@ -443,10 +443,10 @@ retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *c
                                      msg_id);
 }
 
-retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                               tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                               mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                               trit_t *const msg_id) {
+retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                           tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+                                           mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                           trit_t *const msg_id) {
   return mam_api_bundle_write_header(api, ch_id, NULL, NULL, ep1_id, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
                                      msg_id);
 }
