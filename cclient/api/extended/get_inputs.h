@@ -38,7 +38,7 @@ extern "C" {
  * @return #retcode_t
  */
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_trit_t const* const seed,
-                                 address_opt_t const addr_opt, uint64_t const threshold, inputs_t* const out_inputs);
+                                 address_opt_t const addr_opt, int64_t const threshold, inputs_t* const out_inputs);
 
 #ifdef __cplusplus
 }

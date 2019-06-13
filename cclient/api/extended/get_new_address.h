@@ -38,6 +38,16 @@ extern "C" {
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, flex_trit_t const* const seed,
                                       address_opt_t const addr_opt, hash243_queue_t* out_addresses);
 
+/**
+ * @brief Check if the input address is an unused address
+ *
+ * @param[in] serv client service
+ * @param[in] addr examining address
+ * @param[out] is_unused return if addr has been unsed
+ * @return #retcode_t
+ */
+retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
+                            bool* const is_unused);
 #ifdef __cplusplus
 }
 #endif
