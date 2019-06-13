@@ -39,7 +39,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
     goto done;
   }
 
-  if (fread(content, 1, len, file) < 0) {
+  if (fread(content, 1, len, file) != len) {
     log_error(logger_id, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
     goto done;
