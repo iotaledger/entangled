@@ -20,20 +20,20 @@ retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t
   were_addresses_spent_from_res_t* addr_spent_res = were_addresses_spent_from_res_new();
   if (!addr_spent_req || !addr_spent_res) {
     ret_code = RC_OOM;
-    log_error(client_extended_logger_id, "%s: create were_addresses_spent_from request or response failed: %s\n",
+    log_error(client_extended_logger_id, "%s: creating were_addresses_spent_from request or response failed: %s\n",
               __func__, error_2_string(ret_code));
     goto done;
   }
 
   if ((ret_code = were_addresses_spent_from_req_add(addr_spent_req, addr)) != RC_OK) {
-    log_error(client_extended_logger_id, "%s: adding address to requeest failed.: %s\n", __func__,
+    log_error(client_extended_logger_id, "%s: adding address to request failed.: %s\n", __func__,
               error_2_string(ret_code));
     goto done;
   }
 
   if ((ret_code = iota_client_were_addresses_spent_from(serv, addr_spent_req, addr_spent_res)) == RC_OK) {
     if (were_addresses_spent_from_res_states_at(addr_spent_res, 0)) {
-      log_debug(client_extended_logger_id, "the address were spent\n");
+      log_debug(client_extended_logger_id, "the address was spent from\n");
       *is_unused = false;
       goto done;
     }
@@ -49,14 +49,14 @@ retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t
 
   if (!find_tran_req || !find_tran_res) {
     ret_code = RC_OOM;
-    log_error(client_extended_logger_id, "%s: create find transactions request or response failed: %s\n", __func__,
+    log_error(client_extended_logger_id, "%s: creating find transactions request or response failed: %s\n", __func__,
               error_2_string(ret_code));
     goto done;
   }
 
   ret_code = hash243_queue_push(&find_tran_req->addresses, addr);
   if (ret_code) {
-    log_error(client_extended_logger_id, "%s: hahs queue push failed: %s\n", __func__, error_2_string(ret_code));
+    log_error(client_extended_logger_id, "%s: hash queue push failed: %s\n", __func__, error_2_string(ret_code));
     goto done;
   }
   ret_code = iota_client_find_transactions(serv, find_tran_req, find_tran_res);
@@ -65,7 +65,7 @@ retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t
       log_debug(client_extended_logger_id, "the address has transactions\n");
       *is_unused = false;
     } else {
-      log_debug(client_extended_logger_id, "the address has no transactions and was not spent\n");
+      log_debug(client_extended_logger_id, "the address has no transactions and was not spent from\n");
       *is_unused = true;
     }
   }
