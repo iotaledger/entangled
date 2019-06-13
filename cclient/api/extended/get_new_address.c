@@ -10,8 +10,8 @@
 #include "cclient/api/extended/get_new_address.h"
 #include "cclient/api/extended/logger.h"
 
-static retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
-                                   bool* const is_unused) {
+retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
+                            bool* const is_unused) {
   retcode_t ret_code = RC_ERROR;
   size_t ret_num = 0;
   find_transactions_req_t* find_tran_req = NULL;
