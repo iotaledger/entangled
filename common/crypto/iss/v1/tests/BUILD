@@ -1,6 +1,6 @@
 cc_test(
     name = "test_iss",
-    timeout = "short",
+    timeout = "moderate",
     srcs = [
         "test_iss.c",
     ],
