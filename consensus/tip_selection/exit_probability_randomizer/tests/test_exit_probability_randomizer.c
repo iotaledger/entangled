@@ -224,8 +224,8 @@ void test_single_tx_tangle_walker(void) {
 
 void test_single_tx_tangle_map(void) {
   ep_prob_map_randomizer_t ep_randomizer;
-  test_single_tx_tangle_base(EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  test_single_tx_tangle_base(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *)&ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *)&ep_randomizer) == RC_OK);
 }
 
 void test_single_tx_tangle_base(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *const ep_randomizer) {
@@ -282,32 +282,32 @@ void test_cw_topology_only_direct_approvers_walker(void) {
 }
 
 void test_cw_topology_only_direct_approvers_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_gen_topology(ONLY_DIRECT_APPROVERS, EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_gen_topology(ONLY_DIRECT_APPROVERS, EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_blockchain_walker(void) {
-  ep_randomizer_t ep_randomizer;
-  test_cw_gen_topology(BLOCKCHAIN, EP_RANDOM_WALK, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_randomizer_t ep_randomizer = {};
+  test_cw_gen_topology(BLOCKCHAIN, EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 void test_cw_topology_blockchain_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_gen_topology(BLOCKCHAIN, EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_gen_topology(BLOCKCHAIN, EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_four_transactions_diamond_walker(void) {
-  ep_randomizer_t ep_randomizer;
+  ep_randomizer_t ep_randomizer = {};
   test_cw_topology_four_transactions_diamond(EP_RANDOM_WALK, &ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_four_transactions_diamond_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_topology_four_transactions_diamond(EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_topology_four_transactions_diamond(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t ep_impl,
@@ -400,15 +400,16 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
  */
 
 void test_cw_topology_five_transactions_diamond_and_a_tail_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_topology_five_transactions_diamond_and_a_tail(EP_RANDOM_WALK, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_topology_five_transactions_diamond_and_a_tail(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_five_transactions_diamond_and_a_tail_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_topology_five_transactions_diamond_and_a_tail(EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_topology_five_transactions_diamond_and_a_tail(EP_RANDOMIZE_MAP_AND_SAMPLE,
+                                                        (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_implementation_t ep_impl,
@@ -503,15 +504,15 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_impleme
 }
 
 void test_cw_topology_two_inequal_tips_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_topology_two_inequal_tips(EP_RANDOM_WALK, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_topology_two_inequal_tips(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_two_inequal_tips_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_cw_topology_two_inequal_tips(EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_cw_topology_two_inequal_tips(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 void test_cw_topology_two_inequal_tips(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *const ep_randomizer) {
   hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
@@ -628,15 +629,15 @@ void test_cw_topology_two_inequal_tips(ep_randomizer_implementation_t ep_impl, e
 }
 
 void test_1_bundle_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_1_bundle(EP_RANDOM_WALK, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_1_bundle(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_1_bundle_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_1_bundle(EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_1_bundle(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_1_bundle(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *const ep_randomizer) {
@@ -725,15 +726,15 @@ void test_1_bundle(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *cons
 }
 
 void test_2_chained_bundles_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_2_chained_bundles(EP_RANDOM_WALK, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_2_chained_bundles(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_2_chained_bundles_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
-  test_2_chained_bundles(EP_RANDOMIZE_MAP_AND_SAMPLE, &ep_randomizer);
-  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+  ep_prob_map_randomizer_t ep_randomizer = {};
+  test_2_chained_bundles(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *)&ep_randomizer);
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_2_chained_bundles(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *const ep_randomizer) {
@@ -822,8 +823,8 @@ void test_sum_probabilities_1_ep_mapping(ep_randomizer_t *const ep_randomizer, f
   hash_to_double_map_t hash_to_exit_probs = NULL;
   hash_to_double_map_t hash_to_trans_probs = NULL;
 
-  iota_consensus_exit_prob_map_calculate_probs(ep_randomizer, &tangle, &epv, out, ep, &hash_to_exit_probs,
-                                               &hash_to_trans_probs);
+  iota_consensus_exit_prob_map_calculate_probs(ep_randomizer, &tangle, &epv, (cw_calc_result *)out, ep,
+                                               &hash_to_exit_probs, &hash_to_trans_probs);
   double sum_exit_probs = iota_consensus_exit_prob_map_sum_probs(&hash_to_exit_probs);
   double sum_trans_probs = iota_consensus_exit_prob_map_sum_probs(&hash_to_trans_probs);
 

@@ -288,6 +288,7 @@ static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
   retcode_t ret;
   check_not_orphan_do_func_params_t params;
 
+  UNUSED(target_milestone_index);
   params.target_milestone_timestamp = target_milestone_timestamp;
   params.solid_entry_points = solid_entry_points;
   params.is_orphan = true;
