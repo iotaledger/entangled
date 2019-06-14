@@ -105,7 +105,7 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
   c = ptr[0];
   ptr += 1;
 
-  token = strtok(ptr, ";");
+  token = strtok((char *)ptr, ";");
   while (token != NULL) {
     if (flex_trits_from_trytes(curr_hash, NUM_TRITS_ADDRESS, (tryte_t *)token, NUM_TRYTES_ADDRESS,
                                NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
