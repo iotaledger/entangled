@@ -44,13 +44,13 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
   retcode_t ret = RC_OK;
   bool exists = false;
   iota_transaction_t transaction;
-  transaction_reset(&transaction);
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
+  transaction_reset(&transaction);
   // Retreives the transaction from the packet
   if (flex_trits_from_bytes(transaction_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
                             NUM_TRITS_SERIALIZED_TRANSACTION,
