@@ -152,8 +152,8 @@ retcode_t iota_snapshots_service_generate_snapshot(snapshots_service_t *const sn
   if (ret) {
     return ret;
   }
-  ERR_BIND_RETURN(iota_milestone_service_replay_milestones((milestone_service_t *)snapshots_service->milestone_service,
-                                                           (tangle_t *)tangle, snapshot, target_milestone->index),
+  ERR_BIND_RETURN(iota_milestone_service_replay_milestones(snapshots_service->milestone_service, tangle, snapshot,
+                                                           target_milestone->index),
                   ret);
 
   return ret;

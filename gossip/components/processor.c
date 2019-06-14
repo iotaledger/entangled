@@ -44,7 +44,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
   retcode_t ret = RC_OK;
   bool exists = false;
   iota_transaction_t transaction;
-  memset(&transaction, 0, sizeof(transaction));
+  transaction_reset(&transaction);
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
