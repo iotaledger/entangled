@@ -25,7 +25,7 @@ void tearDown(void) {
   TEST_ASSERT(iota_utils_remove_file(test_db_path) == RC_OK);
 }
 
-void test_spent_addresses_provider_store() {
+static void test_spent_addresses_provider_store() {
   bool exist = true;
   tryte_t address_trytes[HASH_LENGTH_TRYTE];
   flex_trit_t address_trits[FLEX_TRIT_SIZE_243];
@@ -49,7 +49,7 @@ void test_spent_addresses_provider_store() {
   }
 }
 
-void test_spent_addresses_provider_batch_store() {
+static void test_spent_addresses_provider_batch_store() {
   bool exist = true;
   tryte_t address_trytes[HASH_LENGTH_TRYTE];
   flex_trit_t address_trits[FLEX_TRIT_SIZE_243];
@@ -85,7 +85,7 @@ void test_spent_addresses_provider_batch_store() {
   }
 }
 
-void test_spent_addresses_provider_import() {
+static void test_spent_addresses_provider_import() {
   bool exist = true;
   tryte_t address_trytes[HASH_LENGTH_TRYTE];
   flex_trit_t address_trits[FLEX_TRIT_SIZE_243];

@@ -53,12 +53,11 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
 }
 
 static retcode_t iota_spent_addresses_service_was_tx_spent_from(tangle_t const *const tangle,
-                                                                iota_transaction_t const *const tx, bool *const spent) {
+                                                                iota_transaction_t const *const tx,
+                                                                flex_trit_t const *const hash, bool *const spent) {
   retcode_t ret = RC_OK;
 
   if (transaction_value(tx) < 0) {
-    bundle_transactions_t *bundle = NULL;
-    bundle_status_t status = BUNDLE_NOT_INITIALIZED;
     flex_trit_t tail[FLEX_TRIT_SIZE_243];
 
     // Transaction is confirmed
@@ -68,17 +67,20 @@ static retcode_t iota_spent_addresses_service_was_tx_spent_from(tangle_t const *
     }
 
     // Transaction is pending
-    if ((ret = iota_tangle_find_tail(tangle, transaction_hash(tx), tail, spent)) != RC_OK) {
+    if ((ret = iota_tangle_find_tail(tangle, hash, tail, spent)) != RC_OK) {
       return ret;
     }
     if (*spent) {
+      bundle_transactions_t *bundle = NULL;
+      bundle_status_t status = BUNDLE_NOT_INITIALIZED;
+
       bundle_transactions_new(&bundle);
       ret = iota_consensus_bundle_validator_validate(tangle, tail, bundle, &status);
       bundle_transactions_free(&bundle);
       // TODO: What if the bundle is invalid but signature is still OK ?
+      // TODO: What if incomplete bundle ?
       *spent = (status == BUNDLE_VALID);
     }
-    // TODO: What if incomplete bundle ?
 
   } else {
     *spent = false;
@@ -143,11 +145,12 @@ retcode_t iota_spent_addresses_service_was_address_spent_from(spent_addresses_se
   // To avoid unnecessary overhead while processing, the loop will return false
 
   for (size_t i = 0; i < pack.num_loaded; ++i) {
-    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, ((flex_trit_t **)(pack.models))[i],
-                                            &tx_pack)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_load_partial(tangle, ((flex_trit_t **)(pack.models))[i], &tx_pack,
+                                                    PARTIAL_TX_MODEL_ESSENCE_METADATA)) != RC_OK) {
       goto done;
     }
-    if ((ret = iota_spent_addresses_service_was_tx_spent_from(tangle, txp, spent)) != RC_OK) {
+    if ((ret = iota_spent_addresses_service_was_tx_spent_from(tangle, txp, ((flex_trit_t **)(pack.models))[i],
+                                                              spent)) != RC_OK) {
       goto done;
     }
     if (*spent) {
