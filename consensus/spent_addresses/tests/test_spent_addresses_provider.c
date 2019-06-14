@@ -83,6 +83,8 @@ static void test_spent_addresses_provider_batch_store() {
     }
     address_trytes[0]++;
   }
+
+  hash243_set_free(&addresses);
 }
 
 static void test_spent_addresses_provider_import() {
