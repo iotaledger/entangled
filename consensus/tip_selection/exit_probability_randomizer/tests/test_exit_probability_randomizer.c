@@ -282,30 +282,30 @@ void test_cw_topology_only_direct_approvers_walker(void) {
 }
 
 void test_cw_topology_only_direct_approvers_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_gen_topology(ONLY_DIRECT_APPROVERS, EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_blockchain_walker(void) {
-  ep_randomizer_t ep_randomizer;
+  ep_randomizer_t ep_randomizer = {};
   test_cw_gen_topology(BLOCKCHAIN, EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 void test_cw_topology_blockchain_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_gen_topology(BLOCKCHAIN, EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_four_transactions_diamond_walker(void) {
-  ep_randomizer_t ep_randomizer;
+  ep_randomizer_t ep_randomizer = {};
   test_cw_topology_four_transactions_diamond(EP_RANDOM_WALK, &ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_four_transactions_diamond_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_topology_four_transactions_diamond(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
@@ -400,13 +400,13 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
  */
 
 void test_cw_topology_five_transactions_diamond_and_a_tail_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_topology_five_transactions_diamond_and_a_tail(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_five_transactions_diamond_and_a_tail_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_topology_five_transactions_diamond_and_a_tail(EP_RANDOMIZE_MAP_AND_SAMPLE,
                                                         (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
@@ -504,13 +504,13 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_impleme
 }
 
 void test_cw_topology_two_inequal_tips_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_topology_two_inequal_tips(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_cw_topology_two_inequal_tips_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_cw_topology_two_inequal_tips(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
@@ -629,13 +629,13 @@ void test_cw_topology_two_inequal_tips(ep_randomizer_implementation_t ep_impl, e
 }
 
 void test_1_bundle_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_1_bundle(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_1_bundle_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_1_bundle(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
@@ -726,13 +726,13 @@ void test_1_bundle(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *cons
 }
 
 void test_2_chained_bundles_walker(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_2_chained_bundles(EP_RANDOM_WALK, (ep_randomizer_t *const) & ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
 
 void test_2_chained_bundles_map(void) {
-  ep_prob_map_randomizer_t ep_randomizer;
+  ep_prob_map_randomizer_t ep_randomizer = {};
   test_2_chained_bundles(EP_RANDOMIZE_MAP_AND_SAMPLE, (ep_randomizer_t *)&ep_randomizer);
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy((ep_randomizer_t *const) & ep_randomizer) == RC_OK);
 }
