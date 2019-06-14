@@ -27,6 +27,10 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
   spent_addresses_provider_t sap;
   connection_config_t db_conf = {.db_path = sas->conf->spent_addresses_db_path};
 
+  if (sas->conf->spent_addresses_files == NULL) {
+    return RC_OK;
+  }
+
   if ((ret = iota_spent_addresses_provider_init(&sap, &db_conf)) != RC_OK) {
     log_error(logger_id, "Initializing spent addresses database connection failed\n");
     return ret;
