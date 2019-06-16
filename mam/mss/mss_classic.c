@@ -92,7 +92,7 @@ retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
   MAM_ASSERT(mss);
 
   memset(mss, 0, sizeof(mam_mss_t));
-  ERR_GUARD_RETURN(0 <= height && height <= MAM_MSS_MAX_D, RC_MAM_INVALID_ARGUMENT);
+  ERR_GUARD_RETURN(height <= MAM_MSS_MAX_D, RC_MAM_INVALID_ARGUMENT);
 
   mss->mt = malloc(sizeof(trit_t) * MAM_MSS_MT_WORDS(height));
   ERR_GUARD_RETURN(mss->mt, RC_OOM);

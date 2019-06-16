@@ -24,7 +24,6 @@ static void *local_snapshots_manager_routine(void *arg) {
   lock_handle_t lock_cond;
   retcode_t err;
   size_t exponential_delay_factor = 1;
-  uint64_t start_timestamp, end_timestamp;
 
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
@@ -40,11 +39,9 @@ static void *local_snapshots_manager_routine(void *arg) {
 
   while (lsm->running) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
-      start_timestamp = current_timestamp_ms();
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
-        end_timestamp = current_timestamp_ms();
         if (iota_tangle_transaction_count(&tangle, &lsm->last_snapshot_transactions_count) != RC_OK) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
