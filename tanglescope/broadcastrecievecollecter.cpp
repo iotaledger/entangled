@@ -16,6 +16,7 @@
 #include "tanglescope/common/tangledb.hpp"
 #include "tanglescope/common/txauxiliary.hpp"
 #include "tanglescope/common/zmqpub.hpp"
+#include "utils/macros.h"
 
 constexpr static auto DEPTH = 3;
 
@@ -59,8 +60,10 @@ void BroadcastReceiveCollector::broadcastTransactions() {
   auto pubWorker = pubThread.create_worker();
 
   if (_broadcastInterval > 0) {
-    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_broadcastInterval),
-                                    [&](auto scbl) { broadcastOneTransaction(); });
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_broadcastInterval), [&](auto scbl) {
+      UNUSED(scbl);
+      broadcastOneTransaction();
+    });
   } else {
     broadcastOneTransaction();
   }

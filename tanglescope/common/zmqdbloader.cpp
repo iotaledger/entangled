@@ -4,6 +4,7 @@
 
 #include "tanglescope/common/tangledb.hpp"
 #include "tanglescope/common/zmqpub.hpp"
+#include "utils/macros.h"
 
 namespace iota {
 namespace tanglescope {
@@ -37,9 +38,11 @@ void ZmqDBLoader::cleanDBPeriodically() {
   auto pubWorker = pubThread.create_worker();
 
   if (_cleanupInterval > 0) {
-    pubWorker.schedule_periodically(
-        pubThread.now(), std::chrono::seconds(_cleanupInterval),
-        [oldestTXAge = _oldestTXAge](auto scbl) { TangleDB::instance().removeAgedTxs(oldestTXAge); });
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_cleanupInterval),
+                                    [oldestTXAge = _oldestTXAge](auto scbl) {
+                                      UNUSED(scbl);
+                                      TangleDB::instance().removeAgedTxs(oldestTXAge);
+                                    });
   }
 }
 

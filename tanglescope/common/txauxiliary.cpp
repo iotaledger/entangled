@@ -11,6 +11,7 @@
 #include "common/helpers/pow.h"
 #include "common/trinary/tryte_long.h"
 #include "tanglescope/common/tangledb.hpp"
+#include "utils/macros.h"
 
 DEFINE_string(transactionAddress,
               "JURSJVFIECKJYEHPATCXADQGHABKOOEZCRUHLIDHPNPIGRCXBFBWVISWCF9ODWQK"
@@ -41,7 +42,11 @@ boost::future<void> removeConfirmedTransactions(std::weak_ptr<cppclient::IotaAPI
 
           auto states = std::move(response.value().states);
           auto idx = 0;
-          txs.erase(std::remove_if(txs.begin(), txs.end(), [&idx, &states](std::string hash) { return states[idx++]; }),
+          txs.erase(std::remove_if(txs.begin(), txs.end(),
+                                   [&idx, &states](std::string hash) {
+                                     UNUSED(hash);
+                                     return states[idx++];
+                                   }),
                     txs.end());
         });
   }
@@ -59,6 +64,7 @@ std::set<std::string> getUnconfirmedTXs(std::weak_ptr<cppclient::IotaAPI> client
     auto tips = {lmhs};
     while (!currentLevelTXs.empty()) {
       auto removeTask = removeConfirmedTransactions(client, tips, currentLevelTXs).then([&](auto future) {
+        UNUSED(future);
         if (!currentLevelTXs.empty()) {
           res.insert(currentLevelTXs.begin(), currentLevelTXs.end());
 
@@ -96,7 +102,7 @@ boost::future<void> handleUnseenTransactions(
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>& hashToDiscoveryTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received, std::weak_ptr<cppclient::IotaAPI> iriClient,
     std::string lmhs) {
-  TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch()};
+  TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch(), {}};
   TangleDB::instance().put(std::move(txRecord));
 
   return boost::async(boost::launch::async, [tx, &hashToDiscoveryTimestamp, received = std::move(received), iriClient,
@@ -123,7 +129,7 @@ nonstd::optional<std::string> fillTX(
     boost::future<nonstd::optional<cppclient::GetTransactionsToApproveResponse>> fuResponse) {
   using namespace std::chrono;
 
-  auto maybeResponse = std::move(fuResponse.get());
+  auto maybeResponse = fuResponse.get();
   if (!maybeResponse.has_value()) {
     return {};
   }
@@ -149,7 +155,7 @@ nonstd::optional<std::string> fillTX(
   bundle.addTransaction(tx, 1);
   bundle.finalize();
 
-  return {std::move(bundle.getTransactions()[0].toTrytes())};
+  return bundle.getTransactions()[0].toTrytes();
 }
 
 nonstd::optional<std::string> powTX(nonstd::optional<std::string> maybeTx, int mwm) {
@@ -167,12 +173,12 @@ nonstd::optional<std::string> powTX(nonstd::optional<std::string> maybeTx, int m
 }
 
 HashedTX hashTX(boost::future<nonstd::optional<std::string>> fuTx) {
-  auto maybeResponse = std::move(fuTx.get());
+  auto maybeResponse = fuTx.get();
   if (!maybeResponse.has_value()) {
     return {};
   }
 
-  auto tx = std::move(maybeResponse.value());
+  auto tx = maybeResponse.value();
   char* digest = iota_digest(tx.data());
   HashedTX hashed = {digest, std::move(tx)};
   free(digest);

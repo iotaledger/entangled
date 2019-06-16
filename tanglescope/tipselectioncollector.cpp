@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "tanglescope/tipselectioncollector.hpp"
+#include "utils/macros.h"
 
 using namespace iota::tanglescope;
 using namespace cppclient;
@@ -62,7 +63,7 @@ void TipSelectionCollector::collect() {
 
   _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
 
-  _histograms = std::move(buildHistogramsMap(registry, "tipselection", {}, nameToDescHistogram));
+  _histograms = buildHistogramsMap(registry, "tipselection", {}, nameToDescHistogram);
 
   queryTipSelectionPeriodically();
 }
@@ -72,8 +73,10 @@ void TipSelectionCollector::queryTipSelectionPeriodically() {
   auto pubWorker = pubThread.create_worker();
 
   if (_sampleInterval > 0) {
-    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_sampleInterval),
-                                    [&](auto scbl) { queryTipSelection(); });
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_sampleInterval), [&](auto scbl) {
+      UNUSED(scbl);
+      queryTipSelection();
+    });
   } else {
     queryTipSelection();
   }
@@ -132,7 +135,7 @@ void TipSelectionCollector::queryTipSelection() {
         for (const auto& approver : transactions) {
           auto txTimestampMS =
               std::chrono::duration_cast<std::chrono::milliseconds>(approver.timestamp.time_since_epoch()).count();
-          if (txToTimeTipSelectionStrated[kv.first] > txTimestampMS) ++numSelectedTXWasNotATip;
+          if (txToTimeTipSelectionStrated[kv.first] > (unsigned long long)txTimestampMS) ++numSelectedTXWasNotATip;
           break;
         }
       }

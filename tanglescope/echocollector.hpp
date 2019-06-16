@@ -33,11 +33,11 @@ class EchoCollector : public BroadcastReceiveCollector {
                                                HistogramsMap& histograms, const std::vector<double>& buckets);
 
  private:
-  virtual void doPeriodically(){};
+  virtual void doPeriodically() override{};
   const std::vector<double>& histogramBuckets() const;
 
   virtual void subscribeToTransactions(std::string zmqURL, const ZmqObservable& zmqObservable,
-                                       std::shared_ptr<prometheus::Registry> registry);
+                                       std::shared_ptr<prometheus::Registry> registry) override;
   // Configuration
   uint32_t _discoveryInterval;
   // Others
