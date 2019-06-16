@@ -1,6 +1,7 @@
 build --copt -W
 build --copt -Wall
 build --copt -Wextra
+build --copt -Werror
 
 build --cxxopt='-std=c++1z'
 
