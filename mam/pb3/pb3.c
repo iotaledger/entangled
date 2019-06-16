@@ -19,6 +19,8 @@ trits_t pb3_trits_take(trits_t *const buffer, size_t const n) { return trits_adv
  * null, tryte, size_t, trytes, tryte [n]
  */
 
+size_t pb3_sizeof_tryte() { return NUMBER_OF_TRITS_IN_A_TRYTE; }
+
 void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer) {
   MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_tryte()));
 
@@ -37,6 +39,8 @@ retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
   return RC_OK;
 }
 
+size_t pb3_sizeof_trint() { return 9; }
+
 void pb3_encode_trint(trint9_t const trint, trits_t *const buffer) {
   MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_trint()));
 
@@ -54,6 +58,8 @@ retcode_t pb3_decode_trint(trint9_t *const trint, trits_t *const buffer) {
 
   return RC_OK;
 }
+
+size_t pb3_sizeof_longtrint() { return 18; }
 
 void pb3_encode_longtrint(trint18_t const trint, trits_t *const buffer) {
   MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_longtrint()));
@@ -78,6 +84,8 @@ size_t pb3_sizeof_size_t(size_t const n) { return trits_sizeof_size_t(n); }
 void pb3_encode_size_t(size_t size, trits_t *const buffer) { trits_encode_size_t(size, buffer); }
 
 retcode_t pb3_decode_size_t(size_t *const size, trits_t *const buffer) { return trits_decode_size_t(size, buffer); }
+
+size_t pb3_sizeof_ntrytes(size_t const n) { return NUMBER_OF_TRITS_IN_A_TRYTE * n; }
 
 void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
