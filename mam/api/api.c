@@ -378,7 +378,7 @@ retcode_t mam_api_channel_create(mam_api_t *const api, size_t const height, tryt
   return ret;
 }
 
-size_t mam_api_channel_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id) {
+size_t mam_api_channel_remaining_sks(mam_api_t const *const api, tryte_t const *const channel_id) {
   return mam_channel_remaining_sks(mam_api_channel_get(api, channel_id));
 }
 
@@ -415,7 +415,7 @@ retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, try
   return ret;
 }
 
-size_t mam_api_endpoint_remaining_sks(mam_api_t *const api, tryte_t const *const channel_id,
+size_t mam_api_endpoint_remaining_sks(mam_api_t const *const api, tryte_t const *const channel_id,
                                       tryte_t const *const endpoint_id) {
   return mam_endpoint_remaining_sks(mam_api_endpoint_get(api, channel_id, endpoint_id));
 }
@@ -425,31 +425,31 @@ void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t 
   trits_put18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE), ord);
 }
 
-retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
-                                                 mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                                 trit_t *const msg_id) {
+retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id,
+                                                 mam_psk_t_set_t const psks, mam_ntru_pk_t_set_t const ntru_pks,
+                                                 bundle_transactions_t *const bundle, trit_t *const msg_id) {
   return mam_api_bundle_write_header(api, ch_id, NULL, NULL, NULL, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
                                      msg_id);
 }
 
 retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                                  tryte_t const *const ep_id, mam_psk_t_set_t psks,
-                                                  mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
-                                                  trit_t *const msg_id) {
+                                                  tryte_t const *const ep_id, mam_psk_t_set_t const psks,
+                                                  mam_ntru_pk_t_set_t const ntru_pks,
+                                                  bundle_transactions_t *const bundle, trit_t *const msg_id) {
   return mam_api_bundle_write_header(api, ch_id, ep_id, NULL, NULL, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
                                      msg_id);
 }
 
 retcode_t mam_api_bundle_announce_channel(mam_api_t *const api, tryte_t const *const ch_id, tryte_t const *const ch1_id,
-                                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
+                                          mam_psk_t_set_t const psks, mam_ntru_pk_t_set_t const ntru_pks,
                                           bundle_transactions_t *const bundle, trit_t *const msg_id) {
   return mam_api_bundle_write_header(api, ch_id, NULL, ch1_id, NULL, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
                                      msg_id);
 }
 
 retcode_t mam_api_bundle_announce_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
-                                           tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-                                           mam_ntru_pk_t_set_t ntru_pks, bundle_transactions_t *const bundle,
+                                           tryte_t const *const ep1_id, mam_psk_t_set_t const psks,
+                                           mam_ntru_pk_t_set_t const ntru_pks, bundle_transactions_t *const bundle,
                                            trit_t *const msg_id) {
   return mam_api_bundle_write_header(api, ch_id, NULL, NULL, ep1_id, psks, ntru_pks, MAM_MSG_TYPE_UNSTRUCTURED, bundle,
                                      msg_id);
