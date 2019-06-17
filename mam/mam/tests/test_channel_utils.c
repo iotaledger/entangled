@@ -30,7 +30,7 @@ bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1, mam_channe
 
   HASH_ITER(hh, channels_1, entry_1, tmp_1) {
     HASH_ITER(hh, channels_2, entry_2, tmp_2) {
-      if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root, MAM_ENDPOINT_ID_SIZE) == 0) {
+      if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root, MAM_ENDPOINT_ID_TRIT_SIZE) == 0) {
         if (!trits_cmp_eq(entry_1->value.name_size, entry_2->value.name_size)) {
           continue;
         }
