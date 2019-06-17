@@ -119,8 +119,23 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
                 consistency_res->info->data);
   }
 
-  // TODO: return out_bundle
-  (void)out_bundle;
+  if (out_bundle == NULL) {
+    ret_code = RC_NULL_PARAM;
+    log_error(client_extended_logger_id, "%s the out_bundle cannot be NULL \n", __func__, error_2_string(ret_code));
+    goto done;
+  }
+  flex_trit_t* array_elt = NULL;
+  iota_transaction_t tx = {};
+  HASH_ARRAY_FOREACH(att_res->trytes, array_elt) {
+    if (transaction_deserialize_from_trits(&tx, array_elt, true) == NUM_TRITS_SERIALIZED_TRANSACTION) {
+      bundle_transactions_add(bundle, &tx);
+    } else {
+      ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+      log_error(client_extended_logger_id, "%s: %s.\n", __func__, error_2_string(ret_code));
+      goto done;
+    }
+  }
+
 done:
   check_consistency_req_free(&consistency_req);
   check_consistency_res_free(&consistency_res);
