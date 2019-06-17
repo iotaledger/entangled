@@ -231,7 +231,7 @@ retcode_t state_delta_deserialize_str(char const *const str, state_delta_t *cons
   char *token;
   uint64_t supply = 0;
 
-  token = strtok(ptr, ";");
+  token = strtok((char *)ptr, ";");
   if (token == NULL) {
     return RC_SNAPSHOT_INVALID_FILE;
   }

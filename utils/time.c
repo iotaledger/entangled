@@ -28,7 +28,7 @@ uint64_t current_timestamp_ms() {
 
   return wintime / 10000LL;
 #else
-  struct timeval tv = {0};
+  struct timeval tv = {0, 0};
 
   gettimeofday(&tv, NULL);
   uint64_t ms = tv.tv_sec * 1000ULL + tv.tv_usec / 1000ULL;

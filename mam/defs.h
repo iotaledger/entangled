@@ -24,6 +24,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#if defined __EMSCRIPTEN__
+#include <emscripten.h>
+#define MAM_EXPORT EMSCRIPTEN_KEEPALIVE
+#else
+#define MAM_EXPORT
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

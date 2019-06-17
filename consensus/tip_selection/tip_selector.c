@@ -84,7 +84,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t
       ret = RC_TIP_SELECTOR_REFERENCE_TOO_OLD;
       goto done;
     }
-    ep_p = reference;
+    ep_p = (flex_trit_t *)reference;
   }
 
   if ((ret = iota_consensus_exit_probability_randomize(tip_selector->ep_randomizer, tangle, &walker_validator,

@@ -13,6 +13,13 @@ cc_library(
 
 emcc_binary(
     name = "mam.js",
-    linkopts = ["-s LINKABLE=1 -s EXPORT_ALL=1"],
+    deps = [
+        "//mam/api",
+    ],
+)
+
+cc_binary(
+    name = "libmam.so",
+    linkshared = True,
     deps = ["//mam/api"],
 )
