@@ -38,9 +38,9 @@ class TXAnalyzer {
   std::list<std::string> _confirmedBundles;
   std::unordered_map<std::string, std::vector<std::shared_ptr<iri::TXMessage>>> _unconfirmedBundles;
 
-  std::shared_ptr<TXStats> _stats;
   PrometheusCollector::CountersMap& _counters;
   PrometheusCollector::HistogramsMap& _histograms;
+  std::shared_ptr<TXStats> _stats;
 };
 }  // namespace statscollector
 }  // namespace tanglescope

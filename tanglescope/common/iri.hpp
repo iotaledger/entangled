@@ -178,7 +178,7 @@ class LMSIMessage : public IRIMessage {
   inline IRIMessageType type() { return IRIMessageType::LMSI; }
 
  public:
-  const uint64_t latestSolidMilestoneIndex() { return this->_latestSolidMilestoneIndex; }
+  uint64_t latestSolidMilestoneIndex() { return this->_latestSolidMilestoneIndex; }
 
  private:
   uint64_t _latestSolidMilestoneIndex;
