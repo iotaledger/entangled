@@ -40,7 +40,7 @@ retcode_t mam_example_announce_channel(mam_api_t* const api, tryte_t const* cons
   fprintf(stderr, "\n");
 
   fprintf(stderr, "CH1 ID: ");
-  for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE / 3; i++) {
+  for (size_t i = 0; i < MAM_CHANNEL_ID_TRYTE_SIZE; i++) {
     fprintf(stderr, "%c", new_channel_id[i]);
   }
   fprintf(stderr, "\n");
@@ -76,7 +76,7 @@ retcode_t mam_example_announce_endpoint(mam_api_t* const api, tryte_t const* con
   fprintf(stderr, "\n");
 
   fprintf(stderr, "EP1 ID: ");
-  for (size_t i = 0; i < MAM_ENDPOINT_ID_SIZE / 3; i++) {
+  for (size_t i = 0; i < MAM_ENDPOINT_ID_TRYTE_SIZE; i++) {
     fprintf(stderr, "%c", new_endpoint_id[i]);
   }
   fprintf(stderr, "\n");
