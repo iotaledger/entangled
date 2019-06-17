@@ -25,7 +25,8 @@
 #include "mam/mss/mss.h"
 #include "mam/trits/trits.h"
 
-#define MAM_CHANNEL_ID_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_CHANNEL_ID_TRIT_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_CHANNEL_ID_TRYTE_SIZE (MAM_CHANNEL_ID_TRIT_SIZE / 3)
 #define MAM_CHANNEL_NAME_SIZE 18
 #define MAM_CHANNEL_MSG_ORD_SIZE 81
 
@@ -46,7 +47,7 @@ typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;
 typedef mam_channel_t_set_entry_t *mam_channel_t_set_t;
 
 typedef struct mam_pk_s {
-  trit_t key[MAM_CHANNEL_ID_SIZE];
+  trit_t key[MAM_CHANNEL_ID_TRIT_SIZE];
 } mam_pk_t;
 
 /**
@@ -57,7 +58,7 @@ typedef struct mam_pk_s {
  * @return the channel's id
  */
 static inline trits_t mam_channel_id(mam_channel_t const *const channel) {
-  return trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->mss.root);
+  return trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, channel->mss.root);
 }
 
 /**

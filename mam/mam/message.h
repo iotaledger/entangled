@@ -67,7 +67,7 @@ typedef enum mam_msg_checksum_e {
 } mam_msg_checksum_t;
 
 typedef struct mam_msg_write_context_s {
-  trit_t chid[MAM_CHANNEL_ID_SIZE];
+  trit_t chid[MAM_CHANNEL_ID_TRIT_SIZE];
   mam_spongos_t spongos;
   trint18_t ord;
   mam_mss_t *mss;

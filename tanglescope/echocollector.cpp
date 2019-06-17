@@ -17,8 +17,6 @@
 #include "tanglescope/common/zmqpub.hpp"
 #include "tanglescope/echocollector.hpp"
 
-constexpr static auto DEPTH = 3;
-
 using namespace iota::tanglescope;
 
 std::map<std::string, std::string> EchoCollector::nameToDescHistogram = {

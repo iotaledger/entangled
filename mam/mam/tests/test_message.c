@@ -136,14 +136,14 @@ static void message_test_generic_read_msg(mam_psk_t const *const pre_shared_key,
 
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
-  memcpy(pk.key, trits_begin(mam_channel_id(cha)), MAM_CHANNEL_ID_SIZE);
+  memcpy(pk.key, trits_begin(mam_channel_id(cha)), MAM_CHANNEL_ID_TRIT_SIZE);
   TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids, &pk) == RC_OK);
   if (ep) {
-    memcpy(pk.key, trits_begin(mam_endpoint_id(ep)), MAM_ENDPOINT_ID_SIZE);
+    memcpy(pk.key, trits_begin(mam_endpoint_id(ep)), MAM_ENDPOINT_ID_TRIT_SIZE);
     TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids, &pk) == RC_OK);
   }
 
-  trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk.key));
+  trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, cfg->pk.key));
 
   e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id, &trusted_channel_ids, &trusted_endpoint_ids);
 
@@ -364,7 +364,7 @@ void serialize_write_ctx_test() {
   TEST_ASSERT(mam_channel_create(&prng_sender, 2, ch_name, &ch) == RC_OK);
   TEST_ASSERT(mam_channel_t_set_add(&chs, &ch) == RC_OK);
 
-  memcpy(write_ctx.chid, trits_begin(mam_channel_id(&ch)), MAM_CHANNEL_ID_SIZE);
+  memcpy(write_ctx.chid, trits_begin(mam_channel_id(&ch)), MAM_CHANNEL_ID_TRIT_SIZE);
   write_ctx.mss = &chs->value.mss;
 
   MAM_TRITS_DEF(rand_msg, strlen(TEST_PLAINTEXT1));
@@ -376,7 +376,7 @@ void serialize_write_ctx_test() {
   mam_msg_write_ctx_serialize(&write_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);
   TEST_ASSERT(mam_msg_write_ctx_deserialize(&ctx_buffer, &deserialized_ctx, chs) == RC_OK);
-  TEST_ASSERT_EQUAL_MEMORY(write_ctx.chid, deserialized_ctx.chid, MAM_CHANNEL_ID_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(write_ctx.chid, deserialized_ctx.chid, MAM_CHANNEL_ID_TRIT_SIZE);
   TEST_ASSERT_EQUAL_INT(write_ctx.spongos.pos, deserialized_ctx.spongos.pos);
   TEST_ASSERT_EQUAL_MEMORY(&write_ctx.spongos.sponge, &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
   TEST_ASSERT_EQUAL_INT(write_ctx.mss, deserialized_ctx.mss);
@@ -392,7 +392,7 @@ void serialize_read_ctx_test() {
   read_ctx.ord = 0;
 
   //"Random" root
-  for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE; ++i) {
+  for (size_t i = 0; i < MAM_CHANNEL_ID_TRIT_SIZE; ++i) {
     read_ctx.pk.key[i] = -1 + rand() % 3;
   }
 
@@ -408,7 +408,7 @@ void serialize_read_ctx_test() {
   TEST_ASSERT_EQUAL_INT(read_ctx.spongos.pos, deserialized_ctx.spongos.pos);
   TEST_ASSERT_EQUAL_MEMORY(&read_ctx.spongos.sponge, &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
 
-  TEST_ASSERT_EQUAL_MEMORY(&read_ctx.pk, &deserialized_ctx.pk, MAM_CHANNEL_ID_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(&read_ctx.pk, &deserialized_ctx.pk, MAM_CHANNEL_ID_TRIT_SIZE);
   TEST_ASSERT_EQUAL_INT(read_ctx.ord, deserialized_ctx.ord);
 }
 
