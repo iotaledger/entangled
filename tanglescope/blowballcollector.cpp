@@ -57,7 +57,7 @@ void BlowballCollector::analyzeBlowballsPeriodically() {
   auto& thisRef = *this;
   if (_snapshotInterval > 0) {
     pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_snapshotInterval),
-                                    [&thisRef, buckets](auto scbl) { thisRef.analyzeBlowballs(buckets); });
+                                    [&thisRef, buckets](auto) { thisRef.analyzeBlowballs(buckets); });
   }
 }
 

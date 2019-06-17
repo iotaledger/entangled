@@ -42,11 +42,11 @@ bool CRCollector::parseConfiguration(const YAML::Node& conf) {
 
 void CRCollector::doPeriodically() {
   if (!_enableApi) return;
-  _collectorThread = std::move(rxcpp::schedulers::make_new_thread());
+  _collectorThread = rxcpp::schedulers::make_new_thread();
   _collectorWorker = _collectorThread.create_worker();
 
   _collectorWorker.schedule_periodically(_collectorThread.now() + std::chrono::seconds(_measurementUpperBound),
-                                         std::chrono::seconds(API_SAMPLE_INTERVAL_SECONDS), [this](auto scbl) {
+                                         std::chrono::seconds(API_SAMPLE_INTERVAL_SECONDS), [this](auto) {
                                            auto task = boost::async(boost::launch::async,
                                                                     [this]() { calcConfirmationRateAPICall(); });
                                            _tasks.emplace_back(std::move(task));
@@ -100,7 +100,7 @@ void CRCollector::calcConfirmationRateAPICall() {
   uint32_t idx = 0;
   std::copy_if(transactions.begin(), transactions.end(),
                std::inserter(confirmedTransactions, confirmedTransactions.begin()),
-               [&](const std::string& hash) { return resp.value().states[idx++]; });
+               [&](const std::string&) { return resp.value().states[idx++]; });
 
   calcAndExposeImpl(confirmedTransactions, CONFIRMATION_RATE_API);
 }
