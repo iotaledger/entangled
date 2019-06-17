@@ -100,6 +100,7 @@ static void test_tx_spend_tx_confirmed() {
 
 static void test_valid_bundle() {
   bool spent = false;
+  bool exist = true;
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
@@ -107,9 +108,13 @@ static void test_valid_bundle() {
   transactions_deserialize(trytes, txs, 4, true);
   TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
 
+  TEST_ASSERT(iota_spent_addresses_provider_exist(&sap, transaction_address(txs[1]), &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
   TEST_ASSERT(iota_spent_addresses_service_was_address_spent_from(&sas, &sap, &tangle, transaction_address(txs[1]),
                                                                   &spent) == RC_OK);
   TEST_ASSERT_TRUE(spent);
+  TEST_ASSERT(iota_spent_addresses_provider_exist(&sap, transaction_address(txs[1]), &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
 
   transactions_free(txs, 4);
 }
