@@ -17,3 +17,9 @@ emcc_binary(
         "//mam/api",
     ],
 )
+
+cc_binary(
+    name = "libmam.so",
+    linkshared = True,
+    deps = ["//mam/api"],
+)
