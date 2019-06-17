@@ -4,7 +4,6 @@
 
 #include "tanglescope/blowballcollector.hpp"
 #include "tanglescope/common/zmqpub.hpp"
-#include "utils/macros.h"
 
 using namespace iota::tanglescope;
 
@@ -58,10 +57,7 @@ void BlowballCollector::analyzeBlowballsPeriodically() {
   auto& thisRef = *this;
   if (_snapshotInterval > 0) {
     pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_snapshotInterval),
-                                    [&thisRef, buckets](auto scbl) {
-                                      UNUSED(scbl);
-                                      thisRef.analyzeBlowballs(buckets);
-                                    });
+                                    [&thisRef, buckets](auto) { thisRef.analyzeBlowballs(buckets); });
   }
 }
 

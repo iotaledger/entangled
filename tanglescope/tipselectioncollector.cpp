@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "tanglescope/tipselectioncollector.hpp"
-#include "utils/macros.h"
 
 using namespace iota::tanglescope;
 using namespace cppclient;
@@ -73,10 +72,8 @@ void TipSelectionCollector::queryTipSelectionPeriodically() {
   auto pubWorker = pubThread.create_worker();
 
   if (_sampleInterval > 0) {
-    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_sampleInterval), [&](auto scbl) {
-      UNUSED(scbl);
-      queryTipSelection();
-    });
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_sampleInterval),
+                                    [&](auto) { queryTipSelection(); });
   } else {
     queryTipSelection();
   }

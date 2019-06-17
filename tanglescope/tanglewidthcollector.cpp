@@ -5,7 +5,6 @@
 #include <glog/logging.h>
 
 #include "tanglescope/common/tangledb.hpp"
-#include "utils/macros.h"
 
 namespace iota {
 namespace tanglescope {
@@ -51,8 +50,7 @@ void TangleWidthCollector::analyzeWidthPeriodically() {
 
   if (_snapshotInterval > 0) {
     _collectorWorker.schedule_periodically(_collectorThread.now() + std::chrono::seconds(_measureLineBaseAge * 3),
-                                           std::chrono::seconds(_snapshotInterval), [this](auto scbl) {
-                                             UNUSED(scbl);
+                                           std::chrono::seconds(_snapshotInterval), [this](auto) {
                                              auto task =
                                                  boost::async(boost::launch::async, [this]() { analyzeWidthImpl(); });
                                              _tasks.emplace_back(std::move(task));

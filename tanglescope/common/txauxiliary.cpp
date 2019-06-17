@@ -11,7 +11,6 @@
 #include "common/helpers/pow.h"
 #include "common/trinary/tryte_long.h"
 #include "tanglescope/common/tangledb.hpp"
-#include "utils/macros.h"
 
 DEFINE_string(transactionAddress,
               "JURSJVFIECKJYEHPATCXADQGHABKOOEZCRUHLIDHPNPIGRCXBFBWVISWCF9ODWQK"
@@ -42,11 +41,7 @@ boost::future<void> removeConfirmedTransactions(std::weak_ptr<cppclient::IotaAPI
 
           auto states = std::move(response.value().states);
           auto idx = 0;
-          txs.erase(std::remove_if(txs.begin(), txs.end(),
-                                   [&idx, &states](std::string hash) {
-                                     UNUSED(hash);
-                                     return states[idx++];
-                                   }),
+          txs.erase(std::remove_if(txs.begin(), txs.end(), [&idx, &states](std::string) { return states[idx++]; }),
                     txs.end());
         });
   }
@@ -63,8 +58,7 @@ std::set<std::string> getUnconfirmedTXs(std::weak_ptr<cppclient::IotaAPI> client
 
     auto tips = {lmhs};
     while (!currentLevelTXs.empty()) {
-      auto removeTask = removeConfirmedTransactions(client, tips, currentLevelTXs).then([&](auto future) {
-        UNUSED(future);
+      auto removeTask = removeConfirmedTransactions(client, tips, currentLevelTXs).then([&](auto) {
         if (!currentLevelTXs.empty()) {
           res.insert(currentLevelTXs.begin(), currentLevelTXs.end());
 
