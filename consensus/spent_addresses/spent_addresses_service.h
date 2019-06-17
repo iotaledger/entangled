@@ -24,8 +24,8 @@ typedef struct spent_addresses_service_s {
 /**
  * Initializes a spent addresses service
  *
- * @param[in] sas   The spent addresses service
- * @param[in] conf  Consensus configuration
+ * @param[out]  sas   The spent addresses service
+ * @param[in]   conf  Consensus configuration
  *
  * @return a status code
  */
@@ -34,7 +34,7 @@ retcode_t iota_spent_addresses_service_init(spent_addresses_service_t *const sas
 /**
  * Destroys a spent addresses service
  *
- * @param[in] sas The spent addresses service
+ * @param[out] sas The spent addresses service
  *
  * @return a status code
  */

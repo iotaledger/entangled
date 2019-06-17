@@ -22,8 +22,8 @@ typedef struct spent_addresses_provider_s {
 /**
  * Initializes a spent addresses provider
  *
- * @param[in] sap   The spent addresses provider
- * @param[in] conf  A connection configuration
+ * @param[out]  sap   The spent addresses provider
+ * @param[in]   conf  A connection configuration
  *
  * @return a status code
  */
@@ -33,7 +33,7 @@ retcode_t iota_spent_addresses_provider_init(spent_addresses_provider_t *const s
 /**
  * Destroys a spent addresses provider
  *
- * @param[in] sap The spent addresses provider
+ * @param[out] sap The spent addresses provider
  *
  * @return a status code
  */

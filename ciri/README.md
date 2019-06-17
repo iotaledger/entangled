@@ -120,4 +120,4 @@ Long option | Short option | Description | Example input
 `--snapshot-signature-pubkey` | | Public key of the snapshot signature. | `--snapshot-signature-pubkey "TTX...YAC"`
 `--snapshot-signature-skip-validation` | | Skip validation of snapshot signature. Must be "true" or "false". | `--snapshot-signature-skip-validation false`
 `--snapshot-timestamp` | | Epoch time of the last snapshot. | `--snapshot-timestamp 1554904800`
-`--spent-addresses-files` | | List of space separated files that contains spent addresses to be merged into the database. | `--spent-addresses-files "file0 file1"`
+`--spent-addresses-files` | | List of whitespace separated files that contains spent addresses to be merged into the database. | `--spent-addresses-files "file0 file1"`

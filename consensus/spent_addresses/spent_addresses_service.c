@@ -36,13 +36,18 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
     return ret;
   }
 
-  ptr = cpy = strdup(sas->conf->spent_addresses_files);
+  if ((ptr = cpy = strdup(sas->conf->spent_addresses_files)) == NULL) {
+    ret = RC_OOM;
+    goto done;
+  }
+
   while ((file = strsep(&cpy, " ")) != NULL) {
     if ((ret = iota_spent_addresses_provider_import(&sap, file)) != RC_OK) {
       log_warning(logger_id, "Reading spent addresses file \"%s\" failed\n", file);
     }
   }
 
+done:
   if ((ret = iota_spent_addresses_provider_destroy(&sap)) != RC_OK) {
     log_error(logger_id, "Destroying spent addresses database connection failed\n");
   }

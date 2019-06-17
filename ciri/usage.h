@@ -186,7 +186,7 @@ static struct cli_argument_s {
      "Skip validation of snapshot signature. Must be \"true\" or \"false\".", REQUIRED_ARG},
     {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP, "Epoch time of the last snapshot.", REQUIRED_ARG},
     {"spent-addresses-files", CONF_SPENT_ADDRESSES_FILES,
-     "List of space separated files that contains spent addresses to be merged into the database.", REQUIRED_ARG},
+     "List of whitespace separated files that contains spent addresses to be merged into the database.", REQUIRED_ARG},
 
     // Local snapshots configuration
 

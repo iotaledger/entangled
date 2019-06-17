@@ -84,7 +84,7 @@ typedef struct iota_consensus_conf_s {
   uint64_t snapshot_timestamp_sec;
   // local snapshots configuration
   iota_consensus_local_snapshots_conf_t local_snapshots;
-  // List of space separated files that contains spent addresses to be merged into the database
+  // List of whitespace separated files that contains spent addresses to be merged into the database
   char* spent_addresses_files;
   // Path of the spent addresses database file
   char spent_addresses_db_path[FILE_PATH_SIZE];
