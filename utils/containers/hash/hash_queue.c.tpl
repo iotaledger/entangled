@@ -68,7 +68,7 @@ flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t *const queue, size_t index) 
   return NULL;
 }
 
-retcode_t hash{SIZE}_queue_copy(hash{SIZE}_queue_t const src, hash{SIZE}_queue_t *dest, size_t size) {
+retcode_t hash{SIZE}_queue_copy(hash{SIZE}_queue_t *dest, hash{SIZE}_queue_t const src, size_t size) {
   size_t count = 1;
   hash{SIZE}_queue_entry_t *iter = NULL;
   // if src is empty, returns NULL.

@@ -42,7 +42,7 @@ void test_hash243_copy() {
   hash243_queue_push(&src, hash243_1);
 
   // copy n elements from src to dest.
-  TEST_ASSERT(hash243_queue_copy(src, &dest, 2) == RC_OK);
+  TEST_ASSERT(hash243_queue_copy(&dest, src, 2) == RC_OK);
   TEST_ASSERT_EQUAL_INT(2, hash243_queue_count(dest));
   TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(&dest, 0), hash243_queue_at(&src, 0), FLEX_TRIT_SIZE_243);
   TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(&dest, 1), hash243_queue_at(&src, 1), FLEX_TRIT_SIZE_243);
