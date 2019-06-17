@@ -15,7 +15,7 @@
 int main(int ac, char **av) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
-  tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
+  tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
   retcode_t ret = RC_OK;
 
   if (ac != 6) {

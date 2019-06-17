@@ -655,8 +655,8 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
 
   MAM_ASSERT(ctx);
 
-  trit_t chid[MAM_CHANNEL_ID_SIZE];
-  memcpy(chid, ctx->pk.key, MAM_CHANNEL_ID_SIZE);
+  trit_t chid[MAM_CHANNEL_ID_TRIT_SIZE];
+  memcpy(chid, ctx->pk.key, MAM_CHANNEL_ID_TRIT_SIZE);
 
   mam_spongos_init(&ctx->spongos);
 
@@ -666,7 +666,8 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
   /* unwrap Channel */
   {
     tryte_t ver = -1;
-    ERR_BIND_RETURN(mam_msg_channel_unwrap(&ctx->spongos, msg, &ver, trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)), ret);
+    ERR_BIND_RETURN(mam_msg_channel_unwrap(&ctx->spongos, msg, &ver, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, chid)),
+                    ret);
     ERR_GUARD_RETURN(0 == ver, RC_MAM_VERSION_NOT_SUPPORTED);
 
     if (!mam_pk_t_set_contains(trusted_channel_pks, &ctx->pk)) {
@@ -682,19 +683,21 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
     ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM_PB3_BAD_ONEOF);
 
     if (MAM_MSG_PUBKEY_CHID1 == pubkey) { /*  SignedId chid1 = 2; */
-      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid1(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key),
-                                                  &spongos_mss, trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
-                      ret);
+      ERR_BIND_RETURN(
+          mam_msg_unwrap_pubkey_chid1(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key),
+                                      &spongos_mss, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, chid)),
+          ret);
       mam_pk_t_set_add(trusted_channel_pks, &ctx->pk);
     } else if (MAM_MSG_PUBKEY_EPID1 == pubkey) { /*  SignedId epid1 = 3; */
 
-      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_epid1(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key),
-                                                  &spongos_mss, trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
-                      ret);
+      ERR_BIND_RETURN(
+          mam_msg_unwrap_pubkey_epid1(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key),
+                                      &spongos_mss, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, chid)),
+          ret);
       mam_pk_t_set_add(trusted_endpoint_pks, &ctx->pk);
     } else if (MAM_MSG_PUBKEY_EPID == pubkey) { /*  absorb tryte epid[81] = 1; */
-      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_epid(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key)),
-                      ret);
+      ERR_BIND_RETURN(
+          mam_msg_unwrap_pubkey_epid(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key)), ret);
       if (!mam_pk_t_set_contains(trusted_endpoint_pks, &ctx->pk)) {
         return RC_MAM_ENDPOINT_NOT_TRUSTED;
       }
@@ -804,7 +807,7 @@ retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx, trits_t *const 
     mam_spongos_t spongos_mss;
     /*    MSSig mssig = 2; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mssig(&ctx->spongos, buffer, &spongos_mss,
-                                                trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key)),
+                                                trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key)),
                   e, cleanup);
   } else {
     ERR_GUARD_GOTO(0, RC_MAM_PB3_BAD_ONEOF, e, cleanup);
@@ -822,11 +825,11 @@ cleanup:
 }
 
 size_t mam_msg_write_ctx_serialized_size(mam_msg_write_context_t const *const ctx) {
-  return MAM_CHANNEL_ID_SIZE + mam_spongos_serialized_size(&ctx->spongos) + MAM_MSG_ORD_SIZE + MAM_MSS_PK_SIZE;
+  return MAM_CHANNEL_ID_TRIT_SIZE + mam_spongos_serialized_size(&ctx->spongos) + MAM_MSG_ORD_SIZE + MAM_MSS_PK_SIZE;
 }
 
 void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx, trits_t *const buffer) {
-  pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->chid), buffer);
+  pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->chid), buffer);
   mam_spongos_serialize(&ctx->spongos, buffer);
   trits_put18(*buffer, ctx->ord);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
@@ -842,7 +845,7 @@ retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_con
   mam_endpoint_t_set_entry_t *ep_entry = NULL;
   mam_endpoint_t_set_entry_t *ep_tmp = NULL;
 
-  ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->chid), buffer), ret);
+  ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->chid), buffer), ret);
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ctx->ord = trits_get18(*buffer);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
@@ -850,7 +853,7 @@ retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_con
   ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, mss_root), buffer), ret);
 
   SET_ITER(channels, ch_entry, ch_tmp) {
-    if (memcmp(trits_begin(mam_channel_id(&ch_entry->value)), mss_root, MAM_CHANNEL_ID_SIZE) == 0) {
+    if (memcmp(trits_begin(mam_channel_id(&ch_entry->value)), mss_root, MAM_CHANNEL_ID_TRIT_SIZE) == 0) {
       ctx->mss = &ch_entry->value.mss;
       return RC_OK;
     } else {
@@ -871,12 +874,12 @@ retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_con
 }
 
 size_t mam_msg_read_ctx_serialized_size(mam_msg_read_context_t const *const ctx) {
-  return mam_spongos_serialized_size(&ctx->spongos) + MAM_CHANNEL_ID_SIZE + MAM_MSG_ORD_SIZE;
+  return mam_spongos_serialized_size(&ctx->spongos) + MAM_CHANNEL_ID_TRIT_SIZE + MAM_MSG_ORD_SIZE;
 }
 
 void mam_msg_read_ctx_serialize(mam_msg_read_context_t const *const ctx, trits_t *const buffer) {
   mam_spongos_serialize(&ctx->spongos, buffer);
-  pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key), buffer);
+  pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key), buffer);
   trits_put18(*buffer, ctx->ord);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
 }
@@ -885,7 +888,7 @@ retcode_t mam_msg_read_ctx_deserialize(trits_t *const buffer, mam_msg_read_conte
   retcode_t ret = RC_OK;
 
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
-  ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk.key), buffer), ret);
+  ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key), buffer), ret);
   ctx->ord = trits_get18(*buffer);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
 

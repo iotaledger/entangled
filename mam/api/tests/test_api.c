@@ -17,9 +17,9 @@
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 
 static mam_api_t sender_api;
-static tryte_t ch_id[MAM_CHANNEL_ID_SIZE];
+static tryte_t ch_id[MAM_CHANNEL_ID_TRYTE_SIZE];
 static tryte_t ep_id[MAM_ENDPOINT_ID_SIZE];
-static tryte_t ch1_id[MAM_CHANNEL_ID_SIZE];
+static tryte_t ch1_id[MAM_CHANNEL_ID_TRYTE_SIZE];
 static tryte_t ep1_id[MAM_ENDPOINT_ID_SIZE];
 
 static tryte_t API_SEED[] =
