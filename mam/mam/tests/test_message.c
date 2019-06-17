@@ -139,7 +139,7 @@ static void message_test_generic_read_msg(mam_psk_t const *const pre_shared_key,
   memcpy(pk.key, trits_begin(mam_channel_id(cha)), MAM_CHANNEL_ID_TRIT_SIZE);
   TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids, &pk) == RC_OK);
   if (ep) {
-    memcpy(pk.key, trits_begin(mam_endpoint_id(ep)), MAM_ENDPOINT_ID_SIZE);
+    memcpy(pk.key, trits_begin(mam_endpoint_id(ep)), MAM_ENDPOINT_ID_TRIT_SIZE);
     TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids, &pk) == RC_OK);
   }
 

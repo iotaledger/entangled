@@ -110,7 +110,7 @@ static mam_channel_t *mam_api_channel_get(mam_api_t const *const api, tryte_t co
  */
 static mam_endpoint_t *mam_api_endpoint_get(mam_api_t const *const api, tryte_t const *const channel_id,
                                             tryte_t const *const endpoint_id) {
-  trit_t endpoint_id_trits[MAM_ENDPOINT_ID_SIZE];
+  trit_t endpoint_id_trits[MAM_ENDPOINT_ID_TRIT_SIZE];
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
   mam_channel_t *parent_channel = mam_api_channel_get(api, channel_id);
@@ -119,10 +119,10 @@ static mam_endpoint_t *mam_api_endpoint_get(mam_api_t const *const api, tryte_t 
     return NULL;
   }
 
-  trytes_to_trits(endpoint_id, endpoint_id_trits, MAM_ENDPOINT_ID_SIZE / 3);
+  trytes_to_trits(endpoint_id, endpoint_id_trits, MAM_ENDPOINT_ID_TRYTE_SIZE);
 
   SET_ITER(parent_channel->endpoints, entry, tmp) {
-    if (memcmp(trits_begin(mam_endpoint_id(&entry->value)), endpoint_id_trits, MAM_ENDPOINT_ID_SIZE) == 0) {
+    if (memcmp(trits_begin(mam_endpoint_id(&entry->value)), endpoint_id_trits, MAM_ENDPOINT_ID_TRIT_SIZE) == 0) {
       return &entry->value;
     }
   }
@@ -403,9 +403,9 @@ retcode_t mam_api_endpoint_create(mam_api_t *const api, size_t const height, try
     mam_endpoint_destroy(&endpoint);
     return ret;
   }
-  memcpy(endpoint_pk.key, trits_begin(mam_endpoint_id(&endpoint)), MAM_ENDPOINT_ID_SIZE);
+  memcpy(endpoint_pk.key, trits_begin(mam_endpoint_id(&endpoint)), MAM_ENDPOINT_ID_TRIT_SIZE);
   ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_endpoint_pks, &endpoint_pk), ret);
-  trits_to_trytes(trits_begin(mam_endpoint_id(&endpoint)), endpoint_id, MAM_ENDPOINT_ID_SIZE);
+  trits_to_trytes(trits_begin(mam_endpoint_id(&endpoint)), endpoint_id, MAM_ENDPOINT_ID_TRIT_SIZE);
   channel->endpoint_ord++;
 
   return ret;

@@ -858,7 +858,7 @@ retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_con
       return RC_OK;
     } else {
       SET_ITER(ch_entry->value.endpoints, ep_entry, ep_tmp) {
-        if (memcmp(trits_begin(mam_endpoint_id(&ep_entry->value)), mss_root, MAM_ENDPOINT_ID_SIZE) == 0) {
+        if (memcmp(trits_begin(mam_endpoint_id(&ep_entry->value)), mss_root, MAM_ENDPOINT_ID_TRIT_SIZE) == 0) {
           ctx->mss = &ep_entry->value.mss;
           return RC_OK;
         }
