@@ -12,21 +12,19 @@
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 
-#define MAX_TRYTES_FOR_SIZE_T ((5 * sizeof(size_t) + 2) / 3)
-
-trits_t pb3_trits_take(trits_t *const b, size_t const n) { return trits_advance(b, n); }
+trits_t pb3_trits_take(trits_t *const buffer, size_t const n) { return trits_advance(buffer, n); }
 
 /**
  * Protobuf3 primitive types
  * null, tryte, size_t, trytes, tryte [n]
  */
 
-size_t pb3_sizeof_tryte() { return 3; }
+size_t pb3_sizeof_tryte() { return NUMBER_OF_TRITS_IN_A_TRYTE; }
 
 void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer) {
   MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_tryte()));
 
-  trits_put3(pb3_trits_take(buffer, 3), tryte);
+  trits_put3(pb3_trits_take(buffer, NUMBER_OF_TRITS_IN_A_TRYTE), tryte);
 }
 
 retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
@@ -36,7 +34,7 @@ retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
     return RC_MAM_PB3_EOF;
   }
 
-  *tryte = trits_get3(pb3_trits_take(buffer, 3));
+  *tryte = trits_get3(pb3_trits_take(buffer, NUMBER_OF_TRITS_IN_A_TRYTE));
 
   return RC_OK;
 }
@@ -83,15 +81,15 @@ retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
 
 size_t pb3_sizeof_size_t(size_t const n) { return trits_sizeof_size_t(n); }
 
-void pb3_encode_size_t(size_t n, trits_t *const buffer) { trits_encode_size_t(n, buffer); }
+void pb3_encode_size_t(size_t size, trits_t *const buffer) { trits_encode_size_t(size, buffer); }
 
-retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) { return trits_decode_size_t(n, buffer); }
+retcode_t pb3_decode_size_t(size_t *const size, trits_t *const buffer) { return trits_decode_size_t(size, buffer); }
 
 size_t pb3_sizeof_ntrytes(size_t const n) { return NUMBER_OF_TRITS_IN_A_TRYTE * n; }
 
 void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
-  MAM_ASSERT(0 == (n % 3));
+  MAM_ASSERT(0 == (n % NUMBER_OF_TRITS_IN_A_TRYTE));
   MAM_ASSERT(buffer && n <= trits_size(*buffer));
 
   trits_copy(ntrytes, pb3_trits_take(buffer, n));
@@ -99,7 +97,7 @@ void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
 
 retcode_t pb3_decode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
-  MAM_ASSERT(buffer && (n % 3) == 0);
+  MAM_ASSERT(buffer && (n % NUMBER_OF_TRITS_IN_A_TRYTE) == 0);
 
   if (n > trits_size(*buffer)) {
     return RC_MAM_PB3_EOF;
@@ -154,19 +152,19 @@ retcode_t pb3_unwrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const b
   return ret;
 }
 
-void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t const t) {
+void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t const size) {
   trits_t b0 = *buffer;
 
-  pb3_encode_size_t(t, buffer);
+  pb3_encode_size_t(size, buffer);
   mam_spongos_absorb(spongos, trits_diff(b0, *buffer));
 }
 
-retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t *const t) {
+retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer, size_t *const size) {
   retcode_t ret = RC_OK;
   trits_t b0;
 
   b0 = *buffer;
-  if ((ret = pb3_decode_size_t(t, buffer)) != RC_OK) {
+  if ((ret = pb3_decode_size_t(size, buffer)) != RC_OK) {
     return ret;
   }
   mam_spongos_absorb(spongos, trits_diff(b0, *buffer));
@@ -196,7 +194,7 @@ retcode_t pb3_unwrap_absorb_ntrytes(mam_spongos_t *const spongos, trits_t *const
 
 void pb3_wrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer, trits_t const trits) {
   size_t n = trits_size(trits);
-  MAM_ASSERT(0 == (n % 3));
+  MAM_ASSERT(0 == (n % NUMBER_OF_TRITS_IN_A_TRYTE));
   MAM_ASSERT(n <= trits_size(*buffer));
 
   mam_spongos_encr(spongos, trits, pb3_trits_take(buffer, n));
@@ -204,7 +202,7 @@ void pb3_wrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer,
 
 retcode_t pb3_unwrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer, trits_t const trits) {
   size_t n = trits_size(trits);
-  MAM_ASSERT(0 == (n % 3));
+  MAM_ASSERT(0 == (n % NUMBER_OF_TRITS_IN_A_TRYTE));
 
   if (n > trits_size(*buffer)) {
     return RC_MAM_PB3_EOF;

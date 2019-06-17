@@ -43,11 +43,14 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
  *
  * @param[in] serv client service
  * @param[in] addr examining address
- * @param[out] is_unused return if addr has been unsed
+ * @param[in, out] is_unused return if addr has been unsed
+ * @param[in] with_txs If <b>True</b> return transactions of this address in the <b>transactions</b>.
+ * @param[in, out] transactions if <b>with_tx_list</b> is true, return transaction list of this address, otherwise
+ * ignore this parameter.
  * @return #retcode_t
  */
 retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
-                            bool* const is_unused);
+                            bool* const is_unused, bool with_txs, hash243_queue_t* transactions);
 #ifdef __cplusplus
 }
 #endif

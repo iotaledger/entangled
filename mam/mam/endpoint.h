@@ -23,7 +23,8 @@
 #include "mam/mss/mss.h"
 #include "mam/trits/trits.h"
 
-#define MAM_ENDPOINT_ID_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_ENDPOINT_ID_TRIT_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_ENDPOINT_ID_TRYTE_SIZE (MAM_ENDPOINT_ID_TRIT_SIZE / 3)
 #define MAM_ENDPOINT_NAME_SIZE 18
 
 #ifdef __cplusplus
@@ -47,7 +48,7 @@ typedef mam_endpoint_t_set_entry_t *mam_endpoint_t_set_t;
  * @return the endpoint's id
  */
 static inline trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint) {
-  return trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->mss.root);
+  return trits_from_rep(MAM_ENDPOINT_ID_TRIT_SIZE, endpoint->mss.root);
 }
 
 /**
