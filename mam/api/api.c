@@ -33,9 +33,13 @@ static void mam_api_bundle_wrap(bundle_transactions_t *const bundle, trit_t cons
   flex_trit_t buffer[FLEX_TRIT_SIZE_6561];
   trits_t message_part = trits_null();
 
+  // We explicitly set some essence fields to 0 or null trits so that the bundle finalization knows it was intentional
+  // and doesn't assert
   transaction_reset(&transaction);
   flex_trits_from_trits(buffer, NUM_TRITS_MESSAGE, address, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
   transaction_set_address(&transaction, buffer);
+  transaction_set_value(&transaction, 0);
+  transaction_set_obsolete_tag(&transaction, transaction.data.signature_or_message);
   transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
   flex_trits_from_trits(buffer, NUM_TRITS_MESSAGE, tag, NUM_TRITS_TAG, NUM_TRITS_TAG);
   transaction_set_tag(&transaction, buffer);
