@@ -39,7 +39,7 @@ void ZmqDBLoader::cleanDBPeriodically() {
   if (_cleanupInterval > 0) {
     pubWorker.schedule_periodically(
         pubThread.now(), std::chrono::seconds(_cleanupInterval),
-        [oldestTXAge = _oldestTXAge](auto scbl) { TangleDB::instance().removeAgedTxs(oldestTXAge); });
+        [oldestTXAge = _oldestTXAge](auto) { TangleDB::instance().removeAgedTxs(oldestTXAge); });
   }
 }
 

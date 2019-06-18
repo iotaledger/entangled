@@ -67,3 +67,26 @@ flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t *const queue, size_t index) 
   }
   return NULL;
 }
+
+retcode_t hash{SIZE}_queue_copy(hash{SIZE}_queue_t *dest, hash{SIZE}_queue_t const src, size_t size) {
+  size_t count = 1;
+  hash{SIZE}_queue_entry_t *iter = NULL;
+  // if src is empty, returns NULL.
+  if (src == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  // copying elements to dest
+  CDL_FOREACH(src, iter) {
+    if (hash{SIZE}_queue_push(dest, iter->hash) == RC_OK) {
+      if (count == size) {
+        break;
+      }
+      count++;
+    } else {
+      return RC_OOM;
+    }
+  }
+
+  return RC_OK;
+}

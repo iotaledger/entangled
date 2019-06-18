@@ -60,7 +60,7 @@ void BroadcastReceiveCollector::broadcastTransactions() {
 
   if (_broadcastInterval > 0) {
     pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_broadcastInterval),
-                                    [&](auto scbl) { broadcastOneTransaction(); });
+                                    [&](auto) { broadcastOneTransaction(); });
   } else {
     broadcastOneTransaction();
   }
