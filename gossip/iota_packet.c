@@ -57,7 +57,9 @@ bool iota_packet_queue_empty(iota_packet_queue_t const queue) { return (queue ==
 size_t iota_packet_queue_count(iota_packet_queue_t const queue) {
   iota_packet_queue_entry_t *iter = NULL;
   size_t count = 0;
+
   CDL_COUNT(queue, iter, count);
+
   return count;
 }
 
@@ -87,7 +89,7 @@ iota_packet_queue_entry_t *iota_packet_queue_pop(iota_packet_queue_t *const queu
 
   front = *queue;
   if (front != NULL) {
-    CDL_DELETE(front, front);
+    CDL_DELETE(*queue, front);
   }
 
   return front;
