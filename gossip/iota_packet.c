@@ -64,37 +64,33 @@ size_t iota_packet_queue_count(iota_packet_queue_t const queue) {
 retcode_t iota_packet_queue_push(iota_packet_queue_t *const queue, iota_packet_t const *const packet) {
   iota_packet_queue_entry_t *entry = NULL;
 
-  if (queue == NULL) {
+  if (queue == NULL || packet == NULL) {
     return RC_NULL_PARAM;
   }
 
   if ((entry = (iota_packet_queue_entry_t *)malloc(sizeof(iota_packet_queue_entry_t))) == NULL) {
     return RC_OOM;
   }
+
   entry->packet = *packet;
   CDL_APPEND(*queue, entry);
+
   return RC_OK;
 }
 
-void iota_packet_queue_pop(iota_packet_queue_t *const queue) {
-  iota_packet_queue_entry_t *tmp = NULL;
+iota_packet_queue_entry_t *iota_packet_queue_pop(iota_packet_queue_t *const queue) {
+  iota_packet_queue_entry_t *front = NULL;
 
-  if (queue == NULL) {
-    return;
-  }
-
-  tmp = *queue;
-  if (tmp != NULL) {
-    CDL_DELETE(*queue, *queue);
-    free(tmp);
-  }
-}
-
-iota_packet_t *iota_packet_queue_peek(iota_packet_queue_t const queue) {
   if (queue == NULL) {
     return NULL;
   }
-  return &queue->packet;
+
+  front = *queue;
+  if (front != NULL) {
+    CDL_DELETE(front, front);
+  }
+
+  return front;
 }
 
 void iota_packet_queue_free(iota_packet_queue_t *const queue) {
