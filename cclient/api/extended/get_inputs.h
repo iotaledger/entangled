@@ -17,7 +17,7 @@
 #ifndef CCLIENT_API_GET_INPUTS_H
 #define CCLIENT_API_GET_INPUTS_H
 
-#include "cclient/api/extended/types.h"
+#include "cclient/api/extended/get_new_address.h"
 #include "cclient/http/http.h"
 #include "common/model/inputs.h"
 

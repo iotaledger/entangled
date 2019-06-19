@@ -17,7 +17,6 @@
 #ifndef CCLIENT_API_GET_ACCOUNT_DATA_H
 #define CCLIENT_API_GET_ACCOUNT_DATA_H
 
-#include "cclient/api/extended/types.h"
 #include "cclient/http/http.h"
 
 #ifdef __cplusplus
@@ -36,9 +35,26 @@ typedef struct {
   UT_array* balances;                             /*!< List of balances */
 } account_data_t;
 
+/**
+ * @brief Initialize the #account_data_t structure.
+ *
+ * @param[out] account An #account_data_t object.
+ */
 void account_data_init(account_data_t* const account);
 
+/**
+ * @brief Clean up the #account_data_t.
+ *
+ * @param[out] account An #account_data_t object.
+ */
 void account_data_clear(account_data_t* const account);
+
+/**
+ * @brief
+ *
+ * @param[in] account Gets the balance value by index.
+ * @return the balance of the index in #account_data_t.balances.
+ */
 uint64_t account_data_get_balance(account_data_t* const account, size_t index);
 
 /**

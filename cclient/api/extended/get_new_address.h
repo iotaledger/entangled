@@ -17,12 +17,21 @@
 #ifndef CCLIENT_API_GET_NEW_ADDRESS_H
 #define CCLIENT_API_GET_NEW_ADDRESS_H
 
-#include "cclient/api/extended/types.h"
 #include "cclient/http/http.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Address genrating options
+ *
+ */
+typedef struct {
+  uint64_t start;   /*!< start key index */
+  uint64_t total;   /*!< total key index */
+  uint8_t security; /*!< security level */
+} address_opt_t;
 
 /**
  * @brief Generates and retruns addresses including an unused address.
