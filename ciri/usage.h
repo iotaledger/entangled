@@ -15,7 +15,9 @@ typedef enum cli_arg_value_e {
 
   // cIRI configuration
 
-  CONF_DB_REVALIDATE,
+  CONF_SPENT_ADDRESSES_DB_PATH,
+  CONF_TANGLE_DB_PATH,
+  CONF_TANGLE_DB_REVALIDATE,
 
   // Gossip configuration
 
@@ -53,6 +55,7 @@ typedef enum cli_arg_value_e {
   CONF_SNAPSHOT_SIGNATURE_PUBKEY,
   CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION,
   CONF_SNAPSHOT_TIMESTAMP,
+  CONF_SPENT_ADDRESSES_FILES,
 
   // Local snapshots
 
@@ -76,15 +79,17 @@ static struct cli_argument_s {
     // cIRI configuration
 
     {"config", 'c', "Path to the configuration file.", REQUIRED_ARG},
-    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
-    {"db-revalidate", CONF_DB_REVALIDATE,
-     "Reloads milestones, state of the ledger and transactions metadata from the database.", REQUIRED_ARG},
     {"help", 'h', "Displays this usage.", NO_ARG},
     {"log-level", 'l',
      "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
      REQUIRED_ARG},
+    {"spent-addresses-db-path", CONF_SPENT_ADDRESSES_DB_PATH, "Path to the spent addresses database file.",
+     REQUIRED_ARG},
+    {"tangle-db-path", CONF_TANGLE_DB_PATH, "Path to the tangle database file.", REQUIRED_ARG},
+    {"tangle-db-revalidate", CONF_TANGLE_DB_REVALIDATE,
+     "Reloads milestones, state of the ledger and transactions metadata from the tangle database.", REQUIRED_ARG},
 
     // Gossip configuration
 
@@ -180,6 +185,8 @@ static struct cli_argument_s {
     {"snapshot-signature-skip-validation", CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION,
      "Skip validation of snapshot signature. Must be \"true\" or \"false\".", REQUIRED_ARG},
     {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP, "Epoch time of the last snapshot.", REQUIRED_ARG},
+    {"spent-addresses-files", CONF_SPENT_ADDRESSES_FILES,
+     "List of whitespace separated files that contains spent addresses to be merged into the database.", REQUIRED_ARG},
 
     // Local snapshots configuration
 

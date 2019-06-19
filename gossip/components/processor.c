@@ -230,7 +230,6 @@ typedef struct packet_digest_s {
  * @param processor The processor state
  */
 static void *processor_routine(processor_t *const processor) {
-  connection_config_t db_conf = {.db_path = processor->node->conf.db_path};
   tangle_t tangle;
   size_t j;
 
@@ -238,9 +237,13 @@ static void *processor_routine(processor_t *const processor) {
     return NULL;
   }
 
-  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(logger_id, "Initializing tangle connection failed\n");
-    return NULL;
+  {
+    connection_config_t db_conf = {.db_path = processor->node->conf.tangle_db_path};
+
+    if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+      log_critical(logger_id, "Initializing tangle connection failed\n");
+      return NULL;
+    }
   }
 
   const size_t PACKET_MAX = 64;

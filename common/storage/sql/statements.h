@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-typedef struct iota_statements_s {
+typedef struct tangle_statements_s {
   void* transaction_insert;
   void* transaction_select_by_hash;
   void* transaction_select_hashes_by_address;
@@ -42,7 +42,12 @@ typedef struct iota_statements_s {
   void* milestone_exist_by_hash;
   void* state_delta_store;
   void* state_delta_load;
-} iota_statements_t;
+} tangle_statements_t;
+
+typedef struct spent_addresses_statements_s {
+  void* spent_address_insert;
+  void* spent_address_exist;
+} spent_addresses_statements_t;
 
 /*
  * Generic statement builders
@@ -104,6 +109,13 @@ extern char* iota_statement_milestone_exist_by_hash;
 
 extern char* iota_statement_state_delta_store;
 extern char* iota_statement_state_delta_load;
+
+/*
+ * Spent address statements
+ */
+
+extern char* iota_statement_spent_address_insert;
+extern char* iota_statement_spent_address_exist;
 
 #ifdef __cplusplus
 }

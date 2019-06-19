@@ -3,9 +3,10 @@
 
 # cIRI configuration
 
-# db-path: ciri/db/ciri-mainnet.db
-# db-revalidate: false
 # log-level: info
+# spent-addresses-db-path: ciri/db/spent-addresses-mainnet.db
+# tangle-db-path: ciri/db/tangle-mainnet.db
+# tangle-db-revalidate: false
 
 # Gossip configuration
 
@@ -46,3 +47,4 @@
 # snapshot-signature-pubkey: "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC"
 # snapshot-signature-skip-validation: false
 # snapshot-timestamp: 1554904800
+# spent-addresses-files: "/absolute/path/to/file0 /absolute/path/to/file1"

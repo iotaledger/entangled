@@ -111,6 +111,12 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
     return ret;
   }
 
+  log_info(logger_id, "Initializing spent addresses service\n");
+  if ((ret = iota_spent_addresses_service_init(&consensus->spent_addresses_service, &consensus->conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing spent addresses service failed\n");
+    return ret;
+  }
+
   return ret;
 }
 
@@ -229,6 +235,11 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   log_info(logger_id, "Destroying milestone service\n");
   if ((ret = iota_milestone_service_destroy(&consensus->milestone_service)) != RC_OK) {
     log_error(logger_id, "Destroying milestone service failed\n");
+  }
+
+  log_info(logger_id, "Destroying spent addresses service\n");
+  if ((ret = iota_spent_addresses_service_destroy(&consensus->spent_addresses_service)) != RC_OK) {
+    log_error(logger_id, "Destroying spent addresses service failed\n");
   }
 
   logger_helper_release(logger_id);

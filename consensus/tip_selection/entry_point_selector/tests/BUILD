@@ -16,7 +16,7 @@ cc_test(
 
 genrule(
     name = "db_file",
-    srcs = ["//common/storage/sql:schema"],
+    srcs = ["//common/storage/sql:tangle-schema"],
     outs = ["ciri.db"],
     cmd = "$(location @sqlite3//:shell) $@ < $<",
     tools = ["@sqlite3//:shell"],
