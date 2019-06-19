@@ -220,7 +220,7 @@ done:
 }
 
 typedef struct packet_digest_s {
-  iota_packet_t packet;
+  iota_packet_queue_entry_t *entry;
   uint64_t digest;
 } packet_digest_t;
 
@@ -248,7 +248,7 @@ static void *processor_routine(processor_t *const processor) {
 
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
-  iota_packet_t *packet_ptr = NULL;
+  iota_packet_queue_entry_t *entry = NULL;
   packet_digest_t *packets = (packet_digest_t *)calloc(PACKET_MAX, sizeof(packet_digest_t));
 
   trit_t *tx = (trit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
@@ -268,34 +268,30 @@ static void *processor_routine(processor_t *const processor) {
   lock_handle_lock(&lock_cond);
 
   while (processor->running) {
-    if (processor_is_empty(processor)) {
-      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_MS);
-    }
-
-    rw_lock_handle_wrlock(&processor->lock);
     packet_cnt = 0;
     while (packet_cnt < PACKET_MAX) {
-      packet_ptr = iota_packet_queue_peek(processor->queue);
-      if (packet_ptr == NULL) {
+      rw_lock_handle_wrlock(&processor->lock);
+      entry = iota_packet_queue_pop(&processor->queue);
+      rw_lock_handle_unlock(&processor->lock);
+      if (entry == NULL) {
         break;
       }
-      recent_seen_bytes_cache_hash(packet_ptr->content, &digest);
+      recent_seen_bytes_cache_hash(entry->packet.content, &digest);
       recent_seen_bytes_cache_get(&processor->node->recent_seen_bytes, digest, flex_hash, &digest_found);
       if (digest_found) {
-        if (process_packet(processor, &tangle, packet_ptr, flex_hash, true, digest) != RC_OK) {
+        if (process_packet(processor, &tangle, &entry->packet, flex_hash, true, digest) != RC_OK) {
           log_warning(logger_id, "Processing packet failed\n");
         }
+        free(entry);
       } else {
-        packets[packet_cnt].packet = *packet_ptr;
+        packets[packet_cnt].entry = entry;
         packets[packet_cnt].digest = digest;
         packet_cnt++;
       }
-      iota_packet_queue_pop(&processor->queue);
     }
 
-    rw_lock_handle_unlock(&processor->lock);
-
     if (packet_cnt == 0) {
+      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_MS);
       continue;
     }
 
@@ -304,7 +300,7 @@ static void *processor_routine(processor_t *const processor) {
     memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(packets[j].packet.content, PACKET_TX_SIZE, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
+      bytes_to_trits(packets[j].entry->packet.content, PACKET_TX_SIZE, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
     }
 
@@ -315,9 +311,10 @@ static void *processor_routine(processor_t *const processor) {
       ptrits_to_trits(txs_acc, hash, j, HASH_LENGTH_TRIT);
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
-      if (process_packet(processor, &tangle, &packets[j].packet, flex_hash, false, packets[j].digest) != RC_OK) {
+      if (process_packet(processor, &tangle, &packets[j].entry->packet, flex_hash, false, packets[j].digest) != RC_OK) {
         log_warning(logger_id, "Processing packet failed\n");
       }
+      free(packets[j].entry);
     }
   }
 
