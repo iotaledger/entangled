@@ -9,16 +9,6 @@ cc_test(
 )
 
 cc_test(
-    name = "test_curlp_bct",
-    timeout = "short",
-    srcs = ["test_bct.c"],
-    deps = [
-        "//common/crypto/curl-p:bct",
-        "@unity",
-    ],
-)
-
-cc_test(
     name = "test_curlp_ptrit",
     timeout = "short",
     srcs = [

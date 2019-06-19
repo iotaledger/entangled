@@ -113,18 +113,9 @@ retcode_t iota_packet_queue_push(iota_packet_queue_t* const queue, iota_packet_t
  *
  * @param queue The packet queue
  *
- * @return a status code
- */
-void iota_packet_queue_pop(iota_packet_queue_t* const queue);
-
-/**
- * Peeks a packet from a packet queue
- *
- * @param queue The packet queue
- *
  * @return the packet
  */
-iota_packet_t* iota_packet_queue_peek(iota_packet_queue_t const queue);
+iota_packet_queue_entry_t* iota_packet_queue_pop(iota_packet_queue_t* const queue);
 
 /**
  * Frees a packet queue

@@ -30,21 +30,6 @@ cc_library(
 )
 
 cc_library(
-    name = "bct",
-    srcs = ["curl_p_bct.c"],
-    hdrs = [
-        "bct.h",
-    ],
-    deps = [
-        ":curl-p-const",
-        "//common:stdint",
-        "//common/trinary:bct",
-        "//common/trinary:trits",
-        "//utils:memset_safe",
-    ],
-)
-
-cc_library(
     name = "ptrit",
     srcs = ["ptrit.c"],
     hdrs = [
