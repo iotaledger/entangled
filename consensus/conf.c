@@ -180,6 +180,8 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
 
   ERR_BIND_GOTO(iota_consensus_local_snapshots_conf_init(&conf->local_snapshots), ret, cleanup);
 
+  conf->spent_addresses_files = NULL;
+
 cleanup:
   logger_helper_release(logger_id);
 

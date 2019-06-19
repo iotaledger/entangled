@@ -457,11 +457,12 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char
   error_res_t *error = NULL;
 
   if (!tangle) {
-    log_debug(logger_id, "Instantiating new HTTP API database connection\n");
+    connection_config_t db_conf = {.db_path = http->api->conf.tangle_db_path};
 
+    log_debug(logger_id, "Instantiating new HTTP API database connection\n");
     tangle = (tangle_t *)calloc(1, sizeof(tangle_t));
     utarray_push_back(http->db_connections, tangle);
-    iota_tangle_init(tangle, http->db_config);
+    iota_tangle_init(tangle, &db_conf);
   }
 
   for (size_t i = 0; http->api->conf.remote_limit_api[i]; i++) {
@@ -611,7 +612,7 @@ cleanup:
   return ret;
 }
 
-retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api, connection_config_t *const db_config) {
+retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api) {
   if (api == NULL) {
     return RC_NULL_PARAM;
   }
@@ -620,7 +621,6 @@ retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api,
 
   http->running = false;
   http->api = api;
-  http->db_config = db_config;
 
   utarray_new(http->db_connections, &ut_ptr_icd);
 

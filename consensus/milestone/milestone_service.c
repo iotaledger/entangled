@@ -32,8 +32,9 @@ retcode_t iota_milestone_service_destroy(milestone_service_t *const milestone_se
   return RC_OK;
 }
 
-retcode_t iota_milestone_service_replay_milestones(milestone_service_t *const milestone_service, tangle_t *const tangle,
-                                                   snapshot_t *const snapshot, uint64_t index) {
+retcode_t iota_milestone_service_replay_milestones(milestone_service_t const *const milestone_service,
+                                                   tangle_t const *const tangle, snapshot_t *const snapshot,
+                                                   uint64_t index) {
   retcode_t ret = RC_OK;
   state_delta_t merged_balance_changes = NULL;
   state_delta_t current_delta = NULL;

@@ -14,12 +14,14 @@
 #include "common/errors.h"
 #include "consensus/conf.h"
 #include "gossip/conf.h"
+#include "utils/files.h"
 #include "utils/logger_helper.h"
 
 #define DEFAULT_CONF_PATH "ciri/conf.yml"
-#define DEFAULT_DB_PATH DB_PATH
-#define DEFAULT_DB_PREVALIDATE false
 #define DEFAULT_LOG_LEVEL LOGGER_INFO
+#define DEFAULT_SPENT_ADDRESSES_DB_PATH SPENT_ADDRESSES_DB_PATH
+#define DEFAULT_TANGLE_DB_PATH TANGLE_DB_PATH
+#define DEFAULT_TANGLE_DB_REVALIDATE false
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,14 +30,16 @@ extern "C" {
 // This structure contains all configuration variables needed to operate cIRI
 typedef struct iota_ciri_conf_s {
   // Path to the configuration file
-  char conf_path[128];
-  // Path to the database file
-  char db_path[128];
-  // Reloads milestones, state of the ledger and transactions metadata from the database
-  bool db_revalidate;
+  char conf_path[FILE_PATH_SIZE];
   // Valid log levels: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
+  // Path of the spent addresses database file
+  char spent_addresses_db_path[FILE_PATH_SIZE];
+  // Path of the tangle database file
+  char tangle_db_path[FILE_PATH_SIZE];
+  // Reloads milestones, state of the ledger and transactions metadata from the tangle database
+  bool tangle_db_revalidate;
 } iota_ciri_conf_t;
 
 /**

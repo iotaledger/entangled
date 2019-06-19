@@ -26,22 +26,41 @@ Everyone will be welcoming and very happy to help you get connected. If you want
 
 cIRI is built and run through [bazel](https://www.bazel.build/).
 
+Clone the project
+
 ```
 $ git clone https://github.com/iotaledger/entangled.git
 $ cd entangled
 ```
-If you want to run a mainnet node
+
+*First build can take some time due to dependencies downloading.*
+
+### For a mainnet node
+
+Create the databases, only the first time:
 ```
-$ sqlite3 ciri/db/ciri-mainnet.db < common/storage/sql/schema.sql # only the first time
+$ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/spent-addresses-schema.sql
+```
+
+Build and run cIRI
+```
 $ bazel run -c opt --define network=mainnet -- ciri # optional flags
 ```
-If you want to run a testnet node
+### For a testnet node
+
+Create the databases, only the first time:
 ```
-$ sqlite3 ciri/db/ciri-testnet.db < common/storage/sql/schema.sql # only the first time
+$ sqlite3 ciri/db/tangle-testnet.db < common/storage/sql/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-testnet.db < common/storage/sql/spent-addresses-schema.sql
+```
+
+Build and run cIRI
+```
 $ bazel run -c opt --define network=testnet -- ciri # optional flags
 ```
 
-*First build can take some time due to dependencies downloading.*
+
 
 ## Configuration
 
@@ -64,10 +83,11 @@ http-port: 14265
 Long option | Short option | Description | Example input
 --- | --- | --- | ---
 `--config` | `-c` | Path to the configuration file. | `--config ciri/conf.yml`
-`--db-path` | `-d` | Path to the database file. | `-d ciri/db/ciri-mainnet.db`
-`--db-revalidate` | | Reloads milestones, state of the ledger and transactions metadata from the database. | `--db-revalidate false`
 `--help` | `-h` | Displays the usage. |
 `--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
+`--spent-addresses-db-path` | | Path to the spent addresses database file. | `--spent-addresses-db-path ciri/db/spent-addresses-mainnet.db`
+`--tangle-db-path` | | Path to the tangle database file. | `--tangle-db-path ciri/db/tangle-mainnet.db`
+`--tangle-db-revalidate` | | Reloads milestones, state of the ledger and transactions metadata from the tangle database. | `--tangle-db-revalidate false`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
 `--p-propagate-request` |  | Probability of propagating the request of a transaction to a neighbor node if it can't be found. This should be low since we don't want to propagate non-existing transactions that spam the network. Value must be in [0,1]. | `--p-propagate-request 0.01`
@@ -99,4 +119,5 @@ Long option | Short option | Description | Example input
 `--snapshot-signature-index` | | Index of the snapshot signature. | `--snapshot-signature-index 12`
 `--snapshot-signature-pubkey` | | Public key of the snapshot signature. | `--snapshot-signature-pubkey "TTX...YAC"`
 `--snapshot-signature-skip-validation` | | Skip validation of snapshot signature. Must be "true" or "false". | `--snapshot-signature-skip-validation false`
-`--snapshot-timestamp` | | Epoch time of the last snapshot | `--snapshot-timestamp 1554904800`
+`--snapshot-timestamp` | | Epoch time of the last snapshot. | `--snapshot-timestamp 1554904800`
+`--spent-addresses-files` | | List of whitespace separated files that contains spent addresses to be merged into the database. | `--spent-addresses-files "file0 file1"`

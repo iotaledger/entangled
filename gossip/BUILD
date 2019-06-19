@@ -17,6 +17,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_byte",
+        "//utils:files",
     ],
 )
 

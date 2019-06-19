@@ -197,3 +197,13 @@ char *iota_statement_state_delta_store =
 
 char *iota_statement_state_delta_load =
     "SELECT " MILESTONE_COL_DELTA " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=?";
+
+/*
+ * Spent address statements
+ */
+
+char *iota_statement_spent_address_insert =
+    "INSERT INTO " SPENT_ADDRESS_TABLE_NAME "(" SPENT_ADDRESS_COL_HASH ")VALUES(?)";
+
+char *iota_statement_spent_address_exist =
+    "SELECT 1 WHERE EXISTS(SELECT 1 FROM " SPENT_ADDRESS_TABLE_NAME " WHERE " SPENT_ADDRESS_COL_HASH "=?)";
