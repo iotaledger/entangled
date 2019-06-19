@@ -25,6 +25,23 @@ extern "C" {
 #endif
 
 /**
+ * @brief Account information
+ *
+ */
+typedef struct {
+  uint64_t balance;                               /*!< total balance */
+  flex_trit_t latest_address[FLEX_TRIT_SIZE_243]; /*!< unused address */
+  hash243_queue_t addresses;                      /*!< List of used addresses */
+  hash243_queue_t transactions;                   /*!< List of transactions */
+  UT_array* balances;                             /*!< List of balances */
+} account_data_t;
+
+void account_data_init(account_data_t* const account);
+
+void account_data_clear(account_data_t* const account);
+uint64_t account_data_get_balance(account_data_t* const account, size_t index);
+
+/**
  * @brief Returns an #account_data_t object.
  *
  * Returns an #account_data_t object, containing account information about <b>addresses</b>, <b>transactions</b>,

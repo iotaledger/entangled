@@ -28,17 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Account information
- *
- */
-typedef struct {
-  uint64_t balance;                               /*!< total balance */
-  flex_trit_t latest_address[FLEX_TRIT_SIZE_243]; /*!< unused address */
-  hash243_queue_t addresses;                      /*!< List of used addresses */
-  hash243_queue_t transactions;                   /*!< List of transactions */
-} account_data_t;
-
-/**
  * @brief Address genrating options
  *
  */
