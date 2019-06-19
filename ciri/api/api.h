@@ -333,15 +333,19 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
  *
  * If an address has a pending transaction, it is also marked as spent.
  *
- * @param[in]   api   The API
- * @param[in]   req   The request
- * @param[out]  res   The response
- * @param[out]  error An error response
+ * @param[in]     api     The API
+ * @param[in,out] tangle  A tangle connection
+ * @param[in,out] sap     A spent addresses provider connection
+ * @param[in]     req     The request
+ * @param[out]    res     The response
+ * @param[out]    error   An error response
  *
  * @return a status code
  */
-retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, check_consistency_req_t const *const req,
-                                             check_consistency_res_t *const res, error_res_t **const error);
+retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, tangle_t *const tangle,
+                                             spent_addresses_provider_t *const sap,
+                                             were_addresses_spent_from_req_t const *const req,
+                                             were_addresses_spent_from_res_t *const res, error_res_t **const error);
 
 #ifdef __cplusplus
 }

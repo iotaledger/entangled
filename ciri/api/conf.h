@@ -37,6 +37,8 @@ typedef struct iota_api_conf_s {
   size_t max_get_trytes;
   // Commands that should be ignored by API
   char* remote_limit_api[API_ENDPOINTS_NUM + 1];
+  // Path of the spent addresses database file
+  char spent_addresses_db_path[FILE_PATH_SIZE];
   // Path of the tangle database file
   char tangle_db_path[FILE_PATH_SIZE];
 } iota_api_conf_t;
