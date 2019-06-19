@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "node/components/tips_requester.h"
+#include "node/pipeline/tips_requester.h"
 #include "common/model/milestone.h"
 #include "consensus/tangle/tangle.h"
 #include "node/iota_packet.h"

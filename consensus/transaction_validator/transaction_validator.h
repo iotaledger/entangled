@@ -14,7 +14,7 @@
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "consensus/snapshot/snapshots_provider.h"
-#include "node/components/transaction_requester.h"
+#include "node/pipeline/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {

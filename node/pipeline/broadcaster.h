@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_BROADCASTER_H__
-#define __NODE_COMPONENTS_BROADCASTER_H__
+#ifndef __NODE_PIPELINE_BROADCASTER_H__
+#define __NODE_PIPELINE_BROADCASTER_H__
 
 #include <stdbool.h>
 
@@ -92,4 +92,4 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_BROADCASTER_H__
+#endif  //__NODE_PIPELINE_BROADCASTER_H__

@@ -18,7 +18,7 @@
 #include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/consensus.h"
-#include "node/components/broadcaster.h"
+#include "node/pipeline/broadcaster.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus

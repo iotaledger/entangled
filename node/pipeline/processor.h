@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_PROCESSOR_H__
-#define __NODE_COMPONENTS_PROCESSOR_H__
+#ifndef __NODE_PIPELINE_PROCESSOR_H__
+#define __NODE_PIPELINE_PROCESSOR_H__
 
 #include <stdbool.h>
 
@@ -109,4 +109,4 @@ size_t processor_size(processor_t *const processor);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_PROCESSOR_H__
+#endif  //__NODE_PIPELINE_PROCESSOR_H__

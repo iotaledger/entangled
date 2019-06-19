@@ -11,9 +11,9 @@
 #include "common/trinary/trit_ptrit.h"
 #include "consensus/milestone/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
-#include "node/components/processor.h"
 #include "node/neighbor.h"
 #include "node/node.h"
+#include "node/pipeline/processor.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"

@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "node/components/responder.h"
+#include "node/pipeline/responder.h"
 #include "consensus/tangle/tangle.h"
 #include "node/neighbor.h"
 #include "node/node.h"

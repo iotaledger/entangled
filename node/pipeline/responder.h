@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_RESPONDER_H__
-#define __NODE_COMPONENTS_RESPONDER_H__
+#ifndef __NODE_PIPELINE_RESPONDER_H__
+#define __NODE_PIPELINE_RESPONDER_H__
 
 #include <stdbool.h>
 
@@ -100,4 +100,4 @@ size_t responder_size(responder_t *const responder);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_RESPONDER_H__
+#endif  //__NODE_PIPELINE_RESPONDER_H__

@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_TIPS_REQUESTER_H__
-#define __NODE_COMPONENTS_TIPS_REQUESTER_H__
+#ifndef __NODE_PIPELINE_TIPS_REQUESTER_H__
+#define __NODE_PIPELINE_TIPS_REQUESTER_H__
 
 #include <stdbool.h>
 
@@ -71,4 +71,4 @@ retcode_t tips_requester_destroy(tips_requester_t *const tips_requester);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_TIPS_REQUESTER_H__
+#endif  //__NODE_PIPELINE_TIPS_REQUESTER_H__

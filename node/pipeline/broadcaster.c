@@ -8,8 +8,8 @@
 #include <string.h>
 
 #include "consensus/tangle/tangle.h"
-#include "node/components/broadcaster.h"
 #include "node/node.h"
+#include "node/pipeline/broadcaster.h"
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"

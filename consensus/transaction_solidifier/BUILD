@@ -11,7 +11,7 @@ cc_library(
         "//consensus/tangle",
         "//consensus/tangle:traversal",
         "//node:tips_cache",
-        "//node/components:transaction_requester",
+        "//node/pipeline:transaction_requester",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
         "//utils/handles:cond",

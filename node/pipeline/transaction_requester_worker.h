@@ -5,11 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_TRANSACTION_REQUESTER_WORKER_H__
-#define __NODE_COMPONENTS_TRANSACTION_REQUESTER_WORKER_H__
+#ifndef __NODE_PIPELINE_TRANSACTION_REQUESTER_WORKER_H__
+#define __NODE_PIPELINE_TRANSACTION_REQUESTER_WORKER_H__
 
 #include "common/errors.h"
-#include "node/components/transaction_requester.h"
+#include "node/pipeline/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ retcode_t requester_stop(transaction_requester_t *const transaction_requester);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_TRANSACTION_REQUESTER_WORKER_H__
+#endif  //__NODE_PIPELINE_TRANSACTION_REQUESTER_WORKER_H__

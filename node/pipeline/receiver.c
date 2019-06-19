@@ -7,8 +7,8 @@
 
 #include <string.h>
 
-#include "node/components/receiver.h"
 #include "node/node.h"
+#include "node/pipeline/receiver.h"
 #include "utils/logger_helper.h"
 
 #define RECEIVER_COMPONENT_LOGGER_ID "receiver"

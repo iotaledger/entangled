@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "node/components/transaction_requester.h"
+#include "node/pipeline/transaction_requester.h"
 #include "consensus/tangle/tangle.h"
 #include "node/node.h"
 #include "utils/handles/rand.h"

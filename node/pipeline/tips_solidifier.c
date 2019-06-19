@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "node/components/tips_solidifier.h"
+#include "node/pipeline/tips_solidifier.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utils/logger_helper.h"

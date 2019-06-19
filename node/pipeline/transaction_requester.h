@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_TRANSACTION_REQUESTER_H__
-#define __NODE_COMPONENTS_TRANSACTION_REQUESTER_H__
+#ifndef __NODE_PIPELINE_TRANSACTION_REQUESTER_H__
+#define __NODE_PIPELINE_TRANSACTION_REQUESTER_H__
 
 #include <stdbool.h>
 
@@ -147,4 +147,4 @@ static inline bool requester_is_empty(transaction_requester_t *const requester) 
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_TRANSACTION_REQUESTER_H__
+#endif  //__NODE_PIPELINE_TRANSACTION_REQUESTER_H__

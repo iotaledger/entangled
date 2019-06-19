@@ -11,8 +11,8 @@
 #include <stdint.h>
 
 #include "common/network/network.h"
-#include "node/components/processor.h"
 #include "node/iota_packet.h"
+#include "node/pipeline/processor.h"
 #include "utils/handles/thread.h"
 
 #define PORT_SIZE 10

@@ -17,7 +17,7 @@
 #include "consensus/conf.h"
 #include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/tangle/tangle.h"
-#include "node/components/transaction_requester.h"
+#include "node/pipeline/transaction_requester.h"
 #include "node/tips_cache.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash243_stack.h"

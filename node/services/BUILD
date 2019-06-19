@@ -5,7 +5,7 @@ cc_library(
     hdrs = ["receiver.h"],
     deps = [
         "//common/network",
-        "//node/components:processor_shared",
+        "//node/pipeline:processor_shared",
         "//utils/handles:thread",
     ],
 )

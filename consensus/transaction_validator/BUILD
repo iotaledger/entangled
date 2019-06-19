@@ -8,7 +8,7 @@ cc_library(
         "//common/model:transaction",
         "//consensus:conf",
         "//consensus/snapshot:snapshots_provider",
-        "//node/components:transaction_requester_shared",
+        "//node/pipeline:transaction_requester_shared",
         "//utils:logger_helper",
         "//utils:time",
     ],

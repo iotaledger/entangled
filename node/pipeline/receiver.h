@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_RECEIVER_H__
-#define __NODE_COMPONENTS_RECEIVER_H__
+#ifndef __NODE_PIPELINE_RECEIVER_H__
+#define __NODE_PIPELINE_RECEIVER_H__
 
 #include <stdbool.h>
 
@@ -70,4 +70,4 @@ retcode_t receiver_destroy(receiver_state_t *const state);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_RECEIVER_H__
+#endif  //__NODE_PIPELINE_RECEIVER_H__

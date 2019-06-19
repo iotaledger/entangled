@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "node/components/transaction_requester_worker.h"
+#include "node/pipeline/transaction_requester_worker.h"
 #include "consensus/tangle/tangle.h"
 #include "node/node.h"
 #include "utils/logger_helper.h"

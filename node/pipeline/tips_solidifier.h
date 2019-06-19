@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_COMPONENTS_TIPS_SOLIDIFIER_H__
-#define __NODE_COMPONENTS_TIPS_SOLIDIFIER_H__
+#ifndef __NODE_PIPELINE_TIPS_SOLIDIFIER_H__
+#define __NODE_PIPELINE_TIPS_SOLIDIFIER_H__
 
 #include <stdbool.h>
 
@@ -79,4 +79,4 @@ retcode_t tips_solidifier_destroy(tips_solidifier_t *const tips_solidifier);
 }
 #endif
 
-#endif  //__NODE_COMPONENTS_TIPS_SOLIDIFIER_H__
+#endif  //__NODE_PIPELINE_TIPS_SOLIDIFIER_H__

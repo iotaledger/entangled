@@ -10,8 +10,8 @@
 
 #include "ciri/conf.h"
 #include "consensus/consensus.h"
-#include "node/components/transaction_requester.h"
 #include "node/node.h"
+#include "node/pipeline/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {
