@@ -25,13 +25,6 @@ cc_library(
 )
 
 cc_library(
-    name = "bct",
-    srcs = ["bct.c"],
-    hdrs = ["bct.h"],
-    deps = [":trits"],
-)
-
-cc_library(
     name = "ptrits",
     srcs = [
         "ptrit_incr.c",
