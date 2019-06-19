@@ -36,9 +36,3 @@ CREATE TABLE IF NOT EXISTS iota_milestone (
 );
 
 CREATE INDEX IF NOT EXISTS milestone_hash_index ON iota_milestone(hash);
-
-CREATE TABLE IF NOT EXISTS iota_spent_address (
-  hash BLOB NOT NULL PRIMARY KEY
-);
-
-CREATE INDEX IF NOT EXISTS spent_address_hash_index ON iota_spent_address(hash);

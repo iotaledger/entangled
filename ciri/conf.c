@@ -168,24 +168,31 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       strncpy(ciri_conf->conf_path, optarg, sizeof(ciri_conf->conf_path));
       break;
-    case CONF_DB_REVALIDATE:  // --db-revalidate
-      ret = get_true_false(value, &ciri_conf->db_revalidate);
-      break;
-    case 'd':  // --db-path
-      if (strlen(value) == 0) {
-        return RC_CONF_INVALID_ARGUMENT;
-      }
-      strncpy(ciri_conf->db_path, value, sizeof(ciri_conf->db_path));
-      strncpy(consensus_conf->db_path, value, sizeof(consensus_conf->db_path));
-      strncpy(gossip_conf->db_path, value, sizeof(gossip_conf->db_path));
-      strncpy(api_conf->db_path, value, sizeof(api_conf->db_path));
-      break;
     case 'h':  // --help
       iota_usage();
       exit(EXIT_SUCCESS);
       break;
     case 'l':  // --log-level
       ret = get_log_level(value, &ciri_conf->log_level);
+      break;
+    case CONF_SPENT_ADDRESSES_DB_PATH:  // --spent-addresses-db-path
+      if (strlen(value) == 0) {
+        return RC_CONF_INVALID_ARGUMENT;
+      }
+      strncpy(ciri_conf->spent_addresses_db_path, value, sizeof(ciri_conf->spent_addresses_db_path));
+      strncpy(consensus_conf->spent_addresses_db_path, value, sizeof(consensus_conf->spent_addresses_db_path));
+      break;
+    case CONF_TANGLE_DB_PATH:  // --tangle-db-path
+      if (strlen(value) == 0) {
+        return RC_CONF_INVALID_ARGUMENT;
+      }
+      strncpy(ciri_conf->tangle_db_path, value, sizeof(ciri_conf->tangle_db_path));
+      strncpy(consensus_conf->tangle_db_path, value, sizeof(consensus_conf->tangle_db_path));
+      strncpy(gossip_conf->tangle_db_path, value, sizeof(gossip_conf->tangle_db_path));
+      strncpy(api_conf->tangle_db_path, value, sizeof(api_conf->tangle_db_path));
+      break;
+    case CONF_TANGLE_DB_REVALIDATE:  // --tangle-db-revalidate
+      ret = get_true_false(value, &ciri_conf->tangle_db_revalidate);
       break;
 
     // Gossip configuration
@@ -321,6 +328,11 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
       consensus_conf->snapshot_timestamp_sec = atoi(value);
       break;
+    case CONF_SPENT_ADDRESSES_FILES:  // --spent-addresses-files
+      consensus_conf->spent_addresses_files = (char*)value;
+      break;
+
+      // Local snapshots configuration
     case CONF_LOCAL_SNAPSHOTS_ENABLED:
       ret = get_true_false(value, &consensus_conf->local_snapshots.local_snapshots_is_enabled);
       break;
@@ -360,11 +372,15 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
 
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
   strncpy(ciri_conf->conf_path, DEFAULT_CONF_PATH, sizeof(ciri_conf->conf_path));
-  strncpy(ciri_conf->db_path, DEFAULT_DB_PATH, sizeof(ciri_conf->db_path));
-  strncpy(consensus_conf->db_path, DEFAULT_DB_PATH, sizeof(consensus_conf->db_path));
-  strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
-  strncpy(api_conf->db_path, DEFAULT_DB_PATH, sizeof(api_conf->db_path));
-  ciri_conf->db_revalidate = DEFAULT_DB_PREVALIDATE;
+  strncpy(ciri_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(ciri_conf->tangle_db_path));
+  strncpy(consensus_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(consensus_conf->tangle_db_path));
+  strncpy(gossip_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(gossip_conf->tangle_db_path));
+  strncpy(api_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(api_conf->tangle_db_path));
+  strncpy(ciri_conf->spent_addresses_db_path, DEFAULT_SPENT_ADDRESSES_DB_PATH,
+          sizeof(ciri_conf->spent_addresses_db_path));
+  strncpy(consensus_conf->spent_addresses_db_path, DEFAULT_SPENT_ADDRESSES_DB_PATH,
+          sizeof(consensus_conf->spent_addresses_db_path));
+  ciri_conf->tangle_db_revalidate = DEFAULT_TANGLE_DB_REVALIDATE;
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;

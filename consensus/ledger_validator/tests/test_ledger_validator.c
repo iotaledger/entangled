@@ -72,7 +72,7 @@ static void init_test_structs() {
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
   strcpy(conf.local_snapshots.local_snapshots_path_base, local_snapshot_path_base);
   conf.snapshot_signature_skip_validation = true;
-  strcpy(conf.db_path, test_db_path);
+  strcpy(conf.tangle_db_path, test_db_path);
   conf.last_milestone = 0;
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;

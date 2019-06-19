@@ -136,16 +136,19 @@ static void *responder_routine(responder_t *const responder) {
   transaction_request_t *request_ptr = NULL;
   transaction_request_t request;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  connection_config_t db_conf = {.db_path = responder->node->conf.db_path};
   tangle_t tangle;
 
   if (responder == NULL) {
     return NULL;
   }
 
-  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(logger_id, "Initializing tangle connection failed\n");
-    return NULL;
+  {
+    connection_config_t db_conf = {.db_path = responder->node->conf.tangle_db_path};
+
+    if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+      log_critical(logger_id, "Initializing tangle connection failed\n");
+      return NULL;
+    }
   }
 
   lock_handle_t lock_cond;

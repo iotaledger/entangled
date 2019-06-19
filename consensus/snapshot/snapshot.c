@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/snapshot/snapshot.h"
 #include <inttypes.h>
 #include <stdlib.h>
+
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
+#include "consensus/snapshot/snapshot.h"
 #include "utils/files.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
@@ -47,13 +48,13 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   retcode_t ret;
   size_t state_size;
   size_t metadata_size;
-
-  char state_path[128];
-  char metadata_path[128];
+  char state_path[FILE_PATH_SIZE];
+  char metadata_path[FILE_PATH_SIZE];
+  char *buffer = NULL;
 
   state_size = state_delta_serialized_str_size(snapshot->state);
   metadata_size = iota_snapshot_metadata_serialized_str_size(&snapshot->metadata);
-  char *buffer;
+
   if ((buffer = (char *)calloc(MAX(state_size, metadata_size), sizeof(char))) == NULL) {
     log_critical(logger_id, "Failed in allocating buffer for snapshot file\n");
     return RC_OOM;

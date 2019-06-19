@@ -9,7 +9,9 @@
 #define __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_LOCAL_SNAPSHOTS_CONF_H__
 
 #include <stdbool.h>
+
 #include "common/errors.h"
+#include "utils/files.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +22,7 @@ typedef struct iota_consensus_local_snapshots_conf_s {
   bool prunning_is_enabled;
   size_t transactions_growth_threshold;
   size_t min_depth;
-  char local_snapshots_path_base[128];
+  char local_snapshots_path_base[FILE_PATH_SIZE];
 } iota_consensus_local_snapshots_conf_t;
 
 /**

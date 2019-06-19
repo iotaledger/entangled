@@ -58,7 +58,7 @@ static storage_connection_t connection;
 void test_init_connection(void) {
   connection_config_t config;
   config.db_path = test_db_path;
-  TEST_ASSERT(connection_init(&connection, &config) == RC_OK);
+  TEST_ASSERT(connection_init(&connection, &config, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
 void test_destroy_connection(void) { TEST_ASSERT(connection_destroy(&connection) == RC_OK); }
