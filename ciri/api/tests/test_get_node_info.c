@@ -12,8 +12,8 @@
 #include "gossip/node.h"
 #include "utils/time.h"
 
-static char *test_db_path = "ciri/api/tests/test.db";
-static char *ciri_db_path = "ciri/api/tests/ciri.db";
+static char *test_db_path = "ciri/api/tests/tangle-test.db";
+static char *ciri_db_path = "ciri/api/tests/tangle.db";
 static iota_api_t api;
 static connection_config_t config;
 static tangle_t tangle;
