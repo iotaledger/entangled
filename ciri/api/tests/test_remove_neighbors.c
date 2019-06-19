@@ -8,7 +8,7 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "gossip/node.h"
+#include "node/node.h"
 
 static iota_api_t api;
 static core_t core;

@@ -9,7 +9,7 @@
 
 #include "ciri/api/api.h"
 #include "consensus/test_utils/tangle.h"
-#include "gossip/node.h"
+#include "node/node.h"
 #include "utils/time.h"
 
 static char *test_db_path = "ciri/api/tests/tangle-test.db";

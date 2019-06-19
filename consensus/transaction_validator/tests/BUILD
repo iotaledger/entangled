@@ -8,7 +8,7 @@ cc_test(
     deps = [
         "//consensus/test_utils",
         "//consensus/transaction_validator",
-        "//gossip:node",
+        "//node",
         "@unity",
     ],
 )

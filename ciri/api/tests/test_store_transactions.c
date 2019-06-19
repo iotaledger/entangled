@@ -12,7 +12,7 @@
 #include "consensus/conf.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
-#include "gossip/node.h"
+#include "node/node.h"
 
 static char *test_db_path = "ciri/api/tests/tangle-test.db";
 static char *ciri_db_path = "ciri/api/tests/tangle.db";
@@ -112,7 +112,7 @@ int main(void) {
 
   config.db_path = test_db_path;
   api.core = &core;
-  TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
+  TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;

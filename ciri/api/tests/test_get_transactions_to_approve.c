@@ -10,7 +10,7 @@
 #include "ciri/api/api.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
-#include "gossip/node.h"
+#include "node/node.h"
 #include "utils/files.h"
 
 static char *test_db_path = "ciri/api/tests/tangle-test.db";
@@ -75,7 +75,7 @@ int main(void) {
   config.db_path = test_db_path;
   api.core = &core;
 
-  TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
+  TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);

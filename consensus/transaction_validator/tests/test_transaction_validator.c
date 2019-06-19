@@ -16,7 +16,7 @@
 #include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/transaction_validator/transaction_validator.h"
-#include "gossip/node.h"
+#include "node/node.h"
 #include "utils/time.h"
 
 static iota_consensus_conf_t conf;

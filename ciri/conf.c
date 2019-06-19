@@ -156,7 +156,7 @@ static retcode_t get_true_false(char const* const input, bool* const output) {
 }
 
 static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int const key,
+                                iota_node_conf_t* const node_conf, iota_api_conf_t* const api_conf, int const key,
                                 char const* const value) {
   retcode_t ret = RC_OK;
 
@@ -189,57 +189,57 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       strncpy(ciri_conf->tangle_db_path, value, sizeof(ciri_conf->tangle_db_path));
       strncpy(consensus_conf->tangle_db_path, value, sizeof(consensus_conf->tangle_db_path));
-      strncpy(gossip_conf->tangle_db_path, value, sizeof(gossip_conf->tangle_db_path));
+      strncpy(node_conf->tangle_db_path, value, sizeof(node_conf->tangle_db_path));
       strncpy(api_conf->tangle_db_path, value, sizeof(api_conf->tangle_db_path));
       break;
     case CONF_TANGLE_DB_REVALIDATE:  // --tangle-db-revalidate
       ret = get_true_false(value, &ciri_conf->tangle_db_revalidate);
       break;
 
-    // Gossip configuration
+    // Node configuration
     case CONF_MWM:  // --mwm
-      gossip_conf->mwm = atoi(value);
-      gossip_conf->request_hash_size_trit = HASH_LENGTH_TRIT - gossip_conf->mwm;
+      node_conf->mwm = atoi(value);
+      node_conf->request_hash_size_trit = HASH_LENGTH_TRIT - node_conf->mwm;
       consensus_conf->mwm = atoi(value);
       break;
     case 'n':  // --neighbors
       if (strlen(value) == 0) {
         return RC_CONF_INVALID_ARGUMENT;
       }
-      gossip_conf->neighbors = strdup(value);
+      node_conf->neighbors = strdup(value);
       break;
     case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
-      ret = get_probability(value, &gossip_conf->p_propagate_request);
+      ret = get_probability(value, &node_conf->p_propagate_request);
       break;
     case CONF_P_REMOVE_REQUEST:  // --p-remove-request
-      ret = get_probability(value, &gossip_conf->p_remove_request);
+      ret = get_probability(value, &node_conf->p_remove_request);
       break;
     case CONF_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
-      ret = get_probability(value, &gossip_conf->p_reply_random_tip);
+      ret = get_probability(value, &node_conf->p_reply_random_tip);
       break;
     case CONF_P_SELECT_MILESTONE:  // --p-select-milestone
-      ret = get_probability(value, &gossip_conf->p_select_milestone);
+      ret = get_probability(value, &node_conf->p_select_milestone);
       break;
     case CONF_P_SEND_MILESTONE:  // --p-send-milestone
-      ret = get_probability(value, &gossip_conf->p_send_milestone);
+      ret = get_probability(value, &node_conf->p_send_milestone);
       break;
     case CONF_RECENT_SEEN_BYTES_CACHE_SIZE:  // --recent-seen-bytes-cache-size
-      gossip_conf->recent_seen_bytes_cache_size = atoi(value);
+      node_conf->recent_seen_bytes_cache_size = atoi(value);
       break;
     case CONF_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
-      gossip_conf->requester_queue_size = atoi(value);
+      node_conf->requester_queue_size = atoi(value);
       break;
     case 't':  // --tcp-receiver-port
-      gossip_conf->tcp_receiver_port = atoi(value);
+      node_conf->tcp_receiver_port = atoi(value);
       break;
     case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
-      gossip_conf->tips_cache_size = atoi(value);
+      node_conf->tips_cache_size = atoi(value);
       break;
     case 'u':  // --udp-receiver-port
-      gossip_conf->udp_receiver_port = atoi(value);
+      node_conf->udp_receiver_port = atoi(value);
       break;
     case CONF_TIPS_SOLIDIFIER_ENABLED:  // --tips-solidifier-enabled
-      ret = get_true_false(value, &gossip_conf->tips_solidifier_enabled);
+      ret = get_true_false(value, &node_conf->tips_solidifier_enabled);
       break;
 
     // API configuration
@@ -367,10 +367,10 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
  */
 
 retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                      iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
+                                      iota_node_conf_t* const node_conf, iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
 
-  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+  if (ciri_conf == NULL || consensus_conf == NULL || node_conf == NULL || api_conf == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -378,7 +378,7 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
   strncpy(ciri_conf->conf_path, DEFAULT_CONF_PATH, sizeof(ciri_conf->conf_path));
   strncpy(ciri_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(ciri_conf->tangle_db_path));
   strncpy(consensus_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(consensus_conf->tangle_db_path));
-  strncpy(gossip_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(gossip_conf->tangle_db_path));
+  strncpy(node_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(node_conf->tangle_db_path));
   strncpy(api_conf->tangle_db_path, DEFAULT_TANGLE_DB_PATH, sizeof(api_conf->tangle_db_path));
   strncpy(ciri_conf->spent_addresses_db_path, DEFAULT_SPENT_ADDRESSES_DB_PATH,
           sizeof(ciri_conf->spent_addresses_db_path));
@@ -392,7 +392,7 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
     return ret;
   }
 
-  if ((ret = iota_gossip_conf_init(gossip_conf)) != RC_OK) {
+  if ((ret = iota_node_conf_init(node_conf)) != RC_OK) {
     return ret;
   }
 
@@ -404,7 +404,7 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
 }
 
 retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                   iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
+                                   iota_node_conf_t* const node_conf, iota_api_conf_t* const api_conf, int argc,
                                    char** argv) {
   retcode_t ret = RC_OK;
   yaml_parser_t parser;
@@ -415,7 +415,7 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
   int state = 0;
   struct option* long_options = build_options();
 
-  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+  if (ciri_conf == NULL || consensus_conf == NULL || node_conf == NULL || api_conf == NULL) {
     ret = RC_NULL_PARAM;
     goto done;
   }
@@ -434,7 +434,7 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
       ret = RC_CONF_UNKNOWN_OPTION;
       goto done;
     } else if (key == 'c') {  // configure file path
-      if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
+      if ((ret = set_conf_value(ciri_conf, consensus_conf, node_conf, api_conf, key, optarg)) != RC_OK) {
         goto done;
       }
     }
@@ -466,7 +466,7 @@ retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_conse
         if (state == 0) {  // Key
           key = get_conf_key(arg);
         } else {  // Value
-          if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, arg)) != RC_OK) {
+          if ((ret = set_conf_value(ciri_conf, consensus_conf, node_conf, api_conf, key, arg)) != RC_OK) {
             goto done;
           }
         }
@@ -493,13 +493,13 @@ done:
 }
 
 retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                  iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
+                                  iota_node_conf_t* const node_conf, iota_api_conf_t* const api_conf, int argc,
                                   char** argv) {
   int key = 0;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
 
-  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+  if (ciri_conf == NULL || consensus_conf == NULL || node_conf == NULL || api_conf == NULL) {
     ret = RC_NULL_PARAM;
     goto done;
   }
@@ -511,7 +511,7 @@ retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t* const ciri_conf, iota_consen
     } else if (key == '?') {
       ret = RC_CONF_UNKNOWN_OPTION;
       break;
-    } else if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
+    } else if ((ret = set_conf_value(ciri_conf, consensus_conf, node_conf, api_conf, key, optarg)) != RC_OK) {
       break;
     }
   }
@@ -527,8 +527,8 @@ done:
 }
 
 retcode_t iota_ciri_conf_destroy(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                 iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
-  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+                                 iota_node_conf_t* const node_conf, iota_api_conf_t* const api_conf) {
+  if (ciri_conf == NULL || consensus_conf == NULL || node_conf == NULL || api_conf == NULL) {
     return RC_NULL_PARAM;
   }
 

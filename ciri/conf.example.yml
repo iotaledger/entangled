@@ -8,7 +8,7 @@
 # tangle-db-path: ciri/db/tangle-mainnet.db
 # tangle-db-revalidate: false
 
-# Gossip configuration
+# Node configuration
 
 # mwm: 14
 # neighbors: "udp://127.0.0.1:14600 tcp://127.0.0.1:15600"

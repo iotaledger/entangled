@@ -19,7 +19,7 @@ typedef enum cli_arg_value_e {
   CONF_TANGLE_DB_PATH,
   CONF_TANGLE_DB_REVALIDATE,
 
-  // Gossip configuration
+  // Node configuration
 
   CONF_MWM,
   CONF_P_PROPAGATE_REQUEST,
@@ -91,7 +91,7 @@ static struct cli_argument_s {
     {"tangle-db-revalidate", CONF_TANGLE_DB_REVALIDATE,
      "Reloads milestones, state of the ledger and transactions metadata from the tangle database.", REQUIRED_ARG},
 
-    // Gossip configuration
+    // Node configuration
 
     {"mwm", CONF_MWM,
      "Number of trailing ternary 0s that must appear at the end of a "

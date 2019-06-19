@@ -46,7 +46,7 @@ cc_library(
     deps = [
         ":conf",
         "//consensus",
-        "//gossip:node_shared",
+        "//node:node_shared",
     ],
 )
 
@@ -55,7 +55,7 @@ cc_library(
     srcs = ["core.c"],
     deps = [
         ":core_shared",
-        "//gossip:node",
+        "//node",
     ],
 )
 
@@ -79,7 +79,7 @@ cc_library(
         "//ciri/api:conf",
         "//common:errors",
         "//consensus:conf",
-        "//gossip:conf",
+        "//node:conf",
         "//utils:logger_helper",
         "@yaml",
     ],
