@@ -160,7 +160,7 @@ static void* milestone_validator(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   iota_milestone_t candidate;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  flex_trit_t* peek = NULL;
+  hash243_queue_entry_t* entry = NULL;
   milestone_status_t milestone_status;
   tangle_t tangle;
 
@@ -183,38 +183,38 @@ static void* milestone_validator(void* arg) {
 
   while (mt->running) {
     rw_lock_handle_wrlock(&mt->candidates_lock);
-    peek = hash243_queue_peek(mt->candidates);
+    entry = hash243_queue_pop(&mt->candidates);
+    rw_lock_handle_unlock(&mt->candidates_lock);
 
-    if (peek != NULL) {
-      memcpy(candidate.hash, peek, FLEX_TRIT_SIZE_243);
-      hash243_queue_pop(&mt->candidates);
-      rw_lock_handle_unlock(&mt->candidates_lock);
-      hash_pack_reset(&pack);
-      if (iota_tangle_transaction_load_partial(&tangle, candidate.hash, &pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) ==
-              RC_OK &&
-          pack.num_loaded != 0) {
-        candidate.index = iota_milestone_tracker_get_milestone_index(&tx);
-        if (iota_milestone_tracker_validate_milestone(mt, &tangle, &candidate, &milestone_status) != RC_OK) {
-          log_warning(logger_id, "Validating milestone failed\n");
-          continue;
-        }
-        if (milestone_status == MILESTONE_VALID) {
-          iota_tangle_milestone_store(&tangle, &candidate);
-          if (candidate.index > mt->latest_milestone_index) {
-            log_info(logger_id,
-                     "Latest milestone has changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
-                     mt->latest_milestone_index, candidate.index, hash243_queue_count(mt->candidates));
-            mt->latest_milestone_index = candidate.index;
-            memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
-          }
-        } else if (milestone_status == MILESTONE_INCOMPLETE) {
-          iota_milestone_tracker_add_candidate(mt, candidate.hash);
-        }
-      }
-    } else {
-      rw_lock_handle_unlock(&mt->candidates_lock);
+    if (entry == NULL) {
+      cond_handle_timedwait(&mt->cond_validator, &lock_cond, MILESTONE_VALIDATION_INTERVAL_MS);
+      continue;
     }
-    cond_handle_timedwait(&mt->cond_validator, &lock_cond, MILESTONE_VALIDATION_INTERVAL_MS);
+
+    memcpy(candidate.hash, entry->hash, FLEX_TRIT_SIZE_243);
+    free(entry);
+    hash_pack_reset(&pack);
+    if (iota_tangle_transaction_load_partial(&tangle, candidate.hash, &pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) ==
+            RC_OK &&
+        pack.num_loaded != 0) {
+      candidate.index = iota_milestone_tracker_get_milestone_index(&tx);
+      if (iota_milestone_tracker_validate_milestone(mt, &tangle, &candidate, &milestone_status) != RC_OK) {
+        log_warning(logger_id, "Validating milestone failed\n");
+        continue;
+      }
+      if (milestone_status == MILESTONE_VALID) {
+        iota_tangle_milestone_store(&tangle, &candidate);
+        if (candidate.index > mt->latest_milestone_index) {
+          log_info(logger_id,
+                   "Latest milestone has changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
+                   mt->latest_milestone_index, candidate.index, hash243_queue_count(mt->candidates));
+          mt->latest_milestone_index = candidate.index;
+          memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
+        }
+      } else if (milestone_status == MILESTONE_INCOMPLETE) {
+        iota_milestone_tracker_add_candidate(mt, candidate.hash);
+      }
+    }
   }
 
   lock_handle_unlock(&lock_cond);

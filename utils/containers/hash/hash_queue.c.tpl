@@ -20,17 +20,19 @@ retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue,
   }
   memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});
   CDL_APPEND(*queue, entry);
+
   return RC_OK;
 }
 
-void hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue) {
-  hash{SIZE}_queue_entry_t *tmp = NULL;
+hash{SIZE}_queue_entry_t *hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue) {
+  hash{SIZE}_queue_entry_t *front = NULL;
 
-  tmp = *queue;
-  if (tmp != NULL) {
-    CDL_DELETE(*queue, *queue);
-    free(tmp);
+  front = *queue;
+  if (front != NULL) {
+    CDL_DELETE(*queue, front);
   }
+
+  return front;
 }
 
 flex_trit_t *hash{SIZE}_queue_peek(hash{SIZE}_queue_t const queue) {
