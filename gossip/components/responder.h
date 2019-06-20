@@ -96,15 +96,6 @@ retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neig
  */
 size_t responder_size(responder_t *const responder);
 
-/**
- * Tells whether the responder queue is empty or not
- *
- * @param responder The responder
- *
- * @return true if empty, false otherwise
- */
-static inline bool responder_is_empty(responder_t *const responder) { return responder->queue == NULL; }
-
 #ifdef __cplusplus
 }
 #endif

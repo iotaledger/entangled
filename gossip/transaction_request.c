@@ -9,12 +9,12 @@
 
 #include "gossip/transaction_request.h"
 
-bool transaction_request_queue_empty(transaction_request_queue_t const queue) { return (queue == NULL); }
-
 size_t transaction_request_queue_count(transaction_request_queue_t const queue) {
   transaction_request_queue_entry_t *iter = NULL;
   size_t count = 0;
+
   CDL_COUNT(queue, iter, count);
+
   return count;
 }
 
@@ -32,28 +32,23 @@ retcode_t transaction_request_queue_push(transaction_request_queue_t *const queu
   entry->request.neighbor = neighbor;
   memcpy(entry->request.hash, hash, FLEX_TRIT_SIZE_243);
   CDL_APPEND(*queue, entry);
+
   return RC_OK;
 }
 
-void transaction_request_queue_pop(transaction_request_queue_t *const queue) {
-  transaction_request_queue_entry_t *tmp = NULL;
+transaction_request_queue_entry_t *transaction_request_queue_pop(transaction_request_queue_t *const queue) {
+  transaction_request_queue_entry_t *front = NULL;
 
-  if (queue == NULL) {
-    return;
-  }
-
-  tmp = *queue;
-  if (tmp != NULL) {
-    CDL_DELETE(*queue, *queue);
-    free(tmp);
-  }
-}
-
-transaction_request_t *transaction_request_queue_peek(transaction_request_queue_t const queue) {
   if (queue == NULL) {
     return NULL;
   }
-  return &queue->request;
+
+  front = *queue;
+  if (front != NULL) {
+    CDL_DELETE(*queue, front);
+  }
+
+  return front;
 }
 
 void transaction_request_queue_free(transaction_request_queue_t *const queue) {
