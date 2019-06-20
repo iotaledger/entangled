@@ -171,6 +171,7 @@ static void *responder_routine(responder_t *const responder) {
     } else if (respond_to_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack) != RC_OK) {
       log_warning(logger_id, "Replying to request failed\n");
     }
+    free(entry);
   }
 
   lock_handle_unlock(&lock_cond);
