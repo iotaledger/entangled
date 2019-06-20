@@ -12,9 +12,10 @@
 #include <stdint.h>
 
 #include "common/errors.h"
-#include "common/trinary/trit_byte.h"
+#include "common/trinary/flex_trit.h"
 #include "utils/files.h"
 
+#define DEFAULT_COORDINATOR_ADDRESS COORDINATOR_ADDRESS
 #define DEFAULT_MWN MWM
 #define DEFAULT_NEIGHBORS NULL
 #define DEFAULT_PROBABILITY_PROPAGATE_REQUEST 0.01
@@ -73,6 +74,8 @@ typedef struct iota_gossip_conf_s {
   char tangle_db_path[FILE_PATH_SIZE];
   // Scan the current tips and attempt to mark them as solid
   bool tips_solidifier_enabled;
+  // The address of the coordinator
+  flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
 } iota_gossip_conf_t;
 
 /**
