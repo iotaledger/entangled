@@ -16,7 +16,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common/trinary:trit_byte",
+        "//common/trinary:flex_trit",
         "//utils:files",
     ],
 )

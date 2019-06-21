@@ -283,6 +283,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_COORDINATOR_ADDRESS:  // --coordinator-address
       ret = get_trytes(value, consensus_conf->coordinator_address, HASH_LENGTH_TRYTE);
+      if (ret == RC_OK) {
+        ret = get_trytes(value, gossip_conf->coordinator_address, HASH_LENGTH_TRYTE);
+      }
       break;
     case CONF_COORDINATOR_DEPTH:  // --coordinator-depth
       consensus_conf->coordinator_depth = atoi(value);
