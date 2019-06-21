@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Address genrating options
+ * @brief Options for address generation
  *
  */
 typedef struct {
@@ -34,9 +34,9 @@ typedef struct {
 } address_opt_t;
 
 /**
- * @brief Generates and retruns addresses including an unused address.
+ * @brief Generates and returns addresses including an unused address.
  *
- * Generates and retruns addresses by calling #iota_client_find_transactions until the first unused address is detected.
+ * Generates and returns addresses by calling #iota_client_find_transactions until the first unused address is detected.
  *
  * @param[in] serv client service
  * @param[in] seed A seed for address generation.
@@ -52,7 +52,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
  *
  * @param[in] serv client service
  * @param[in] addr examining address
- * @param[in, out] is_unused return if addr has been unsed
+ * @param[in, out] is_unused return if addr has been unused
  * @param[in] with_txs If <b>True</b> return transactions of this address in the <b>transactions</b>.
  * @param[in, out] transactions if <b>with_tx_list</b> is true, return transaction list of this address, otherwise
  * ignore this parameter.

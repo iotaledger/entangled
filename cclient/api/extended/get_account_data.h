@@ -50,9 +50,10 @@ void account_data_init(account_data_t* const account);
 void account_data_clear(account_data_t* const account);
 
 /**
- * @brief
+ * @brief Gets the balance value by index.
  *
- * @param[in] account Gets the balance value by index.
+ * @param[in] account the #account_data_t object.
+ * @param[in] index The index of the balance list.
  * @return the balance of the index in #account_data_t.balances.
  */
 uint64_t account_data_get_balance(account_data_t* const account, size_t index);
