@@ -10,7 +10,7 @@
 #include "ciri/api/api.h"
 #include "consensus/conf.h"
 #include "consensus/test_utils/tangle.h"
-//
+
 static char *spent_addresses_test_db_path = "ciri/api/tests/spent-addresses-test.db";
 static char *spent_addresses_db_path = "ciri/api/tests/spent-addresses.db";
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
