@@ -15,13 +15,13 @@ retcode_t map_transition_probabilities(double alpha, hash_to_int64_t_map_t const
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
   hash_to_int64_t_map_entry_t *curr_rating = NULL;
-  size_t num_approvers = hash243_set_size(approvers);
+  size_t num_approvers = hash243_set_size(*approvers);
   double sum_transition_probabilities = 0;
   double max_weight = 0;
   size_t idx = 0;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
+    if (!hash_to_int64_t_map_find(cw_ratings, curr_approver->hash, &curr_rating)) {
       return RC_EXIT_PROBABILITIES_MISSING_RATING;
     }
     transition_probs[idx++] = curr_rating->value;

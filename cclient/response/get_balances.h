@@ -78,7 +78,7 @@ static inline retcode_t get_balances_res_reference_add(get_balances_res_t* const
  * @return A pointer to a reference hash. NULL if index is invalid.
  */
 static inline flex_trit_t* get_balances_res_reference_get(get_balances_res_t* const res, size_t index) {
-  return hash243_queue_at(&res->references, index);
+  return hash243_queue_at(res->references, index);
 }
 
 /**

@@ -67,7 +67,7 @@ static inline retcode_t were_addresses_spent_from_req_add(were_addresses_spent_f
  * @return A pointer to an address hash.
  */
 static inline flex_trit_t* were_addresses_spent_from_req_get(were_addresses_spent_from_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->addresses, index);
+  return hash243_queue_at(req->addresses, index);
 }
 
 #ifdef __cplusplus

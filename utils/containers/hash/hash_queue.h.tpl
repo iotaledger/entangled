@@ -26,13 +26,12 @@ typedef struct hash{SIZE}_queue_entry_s {
 typedef hash{SIZE}_queue_entry_t *hash{SIZE}_queue_t;
 
 bool hash{SIZE}_queue_empty(hash{SIZE}_queue_t const queue);
-retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue,
-                          flex_trit_t const *const hash);
+retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue, flex_trit_t const *const hash);
 hash{SIZE}_queue_entry_t *hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue);
 flex_trit_t *hash{SIZE}_queue_peek(hash{SIZE}_queue_t const queue);
 void hash{SIZE}_queue_free(hash{SIZE}_queue_t *const queue);
 size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t const queue);
-flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t *const queue, size_t index);
+flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t const queue, size_t index);
 retcode_t hash{SIZE}_queue_copy(hash{SIZE}_queue_t *dest, hash{SIZE}_queue_t const src, size_t size);
 
 #ifdef __cplusplus

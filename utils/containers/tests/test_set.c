@@ -22,7 +22,7 @@ void test_ints_set() {
   TEST_ASSERT_EQUAL_INT(int_set_size(set), 100);
 
   for (int i = 0; i < 100; ++i) {
-    TEST_ASSERT(int_set_contains(&set, &i));
+    TEST_ASSERT(int_set_contains(set, &i));
   }
 
   int_set_free(&set);

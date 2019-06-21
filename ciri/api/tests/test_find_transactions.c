@@ -32,7 +32,7 @@ static bool hash243_queue_cmp(hash243_queue_t const lhs, hash243_queue_t const r
   CDL_FOREACH(lhs, iter) { hash243_set_add(&set, iter->hash); }
 
   CDL_FOREACH(rhs, iter) {
-    if (!hash243_set_contains(&set, iter->hash)) {
+    if (!hash243_set_contains(set, iter->hash)) {
       cmp = false;
       goto done;
     }

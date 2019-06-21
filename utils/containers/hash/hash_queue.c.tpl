@@ -11,8 +11,7 @@
 
 bool hash{SIZE}_queue_empty(hash{SIZE}_queue_t const queue) { return (queue == NULL); }
 
-retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue,
-                          flex_trit_t const *const hash) {
+retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue, flex_trit_t const *const hash) {
   hash{SIZE}_queue_entry_t *entry = NULL;
 
   if ((entry = (hash{SIZE}_queue_entry_t *)malloc(sizeof(hash{SIZE}_queue_entry_t))) == NULL) {
@@ -58,10 +57,10 @@ size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t const queue) {
   return count;
 }
 
-flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t *const queue, size_t index) {
+flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t const queue, size_t index) {
   hash{SIZE}_queue_entry_t *iter = NULL;
   size_t count = 0;
-  CDL_FOREACH(*queue, iter) {
+  CDL_FOREACH(queue, iter) {
     if (count == index) {
       return (flex_trit_t *)(iter->hash);
     }

@@ -66,7 +66,7 @@ static inline retcode_t get_trytes_req_hash_add(get_trytes_req_t* const req, fle
  * @return A pointer to a transaction hash.
  */
 static inline flex_trit_t* get_trytes_req_hash_get(get_trytes_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->hashes, index);
+  return hash243_queue_at(req->hashes, index);
 }
 
 #ifdef __cplusplus

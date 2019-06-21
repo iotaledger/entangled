@@ -385,7 +385,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
 
   for (size_t i = 0; i < hash_pack.num_loaded; i++) {
     curr_hash = ((flex_trit_t**)hash_pack.models)[i];
-    if (!hash243_set_contains(&solid_entry_points, curr_hash)) {
+    if (!hash243_set_contains(solid_entry_points, curr_hash)) {
       iota_milestone_tracker_add_candidate(mt, curr_hash);
     }
   }

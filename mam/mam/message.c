@@ -670,7 +670,7 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
                     ret);
     ERR_GUARD_RETURN(0 == ver, RC_MAM_VERSION_NOT_SUPPORTED);
 
-    if (!mam_pk_t_set_contains(trusted_channel_pks, &ctx->pk)) {
+    if (!mam_pk_t_set_contains(*trusted_channel_pks, &ctx->pk)) {
       return RC_MAM_CHANNEL_NOT_TRUSTED;
     }
   }
@@ -698,7 +698,7 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const 
     } else if (MAM_MSG_PUBKEY_EPID == pubkey) { /*  absorb tryte epid[81] = 1; */
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_epid(&ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_TRIT_SIZE, ctx->pk.key)), ret);
-      if (!mam_pk_t_set_contains(trusted_endpoint_pks, &ctx->pk)) {
+      if (!mam_pk_t_set_contains(*trusted_endpoint_pks, &ctx->pk)) {
         return RC_MAM_ENDPOINT_NOT_TRUSTED;
       }
     } else if (MAM_MSG_PUBKEY_CHID == pubkey) { /*  absorb null chid = 0; */

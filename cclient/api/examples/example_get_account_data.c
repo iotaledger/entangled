@@ -26,7 +26,7 @@ void example_get_account_data(iota_client_service_t *s) {
     size_t tx_count = hash243_queue_count(account.transactions);
     for (size_t i = 0; i < tx_count; i++) {
       printf("[%zu]: ", i);
-      flex_trit_print(hash243_queue_at(&account.transactions, i), NUM_TRITS_ADDRESS);
+      flex_trit_print(hash243_queue_at(account.transactions, i), NUM_TRITS_ADDRESS);
       printf("\n");
     }
     printf("transaction count %zu\n", tx_count);
@@ -45,7 +45,7 @@ void example_get_account_data(iota_client_service_t *s) {
     printf("address count %zu\n", addr_count);
     for (size_t i = 0; i < addr_count; i++) {
       printf("[%ld] ", i);
-      flex_trit_print(hash243_queue_at(&account.addresses, i), NUM_TRITS_ADDRESS);
+      flex_trit_print(hash243_queue_at(account.addresses, i), NUM_TRITS_ADDRESS);
       printf(" : %" PRIu64 "\n", account_data_get_balance(&account, i));
     }
 

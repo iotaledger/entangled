@@ -450,11 +450,11 @@ static void test_api_serialization() {
   TEST_ASSERT_EQUAL_INT(mam_api_channel_remaining_sks(&deserialized_api, ch_id), remaining_sks);
 
   TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &sender_api.prng, MAM_PRNG_SECRET_KEY_SIZE);
-  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &sender_api.ntru_sks));
-  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &sender_api.ntru_pks));
-  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&deserialized_api.psks, &sender_api.psks));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(&deserialized_api.write_ctxs, &sender_api.write_ctxs));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(&deserialized_api.read_ctxs, &sender_api.read_ctxs));
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(deserialized_api.ntru_sks, sender_api.ntru_sks));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(deserialized_api.ntru_pks, sender_api.ntru_pks));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(deserialized_api.psks, sender_api.psks));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(deserialized_api.write_ctxs, sender_api.write_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(deserialized_api.read_ctxs, sender_api.read_ctxs));
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(deserialized_api.channels, sender_api.channels));
   TEST_ASSERT_EQUAL_INT(deserialized_api.channel_ord, sender_api.channel_ord);
 
@@ -480,11 +480,11 @@ static void test_api_save_load() {
   TEST_ASSERT_EQUAL_INT(mam_api_channel_remaining_sks(&loaded_api, ch_id), remaining_sks);
 
   TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &sender_api.prng, MAM_PRNG_SECRET_KEY_SIZE);
-  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &sender_api.ntru_sks));
-  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&loaded_api.ntru_pks, &sender_api.ntru_pks));
-  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&loaded_api.psks, &sender_api.psks));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(&loaded_api.write_ctxs, &sender_api.write_ctxs));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(&loaded_api.read_ctxs, &sender_api.read_ctxs));
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(loaded_api.ntru_sks, sender_api.ntru_sks));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(loaded_api.ntru_pks, sender_api.ntru_pks));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(loaded_api.psks, sender_api.psks));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(loaded_api.write_ctxs, sender_api.write_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(loaded_api.read_ctxs, sender_api.read_ctxs));
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(loaded_api.channels, sender_api.channels));
   TEST_ASSERT_EQUAL_INT(loaded_api.channel_ord, sender_api.channel_ord);
 
