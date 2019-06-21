@@ -19,13 +19,10 @@ void example_get_account_data(iota_client_service_t *s) {
 
   // init account data
   account_data_t account = {};
-  account.balance = 0;
-  memset(account.latest_address, 0, FLEX_TRIT_SIZE_243);
-  account.addresses = NULL;
-  account.transactions = NULL;
+  account_data_init(&account);
 
   if ((ret = iota_client_get_account_data(s, seed, 2, &account)) == RC_OK) {
-#if 0  // dump transaction hashes
+#if 1  // dump transaction hashes
     size_t tx_count = hash243_queue_count(account.transactions);
     for (size_t i = 0; i < tx_count; i++) {
       printf("[%zu]: ", i);
@@ -49,11 +46,10 @@ void example_get_account_data(iota_client_service_t *s) {
     for (size_t i = 0; i < addr_count; i++) {
       printf("[%ld] ", i);
       flex_trit_print(hash243_queue_at(&account.addresses, i), NUM_TRITS_ADDRESS);
-      printf("\n");
+      printf(" : %" PRIu64 "\n", account_data_get_balance(&account, i));
     }
 
-    hash243_queue_free(&account.transactions);
-    hash243_queue_free(&account.addresses);
+    account_data_clear(&account);
   } else {
     printf("Error: %s\n", error_2_string(ret));
   }
