@@ -21,12 +21,12 @@ int main() {
    * Create a channel
    */
 
-  tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
+  tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
 
   mam_api_channel_create(&api, 5, channel_id);
 
   fprintf(stderr, "Channel ID: ");
-  for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE / 3; i++) {
+  for (size_t i = 0; i < MAM_CHANNEL_ID_TRYTE_SIZE; i++) {
     fprintf(stderr, "%c", channel_id[i]);
   }
   fprintf(stderr, "\n");
@@ -35,12 +35,12 @@ int main() {
    * Create an endpoint
    */
 
-  tryte_t endpoint_id[MAM_ENDPOINT_ID_SIZE];
+  tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
 
   mam_api_endpoint_create(&api, 5, channel_id, endpoint_id);
 
   fprintf(stderr, "Endpoint ID: ");
-  for (size_t i = 0; i < MAM_ENDPOINT_ID_SIZE / 3; i++) {
+  for (size_t i = 0; i < MAM_ENDPOINT_ID_TRYTE_SIZE; i++) {
     fprintf(stderr, "%c", endpoint_id[i]);
   }
   fprintf(stderr, "\n");

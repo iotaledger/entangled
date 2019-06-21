@@ -146,7 +146,7 @@ We create a new MAM channel by providing:
 Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 packets with this channel central endpoint.
 
 ```c
-tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
+tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
 
 mam_api_channel_create(&api, 5, channel_id);
 ```
@@ -167,7 +167,7 @@ We create a new MAM endpoint that belongs to the previously created channel by p
 Here we choose a height of 5, meaning that we will be able to sign 2^5 = 32 packets with this endpoint.
 
 ```c
-tryte_t endpoint_id[MAM_ENDPOINT_ID_SIZE];
+tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
 
 mam_api_endpoint_create(&api, 5, channel_id, endpoint_id);
 ```
