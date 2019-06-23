@@ -20,6 +20,7 @@
 
 static logger_id_t logger_id;
 static _Thread_local tangle_t *tangle;
+static _Thread_local spent_addresses_provider_t *sap;
 
 typedef struct iota_api_http_session_s {
   bool valid_api_version;
@@ -452,6 +453,35 @@ done:
   return ret;
 }
 
+static inline retcode_t process_were_addresses_spent_from_request(iota_api_http_t *const http,
+                                                                  char const *const payload, char_buffer_t *const out) {
+  retcode_t ret = RC_OK;
+  were_addresses_spent_from_req_t *req = were_addresses_spent_from_req_new();
+  were_addresses_spent_from_res_t *res = were_addresses_spent_from_res_new();
+  error_res_t *error = NULL;
+
+  if (req == NULL || res == NULL) {
+    ret = RC_OOM;
+    goto done;
+  }
+
+  if ((ret = http->serializer.vtable.were_addresses_spent_from_deserialize_request(payload, req)) != RC_OK) {
+    goto done;
+  }
+
+  if ((ret = iota_api_were_addresses_spent_from(http->api, tangle, sap, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.were_addresses_spent_from_serialize_response(res, out);
+  }
+
+done:
+  were_addresses_spent_from_req_free(&req);
+  were_addresses_spent_from_res_free(&res);
+
+  return ret;
+}
+
 static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char const *const command,
                                                char const *const payload, char_buffer_t *const out) {
   error_res_t *error = NULL;
@@ -459,10 +489,17 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char
   if (!tangle) {
     connection_config_t db_conf = {.db_path = http->api->conf.tangle_db_path};
 
-    log_debug(logger_id, "Instantiating new HTTP API database connection\n");
     tangle = (tangle_t *)calloc(1, sizeof(tangle_t));
-    utarray_push_back(http->db_connections, tangle);
+    utarray_push_back(http->tangle_db_connections, tangle);
     iota_tangle_init(tangle, &db_conf);
+  }
+
+  if (!sap) {
+    connection_config_t db_conf = {.db_path = http->api->conf.spent_addresses_db_path};
+
+    sap = (spent_addresses_provider_t *)calloc(1, sizeof(spent_addresses_provider_t));
+    utarray_push_back(http->spent_addresses_db_connections, sap);
+    iota_spent_addresses_provider_init(sap, &db_conf);
   }
 
   for (size_t i = 0; http->api->conf.remote_limit_api[i]; i++) {
@@ -502,6 +539,8 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char
     return process_remove_neighbors_request(http, payload, out);
   } else if (strcmp(command, "storeTransactions") == 0) {
     return process_store_transactions_request(http, payload, out);
+  } else if (strcmp(command, "wereAddressesSpentFrom") == 0) {
+    return process_were_addresses_spent_from_request(http, payload, out);
   } else {
     error_serialize_response(http, &error, "Unknown command", out);
   }
@@ -622,7 +661,8 @@ retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api)
   http->running = false;
   http->api = api;
 
-  utarray_new(http->db_connections, &ut_ptr_icd);
+  utarray_new(http->tangle_db_connections, &ut_ptr_icd);
+  utarray_new(http->spent_addresses_db_connections, &ut_ptr_icd);
 
   init_json_serializer(&http->serializer);
 
@@ -658,7 +698,8 @@ retcode_t iota_api_http_stop(iota_api_http_t *const api) {
 }
 
 retcode_t iota_api_http_destroy(iota_api_http_t *const api) {
-  tangle_t *iter = NULL;
+  tangle_t *tangle_iter = NULL;
+  spent_addresses_provider_t *spent_addresses_iter = NULL;
 
   if (api == NULL) {
     return RC_NULL_PARAM;
@@ -666,13 +707,22 @@ retcode_t iota_api_http_destroy(iota_api_http_t *const api) {
     return RC_STILL_RUNNING;
   }
 
-  for (iter = (tangle_t *)utarray_back(api->db_connections); iter != NULL;
-       iter = (tangle_t *)utarray_back(api->db_connections)) {
-    iota_tangle_destroy(iter);
-    free(iter);
+  for (tangle_iter = (tangle_t *)utarray_back(api->tangle_db_connections); tangle_iter != NULL;
+       tangle_iter = (tangle_t *)utarray_back(api->tangle_db_connections)) {
+    iota_tangle_destroy(tangle_iter);
+    free(tangle_iter);
   }
 
-  utarray_free(api->db_connections);
+  utarray_free(api->tangle_db_connections);
+
+  for (spent_addresses_iter = (spent_addresses_provider_t *)utarray_back(api->spent_addresses_db_connections);
+       spent_addresses_iter != NULL;
+       spent_addresses_iter = (spent_addresses_provider_t *)utarray_back(api->spent_addresses_db_connections)) {
+    iota_spent_addresses_provider_destroy(spent_addresses_iter);
+    free(spent_addresses_iter);
+  }
+
+  utarray_free(api->spent_addresses_db_connections);
 
   logger_helper_release(logger_id);
 

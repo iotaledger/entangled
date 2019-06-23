@@ -30,7 +30,8 @@ typedef struct iota_api_http_s {
   iota_api_t *api;
   serializer_t serializer;
   void *state;
-  UT_array *db_connections;
+  UT_array *tangle_db_connections;
+  UT_array *spent_addresses_db_connections;
 
 } iota_api_http_t;
 

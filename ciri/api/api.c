@@ -597,10 +597,26 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
   return ret;
 }
 
-retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, check_consistency_req_t const *const req,
-                                             check_consistency_res_t *const res, error_res_t **const error) {
+retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, tangle_t *const tangle,
+                                             spent_addresses_provider_t *const sap,
+                                             were_addresses_spent_from_req_t const *const req,
+                                             were_addresses_spent_from_res_t *const res, error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  bool spent = false;
+  hash243_queue_entry_t *iter = NULL;
+
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
+  }
+
+  CDL_FOREACH(req->addresses, iter) {
+    if ((ret = iota_spent_addresses_service_was_address_spent_from(&api->core->consensus.spent_addresses_service, sap,
+                                                                   tangle, iter->hash, &spent)) != RC_OK) {
+      return ret;
+    }
+    if ((ret = were_addresses_spent_from_res_states_add(res, spent)) != RC_OK) {
+      return ret;
+    }
   }
 
   return RC_OK;

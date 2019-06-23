@@ -36,6 +36,9 @@ bool were_addresses_spent_from_res_states_at(were_addresses_spent_from_res_t* in
 }
 
 size_t were_addresses_spent_from_res_states_count(were_addresses_spent_from_res_t* in) {
+  if (in->states == NULL) {
+    return 0;
+  }
   return utarray_len(in->states);
 }
 
