@@ -28,7 +28,7 @@ typedef hash{SIZE}_queue_entry_t *hash{SIZE}_queue_t;
 bool hash{SIZE}_queue_empty(hash{SIZE}_queue_t const queue);
 retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue,
                           flex_trit_t const *const hash);
-void hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue);
+hash{SIZE}_queue_entry_t *hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue);
 flex_trit_t *hash{SIZE}_queue_peek(hash{SIZE}_queue_t const queue);
 void hash{SIZE}_queue_free(hash{SIZE}_queue_t *const queue);
 size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t const queue);

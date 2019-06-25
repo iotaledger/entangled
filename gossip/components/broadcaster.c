@@ -23,8 +23,7 @@ static logger_id_t logger_id;
 
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   neighbor_t *iter = NULL;
-  flex_trit_t *transaction_flex_trits_ptr = NULL;
-  flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  hash8019_queue_entry_t *entry = NULL;
   tangle_t tangle;
 
   if (broadcaster == NULL) {
@@ -45,28 +44,24 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   lock_handle_lock(&lock_cond);
 
   while (broadcaster->running) {
-    if (broadcaster_is_empty(broadcaster)) {
-      cond_handle_timedwait(&broadcaster->cond, &lock_cond, BROADCASTER_TIMEOUT_MS);
-    }
-
     rw_lock_handle_wrlock(&broadcaster->lock);
-    transaction_flex_trits_ptr = hash8019_queue_peek(broadcaster->queue);
-    if (transaction_flex_trits_ptr == NULL) {
-      rw_lock_handle_unlock(&broadcaster->lock);
+    entry = hash8019_queue_pop(&broadcaster->queue);
+    rw_lock_handle_unlock(&broadcaster->lock);
+
+    if (entry == NULL) {
+      cond_handle_timedwait(&broadcaster->cond, &lock_cond, BROADCASTER_TIMEOUT_MS);
       continue;
     }
-    memcpy(transaction_flex_trits, transaction_flex_trits_ptr, FLEX_TRIT_SIZE_8019);
-    hash8019_queue_pop(&broadcaster->queue);
-    rw_lock_handle_unlock(&broadcaster->lock);
 
     log_debug(logger_id, "Broadcasting transaction\n");
     rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
     LL_FOREACH(broadcaster->node->neighbors, iter) {
-      if (neighbor_send(broadcaster->node, &tangle, iter, transaction_flex_trits) != RC_OK) {
+      if (neighbor_send(broadcaster->node, &tangle, iter, entry->hash) != RC_OK) {
         log_warning(logger_id, "Broadcasting transaction failed\n");
       }
     }
     rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
+    free(entry);
   }
 
   lock_handle_unlock(&lock_cond);

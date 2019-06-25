@@ -88,15 +88,6 @@ size_t broadcaster_size(broadcaster_t *const broadcaster);
  */
 retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 
-/**
- * Tells whether the broadcaster queue is empty or not
- *
- * @param broadcaster The broadcaster
- *
- * @return true if empty, false otherwise
- */
-static inline bool broadcaster_is_empty(broadcaster_t *const broadcaster) { return broadcaster->queue == NULL; }
-
 #ifdef __cplusplus
 }
 #endif

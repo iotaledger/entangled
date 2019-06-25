@@ -102,7 +102,7 @@ retcode_t traverse_bundle(iota_client_service_t const* const serv, flex_trit_t c
     }
     // The response is not needed anymore
     hash8019_queue_free(&get_trytes_res->trytes);
-    hash243_queue_pop(&get_trytes_req->hashes);
+    free(hash243_queue_pop(&get_trytes_req->hashes));
   } while (current_index != last_index);
   get_trytes_req_free(&get_trytes_req);
   get_trytes_res_free(&get_trytes_res);
