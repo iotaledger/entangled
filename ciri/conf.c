@@ -181,6 +181,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       strncpy(ciri_conf->spent_addresses_db_path, value, sizeof(ciri_conf->spent_addresses_db_path));
       strncpy(consensus_conf->spent_addresses_db_path, value, sizeof(consensus_conf->spent_addresses_db_path));
+      strncpy(api_conf->spent_addresses_db_path, value, sizeof(api_conf->spent_addresses_db_path));
       break;
     case CONF_TANGLE_DB_PATH:  // --tangle-db-path
       if (strlen(value) == 0) {
@@ -283,6 +284,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_COORDINATOR_ADDRESS:  // --coordinator-address
       ret = get_trytes(value, consensus_conf->coordinator_address, HASH_LENGTH_TRYTE);
+      if (ret == RC_OK) {
+        ret = get_trytes(value, gossip_conf->coordinator_address, HASH_LENGTH_TRYTE);
+      }
       break;
     case CONF_COORDINATOR_DEPTH:  // --coordinator-depth
       consensus_conf->coordinator_depth = atoi(value);
@@ -380,6 +384,8 @@ retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_co
           sizeof(ciri_conf->spent_addresses_db_path));
   strncpy(consensus_conf->spent_addresses_db_path, DEFAULT_SPENT_ADDRESSES_DB_PATH,
           sizeof(consensus_conf->spent_addresses_db_path));
+  strncpy(api_conf->spent_addresses_db_path, DEFAULT_SPENT_ADDRESSES_DB_PATH,
+          sizeof(api_conf->spent_addresses_db_path));
   ciri_conf->tangle_db_revalidate = DEFAULT_TANGLE_DB_REVALIDATE;
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {

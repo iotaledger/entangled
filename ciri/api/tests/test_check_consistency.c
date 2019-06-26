@@ -13,8 +13,8 @@
 #include "gossip/node.h"
 #include "utils/files.h"
 
-static char *test_db_path = "ciri/api/tests/test.db";
-static char *ciri_db_path = "ciri/api/tests/ciri.db";
+static char *test_db_path = "ciri/api/tests/tangle-test.db";
+static char *ciri_db_path = "ciri/api/tests/tangle.db";
 static connection_config_t config;
 static iota_api_t api;
 static core_t core;

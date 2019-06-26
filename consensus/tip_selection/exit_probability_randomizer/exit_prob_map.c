@@ -116,13 +116,13 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(ep_randomizer_t const *co
   retcode_t ret;
   bool ep_is_valid = false;
   hash243_queue_t queue = NULL;
+  hash243_queue_entry_t *curr_tx = NULL;
   hash_to_indexed_hash_set_entry_t *aps = NULL;
   hash_to_double_map_entry_t *curr_tx_entry = NULL;
   hash243_set_entry_t *approver_entry = NULL;
   hash243_set_entry_t *tmp_entry = NULL;
   size_t num_approvers;
   size_t approver_idx;
-  flex_trit_t *curr_tx;
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(ep_validator, tangle, ep, &ep_is_valid)) !=
       RC_OK) {
@@ -142,9 +142,9 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(ep_randomizer_t const *co
   hash243_queue_push(&queue, ep);
 
   while (hash243_queue_count(queue)) {
-    curr_tx = hash243_queue_peek(queue);
-    hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers, curr_tx, &aps);
-    hash_to_double_map_find(hash_to_exit_probs, curr_tx, &curr_tx_entry);
+    curr_tx = hash243_queue_pop(&queue);
+    hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers, curr_tx->hash, &aps);
+    hash_to_double_map_find(hash_to_exit_probs, curr_tx->hash, &curr_tx_entry);
     num_approvers = hash243_set_size(&aps->approvers);
     double trans_probs_to_direct_approvers[num_approvers];
     map_transition_probabilities(exit_probability_randomizer->conf->alpha, cw_result->cw_ratings, &aps->approvers,
@@ -161,13 +161,14 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(ep_randomizer_t const *co
       approver_idx++;
     }
 
-    if (!iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers, curr_tx)) {
+    if (!iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers, curr_tx->hash)) {
       curr_tx_entry->value = 0;
     }
-
-    hash243_queue_pop(&queue);
+    free(curr_tx);
   }
+
   hash243_queue_free(&queue);
+
   return RC_OK;
 }
 
