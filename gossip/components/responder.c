@@ -133,8 +133,7 @@ static retcode_t respond_to_request(responder_t const *const responder, tangle_t
  * @param responder The responder state
  */
 static void *responder_routine(responder_t *const responder) {
-  transaction_request_t *request_ptr = NULL;
-  transaction_request_t request;
+  transaction_request_queue_entry_t *entry = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   tangle_t tangle;
 
@@ -156,27 +155,23 @@ static void *responder_routine(responder_t *const responder) {
   lock_handle_lock(&lock_cond);
 
   while (responder->running) {
-    if (responder_is_empty(responder)) {
-      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_MS);
-    }
-
     rw_lock_handle_wrlock(&responder->lock);
-    request_ptr = transaction_request_queue_peek(responder->queue);
-    if (request_ptr == NULL) {
-      rw_lock_handle_unlock(&responder->lock);
+    entry = transaction_request_queue_pop(&responder->queue);
+    rw_lock_handle_unlock(&responder->lock);
+
+    if (entry == NULL) {
+      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_MS);
       continue;
     }
-    request = *request_ptr;
-    transaction_request_queue_pop(&responder->queue);
-    rw_lock_handle_unlock(&responder->lock);
 
     log_debug(logger_id, "Responding to request\n");
     hash_pack_reset(&pack);
-    if (get_transaction_for_request(responder, &tangle, request.neighbor, request.hash, &pack) != RC_OK) {
+    if (get_transaction_for_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack) != RC_OK) {
       log_warning(logger_id, "Getting transaction for request failed\n");
-    } else if (respond_to_request(responder, &tangle, request.neighbor, request.hash, &pack) != RC_OK) {
+    } else if (respond_to_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack) != RC_OK) {
       log_warning(logger_id, "Replying to request failed\n");
     }
+    free(entry);
   }
 
   lock_handle_unlock(&lock_cond);

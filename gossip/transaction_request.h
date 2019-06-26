@@ -37,15 +37,6 @@ typedef struct transaction_request_queue_entry_s {
 typedef transaction_request_queue_entry_t* transaction_request_queue_t;
 
 /**
- * Tells whether a transaction request queue is empty or not
- *
- * @param queue The transaction request queue
- *
- * @return true if empty, false otherwise
- */
-bool transaction_request_queue_empty(transaction_request_queue_t const queue);
-
-/**
  * Gets the size of a transaction request queue
  *
  * @param queue The transaction request queue
@@ -71,18 +62,9 @@ retcode_t transaction_request_queue_push(transaction_request_queue_t* const queu
  *
  * @param queue The transaction request queue
  *
- * @return a status code
+ * @return the transaction request entry
  */
-void transaction_request_queue_pop(transaction_request_queue_t* const queue);
-
-/**
- * Peeks a transaction request from a transaction request queue
- *
- * @param queue The transaction request queue
- *
- * @return the transaction request
- */
-transaction_request_t* transaction_request_queue_peek(transaction_request_queue_t const queue);
+transaction_request_queue_entry_t* transaction_request_queue_pop(transaction_request_queue_t* const queue);
 
 /**
  * Frees a transaction request queue
