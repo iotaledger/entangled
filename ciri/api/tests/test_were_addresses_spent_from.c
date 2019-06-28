@@ -8,8 +8,8 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "consensus/conf.h"
-#include "consensus/test_utils/tangle.h"
+#include "ciri/consensus/conf.h"
+#include "ciri/consensus/test_utils/tangle.h"
 
 static char *spent_addresses_test_db_path = "ciri/api/tests/spent-addresses-test.db";
 static char *spent_addresses_db_path = "ciri/api/tests/spent-addresses.db";
@@ -116,7 +116,7 @@ int main(void) {
   tangle_config.db_path = tangle_test_db_path;
   api.core = &core;
 
-  TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
+  TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);

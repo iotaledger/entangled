@@ -15,10 +15,10 @@
 
 #include "cclient/serialization/serializer.h"
 #include "ciri/api/api.h"
+#include "ciri/consensus/consensus.h"
+#include "ciri/node/pipeline/broadcaster.h"
 #include "common/errors.h"
 #include "common/storage/connection.h"
-#include "consensus/consensus.h"
-#include "gossip/components/broadcaster.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus

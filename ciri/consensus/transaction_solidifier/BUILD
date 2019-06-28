@@ -1,0 +1,21 @@
+cc_library(
+    name = "transaction_solidifier",
+    srcs = ["transaction_solidifier.c"],
+    hdrs = ["transaction_solidifier.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ciri/consensus:conf",
+        "//ciri/consensus/snapshot:snapshots_provider",
+        "//ciri/consensus/tangle",
+        "//ciri/consensus/tangle:traversal",
+        "//ciri/node:tips_cache",
+        "//ciri/node/pipeline:transaction_requester",
+        "//common:errors",
+        "//common/model:transaction",
+        "//utils:logger_helper",
+        "//utils/containers/hash:hash243_set",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:thread",
+    ],
+)

@@ -1,4 +1,4 @@
-load("//consensus:conf.bzl", "CONSENSUS_MAINNET_VARIABLES")
+load("//ciri/consensus:conf.bzl", "CONSENSUS_MAINNET_VARIABLES")
 
 cc_test(
     name = "test_merkle",
@@ -18,11 +18,11 @@ cc_test(
     srcs = ["test_signed_files.c"],
     data = [
         "fake.sig",
-        "//consensus/snapshot:snapshot_files",
+        "//ciri/consensus/snapshot:snapshot_files",
     ],
     defines = CONSENSUS_MAINNET_VARIABLES,
     deps = [
-        "//consensus/snapshot",
+        "//ciri/consensus/snapshot",
         "//utils:signed_files",
         "@unity",
     ],

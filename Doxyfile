@@ -795,8 +795,6 @@ INPUT                  = common \
                          README.md \
                          doxy.txt \
                          ciri \
-                         gossip \
-                         consensus \
                          utils \
                          mam \
                          tanglescope

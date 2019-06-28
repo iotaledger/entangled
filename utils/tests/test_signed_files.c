@@ -7,7 +7,7 @@
 
 #include <unity/unity.h>
 
-#include "consensus/snapshot/snapshot.h"
+#include "ciri/consensus/snapshot/snapshot.h"
 #include "utils/signed_files.h"
 
 iota_consensus_conf_t conf;
