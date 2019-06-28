@@ -45,8 +45,8 @@ cc_library(
     hdrs = ["core.h"],
     deps = [
         ":conf",
-        "//consensus",
-        "//node:node_shared",
+        "//ciri/consensus",
+        "//ciri/node:node_shared",
     ],
 )
 
@@ -55,7 +55,7 @@ cc_library(
     srcs = ["core.c"],
     deps = [
         ":core_shared",
-        "//node",
+        "//ciri/node",
     ],
 )
 
@@ -77,9 +77,9 @@ cc_library(
     deps = [
         ":usage",
         "//ciri/api:conf",
+        "//ciri/consensus:conf",
+        "//ciri/node:conf",
         "//common:errors",
-        "//consensus:conf",
-        "//node:conf",
         "//utils:logger_helper",
         "@yaml",
     ],

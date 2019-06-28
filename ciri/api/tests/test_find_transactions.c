@@ -9,8 +9,8 @@
 
 #include "ciri/api/api.h"
 #include "ciri/api/tests/defs.h"
-#include "consensus/test_utils/bundle.h"
-#include "consensus/test_utils/tangle.h"
+#include "ciri/consensus/test_utils/bundle.h"
+#include "ciri/consensus/test_utils/tangle.h"
 
 static char *test_db_path = "ciri/api/tests/tangle-test.db";
 static char *ciri_db_path = "ciri/api/tests/tangle.db";

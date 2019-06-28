@@ -9,9 +9,9 @@
 #define __CIRI_CORE_H__
 
 #include "ciri/conf.h"
-#include "consensus/consensus.h"
-#include "node/node.h"
-#include "node/pipeline/transaction_requester.h"
+#include "ciri/consensus/consensus.h"
+#include "ciri/node/node.h"
+#include "ciri/node/pipeline/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {

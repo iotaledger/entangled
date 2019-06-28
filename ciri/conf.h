@@ -11,9 +11,9 @@
 #include <stdbool.h>
 
 #include "ciri/api/conf.h"
+#include "ciri/consensus/conf.h"
+#include "ciri/node/conf.h"
 #include "common/errors.h"
-#include "consensus/conf.h"
-#include "node/conf.h"
 #include "utils/files.h"
 #include "utils/logger_helper.h"
 

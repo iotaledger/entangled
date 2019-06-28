@@ -4,10 +4,10 @@ cc_library(
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//ciri/consensus/snapshot:state_delta",
         "//common:errors",
         "//common/model:bundle",
         "//common/trinary:trit_array",
-        "//consensus/snapshot:state_delta",
         "//utils:hash_maps",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_queue",

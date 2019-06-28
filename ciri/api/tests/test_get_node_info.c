@@ -8,8 +8,8 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "consensus/test_utils/tangle.h"
-#include "node/node.h"
+#include "ciri/consensus/test_utils/tangle.h"
+#include "ciri/node/node.h"
 #include "utils/time.h"
 
 static char *test_db_path = "ciri/api/tests/tangle-test.db";

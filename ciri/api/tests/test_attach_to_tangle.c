@@ -8,7 +8,7 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "consensus/test_utils/bundle.h"
+#include "ciri/consensus/test_utils/bundle.h"
 
 static iota_api_t api;
 

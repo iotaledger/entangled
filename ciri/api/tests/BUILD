@@ -38,7 +38,7 @@ cc_test(
     srcs = ["test_attach_to_tangle.c"],
     deps = [
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -51,7 +51,7 @@ cc_test(
     deps = [
         ":defs",
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -63,7 +63,7 @@ cc_test(
     data = [":tangle_db_file"],
     deps = [
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -76,7 +76,7 @@ cc_test(
     deps = [
         ":defs",
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -88,7 +88,7 @@ cc_test(
     data = [":tangle_db_file"],
     deps = [
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -110,7 +110,7 @@ cc_test(
     data = [":tangle_db_file"],
     deps = [
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -132,7 +132,7 @@ cc_test(
     data = [":tangle_db_file"],
     deps = [
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -145,7 +145,7 @@ cc_test(
     deps = [
         ":defs",
         "//ciri/api",
-        "//consensus/test_utils",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -168,8 +168,8 @@ cc_test(
     deps = [
         ":defs",
         "//ciri/api",
-        "//consensus:conf",
-        "//consensus/test_utils",
+        "//ciri/consensus:conf",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
@@ -184,8 +184,8 @@ cc_test(
     ],
     deps = [
         "//ciri/api",
-        "//consensus:conf",
-        "//consensus/test_utils",
+        "//ciri/consensus:conf",
+        "//ciri/consensus/test_utils",
         "@unity",
     ],
 )
