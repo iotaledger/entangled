@@ -10,8 +10,8 @@
 
 #include <stdbool.h>
 
+#include "ciri/node/iota_packet.h"
 #include "common/errors.h"
-#include "utils/containers/hash/hash8019_queue.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
@@ -25,7 +25,7 @@ typedef struct broadcaster_s {
   bool running;
   thread_handle_t thread;
   node_t *node;
-  hash8019_queue_t queue;
+  iota_packet_queue_t queue;
 } broadcaster_t;
 
 #ifdef __cplusplus
@@ -70,14 +70,14 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
 
 /**
- * Adds transaction flex trits to the broadcaster queue
+ * Adds a packet to the broadcaster queue
  *
  * @param broadcaster The broadcaster
- * @param flex_trits Transaction flex trits
+ * @param packet The packet
  *
  * @return a status code
  */
-retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, flex_trit_t const *const flex_trits);
+retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, iota_packet_t const *const packet);
 
 /**
  * Gets the size of the broadcaster queue

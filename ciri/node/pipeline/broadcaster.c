@@ -21,7 +21,7 @@ static logger_id_t logger_id;
 
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   neighbor_t *iter = NULL;
-  hash8019_queue_entry_t *entry = NULL;
+  iota_packet_queue_entry_t *entry = NULL;
   tangle_t tangle;
   lock_handle_t lock_cond;
 
@@ -43,7 +43,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
 
   while (broadcaster->running) {
     rw_lock_handle_wrlock(&broadcaster->lock);
-    entry = hash8019_queue_pop(&broadcaster->queue);
+    entry = iota_packet_queue_pop(&broadcaster->queue);
     rw_lock_handle_unlock(&broadcaster->lock);
 
     if (entry == NULL) {
@@ -54,8 +54,10 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     log_debug(logger_id, "Broadcasting transaction\n");
     rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
     LL_FOREACH(broadcaster->node->neighbors, iter) {
-      if (neighbor_send(broadcaster->node, &tangle, iter, entry->hash) != RC_OK) {
-        log_warning(logger_id, "Broadcasting transaction failed\n");
+      if (!endpoint_cmp(&entry->packet.source, &iter->endpoint)) {
+        if (neighbor_send_bytes(broadcaster->node, &tangle, iter, entry->packet.content) != RC_OK) {
+          log_warning(logger_id, "Broadcasting transaction failed\n");
+        }
       }
     }
     rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
@@ -133,7 +135,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   }
 
   broadcaster->node = NULL;
-  hash8019_queue_free(&broadcaster->queue);
+  iota_packet_queue_free(&broadcaster->queue);
   rw_lock_handle_destroy(&broadcaster->lock);
   cond_handle_destroy(&broadcaster->cond);
   logger_helper_release(logger_id);
@@ -141,19 +143,19 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   return RC_OK;
 }
 
-retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, flex_trit_t const *const transaction_flex_trits) {
+retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, iota_packet_t const *const packet) {
   retcode_t ret = RC_OK;
 
-  if (broadcaster == NULL || transaction_flex_trits == NULL) {
+  if (broadcaster == NULL || packet == NULL) {
     return RC_NULL_PARAM;
   }
 
   rw_lock_handle_wrlock(&broadcaster->lock);
-  ret = hash8019_queue_push(&broadcaster->queue, transaction_flex_trits);
+  ret = iota_packet_queue_push(&broadcaster->queue, packet);
   rw_lock_handle_unlock(&broadcaster->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id, "Pushing transaction flex trits to broadcaster queue failed\n");
+    log_warning(logger_id, "Pushing packet to broadcaster queue failed\n");
     return ret;
   }
 
@@ -170,7 +172,7 @@ size_t broadcaster_size(broadcaster_t *const broadcaster) {
   }
 
   rw_lock_handle_rdlock(&broadcaster->lock);
-  size = hash8019_queue_count(broadcaster->queue);
+  size = iota_packet_queue_count(broadcaster->queue);
   rw_lock_handle_unlock(&broadcaster->lock);
 
   return size;

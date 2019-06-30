@@ -71,17 +71,30 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
 retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, iota_packet_t const *const packet);
 
 /**
- * Sends transaction flex trits to a neighbor
+ * Sends transaction trits to a neighbor
  *
  * @param node A node
  * @param tangle A tangle
  * @param neighbor The neighbor
- * @param transaction The transaction flex trits
+ * @param trits The transaction trits
  *
  * @return a status code
  */
-retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
-                        flex_trit_t const *const transaction);
+retcode_t neighbor_send_trits(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+                              flex_trit_t const *const trits);
+
+/**
+ * Sends transaction bytes to a neighbor
+ *
+ * @param node A node
+ * @param tangle A tangle
+ * @param neighbor The neighbor
+ * @param bytes The transaction bytes
+ *
+ * @return a status code
+ */
+retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+                              byte_t const *const bytes);
 
 /**
  * Adds a neighbor to a neighbors list

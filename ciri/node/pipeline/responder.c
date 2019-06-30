@@ -107,7 +107,7 @@ static retcode_t respond_to_request(responder_t const *const responder, tangle_t
                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
     recent_seen_bytes_cache_hash(transaction_bytes, &digest);
     recent_seen_bytes_cache_put(&responder->node->recent_seen_bytes, digest, hash);
-    if ((ret = neighbor_send(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
+    if ((ret = neighbor_send_trits(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
       log_warning(logger_id, "Sending transaction failed\n");
       return ret;
     }

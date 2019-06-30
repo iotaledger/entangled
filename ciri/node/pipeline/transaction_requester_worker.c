@@ -63,7 +63,7 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
     }
     rw_lock_handle_rdlock(&transaction_requester->node->neighbors_lock);
     LL_FOREACH(transaction_requester->node->neighbors, iter) {
-      if (neighbor_send(transaction_requester->node, &tangle, iter, transaction) != RC_OK) {
+      if (neighbor_send_trits(transaction_requester->node, &tangle, iter, transaction) != RC_OK) {
         log_warning(logger_id, "Sending request failed\n");
       }
     }

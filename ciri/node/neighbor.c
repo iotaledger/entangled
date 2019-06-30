@@ -77,31 +77,50 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, i
   return RC_OK;
 }
 
-retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
-                        flex_trit_t const *const transaction) {
+static retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+                               iota_packet_t *const packet) {
   retcode_t ret = RC_OK;
-  iota_packet_t packet;
   flex_trit_t request[FLEX_TRIT_SIZE_243];
-
-  if (node == NULL || neighbor == NULL || transaction == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if ((ret = iota_packet_set_transaction(&packet, transaction)) != RC_OK) {
-    return ret;
-  }
-
   bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
 
   if ((ret = get_transaction_to_request(&node->transaction_requester, tangle, request, is_milestone)) != RC_OK) {
     return ret;
   }
 
-  if ((ret = iota_packet_set_request(&packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
+  if ((ret = iota_packet_set_request(packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
     return ret;
   }
 
-  return neighbor_send_packet(node, neighbor, &packet);
+  return neighbor_send_packet(node, neighbor, packet);
+}
+
+retcode_t neighbor_send_trits(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+                              flex_trit_t const *const trits) {
+  retcode_t ret = RC_OK;
+  iota_packet_t packet;
+
+  if (node == NULL || tangle == NULL || neighbor == NULL || trits == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((ret = iota_packet_set_transaction(&packet, trits)) != RC_OK) {
+    return ret;
+  }
+
+  return neighbor_send(node, tangle, neighbor, &packet);
+}
+
+retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+                              byte_t const *const bytes) {
+  iota_packet_t packet;
+
+  if (node == NULL || tangle == NULL || neighbor == NULL || bytes == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  memcpy(packet.content, bytes, PACKET_SIZE);
+
+  return neighbor_send(node, tangle, neighbor, &packet);
 }
 
 static int neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
@@ -109,8 +128,7 @@ static int neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs
     return false;
   }
 
-  return !((strcmp(lhs->endpoint.ip, rhs->endpoint.ip) == 0 || strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0) &&
-           lhs->endpoint.port == rhs->endpoint.port && lhs->endpoint.protocol == rhs->endpoint.protocol);
+  return !endpoint_cmp(&lhs->endpoint, &rhs->endpoint);
 }
 
 retcode_t neighbors_add(neighbor_t **const neighbors, neighbor_t const *const neighbor) {
