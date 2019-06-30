@@ -159,7 +159,7 @@ retcode_t iota_consensus_transaction_solidifier_start(transaction_solidifier_t *
   log_info(logger_id, "Spawning transaction solidifier thread\n");
   if (thread_handle_create(&ts->thread, (thread_routine_t)spawn_solid_transactions_propagation, ts) != 0) {
     log_critical(logger_id, "Spawning transaction solidifier thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
   return RC_OK;
 }
@@ -178,7 +178,7 @@ retcode_t iota_consensus_transaction_solidifier_stop(transaction_solidifier_t *c
   cond_handle_signal(&ts->cond);
   if (thread_handle_join(ts->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down transaction solidifier thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
   return ret;
 }

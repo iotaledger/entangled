@@ -16,21 +16,23 @@
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Forward declarations
 typedef struct node_s node_t;
 
 typedef struct broadcaster_s {
+  // Metadata
   cond_handle_t cond;
   rw_lock_handle_t lock;
   bool running;
   thread_handle_t thread;
+  // Data
   node_t *node;
   iota_packet_queue_t queue;
 } broadcaster_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * Initializes a broadcaster

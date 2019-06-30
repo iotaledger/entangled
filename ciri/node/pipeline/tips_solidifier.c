@@ -127,7 +127,7 @@ retcode_t tips_solidifier_start(tips_solidifier_t *const tips_solidifier) {
   tips_solidifier->running = true;
   if (thread_handle_create(&tips_solidifier->thread, (thread_routine_t)tips_solidifier_routine, tips_solidifier) != 0) {
     log_error(logger_id, "Spawning tips solidifier thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -145,7 +145,7 @@ retcode_t tips_solidifier_stop(tips_solidifier_t *const tips_solidifier) {
   cond_handle_signal(&tips_solidifier->cond);
   if (thread_handle_join(tips_solidifier->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down tips solidifier thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
+    return RC_THREAD_JOIN;
   }
 
   return RC_OK;

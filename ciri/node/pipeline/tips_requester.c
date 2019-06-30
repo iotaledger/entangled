@@ -114,7 +114,7 @@ retcode_t tips_requester_start(tips_requester_t *const tips_requester) {
   tips_requester->running = true;
   if (thread_handle_create(&tips_requester->thread, (thread_routine_t)tips_requester_routine, tips_requester) != 0) {
     log_critical(logger_id, "Spawning tips requester thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -132,7 +132,7 @@ retcode_t tips_requester_stop(tips_requester_t *const tips_requester) {
   cond_handle_signal(&tips_requester->cond);
   if (thread_handle_join(tips_requester->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down tips requester thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
+    return RC_THREAD_JOIN;
   }
 
   return RC_OK;

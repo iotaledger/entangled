@@ -96,7 +96,7 @@ retcode_t requester_start(transaction_requester_t *const transaction_requester) 
   transaction_requester->running = true;
   if (thread_handle_create(&transaction_requester->thread, (thread_routine_t)transaction_requester_routine,
                            transaction_requester) != 0) {
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -114,7 +114,7 @@ retcode_t requester_stop(transaction_requester_t *const transaction_requester) {
   cond_handle_signal(&transaction_requester->cond);
   if (thread_handle_join(transaction_requester->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down transaction requester thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
+    return RC_THREAD_JOIN;
   }
 
   return RC_OK;

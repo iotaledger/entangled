@@ -370,7 +370,7 @@ retcode_t processor_start(processor_t *const processor) {
   processor->running = true;
   if (thread_handle_create(&processor->thread, (thread_routine_t)processor_routine, processor) != 0) {
     log_critical(logger_id, "Spawning processor thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -388,7 +388,7 @@ retcode_t processor_stop(processor_t *const processor) {
   cond_handle_signal(&processor->cond);
   if (thread_handle_join(processor->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down processor thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
+    return RC_THREAD_JOIN;
   }
 
   return RC_OK;
