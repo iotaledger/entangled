@@ -172,7 +172,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   return RC_OK;
 }
 
-retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, iota_packet_t const *const packet) {
+retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const *const packet) {
   retcode_t ret = RC_OK;
 
   if (broadcaster == NULL || packet == NULL) {

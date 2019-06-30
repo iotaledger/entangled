@@ -121,7 +121,7 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
       continue;
     }
     // TODO priority queue on weight_magnitude
-    if ((ret = broadcaster_on_next(&api->core->node.broadcaster, elt)) != RC_OK) {
+    if ((ret = broadcaster_add(&api->core->node.broadcaster, elt)) != RC_OK) {
       return ret;
     }
   }

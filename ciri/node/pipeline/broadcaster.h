@@ -25,20 +25,20 @@ typedef struct node_s node_t;
 
 typedef struct broadcaster_s {
   // Metadata
-  cond_handle_t cond;
-  rw_lock_handle_t lock;
-  bool running;
-  thread_handle_t thread;
+  cond_handle_t cond;     /*!< Condition variable to wait/signal the broadcaster */
+  rw_lock_handle_t lock;  /*!< Lock for the broadcaster queue */
+  bool running;           /*!< State of the broadcaster */
+  thread_handle_t thread; /*!< Handle for the broadcaster thread */
   // Data
-  node_t *node;
-  iota_packet_queue_t queue;
+  node_t *node;              /*!< The parent node */
+  iota_packet_queue_t queue; /*!< A queue of packets to be broadcasted */
 } broadcaster_t;
 
 /**
  * Initializes a broadcaster
  *
- * @param broadcaster The broadcaster
- * @param node A node
+ * @param[out]  broadcaster The broadcaster
+ * @param[in]   node        A node
  *
  * @return a status code
  */
@@ -47,7 +47,7 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node)
 /**
  * Starts a broadcaster
  *
- * @param broadcaster The broadcaster
+ * @param[out]  broadcaster The broadcaster
  *
  * @return a status code
  */
@@ -56,7 +56,7 @@ retcode_t broadcaster_start(broadcaster_t *const broadcaster);
 /**
  * Stops a broadcaster
  *
- * @param broadcaster The broadcaster
+ * @param[out]  broadcaster The broadcaster
  *
  * @return a status code
  */
@@ -65,26 +65,26 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 /**
  * Destroys a broadcaster
  *
- * @param broadcaster The broadcaster
+ * @param[out]  broadcaster The broadcaster
  *
  * @return a status code
  */
 retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
 
 /**
- * Adds a packet to the broadcaster queue
+ * Adds a packet to be broadcasted
  *
- * @param broadcaster The broadcaster
- * @param packet The packet
+ * @param[out]  broadcaster The broadcaster
+ * @param[in]   packet      The packet
  *
  * @return a status code
  */
-retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, iota_packet_t const *const packet);
+retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const *const packet);
 
 /**
  * Gets the size of the broadcaster queue
  *
- * @param broadcaster The broadcaster
+ * @param[in] broadcaster The broadcaster
  *
  * @return a status code
  */

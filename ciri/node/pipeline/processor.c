@@ -99,7 +99,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
     // TODO Store transaction metadata
 
     // Broadcast the new transaction
-    if ((ret = broadcaster_on_next(&processor->node->broadcaster, packet)) != RC_OK) {
+    if ((ret = broadcaster_add(&processor->node->broadcaster, packet)) != RC_OK) {
       log_warning(logger_id, "Propagating packet to broadcaster failed\n");
       goto failure;
     }

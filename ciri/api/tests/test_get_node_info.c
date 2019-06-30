@@ -121,10 +121,10 @@ int main(void) {
   // Adding broadcasts
 
   flex_trit_t to_broadcast[FLEX_TRIT_SIZE_8019];
-  TEST_ASSERT(broadcaster_on_next(&api.core->node.broadcaster, to_broadcast) == RC_OK);
-  TEST_ASSERT(broadcaster_on_next(&api.core->node.broadcaster, to_broadcast) == RC_OK);
-  TEST_ASSERT(broadcaster_on_next(&api.core->node.broadcaster, to_broadcast) == RC_OK);
-  TEST_ASSERT(broadcaster_on_next(&api.core->node.broadcaster, to_broadcast) == RC_OK);
+  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, to_broadcast) == RC_OK);
+  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, to_broadcast) == RC_OK);
+  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, to_broadcast) == RC_OK);
+  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, to_broadcast) == RC_OK);
 
   RUN_TEST(test_get_node_info);
 
