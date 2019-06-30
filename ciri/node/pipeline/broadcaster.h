@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_PIPELINE_BROADCASTER_H__
-#define __NODE_PIPELINE_BROADCASTER_H__
+#ifndef __CIRI_NODE_PIPELINE_BROADCASTER_H__
+#define __CIRI_NODE_PIPELINE_BROADCASTER_H__
 
 #include <stdbool.h>
 
@@ -20,12 +20,12 @@
 typedef struct node_s node_t;
 
 typedef struct broadcaster_s {
-  thread_handle_t thread;
+  cond_handle_t cond;
+  rw_lock_handle_t lock;
   bool running;
+  thread_handle_t thread;
   node_t *node;
   hash8019_queue_t queue;
-  rw_lock_handle_t lock;
-  cond_handle_t cond;
 } broadcaster_t;
 
 #ifdef __cplusplus
@@ -43,15 +43,6 @@ extern "C" {
 retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node);
 
 /**
- * Destroys a broadcaster
- *
- * @param broadcaster The broadcaster
- *
- * @return a status code
- */
-retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
-
-/**
  * Starts a broadcaster
  *
  * @param broadcaster The broadcaster
@@ -59,6 +50,24 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
  * @return a status code
  */
 retcode_t broadcaster_start(broadcaster_t *const broadcaster);
+
+/**
+ * Stops a broadcaster
+ *
+ * @param broadcaster The broadcaster
+ *
+ * @return a status code
+ */
+retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
+
+/**
+ * Destroys a broadcaster
+ *
+ * @param broadcaster The broadcaster
+ *
+ * @return a status code
+ */
+retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
 
 /**
  * Adds transaction flex trits to the broadcaster queue
@@ -79,17 +88,8 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, flex_trit_t cons
  */
 size_t broadcaster_size(broadcaster_t *const broadcaster);
 
-/**
- * Stops a broadcaster
- *
- * @param broadcaster The broadcaster
- *
- * @return a status code
- */
-retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif  //__NODE_PIPELINE_BROADCASTER_H__
+#endif  //__CIRI_NODE_PIPELINE_BROADCASTER_H__

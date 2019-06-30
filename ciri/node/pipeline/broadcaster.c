@@ -5,11 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <string.h>
-
+#include "ciri/node/pipeline/broadcaster.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/node/node.h"
-#include "ciri/node/pipeline/broadcaster.h"
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
@@ -25,6 +23,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   neighbor_t *iter = NULL;
   hash8019_queue_entry_t *entry = NULL;
   tangle_t tangle;
+  lock_handle_t lock_cond;
 
   if (broadcaster == NULL) {
     return NULL;
@@ -39,7 +38,6 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
@@ -84,12 +82,45 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node)
   }
 
   logger_id = logger_helper_enable(BROADCASTER_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(broadcaster, 0, sizeof(broadcaster_t));
+
+  cond_handle_init(&broadcaster->cond);
   broadcaster->running = false;
+  rw_lock_handle_init(&broadcaster->lock);
+
   broadcaster->node = node;
   broadcaster->queue = NULL;
-  rw_lock_handle_init(&broadcaster->lock);
-  cond_handle_init(&broadcaster->cond);
+
+  return RC_OK;
+}
+
+retcode_t broadcaster_start(broadcaster_t *const broadcaster) {
+  if (broadcaster == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  log_info(logger_id, "Spawning broadcaster thread\n");
+  broadcaster->running = true;
+  if (thread_handle_create(&broadcaster->thread, (thread_routine_t)broadcaster_routine, broadcaster) != 0) {
+    return RC_FAILED_THREAD_SPAWN;
+  }
+
+  return RC_OK;
+}
+
+retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
+  if (broadcaster == NULL) {
+    return RC_NULL_PARAM;
+  } else if (broadcaster->running == false) {
+    return RC_OK;
+  }
+
+  log_info(logger_id, "Shutting down broadcaster thread\n");
+  broadcaster->running = false;
+  cond_handle_signal(&broadcaster->cond);
+  if (thread_handle_join(broadcaster->thread, NULL) != 0) {
+    log_error(logger_id, "Shutting down broadcaster thread failed\n");
+    return RC_FAILED_THREAD_JOIN;
+  }
 
   return RC_OK;
 }
@@ -106,20 +137,6 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   rw_lock_handle_destroy(&broadcaster->lock);
   cond_handle_destroy(&broadcaster->cond);
   logger_helper_release(logger_id);
-
-  return RC_OK;
-}
-
-retcode_t broadcaster_start(broadcaster_t *const broadcaster) {
-  if (broadcaster == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  log_info(logger_id, "Spawning broadcaster thread\n");
-  broadcaster->running = true;
-  if (thread_handle_create(&broadcaster->thread, (thread_routine_t)broadcaster_routine, broadcaster) != 0) {
-    return RC_FAILED_THREAD_SPAWN;
-  }
 
   return RC_OK;
 }
@@ -157,22 +174,4 @@ size_t broadcaster_size(broadcaster_t *const broadcaster) {
   rw_lock_handle_unlock(&broadcaster->lock);
 
   return size;
-}
-
-retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
-  if (broadcaster == NULL) {
-    return RC_NULL_PARAM;
-  } else if (broadcaster->running == false) {
-    return RC_OK;
-  }
-
-  log_info(logger_id, "Shutting down broadcaster thread\n");
-  broadcaster->running = false;
-  cond_handle_signal(&broadcaster->cond);
-  if (thread_handle_join(broadcaster->thread, NULL) != 0) {
-    log_error(logger_id, "Shutting down broadcaster thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
-  }
-
-  return RC_OK;
 }
