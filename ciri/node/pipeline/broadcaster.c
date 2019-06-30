@@ -169,7 +169,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
 
   logger_helper_release(logger_id);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const *const packet) {
