@@ -106,6 +106,7 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
   iota_transaction_t tx;
+  iota_packet_t packet;
 
   if (api == NULL || req == NULL || error == NULL) {
     return RC_NULL_PARAM;
@@ -115,13 +116,17 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
     return ret;
   }
 
+  memset(&packet, 0, sizeof(iota_packet_t));
+
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);
     if (!iota_consensus_transaction_validate(&api->core->consensus.transaction_validator, &tx)) {
       continue;
     }
+    flex_trits_to_bytes(packet.content, NUM_TRITS_SERIALIZED_TRANSACTION, elt, NUM_TRITS_SERIALIZED_TRANSACTION,
+                        NUM_TRITS_SERIALIZED_TRANSACTION);
     // TODO priority queue on weight_magnitude
-    if ((ret = broadcaster_add(&api->core->node.broadcaster, elt)) != RC_OK) {
+    if ((ret = broadcaster_add(&api->core->node.broadcaster, &packet)) != RC_OK) {
       return ret;
     }
   }
