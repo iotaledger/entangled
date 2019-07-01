@@ -28,7 +28,6 @@
 #define DEFAULT_TCP_RECEIVER_PORT 15600
 #define DEFAULT_TIPS_CACHE_SIZE 5000
 #define DEFAULT_TIPS_SOLIDIFIER_ENABLED true
-#define DEFAULT_UDP_RECEIVER_PORT 14600
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +35,6 @@ extern "C" {
 
 // This structure contains all configuration variables needed to operate a IOTA node
 typedef struct iota_node_conf_s {
-  // UDP listen port
-  uint16_t udp_receiver_port;
   // TCP listen port
   uint16_t tcp_receiver_port;
   // Number of trailing ternary 0s that must appear at the end of a transaction

@@ -90,9 +90,9 @@ int main(void) {
   // Adding neighbors
 
   neighbor_t neighbor;
-  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "udp://8.8.8.1:15001") == RC_OK);
+  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://8.8.8.1:15001") == RC_OK);
   TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
-  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "udp://8.8.8.2:15002") == RC_OK);
+  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://8.8.8.2:15002") == RC_OK);
   TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
 
   // Adding tips

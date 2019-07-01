@@ -11,7 +11,6 @@
 #include "ciri/node/neighbor.h"
 #include "ciri/node/node.h"
 #include "ciri/node/services/tcp_sender.hpp"
-#include "ciri/node/services/udp_sender.hpp"
 #include "common/network/uri.h"
 #include "utils/handles/rand.h"
 
@@ -29,8 +28,6 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
   }
   if (strcmp(scheme, "tcp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_TCP;
-  } else if (strcmp(scheme, "udp") == 0) {
-    neighbor->endpoint.protocol = PROTOCOL_UDP;
   } else {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
@@ -62,10 +59,6 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, i
 
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_send(&neighbor->endpoint, packet) == false) {
-      return RC_NEIGHBOR_FAILED_SEND;
-    }
-  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) == false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else {
@@ -152,11 +145,7 @@ retcode_t neighbors_add(neighbor_t **const neighbors, neighbor_t const *const ne
   memcpy(entry, neighbor, sizeof(neighbor_t));
   LL_PREPEND(*neighbors, entry);
 
-  if (entry->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_endpoint_init(&entry->endpoint) == false) {
-      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
-    }
-  } else if (entry->endpoint.protocol == PROTOCOL_TCP) {
+  if (entry->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_sender_endpoint_init(&entry->endpoint) != RC_OK) {
       return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
     }
@@ -174,11 +163,7 @@ retcode_t neighbors_remove_entry(neighbor_t **const neighbors, neighbor_t *const
     return RC_NULL_PARAM;
   }
 
-  if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_endpoint_destroy(&neighbor->endpoint) == false) {
-      ret = RC_NEIGHBOR_FAILED_ENDPOINT_DESTROY;
-    }
-  } else if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_sender_endpoint_destroy(&neighbor->endpoint) != RC_OK) {
       return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
     }

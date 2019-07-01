@@ -16,7 +16,6 @@ cc_library(
     deps = [
         ":receiver_shared",
         "//ciri/node/services:tcp_receiver",
-        "//ciri/node/services:udp_receiver",
     ],
 )
 
@@ -42,27 +41,5 @@ cc_library(
         "//utils:logger_helper",
         "@boost//:asio",
         "@boost//:crc",
-    ],
-)
-
-cc_library(
-    name = "udp_receiver",
-    srcs = ["udp_receiver.cc"],
-    hdrs = ["udp_receiver.hpp"],
-    deps = [
-        ":receiver_shared",
-        "@boost//:asio",
-    ],
-)
-
-cc_library(
-    name = "udp_sender",
-    srcs = ["udp_sender.cc"],
-    hdrs = ["udp_sender.hpp"],
-    deps = [
-        ":receiver_shared",
-        "//ciri/node:iota_packet",
-        "//utils:logger_helper",
-        "@boost//:asio",
     ],
 )

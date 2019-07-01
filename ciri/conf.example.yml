@@ -11,7 +11,7 @@
 # Node configuration
 
 # mwm: 14
-# neighbors: "udp://127.0.0.1:14600 tcp://127.0.0.1:15600"
+# neighbors: "tcp://127.0.0.1:15600"
 # p-propagate-request: 0.01
 # p-remove-request: 0.01
 # p-reply-random-tip: 0.66
@@ -22,7 +22,6 @@
 # tcp-receiver-port: 15600
 # tips-cache-size: 5000
 # tips-solidifier-enabled: true
-# udp-receiver-port: 14600
 
 # API configuration
 

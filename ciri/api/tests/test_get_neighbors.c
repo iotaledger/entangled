@@ -51,7 +51,7 @@ void test_get_neighbors(void) {
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_stale_txs, info->stale_trans_num);
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_sent_txs, info->sent_trans_num);
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_random_tx_reqs, info->random_trans_req_num);
-    TEST_ASSERT_EQUAL_STRING((neighbor->endpoint.protocol == PROTOCOL_TCP ? "TCP" : "UDP"),
+    TEST_ASSERT_EQUAL_STRING((neighbor->endpoint.protocol == PROTOCOL_TCP ? "TCP" : "UNKNOWN"),
                              info->connection_type->data);
     TEST_ASSERT_EQUAL_STRING(address, info->address->data);
 
@@ -75,41 +75,41 @@ int main(void) {
 
   neighbor_t neighbor;
 
-  neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:15001");
+  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15001") == RC_OK);
   neighbor.nbr_all_txs = 1;
   neighbor.nbr_new_txs = 2;
   neighbor.nbr_invalid_txs = 3;
   neighbor.nbr_stale_txs = 4;
   neighbor.nbr_sent_txs = 5;
   neighbor.nbr_random_tx_reqs = 6;
-  neighbors_add(&api.core->node.neighbors, &neighbor);
+  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
 
-  neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15002");
+  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15002") == RC_OK);
   neighbor.nbr_all_txs = 7;
   neighbor.nbr_new_txs = 8;
   neighbor.nbr_invalid_txs = 9;
   neighbor.nbr_stale_txs = 10;
   neighbor.nbr_sent_txs = 11;
   neighbor.nbr_random_tx_reqs = 12;
-  neighbors_add(&api.core->node.neighbors, &neighbor);
+  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
 
-  neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:15003");
+  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15003") == RC_OK);
   neighbor.nbr_all_txs = 13;
   neighbor.nbr_new_txs = 14;
   neighbor.nbr_invalid_txs = 15;
   neighbor.nbr_stale_txs = 16;
   neighbor.nbr_sent_txs = 17;
   neighbor.nbr_random_tx_reqs = 18;
-  neighbors_add(&api.core->node.neighbors, &neighbor);
+  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
 
-  neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15004");
+  TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15004") == RC_OK);
   neighbor.nbr_all_txs = 19;
   neighbor.nbr_new_txs = 20;
   neighbor.nbr_invalid_txs = 21;
   neighbor.nbr_stale_txs = 22;
   neighbor.nbr_sent_txs = 23;
   neighbor.nbr_random_tx_reqs = 24;
-  neighbors_add(&api.core->node.neighbors, &neighbor);
+  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
 
   RUN_TEST(test_get_neighbors);
 

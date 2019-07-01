@@ -53,7 +53,6 @@ cc_library(
         ":node_shared",
         "//ciri/node/pipeline:transaction_requester",
         "//ciri/node/services:tcp_sender",
-        "//ciri/node/services:udp_sender",
         "//common/network:uri",
         "//utils/handles:rand",
     ],

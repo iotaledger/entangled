@@ -40,7 +40,7 @@ extern "C" {
  * Initializes a neighbor with an URI
  *
  * @param neighbor The neighbor
- * @param uri The URI (e.g udp://8.8.8.8:14265)
+ * @param uri The URI (e.g tcp://8.8.8.8:14265)
  *
  * @return a status code
  */

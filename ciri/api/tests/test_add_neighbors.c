@@ -20,8 +20,8 @@ void test_add_neighbors(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 0);
 
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.1:15001") == RC_OK);
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.2:15002") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.1:15001") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.2:15002") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.3:15003") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.4:15004") == RC_OK);
 
@@ -44,12 +44,12 @@ void test_add_neighbors(void) {
 
   TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.2");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15002);
-  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_UDP);
+  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_TCP);
   neighbor = neighbor->next;
 
   TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.1");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15001);
-  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_UDP);
+  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_TCP);
   neighbor = neighbor->next;
 
   TEST_ASSERT_NULL(neighbor);
@@ -66,8 +66,8 @@ void test_add_neighbors_with_already_paired(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
 
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.1:15001") == RC_OK);
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.5:15005") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.1:15001") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.5:15005") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.3:15003") == RC_OK);
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_OK);
@@ -79,7 +79,7 @@ void test_add_neighbors_with_already_paired(void) {
   neighbor_t *neighbor = api.core->node.neighbors;
   TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.5");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15005);
-  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_UDP);
+  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_TCP);
 
   add_neighbors_req_free(&req);
   add_neighbors_res_free(&res);
@@ -93,9 +93,9 @@ void test_add_neighbors_with_invalid(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 5);
 
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.6:15006") == RC_OK);
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.7@15007") == RC_OK);
-  TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.8:15009") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.6:15006") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.7@15007") == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.8:15009") == RC_OK);
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_NEIGHBOR_FAILED_URI_PARSING);
   TEST_ASSERT(error != NULL);
@@ -107,7 +107,7 @@ void test_add_neighbors_with_invalid(void) {
   neighbor_t *neighbor = api.core->node.neighbors;
   TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.6");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15006);
-  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_UDP);
+  TEST_ASSERT_EQUAL_INT(neighbor->endpoint.protocol, PROTOCOL_TCP);
 
   add_neighbors_req_free(&req);
   add_neighbors_res_free(&res);

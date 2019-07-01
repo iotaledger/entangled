@@ -7,7 +7,6 @@
 
 #include "ciri/node/services/receiver.h"
 #include "ciri/node/services/tcp_receiver.hpp"
-#include "ciri/node/services/udp_receiver.hpp"
 #include "utils/logger_helper.h"
 
 #define RECEIVER_SERVICE_LOGGER_ID "receiver_service"
@@ -25,10 +24,6 @@ bool receiver_service_start(receiver_service_t* const service) {
     if (service->protocol == PROTOCOL_TCP) {
       log_info(logger_id, "Starting TCP receiver service on port %d\n", service->port);
       TcpReceiverService tcpService(service, ctx, service->port);
-      ctx.run();
-    } else if (service->protocol == PROTOCOL_UDP) {
-      log_info(logger_id, "Starting UDP receiver service on port %d\n", service->port);
-      UdpReceiverService udpService(service, ctx, service->port);
       ctx.run();
     } else {
       log_error(logger_id, "Starting receiver service failed: unknown protocol\n");

@@ -26,7 +26,6 @@ retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
   conf->tcp_receiver_port = DEFAULT_TCP_RECEIVER_PORT;
   conf->tips_cache_size = DEFAULT_TIPS_CACHE_SIZE;
   conf->tips_solidifier_enabled = DEFAULT_TIPS_SOLIDIFIER_ENABLED;
-  conf->udp_receiver_port = DEFAULT_UDP_RECEIVER_PORT;
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
 

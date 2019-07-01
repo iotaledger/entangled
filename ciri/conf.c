@@ -235,9 +235,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
       node_conf->tips_cache_size = atoi(value);
       break;
-    case 'u':  // --udp-receiver-port
-      node_conf->udp_receiver_port = atoi(value);
-      break;
     case CONF_TIPS_SOLIDIFIER_ENABLED:  // --tips-solidifier-enabled
       ret = get_true_false(value, &node_conf->tips_solidifier_enabled);
       break;

@@ -18,7 +18,6 @@ typedef struct node_s node_t;
 
 typedef struct receiver_state_s {
   receiver_service_t tcp_service;
-  receiver_service_t udp_service;
   bool running;
   node_t *node;
 } receiver_state_t;
@@ -33,11 +32,10 @@ extern "C" {
  * @param state The receiver state
  * @param node A node
  * @param tcp_port A TCP port to listen
- * @param udp_port A UDP port to listen
  *
  * @return a status code
  */
-retcode_t receiver_init(receiver_state_t *const state, node_t *const node, uint16_t tcp_port, uint16_t udp_port);
+retcode_t receiver_init(receiver_state_t *const state, node_t *const node, uint16_t tcp_port);
 
 /**
  * Starts a receiver

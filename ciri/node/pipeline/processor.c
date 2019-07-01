@@ -187,7 +187,7 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
   rw_lock_handle_rdlock(&processor->node->neighbors_lock);
 
   neighbor = neighbors_find_by_endpoint(processor->node->neighbors, &packet->source);
-  protocol = packet->source.protocol == PROTOCOL_TCP ? "tcp" : "udp";
+  protocol = packet->source.protocol == PROTOCOL_TCP ? "tcp" : "unknown";
 
   if (neighbor) {
     log_debug(logger_id, "Processing packet from tethered node %s://%s:%d\n", protocol, neighbor->endpoint.host,
