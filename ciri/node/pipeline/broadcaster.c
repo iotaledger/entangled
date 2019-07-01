@@ -18,6 +18,14 @@ static logger_id_t logger_id;
  * Private functions
  */
 
+/**
+ * @brief Continuously broadcasts newly received transactions to all neighbors except the neighbor from which the
+ * transaction originated from
+ *
+ * @param[in,out] broadcaster The broadcaster
+ *
+ * @return a status pointer
+ */
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   tangle_t tangle;
   lock_handle_t cond_lock;

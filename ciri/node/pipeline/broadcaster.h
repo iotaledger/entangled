@@ -23,6 +23,10 @@ extern "C" {
 // Forward declarations
 typedef struct node_s node_t;
 
+/**
+ * @brief The broadcaster takes care of broadcasting newly received transactions to all neighbors except the neighbor
+ * from which the transaction originated from
+ */
 typedef struct broadcaster_s {
   // Metadata
   cond_handle_t cond;     /*!< Condition variable to wait/signal the broadcaster */
@@ -35,7 +39,7 @@ typedef struct broadcaster_s {
 } broadcaster_t;
 
 /**
- * Initializes a broadcaster
+ * @brief Initializes a broadcaster
  *
  * @param[out]  broadcaster The broadcaster
  * @param[in]   node        A node
@@ -45,7 +49,7 @@ typedef struct broadcaster_s {
 retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node);
 
 /**
- * Starts a broadcaster
+ * @brief Starts a broadcaster
  *
  * @param[out]  broadcaster The broadcaster
  *
@@ -54,7 +58,7 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node)
 retcode_t broadcaster_start(broadcaster_t *const broadcaster);
 
 /**
- * Stops a broadcaster
+ * @brief Stops a broadcaster
  *
  * @param[out]  broadcaster The broadcaster
  *
@@ -63,7 +67,7 @@ retcode_t broadcaster_start(broadcaster_t *const broadcaster);
 retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 
 /**
- * Destroys a broadcaster
+ * @brief Destroys a broadcaster
  *
  * @param[out]  broadcaster The broadcaster
  *
@@ -72,7 +76,7 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
 
 /**
- * Adds a packet to be broadcasted
+ * @brief Adds a packet to be broadcasted
  *
  * @param[out]  broadcaster The broadcaster
  * @param[in]   packet      The packet
@@ -82,7 +86,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
 retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const *const packet);
 
 /**
- * Gets the size of the broadcaster queue
+ * @brief Gets the size of the broadcaster queue
  *
  * @param[in] broadcaster The broadcaster
  *
