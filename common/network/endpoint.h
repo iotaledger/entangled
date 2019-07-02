@@ -21,7 +21,7 @@ typedef struct endpoint_s {
 
 static inline bool endpoint_cmp(endpoint_t const *const lhs, endpoint_t const *const rhs) {
   return (lhs != NULL && rhs != NULL && (strcmp(lhs->ip, rhs->ip) == 0 || strcmp(lhs->host, rhs->host) == 0) &&
-          lhs->port == rhs->port && lhs->protocol == rhs->protocol);
+          lhs->port == rhs->port);
 }
 
 #endif  // __COMMON_NETWORK_ENDPOINT_H__
