@@ -52,7 +52,6 @@ cc_library(
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = ["//ciri/node/services:receiver_shared"],
 )
 
 cc_library(
@@ -61,7 +60,6 @@ cc_library(
     deps = [
         ":receiver_shared",
         "//ciri/node:node_shared",
-        "//ciri/node/services:receiver",
     ],
 )
 

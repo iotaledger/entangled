@@ -10,7 +10,6 @@
 #include "ciri/node/iota_packet.h"
 #include "ciri/node/neighbor.h"
 #include "ciri/node/node.h"
-#include "ciri/node/services/tcp_sender.hpp"
 #include "common/network/uri.h"
 #include "utils/handles/rand.h"
 
@@ -52,10 +51,6 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
 retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, iota_packet_t const *const packet) {
   if (node == NULL || neighbor == NULL || packet == NULL) {
     return RC_NULL_PARAM;
-  }
-
-  if (tcp_send(&neighbor->endpoint, packet) == false) {
-    return RC_NEIGHBOR_FAILED_SEND;
   }
 
   neighbor->nbr_sent_txs++;
@@ -138,10 +133,6 @@ retcode_t neighbors_add(neighbor_t **const neighbors, neighbor_t const *const ne
   memcpy(entry, neighbor, sizeof(neighbor_t));
   LL_PREPEND(*neighbors, entry);
 
-  if (tcp_sender_endpoint_init(&entry->endpoint) != RC_OK) {
-    return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
-  }
-
   return RC_OK;
 }
 
@@ -150,10 +141,6 @@ retcode_t neighbors_remove_entry(neighbor_t **const neighbors, neighbor_t *const
 
   if (neighbors == NULL || neighbor == NULL) {
     return RC_NULL_PARAM;
-  }
-
-  if (tcp_sender_endpoint_destroy(&neighbor->endpoint) != RC_OK) {
-    return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
   }
 
   LL_DELETE(*neighbors, neighbor);

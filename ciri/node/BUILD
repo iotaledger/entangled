@@ -52,7 +52,6 @@ cc_library(
         ":neighbor_shared",
         ":node_shared",
         "//ciri/node/pipeline:transaction_requester",
-        "//ciri/node/services:tcp_sender",
         "//common/network:uri",
         "//utils/handles:rand",
     ],

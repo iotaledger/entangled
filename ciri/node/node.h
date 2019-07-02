@@ -35,7 +35,7 @@ typedef struct node_s {
   core_t* core;
   broadcaster_t broadcaster;
   processor_t processor;
-  receiver_state_t receiver;
+  receiver_t receiver;
   responder_t responder;
   transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
