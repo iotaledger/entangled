@@ -24,7 +24,6 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node, uint1
   memset(state, 0, sizeof(receiver_state_t));
   state->running = false;
   state->tcp_service.port = tcp_port;
-  state->tcp_service.protocol = PROTOCOL_TCP;
   state->tcp_service.state = state;
   state->tcp_service.processor = &node->processor;
   state->tcp_service.context = NULL;

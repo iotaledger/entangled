@@ -24,7 +24,6 @@ typedef struct receiver_state_s receiver_state_t;
 typedef struct receiver_service_s {
   thread_handle_t thread;
   uint16_t port;
-  protocol_type_t protocol;
   receiver_state_t* state;
   processor_t* processor;
   void* context;

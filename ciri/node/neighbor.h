@@ -52,12 +52,10 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
  * @param neighbor The neighbor
  * @param ip The endpoint ip
  * @param port The endpoint port
- * @param protocol The endpoint protocol
  *
  * @return a status code
  */
-retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port,
-                                    protocol_type_t const protocol);
+retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port);
 
 /**
  * Sends a packet to a neighbor
@@ -156,12 +154,10 @@ neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors, endpoint_t c
  * @param neighbors The neighbors list
  * @param ip The endpoint ip
  * @param port The endpoint port
- * @param protocol The endpoint protocol
  *
  * @return a pointer to the neigbor if found, NULL otherwise
  */
-neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char const *const ip, uint16_t const port,
-                                              protocol_type_t const protocol);
+neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char const *const ip, uint16_t const port);
 
 #ifdef __cplusplus
 }

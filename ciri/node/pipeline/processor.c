@@ -178,7 +178,6 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
                                 uint64_t const digest) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
-  char *protocol = NULL;
 
   if (processor == NULL || packet == NULL) {
     return RC_NULL_PARAM;
@@ -187,10 +186,9 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
   rw_lock_handle_rdlock(&processor->node->neighbors_lock);
 
   neighbor = neighbors_find_by_endpoint(processor->node->neighbors, &packet->source);
-  protocol = packet->source.protocol == PROTOCOL_TCP ? "tcp" : "unknown";
 
   if (neighbor) {
-    log_debug(logger_id, "Processing packet from tethered node %s://%s:%d\n", protocol, neighbor->endpoint.host,
+    log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.host,
               neighbor->endpoint.port);
     neighbor->nbr_all_txs++;
 
@@ -209,7 +207,7 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
       goto done;
     }
   } else {
-    log_debug(logger_id, "Discarding packet from non-tethered node %s://%s:%d\n", protocol, packet->source.ip,
+    log_debug(logger_id, "Discarding packet from non-tethered node tcp://%s:%d\n", packet->source.ip,
               packet->source.port);
     // TODO Testnet add non-tethered neighbor
   }

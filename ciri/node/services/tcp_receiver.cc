@@ -48,8 +48,8 @@ void TcpConnection::start(uint16_t const port) {
 
   rw_lock_handle_wrlock(&service_->state->node->neighbors_lock);
 
-  neighbor_t* neighbor = neighbors_find_by_endpoint_values(service_->state->node->neighbors, remote_host_.c_str(),
-                                                           remote_port_, PROTOCOL_TCP);
+  neighbor_t* neighbor =
+      neighbors_find_by_endpoint_values(service_->state->node->neighbors, remote_host_.c_str(), remote_port_);
 
   if (neighbor == NULL) {
     log_info(logger_id, "Connection denied with non-tethered neighbor tcp://%s:%d\n", remote_host_.c_str(),
@@ -102,8 +102,7 @@ void TcpConnection::start(uint16_t const port) {
 
     if (memcmp(crc, &tcp_packet[0] + PACKET_SIZE, CRC_SIZE) == 0) {
       memcpy(packet.content, &tcp_packet[0], PACKET_SIZE);
-      iota_packet_set_endpoint(&packet, socket_.remote_endpoint().address().to_string().c_str(), remote_port_,
-                               PROTOCOL_TCP);
+      iota_packet_set_endpoint(&packet, socket_.remote_endpoint().address().to_string().c_str(), remote_port_);
       processor_on_next(service_->processor, packet);
     }
   }

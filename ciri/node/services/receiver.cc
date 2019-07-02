@@ -21,14 +21,9 @@ bool receiver_service_start(receiver_service_t* const service) {
   try {
     boost::asio::io_context ctx;
     service->context = &ctx;
-    if (service->protocol == PROTOCOL_TCP) {
-      log_info(logger_id, "Starting TCP receiver service on port %d\n", service->port);
-      TcpReceiverService tcpService(service, ctx, service->port);
-      ctx.run();
-    } else {
-      log_error(logger_id, "Starting receiver service failed: unknown protocol\n");
-      return false;
-    }
+    log_info(logger_id, "Starting TCP receiver service on port %d\n", service->port);
+    TcpReceiverService tcpService(service, ctx, service->port);
+    ctx.run();
   } catch (std::exception const& e) {
     log_error(logger_id, "Starting receiver service failed: %s\n", e.what());
     return false;

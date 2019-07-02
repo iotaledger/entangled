@@ -411,10 +411,9 @@ retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_
   rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
   LL_FOREACH(api->core->node.neighbors, iter) {
     snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", iter->endpoint.host, iter->endpoint.port);
-    if ((ret = get_neighbors_res_add_neighbor(
-             res, address, iter->nbr_all_txs, iter->nbr_random_tx_reqs, iter->nbr_new_txs, iter->nbr_invalid_txs,
-             iter->nbr_stale_txs, iter->nbr_sent_txs, (iter->endpoint.protocol == PROTOCOL_TCP ? "TCP" : "UNKNOWN"))) !=
-        RC_OK) {
+    if ((ret = get_neighbors_res_add_neighbor(res, address, iter->nbr_all_txs, iter->nbr_random_tx_reqs,
+                                              iter->nbr_new_txs, iter->nbr_invalid_txs, iter->nbr_stale_txs,
+                                              iter->nbr_sent_txs, "TCP")) != RC_OK) {
       break;
     }
   }

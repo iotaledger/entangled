@@ -37,8 +37,7 @@ retcode_t iota_packet_set_request(iota_packet_t *const packet, flex_trit_t const
   return RC_OK;
 }
 
-retcode_t iota_packet_set_endpoint(iota_packet_t *const packet, char const *const ip, uint16_t const port,
-                                   protocol_type_t const protocol) {
+retcode_t iota_packet_set_endpoint(iota_packet_t *const packet, char const *const ip, uint16_t const port) {
   if (packet == NULL) {
     return RC_NULL_PARAM;
   }
@@ -47,7 +46,6 @@ retcode_t iota_packet_set_endpoint(iota_packet_t *const packet, char const *cons
     strcpy(packet->source.ip, ip);
   }
   packet->source.port = port;
-  packet->source.protocol = protocol;
 
   return RC_OK;
 }

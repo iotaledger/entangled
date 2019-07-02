@@ -51,8 +51,6 @@ void test_get_neighbors(void) {
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_stale_txs, info->stale_trans_num);
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_sent_txs, info->sent_trans_num);
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_random_tx_reqs, info->random_trans_req_num);
-    TEST_ASSERT_EQUAL_STRING((neighbor->endpoint.protocol == PROTOCOL_TCP ? "TCP" : "UNKNOWN"),
-                             info->connection_type->data);
     TEST_ASSERT_EQUAL_STRING(address, info->address->data);
 
     neighbor = neighbor->next;

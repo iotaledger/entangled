@@ -73,12 +73,10 @@ retcode_t iota_packet_set_request(iota_packet_t* const packet, flex_trit_t const
  * @param packet The packet
  * @param ip The endpoint ip
  * @param port The endpoint port
- * @param protocol The endpoint protocol
  *
  * @return a status code
  */
-retcode_t iota_packet_set_endpoint(iota_packet_t* const packet, char const* const ip, uint16_t const port,
-                                   protocol_type_t const protocol);
+retcode_t iota_packet_set_endpoint(iota_packet_t* const packet, char const* const ip, uint16_t const port);
 
 /**
  * Tells whether a packet queue is empty or not

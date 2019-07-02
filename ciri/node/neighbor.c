@@ -26,22 +26,19 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
       false) {
     return RC_NEIGHBOR_FAILED_URI_PARSING;
   }
-  if (strcmp(scheme, "tcp") == 0) {
-    neighbor->endpoint.protocol = PROTOCOL_TCP;
-  } else {
+  if (strcmp(scheme, "tcp") != 0) {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
+
   return RC_OK;
 }
 
-retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port,
-                                    protocol_type_t const protocol) {
+retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port) {
   if (neighbor == NULL) {
     return RC_NULL_PARAM;
   }
 
   memset(neighbor, 0, sizeof(neighbor_t));
-  neighbor->endpoint.protocol = protocol;
   if (ip) {
     if (strlen(ip) > MAX_HOST_LENGTH) {
       return RC_NEIGHBOR_INVALID_HOST;
@@ -57,12 +54,8 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, i
     return RC_NULL_PARAM;
   }
 
-  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&neighbor->endpoint, packet) == false) {
-      return RC_NEIGHBOR_FAILED_SEND;
-    }
-  } else {
-    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  if (tcp_send(&neighbor->endpoint, packet) == false) {
+    return RC_NEIGHBOR_FAILED_SEND;
   }
 
   neighbor->nbr_sent_txs++;
@@ -145,12 +138,8 @@ retcode_t neighbors_add(neighbor_t **const neighbors, neighbor_t const *const ne
   memcpy(entry, neighbor, sizeof(neighbor_t));
   LL_PREPEND(*neighbors, entry);
 
-  if (entry->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_sender_endpoint_init(&entry->endpoint) != RC_OK) {
-      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
-    }
-  } else {
-    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  if (tcp_sender_endpoint_init(&entry->endpoint) != RC_OK) {
+    return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
   }
 
   return RC_OK;
@@ -163,12 +152,8 @@ retcode_t neighbors_remove_entry(neighbor_t **const neighbors, neighbor_t *const
     return RC_NULL_PARAM;
   }
 
-  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_sender_endpoint_destroy(&neighbor->endpoint) != RC_OK) {
-      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
-    }
-  } else {
-    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  if (tcp_sender_endpoint_destroy(&neighbor->endpoint) != RC_OK) {
+    return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
   }
 
   LL_DELETE(*neighbors, neighbor);
@@ -220,11 +205,10 @@ neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors, endpoint_t c
     return NULL;
   }
 
-  return neighbors_find_by_endpoint_values(neighbors, endpoint->ip, endpoint->port, endpoint->protocol);
+  return neighbors_find_by_endpoint_values(neighbors, endpoint->ip, endpoint->port);
 }
 
-neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char const *const ip, uint16_t const port,
-                                              protocol_type_t const protocol) {
+neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char const *const ip, uint16_t const port) {
   neighbor_t cmp;
   neighbor_t *elt;
 
@@ -232,7 +216,7 @@ neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char 
     return NULL;
   }
 
-  if (neighbor_init_with_values(&cmp, ip, port, protocol)) {
+  if (neighbor_init_with_values(&cmp, ip, port)) {
     return NULL;
   }
 
