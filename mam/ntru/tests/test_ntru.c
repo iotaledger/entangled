@@ -105,7 +105,7 @@ static void test_ntru_pk_serialization(void) {
 
   TEST_ASSERT(mam_ntru_pks_deserialize(&trits, &ntru_set_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&ntru_set_1, &ntru_set_2));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(ntru_set_1, ntru_set_2));
 
   trits_free(trits);
   mam_ntru_pk_t_set_free(&ntru_set_1);
@@ -146,7 +146,7 @@ static void test_ntru_sk_serialization(void) {
   trits = trits_pickup_all(trits);
   TEST_ASSERT(mam_ntru_sks_deserialize(&trits, &ntru_sk_set_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&ntru_sk_set_1, &ntru_sk_set_2));
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(ntru_sk_set_1, ntru_sk_set_2));
 
   mam_ntru_sk_t_set_free(&ntru_sk_set_1);
   mam_ntru_sk_t_set_free(&ntru_sk_set_2);

@@ -38,13 +38,13 @@ static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   }
 
   while (non_analyzed_hashes != NULL) {
-    if (hash243_set_size(&analyzed_hashes) == epv->conf->below_max_depth) {
+    if (hash243_set_size(analyzed_hashes) == epv->conf->below_max_depth) {
       log_error(logger_id, "Validation failed, exceeded num of transactions\n");
       goto done;
     }
 
     curr_hash_trits = hash243_stack_peek(non_analyzed_hashes);
-    if (hash243_set_contains(&analyzed_hashes, curr_hash_trits)) {
+    if (hash243_set_contains(analyzed_hashes, curr_hash_trits)) {
       hash243_stack_pop(&non_analyzed_hashes);
       continue;
     }
@@ -72,7 +72,7 @@ static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     }
 
     if (!is_genesis_hash && transaction_snapshot_index(curr_tx) == 0) {
-      if (!hash243_set_contains(&epv->max_depth_ok_memoization, curr_hash_trits)) {
+      if (!hash243_set_contains(epv->max_depth_ok_memoization, curr_hash_trits)) {
         if ((res = hash243_stack_push(&non_analyzed_hashes, transaction_trunk(curr_tx))) != RC_OK) {
           goto done;
         }

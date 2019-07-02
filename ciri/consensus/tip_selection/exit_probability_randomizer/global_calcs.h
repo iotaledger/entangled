@@ -35,7 +35,7 @@ static inline bool iota_consensus_is_tx_a_tip(hash_to_indexed_hash_set_map_t con
                                               flex_trit_t const *const tx) {
   hash_to_indexed_hash_set_entry_t *aps = NULL;
   hash_to_indexed_hash_set_map_find(tx_to_approvers, tx, &aps);
-  return hash243_set_size(&aps->approvers) == 0;
+  return hash243_set_size(aps->approvers) == 0;
 }
 #ifdef __cplusplus
 }

@@ -18,7 +18,7 @@ static retcode_t tips_cache_fifo_add(hash243_set_t* const set, size_t const capa
     return RC_NULL_PARAM;
   }
 
-  if (hash243_set_size(set) >= capacity) {
+  if (hash243_set_size(*set) >= capacity) {
     if ((ret = hash243_set_remove_entry(set, *set)) != RC_OK) {
       return ret;
     }
@@ -32,7 +32,7 @@ static retcode_t tips_cache_random_tip_from_set(hash243_set_t* const set, flex_t
     return RC_NULL_PARAM;
   }
 
-  if (hash243_set_size(set) == 0) {
+  if (hash243_set_size(*set) == 0) {
     memset(tip, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     return RC_OK;
   }
@@ -148,7 +148,7 @@ retcode_t tips_cache_set_solid(tips_cache_t* const cache, flex_trit_t const* con
   }
 
   rw_lock_handle_wrlock(&cache->tips_lock);
-  if ((solidify = hash243_set_contains(&cache->tips, tip))) {
+  if ((solidify = hash243_set_contains(cache->tips, tip))) {
     ret = hash243_set_remove(&cache->tips, tip);
   }
   rw_lock_handle_unlock(&cache->tips_lock);
@@ -174,7 +174,7 @@ size_t tips_cache_non_solid_size(tips_cache_t* const cache) {
   }
 
   rw_lock_handle_rdlock(&cache->tips_lock);
-  size = hash243_set_size(&cache->tips);
+  size = hash243_set_size(cache->tips);
   rw_lock_handle_unlock(&cache->tips_lock);
 
   return size;
@@ -188,7 +188,7 @@ size_t tips_cache_solid_size(tips_cache_t* const cache) {
   }
 
   rw_lock_handle_rdlock(&cache->solid_tips_lock);
-  size = hash243_set_size(&cache->solid_tips);
+  size = hash243_set_size(cache->solid_tips);
   rw_lock_handle_unlock(&cache->solid_tips_lock);
 
   return size;
@@ -202,11 +202,11 @@ size_t tips_cache_size(tips_cache_t* const cache) {
   }
 
   rw_lock_handle_rdlock(&cache->tips_lock);
-  size = hash243_set_size(&cache->tips);
+  size = hash243_set_size(cache->tips);
   rw_lock_handle_unlock(&cache->tips_lock);
 
   rw_lock_handle_rdlock(&cache->solid_tips_lock);
-  size += hash243_set_size(&cache->solid_tips);
+  size += hash243_set_size(cache->solid_tips);
   rw_lock_handle_unlock(&cache->solid_tips_lock);
 
   return size;

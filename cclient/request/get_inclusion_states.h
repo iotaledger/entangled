@@ -75,7 +75,7 @@ static inline retcode_t get_inclusion_states_req_hash_add(get_inclusion_states_r
  * @return A pointer to a transaction hash.
  */
 static inline flex_trit_t* get_inclusion_states_req_hash_get(get_inclusion_states_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->transactions, index);
+  return hash243_queue_at(req->transactions, index);
 }
 
 /**
@@ -98,7 +98,7 @@ static inline retcode_t get_inclusion_states_req_tip_add(get_inclusion_states_re
  * @return A pointer to a tip transaction hash.
  */
 static inline flex_trit_t* get_inclusion_states_req_tip_get(get_inclusion_states_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->tips, index);
+  return hash243_queue_at(req->tips, index);
 }
 
 #ifdef __cplusplus

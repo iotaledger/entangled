@@ -74,7 +74,7 @@ static inline retcode_t find_transactions_res_hashes_add(find_transactions_res_t
  * @return A pointer to the hash. NULL if the index is invalid.
  */
 static inline flex_trit_t* find_transactions_res_hashes_get(find_transactions_res_t* const res, size_t index) {
-  return hash243_queue_at(&res->hashes, index);
+  return hash243_queue_at(res->hashes, index);
 }
 
 #ifdef __cplusplus

@@ -54,18 +54,18 @@ void test_get_inclusion_states_deserialize_request(void) {
 
   // test request with no tips
   serializer.vtable.get_inclusion_states_deserialize_request(json_text_no_tips, deserialize_get_is);
-  req_transaction = hash243_queue_at(&deserialize_get_is->transactions, 0);
+  req_transaction = hash243_queue_at(deserialize_get_is->transactions, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(hash243_queue_count(deserialize_get_is->tips) == 0);
 
   // test request with tips
   serializer.vtable.get_inclusion_states_deserialize_request(json_text, deserialize_get_is);
-  req_transaction = hash243_queue_at(&deserialize_get_is->transactions, 0);
+  req_transaction = hash243_queue_at(deserialize_get_is->transactions, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
 
-  req_transaction = hash243_queue_at(&deserialize_get_is->tips, 0);
+  req_transaction = hash243_queue_at(deserialize_get_is->tips, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_2, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
   get_inclusion_states_req_free(&deserialize_get_is);

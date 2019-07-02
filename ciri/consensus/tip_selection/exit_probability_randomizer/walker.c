@@ -27,7 +27,7 @@ static retcode_t select_approver(ep_randomizer_t const *const exit_probability_r
                                  flex_trit_t *const approver) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
-  size_t num_approvers = hash243_set_size(approvers);
+  size_t num_approvers = hash243_set_size(*approvers);
   double transition_probs[num_approvers];
   double sum_transition_probs = 0;
   double target = 0;

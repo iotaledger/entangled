@@ -9,7 +9,7 @@
 
 #include "utils/containers/hash/hash{SIZE}_stack.h"
 
-retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t * const stack, flex_trit_t const *const hash) {
+retcode_t hash{SIZE}_stack_push(hash{SIZE}_stack_t *const stack, flex_trit_t const *const hash) {
   hash{SIZE}_stack_entry_t *entry = NULL;
 
   if ((entry = (hash{SIZE}_stack_entry_t *)malloc(sizeof(hash{SIZE}_stack_entry_t))) == NULL) {
@@ -30,9 +30,7 @@ void hash{SIZE}_stack_pop(hash{SIZE}_stack_t *const stack) {
   free(tmp);
 }
 
-flex_trit_t *hash{SIZE}_stack_peek(hash{SIZE}_stack_t const stack) {
-  return (flex_trit_t *)(STACK_TOP(stack)->hash);
-}
+flex_trit_t *hash{SIZE}_stack_peek(hash{SIZE}_stack_t const stack) { return (flex_trit_t *)(STACK_TOP(stack)->hash); }
 
 void hash{SIZE}_stack_free(hash{SIZE}_stack_t *const stack) {
   hash{SIZE}_stack_entry_t *iter = NULL;

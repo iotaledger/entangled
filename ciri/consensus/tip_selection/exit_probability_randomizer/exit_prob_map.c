@@ -25,7 +25,7 @@ static logger_id_t logger_id;
 static void iota_consensus_exit_prob_map_add_exit_probs(hash_to_double_map_t *const *const hash_to_probs,
                                                         flex_trit_t const *const hash, double value) {
   hash_to_double_map_entry_t *curr_approver_entry = NULL;
-  if (hash_to_double_map_find(*hash_to_probs, hash, &curr_approver_entry)) {
+  if (hash_to_double_map_find(**hash_to_probs, hash, &curr_approver_entry)) {
     curr_approver_entry->value += value;
   } else {
     hash_to_double_map_add(*hash_to_probs, hash, value);
@@ -96,7 +96,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(ep_randomizer_t const *const ra
   hash_to_double_map_entry_t *curr_ep = NULL;
 
   HASH_ITER(hh, tips, tip_entry, tip_tmp_entry) {
-    hash_to_double_map_find(&prob_randomizer->exit_probs, tip_entry->hash, &curr_ep);
+    hash_to_double_map_find(prob_randomizer->exit_probs, tip_entry->hash, &curr_ep);
     rand_weight -= curr_ep->value;
     if (rand_weight <= 0) {
       memcpy(tip, tip_entry->hash, FLEX_TRIT_SIZE_243);
@@ -144,8 +144,8 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(ep_randomizer_t const *co
   while (hash243_queue_count(queue)) {
     curr_tx = hash243_queue_pop(&queue);
     hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers, curr_tx->hash, &aps);
-    hash_to_double_map_find(hash_to_exit_probs, curr_tx->hash, &curr_tx_entry);
-    num_approvers = hash243_set_size(&aps->approvers);
+    hash_to_double_map_find(*hash_to_exit_probs, curr_tx->hash, &curr_tx_entry);
+    num_approvers = hash243_set_size(aps->approvers);
     double trans_probs_to_direct_approvers[num_approvers];
     map_transition_probabilities(exit_probability_randomizer->conf->alpha, cw_result->cw_ratings, &aps->approvers,
                                  trans_probs_to_direct_approvers);
@@ -190,7 +190,7 @@ double iota_consensus_exit_prob_map_sum_probs(hash_to_double_map_t *const hash_t
   hash243_set_t keys = NULL;
   hash_to_double_map_keys(hash_to_probs, &keys);
   HASH_ITER(hh, keys, tip_entry, tmp_tip_entry) {
-    if (hash_to_double_map_find(hash_to_probs, tip_entry->hash, &exit_prob_entry)) {
+    if (hash_to_double_map_find(*hash_to_probs, tip_entry->hash, &exit_prob_entry)) {
       sum += exit_prob_entry->value;
     }
   }

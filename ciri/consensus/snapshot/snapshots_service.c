@@ -209,7 +209,7 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
     return RC_OK;
   }
 
-  if (hash_to_uint64_t_map_contains(params->solid_entry_points, hash)) {
+  if (hash_to_uint64_t_map_contains(*params->solid_entry_points, hash)) {
     params->is_orphan = false;
     *should_stop = true;
     return RC_OK;

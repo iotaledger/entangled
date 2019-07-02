@@ -79,7 +79,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t
   }
 
   if (reference != NULL) {
-    if (!hash_to_int64_t_map_contains(&rating_results.cw_ratings, reference)) {
+    if (!hash_to_int64_t_map_contains(rating_results.cw_ratings, reference)) {
       log_warning(logger_id, "Reference is too old\n");
       ret = RC_TIP_SELECTOR_REFERENCE_TOO_OLD;
       goto done;

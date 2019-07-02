@@ -12,9 +12,9 @@
 void test_hash_int64_t_map() {
   hash_to_int64_t_map_t map = NULL;
   hash_to_int64_t_map_entry_t* e = NULL;
-  TEST_ASSERT(hash_to_int64_t_map_find(&map, hash243_1, &e) == false);
+  TEST_ASSERT(hash_to_int64_t_map_find(map, hash243_1, &e) == false);
   TEST_ASSERT(hash_to_int64_t_map_add(&map, hash243_1, 42) == RC_OK);
-  TEST_ASSERT(hash_to_int64_t_map_find(&map, hash243_1, &e));
+  TEST_ASSERT(hash_to_int64_t_map_find(map, hash243_1, &e));
   hash_to_int64_t_map_free(&map);
 }
 
