@@ -107,7 +107,7 @@ static retcode_t respond_to_request(responder_t const *const responder, tangle_t
                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
     recent_seen_bytes_cache_hash(transaction_bytes, &digest);
     recent_seen_bytes_cache_put(&responder->node->recent_seen_bytes, digest, hash);
-    if ((ret = neighbor_send(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
+    if ((ret = neighbor_send_trits(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
       log_warning(logger_id, "Sending transaction failed\n");
       return ret;
     }
@@ -213,7 +213,7 @@ retcode_t responder_start(responder_t *const responder) {
   responder->running = true;
   if (thread_handle_create(&responder->thread, (thread_routine_t)responder_routine, responder) != 0) {
     log_critical(logger_id, "Spawning responder thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -233,7 +233,7 @@ retcode_t responder_stop(responder_t *const responder) {
   cond_handle_signal(&responder->cond);
   if (thread_handle_join(responder->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down responder thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
 
   return ret;

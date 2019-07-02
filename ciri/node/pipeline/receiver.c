@@ -50,7 +50,7 @@ retcode_t receiver_start(receiver_state_t *const state) {
     if (thread_handle_create(&state->tcp_service.thread, (thread_routine_t)receiver_service_start,
                              &state->tcp_service) != 0) {
       log_critical(logger_id, "Spawning TCP receiver thread failed\n");
-      return RC_FAILED_THREAD_SPAWN;
+      return RC_THREAD_CREATE;
     }
   }
   if (state->udp_service.port != 0) {
@@ -58,7 +58,7 @@ retcode_t receiver_start(receiver_state_t *const state) {
     if (thread_handle_create(&state->udp_service.thread, (thread_routine_t)receiver_service_start,
                              &state->udp_service) != 0) {
       log_critical(logger_id, "Spawning UDP receiver thread failed\n");
-      return RC_FAILED_THREAD_SPAWN;
+      return RC_THREAD_CREATE;
     }
   }
   return RC_OK;
@@ -77,12 +77,12 @@ retcode_t receiver_stop(receiver_state_t *const state) {
   log_info(logger_id, "Shutting down TCP receiver thread\n");
   if (receiver_service_stop(&state->tcp_service) == false || thread_handle_join(state->tcp_service.thread, NULL) != 0) {
     log_error(logger_id, "Shutting down TCP receiver thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
   log_info(logger_id, "Shutting down UDP receiver thread\n");
   if (receiver_service_stop(&state->udp_service) == false || thread_handle_join(state->udp_service.thread, NULL) != 0) {
     log_error(logger_id, "Shutting down UDP receiver thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
   return ret;
 }

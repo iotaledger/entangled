@@ -63,7 +63,7 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
     }
     rw_lock_handle_rdlock(&transaction_requester->node->neighbors_lock);
     LL_FOREACH(transaction_requester->node->neighbors, iter) {
-      if (neighbor_send(transaction_requester->node, &tangle, iter, transaction) != RC_OK) {
+      if (neighbor_send_trits(transaction_requester->node, &tangle, iter, transaction) != RC_OK) {
         log_warning(logger_id, "Sending request failed\n");
       }
     }
@@ -96,7 +96,7 @@ retcode_t requester_start(transaction_requester_t *const transaction_requester) 
   transaction_requester->running = true;
   if (thread_handle_create(&transaction_requester->thread, (thread_routine_t)transaction_requester_routine,
                            transaction_requester) != 0) {
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -114,7 +114,7 @@ retcode_t requester_stop(transaction_requester_t *const transaction_requester) {
   cond_handle_signal(&transaction_requester->cond);
   if (thread_handle_join(transaction_requester->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down transaction requester thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
+    return RC_THREAD_JOIN;
   }
 
   return RC_OK;
