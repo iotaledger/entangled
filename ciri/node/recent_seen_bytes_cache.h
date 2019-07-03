@@ -10,7 +10,7 @@
 
 #include "xxhash.h"
 
-#include "ciri/node/iota_packet.h"
+#include "ciri/node/protocol/iota_packet.h"
 #include "ciri/node/uint64_t_to_flex_trit_t_map.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"

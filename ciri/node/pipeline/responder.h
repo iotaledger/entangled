@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#include "ciri/node/transaction_request.h"
+#include "ciri/node/protocol/transaction_request.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/handles/cond.h"

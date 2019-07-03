@@ -22,25 +22,10 @@ cc_library(
 )
 
 cc_library(
-    name = "iota_packet",
-    srcs = ["iota_packet.c"],
-    hdrs = ["iota_packet.h"],
-    deps = [
-        ":conf",
-        "//common:errors",
-        "//common/model:transaction",
-        "//common/network:endpoint",
-        "//common/trinary:bytes",
-        "//common/trinary:flex_trit",
-        "@com_github_uthash//:uthash",
-    ],
-)
-
-cc_library(
     name = "neighbor_shared",
     hdrs = ["neighbor.h"],
     deps = [
-        ":iota_packet",
+        "//ciri/node/protocol:iota_packet",
         "//common:errors",
     ],
 )
@@ -54,17 +39,6 @@ cc_library(
         "//ciri/node/pipeline:transaction_requester",
         "//common/network:uri",
         "//utils/handles:rand",
-    ],
-)
-
-cc_library(
-    name = "transaction_request",
-    srcs = ["transaction_request.c"],
-    hdrs = ["transaction_request.h"],
-    deps = [
-        "//common:errors",
-        "//common/trinary:flex_trit",
-        "@com_github_uthash//:uthash",
     ],
 )
 
@@ -86,8 +60,8 @@ cc_library(
     srcs = ["recent_seen_bytes_cache.c"],
     hdrs = ["recent_seen_bytes_cache.h"],
     deps = [
-        ":iota_packet",
         ":uint64_t_to_flex_trit_t_map",
+        "//ciri/node/protocol:iota_packet",
         "//common:errors",
         "//common/trinary:flex_trit",
         "//utils/handles:rw_lock",

@@ -10,7 +10,6 @@
 
 #include "utlist.h"
 
-#include "ciri/node/conf.h"
 #include "common/errors.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"

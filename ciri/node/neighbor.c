@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-#include "ciri/node/iota_packet.h"
 #include "ciri/node/neighbor.h"
 #include "ciri/node/node.h"
+#include "ciri/node/protocol/iota_packet.h"
 #include "common/network/uri.h"
 #include "utils/handles/rand.h"
 

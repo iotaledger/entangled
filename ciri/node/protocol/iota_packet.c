@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "ciri/node/iota_packet.h"
+#include "ciri/node/protocol/iota_packet.h"
 #include "common/model/transaction.h"
 
 retcode_t iota_packet_set_transaction(iota_packet_t *const packet, flex_trit_t const *const transaction) {

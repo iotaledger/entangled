@@ -7,8 +7,8 @@
 
 #include "ciri/node/pipeline/tips_requester.h"
 #include "ciri/consensus/tangle/tangle.h"
-#include "ciri/node/iota_packet.h"
 #include "ciri/node/node.h"
+#include "ciri/node/protocol/iota_packet.h"
 #include "common/model/milestone.h"
 #include "utils/logger_helper.h"
 

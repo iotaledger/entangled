@@ -12,7 +12,7 @@
 
 #include "utlist.h"
 
-#include "ciri/node/iota_packet.h"
+#include "ciri/node/protocol/iota_packet.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"

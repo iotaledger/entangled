@@ -8,7 +8,9 @@
 #ifndef __COMMON_NETWORK_ENDPOINT_H__
 #define __COMMON_NETWORK_ENDPOINT_H__
 
+#include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "common/network/network.h"
 

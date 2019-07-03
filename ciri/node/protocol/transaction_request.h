@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_TRANSACTION_REQUEST_H__
-#define __NODE_TRANSACTION_REQUEST_H__
+#ifndef __CIRI_NODE_PROTOCOL_TRANSACTION_REQUEST_H__
+#define __CIRI_NODE_PROTOCOL_TRANSACTION_REQUEST_H__
 
 #include "utlist.h"
 
@@ -75,4 +75,4 @@ transaction_request_queue_entry_t* transaction_request_queue_pop(transaction_req
  */
 void transaction_request_queue_free(transaction_request_queue_t* const queue);
 
-#endif  // __NODE_TRANSACTION_REQUEST_H__
+#endif  // __CIRI_NODE_PROTOCOL_TRANSACTION_REQUEST_H__

@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 #include "ciri/consensus/transaction_validator/transaction_validator.h"
-#include "ciri/node/iota_packet.h"
+#include "ciri/node/protocol/iota_packet.h"
 #include "common/errors.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/lock.h"
