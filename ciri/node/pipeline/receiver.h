@@ -5,19 +5,22 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_PIPELINE_RECEIVER_H__
-#define __NODE_PIPELINE_RECEIVER_H__
+#ifndef __CIRI_NODE_PIPELINE_RECEIVER_H__
+#define __CIRI_NODE_PIPELINE_RECEIVER_H__
 
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "utils/handles/thread.h"
 
 // Forward declarations
 typedef struct node_s node_t;
 
 typedef struct receiver_s {
+  thread_handle_t thread;
   bool running;
   node_t *node;
+  uint16_t port;
 } receiver_t;
 
 #ifdef __cplusplus
@@ -29,11 +32,11 @@ extern "C" {
  *
  * @param receiver The receiver
  * @param node A node
- * @param tcp_port A TCP port to listen
+ * @param port A port to listen to
  *
  * @return a status code
  */
-retcode_t receiver_init(receiver_t *const receiver, node_t *const node, uint16_t tcp_port);
+retcode_t receiver_init(receiver_t *const receiver, node_t *const node, uint16_t port);
 
 /**
  * Starts a receiver
@@ -66,4 +69,4 @@ retcode_t receiver_destroy(receiver_t *const receiver);
 }
 #endif
 
-#endif  //__NODE_PIPELINE_RECEIVER_H__
+#endif  //__CIRI_NODE_PIPELINE_RECEIVER_H__

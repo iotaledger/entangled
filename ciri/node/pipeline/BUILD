@@ -52,6 +52,7 @@ cc_library(
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
+    deps = ["//utils/handles:thread"],
 )
 
 cc_library(
@@ -60,6 +61,7 @@ cc_library(
     deps = [
         ":receiver_shared",
         "//ciri/node:node_shared",
+        "//ciri/node/network:event",
     ],
 )
 
