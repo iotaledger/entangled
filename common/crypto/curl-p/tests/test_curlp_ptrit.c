@@ -26,14 +26,12 @@ void test_curl_p_27_works(void) {
   curl.type = CURL_P_27;
   ptrit_t trits_exp[] = {EXP_27};
   run_curl_p_test(&curl, trits_exp, CURL_P_27);
-  run_curl_p_test(&curl, trits_exp, CURL_P_27);
 }
 
 void test_curl_p_81_works(void) {
   PCurl curl;
   curl.type = CURL_P_81;
   ptrit_t trits_exp[] = {EXP_81};
-  run_curl_p_test(&curl, trits_exp, CURL_P_81);
   run_curl_p_test(&curl, trits_exp, CURL_P_81);
 }
 
