@@ -99,7 +99,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
     // TODO Store transaction metadata
 
     // Broadcast the new transaction
-    if ((ret = broadcaster_on_next(&processor->node->broadcaster, transaction_flex_trits)) != RC_OK) {
+    if ((ret = broadcaster_add(&processor->node->broadcaster, packet)) != RC_OK) {
       log_warning(logger_id, "Propagating packet to broadcaster failed\n");
       goto failure;
     }
@@ -370,7 +370,7 @@ retcode_t processor_start(processor_t *const processor) {
   processor->running = true;
   if (thread_handle_create(&processor->thread, (thread_routine_t)processor_routine, processor) != 0) {
     log_critical(logger_id, "Spawning processor thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -388,7 +388,7 @@ retcode_t processor_stop(processor_t *const processor) {
   cond_handle_signal(&processor->cond);
   if (thread_handle_join(processor->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down processor thread failed\n");
-    return RC_FAILED_THREAD_JOIN;
+    return RC_THREAD_JOIN;
   }
 
   return RC_OK;

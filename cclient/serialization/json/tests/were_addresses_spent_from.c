@@ -39,7 +39,7 @@ void test_were_addresses_spent_from_deserialize_request(void) {
   were_addresses_spent_from_req_t* deserialize_addr_spent = were_addresses_spent_from_req_new();
 
   serializer.vtable.were_addresses_spent_from_deserialize_request(json_text, deserialize_addr_spent);
-  req_transaction = hash243_queue_at(&deserialize_addr_spent->addresses, 0);
+  req_transaction = hash243_queue_at(deserialize_addr_spent->addresses, 0);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, req_transaction, FLEX_TRIT_SIZE_243);
 

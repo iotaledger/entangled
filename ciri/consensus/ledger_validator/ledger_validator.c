@@ -330,7 +330,7 @@ retcode_t iota_consensus_ledger_validator_update_delta(ledger_validator_t const 
     goto done;
   }
 
-  if (hash243_set_contains(analyzed_hashes, tip)) {
+  if (hash243_set_contains(*analyzed_hashes, tip)) {
     *is_consistent = true;
     goto done;
   }

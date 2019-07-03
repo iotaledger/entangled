@@ -90,7 +90,7 @@ size_t requester_size(transaction_requester_t *const transaction_requester) {
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
-  size = hash243_set_size(&transaction_requester->transactions) + hash243_set_size(&transaction_requester->milestones);
+  size = hash243_set_size(transaction_requester->transactions) + hash243_set_size(transaction_requester->milestones);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
   return size;
@@ -104,7 +104,7 @@ bool requester_is_full(transaction_requester_t *const transaction_requester) {
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
-  size = hash243_set_size(&transaction_requester->transactions);
+  size = hash243_set_size(transaction_requester->transactions);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
   return size >= transaction_requester->node->conf.requester_queue_size;
@@ -131,10 +131,10 @@ retcode_t requester_is_requested(transaction_requester_t *const transaction_requ
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
   if (is_milestone) {
-    *is_requested = hash243_set_contains(&transaction_requester->milestones, hash);
+    *is_requested = hash243_set_contains(transaction_requester->milestones, hash);
   } else {
-    *is_requested = hash243_set_contains(&transaction_requester->transactions, hash) ||
-                    hash243_set_contains(&transaction_requester->milestones, hash);
+    *is_requested = hash243_set_contains(transaction_requester->transactions, hash) ||
+                    hash243_set_contains(transaction_requester->milestones, hash);
   }
   rw_lock_handle_unlock(&transaction_requester->lock);
 
@@ -168,8 +168,8 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
     if ((ret = hash243_set_add(&transaction_requester->milestones, hash)) != RC_OK) {
       goto done;
     }
-  } else if (!hash243_set_contains(&transaction_requester->milestones, hash)) {
-    if (hash243_set_size(&transaction_requester->transactions) >=
+  } else if (!hash243_set_contains(transaction_requester->milestones, hash)) {
+    if (hash243_set_size(transaction_requester->transactions) >=
         transaction_requester->node->conf.requester_queue_size) {
       if ((ret = hash243_set_remove_entry(&transaction_requester->transactions, transaction_requester->transactions)) !=
           RC_OK) {
@@ -202,9 +202,9 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
 
   rw_lock_handle_wrlock(&transaction_requester->lock);
 
-  request_set = hash243_set_size(request_set) != 0 ? request_set : backup_set;
+  request_set = hash243_set_size(*request_set) != 0 ? request_set : backup_set;
 
-  while (hash243_set_size(request_set) != 0) {
+  while (hash243_set_size(*request_set) != 0) {
     hash243_set_random_hash(request_set, hash);
     if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, hash, &exists)) != RC_OK) {
       goto done;
@@ -218,7 +218,7 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
     break;
   }
 
-  if (hash243_set_size(request_set) == 0) {
+  if (hash243_set_size(*request_set) == 0) {
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 

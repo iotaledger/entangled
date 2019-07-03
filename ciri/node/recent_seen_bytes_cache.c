@@ -41,7 +41,7 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
 
   rw_lock_handle_wrlock(&cache->lock);
 
-  if ((*found = uint64_t_to_flex_trit_t_map_find(&cache->map, &digest, &entry))) {
+  if ((*found = uint64_t_to_flex_trit_t_map_find(cache->map, &digest, &entry))) {
     memcpy(hash, entry->value, FLEX_TRIT_SIZE_243);
     cache->hit++;
   } else {
@@ -64,8 +64,8 @@ retcode_t recent_seen_bytes_cache_put(recent_seen_bytes_cache_t *const cache, ui
 
   rw_lock_handle_wrlock(&cache->lock);
 
-  if (!uint64_t_to_flex_trit_t_map_find(&cache->map, &digest, &entry)) {
-    if (uint64_t_to_flex_trit_t_map_size(&cache->map) >= cache->capacity) {
+  if (!uint64_t_to_flex_trit_t_map_find(cache->map, &digest, &entry)) {
+    if (uint64_t_to_flex_trit_t_map_size(cache->map) >= cache->capacity) {
       if ((ret = uint64_t_to_flex_trit_t_map_remove_entry(&cache->map, cache->map.map)) != RC_OK) {
         goto done;
       }

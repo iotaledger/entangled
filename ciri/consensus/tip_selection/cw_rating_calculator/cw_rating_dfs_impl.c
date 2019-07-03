@@ -108,8 +108,8 @@ static retcode_t cw_rating_dfs_do_dfs_light(hash_to_indexed_hash_set_map_t tx_to
 
     bitset_set_true(visited_bitset, curr_tx_entry->idx);
 
-    if ((ret = hash243_set_for_each(&curr_tx_entry->approvers, (hash243_on_container_func)hash243_stack_push,
-                                    &stack)) != RC_OK) {
+    if ((ret = hash243_set_for_each(curr_tx_entry->approvers, (hash243_on_container_func)hash243_stack_push, &stack)) !=
+        RC_OK) {
       goto done;
     }
   }

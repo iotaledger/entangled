@@ -50,7 +50,7 @@ static inline size_t recent_seen_bytes_cache_size(recent_seen_bytes_cache_t *con
   size_t size = 0;
 
   rw_lock_handle_rdlock(&cache->lock);
-  size = uint64_t_to_flex_trit_t_map_size(&cache->map);
+  size = uint64_t_to_flex_trit_t_map_size(cache->map);
   rw_lock_handle_unlock(&cache->lock);
 
   return size;

@@ -33,7 +33,7 @@ retcode_t tangle_traversal_dfs_to_past(tangle_t const *const tangle, tangle_trav
   while (non_analyzed_hashes != NULL) {
     memcpy(hash, hash243_stack_peek(non_analyzed_hashes), FLEX_TRIT_SIZE_243);
     hash243_stack_pop(&non_analyzed_hashes);
-    if (!hash243_set_contains(analyzed_hashes, hash)) {
+    if (!hash243_set_contains(*analyzed_hashes, hash)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load_partial(tangle, hash, &pack,
                                                       PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
@@ -94,7 +94,7 @@ retcode_t tangle_traversal_dfs_to_future(tangle_t const *const tangle, tangle_tr
   while (!hash243_stack_empty(non_analyzed_hashes)) {
     memcpy(curr_tx_hash, hash243_stack_peek(non_analyzed_hashes), FLEX_TRIT_SIZE_243);
 
-    if (!hash243_set_contains(analyzed_hashes, curr_tx_hash)) {
+    if (!hash243_set_contains(*analyzed_hashes, curr_tx_hash)) {
       hash_pack_reset(&transaction_pack);
       if ((ret = iota_tangle_transaction_load_partial(tangle, curr_tx_hash, &transaction_pack,
                                                       PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {

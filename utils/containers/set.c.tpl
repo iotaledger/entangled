@@ -7,15 +7,12 @@
 
 #include "{PARENT_DIRECTORY}/{TYPE}_set.h"
 
-size_t {TYPE}_set_size({TYPE}_set_t const set) {
-  return HASH_COUNT(set);
-}
+size_t {TYPE}_set_size({TYPE}_set_t const set) { return HASH_COUNT(set); }
 
-retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
-                            {TYPE} const *const value) {
+retcode_t {TYPE}_set_add({TYPE}_set_t *const set, {TYPE} const *const value) {
   {TYPE}_set_entry_t *entry = NULL;
 
-  if (!{TYPE}_set_contains(set, value)) {
+  if (!{TYPE}_set_contains(*set, value)) {
     if ((entry = ({TYPE}_set_entry_t *)malloc(sizeof({TYPE}_set_entry_t))) == NULL) {
       return RC_OOM;
     }
@@ -25,28 +22,25 @@ retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
   return RC_OK;
 }
 
-retcode_t {TYPE}_set_remove({TYPE}_set_t *const set,
-                                {TYPE} const *const value) {
+retcode_t {TYPE}_set_remove({TYPE}_set_t *const set, {TYPE} const *const value) {
   {TYPE}_set_entry_t *entry = NULL;
 
-  if (set != NULL && * set != NULL &&  value != NULL) {
+  if (set != NULL && *set != NULL && value != NULL) {
     HASH_FIND(hh, *set, value, sizeof({TYPE}), entry);
     return {TYPE}_set_remove_entry(set, entry);
   }
   return RC_OK;
 }
 
-retcode_t {TYPE}_set_remove_entry({TYPE}_set_t *const set,
-                                      {TYPE}_set_entry_t * const entry) {
-  if (set != NULL && * set != NULL && entry != NULL) {
+retcode_t {TYPE}_set_remove_entry({TYPE}_set_t *const set, {TYPE}_set_entry_t *const entry) {
+  if (set != NULL && *set != NULL && entry != NULL) {
     HASH_DEL(*set, entry);
     free(entry);
   }
   return RC_OK;
 }
 
-retcode_t {TYPE}_set_append({TYPE}_set_t const *const set1,
-                               {TYPE}_set_t *const set2) {
+retcode_t {TYPE}_set_append({TYPE}_set_t const *const set1, {TYPE}_set_t *const set2) {
   retcode_t ret = RC_OK;
   {TYPE}_set_entry_t *iter = NULL, *tmp = NULL;
 
@@ -58,33 +52,28 @@ retcode_t {TYPE}_set_append({TYPE}_set_t const *const set1,
   return ret;
 }
 
-bool {TYPE}_set_contains({TYPE}_set_t const *const set,
-                            {TYPE} const *const value) {
+bool {TYPE}_set_contains({TYPE}_set_t const set, {TYPE} const *const value) {
   {TYPE}_set_entry_t *entry = NULL;
 
-  if (*set == NULL) {
+  if (set == NULL) {
     return false;
   }
 
-  HASH_FIND(hh, *set, value, sizeof({TYPE}), entry);
+  HASH_FIND(hh, set, value, sizeof({TYPE}), entry);
   return entry != NULL;
 }
 
+bool {TYPE}_set_find({TYPE}_set_t const set, {TYPE} const *const value, {TYPE}_set_entry_t **entry) {
+  if (set == NULL) {
+    return false;
+  }
 
+  if (entry == NULL) {
+    return RC_NULL_PARAM;
+  }
 
-bool {TYPE}_set_find({TYPE}_set_t const *const set,
-        {TYPE} const *const value, {TYPE}_set_entry_t const ** entry){
-if (*set == NULL) {
-return false;
-}
-
-if (entry == NULL){
-  return RC_NULL_PARAM;
-}
-
-HASH_FIND(hh, *set, value, sizeof({TYPE}), *entry);
-return *entry != NULL;
-
+  HASH_FIND(hh, set, value, sizeof({TYPE}), *entry);
+  return *entry != NULL;
 }
 
 void {TYPE}_set_free({TYPE}_set_t *const set) {
@@ -101,14 +90,12 @@ void {TYPE}_set_free({TYPE}_set_t *const set) {
   *set = NULL;
 }
 
-retcode_t {TYPE}_set_for_each({TYPE}_set_t const *const set,
-                                 {TYPE}_on_container_func func,
-                                 void *const container) {
+retcode_t {TYPE}_set_for_each({TYPE}_set_t const set, {TYPE}_on_container_func func, void *const container) {
   retcode_t ret = RC_OK;
   {TYPE}_set_entry_t *curr_entry = NULL;
   {TYPE}_set_entry_t *tmp_entry = NULL;
 
-  HASH_ITER(hh, *set, curr_entry, tmp_entry) {
+  HASH_ITER(hh, set, curr_entry, tmp_entry) {
     if ((ret = func(container, &curr_entry->value)) != RC_OK) {
       return ret;
     }
@@ -116,20 +103,18 @@ retcode_t {TYPE}_set_for_each({TYPE}_set_t const *const set,
   return ret;
 }
 
-bool {TYPE}_set_cmp({TYPE}_set_t const *const lhs,
-                          {TYPE}_set_t const *const rhs){
-
-  if (HASH_COUNT(*lhs) != HASH_COUNT(*rhs)){
+bool {TYPE}_set_cmp({TYPE}_set_t const lhs, {TYPE}_set_t const rhs) {
+  if (HASH_COUNT(lhs) != HASH_COUNT(rhs)) {
     return false;
   }
 
   {TYPE}_set_entry_t *curr_entry = NULL;
   {TYPE}_set_entry_t *tmp_entry = NULL;
 
-  HASH_ITER(hh, *lhs, curr_entry, tmp_entry) {
-      if (!({TYPE}_set_contains(rhs, &curr_entry->value))){
-        return false;
-      }
+  HASH_ITER(hh, lhs, curr_entry, tmp_entry) {
+    if (!({TYPE}_set_contains(rhs, &curr_entry->value))) {
+      return false;
+    }
   }
   return true;
 }

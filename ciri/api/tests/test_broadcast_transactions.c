@@ -71,6 +71,10 @@ void test_broadcast_transactions(void) {
   tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
                                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
+  byte_t bytes[PACKET_SIZE];
+  iota_packet_queue_entry_t *entry = NULL;
+
+  memset(bytes, 0, PACKET_SIZE);
 
   // Broadcasting 4 transactions
 
@@ -83,6 +87,14 @@ void test_broadcast_transactions(void) {
   TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.core->node.broadcaster), 4);
+
+  for (size_t i = 0; i < 4; i++) {
+    flex_trits_to_bytes(bytes, NUM_TRITS_SERIALIZED_TRANSACTION, broadcat_transactions_req_trytes_get(req, i),
+                        NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
+    entry = iota_packet_queue_pop(&api.core->node.broadcaster.queue);
+    TEST_ASSERT_EQUAL_MEMORY(entry->packet.content, bytes, PACKET_SIZE);
+    free(entry);
+  }
 
   broadcast_transactions_req_free(&req);
   error_res_free(&error);

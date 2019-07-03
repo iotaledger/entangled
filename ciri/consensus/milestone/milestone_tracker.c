@@ -385,7 +385,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
 
   for (size_t i = 0; i < hash_pack.num_loaded; i++) {
     curr_hash = ((flex_trit_t**)hash_pack.models)[i];
-    if (!hash243_set_contains(&solid_entry_points, curr_hash)) {
+    if (!hash243_set_contains(solid_entry_points, curr_hash)) {
       iota_milestone_tracker_add_candidate(mt, curr_hash);
     }
   }
@@ -395,7 +395,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
   log_info(logger_id, "Spawning milestone validator thread\n");
   if (thread_handle_create(&mt->milestone_validator, (thread_routine_t)milestone_validator, mt) != 0) {
     log_critical(logger_id, "Spawning milestone validator thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   log_info(logger_id, "Latest solid milestone: #%d\n", mt->latest_solid_subtangle_milestone_index);
@@ -403,7 +403,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
   log_info(logger_id, "Spawning milestone solidifier thread\n");
   if (thread_handle_create(&mt->milestone_solidifier, (thread_routine_t)milestone_solidifier, mt) != 0) {
     log_critical(logger_id, "Spawning milestone solidifier thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
 
   return RC_OK;
@@ -424,14 +424,14 @@ retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt) {
   cond_handle_signal(&mt->cond_validator);
   if (thread_handle_join(mt->milestone_validator, NULL) != 0) {
     log_error(logger_id, "Shutting down milestone validator thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
 
   log_info(logger_id, "Shutting down milestone solidifier thread\n");
   cond_handle_signal(&mt->cond_solidifier);
   if (thread_handle_join(mt->milestone_solidifier, NULL) != 0) {
     log_error(logger_id, "Shutting down milestone solidifier thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
 
   return ret;

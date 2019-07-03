@@ -304,7 +304,7 @@ bool iota_snapshot_has_solid_entry_point(snapshot_t *const snapshot, flex_trit_t
   bool is_solid_entry_point;
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-  is_solid_entry_point = hash_to_uint64_t_map_contains(&snapshot->metadata.solid_entry_points, hash);
+  is_solid_entry_point = hash_to_uint64_t_map_contains(snapshot->metadata.solid_entry_points, hash);
   rw_lock_handle_unlock(&snapshot->rw_lock);
 
   return is_solid_entry_point;
