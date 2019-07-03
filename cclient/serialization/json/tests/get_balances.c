@@ -51,7 +51,7 @@ void test_get_balances_deserialize_request(void) {
 
   TEST_ASSERT_EQUAL_INT(TEST_BALANCES_SERIALIZE_THRESHOLD, deserialize_get_bal->threshold);
 
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_get_bal->addresses, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(deserialize_get_bal->addresses, 0), FLEX_TRIT_SIZE_243);
 
   get_balances_req_free(&deserialize_get_bal);
 }
@@ -109,7 +109,7 @@ void test_get_balances_deserialize_response(void) {
 
   TEST_ASSERT_EQUAL_UINT64(TEST_BALANCES_BALANCE, get_balances_res_balances_at(deserialize_get_bal, 0));
 
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_get_bal->references, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(deserialize_get_bal->references, 0), FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX, deserialize_get_bal->milestone_index);
 

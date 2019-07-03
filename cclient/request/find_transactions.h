@@ -89,7 +89,7 @@ static inline retcode_t find_transactions_req_bundle_add(find_transactions_req_t
  * @return A pointer to a bundle hash.
  */
 static inline flex_trit_t* find_transactions_req_bundle_get(find_transactions_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->bundles, index);
+  return hash243_queue_at(req->bundles, index);
 }
 
 /**
@@ -112,7 +112,7 @@ static inline retcode_t find_transactions_req_address_add(find_transactions_req_
  * @return A pointer to an address hash.
  */
 static inline flex_trit_t* find_transactions_req_address_get(find_transactions_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->addresses, index);
+  return hash243_queue_at(req->addresses, index);
 }
 
 /**
@@ -135,7 +135,7 @@ static inline retcode_t find_transactions_req_tag_add(find_transactions_req_t* c
  * @return A pointer to a tag.
  */
 static inline flex_trit_t* find_transactions_req_tag_get(find_transactions_req_t* const req, size_t index) {
-  return hash81_queue_at(&req->tags, index);
+  return hash81_queue_at(req->tags, index);
 }
 
 /**
@@ -158,7 +158,7 @@ static inline retcode_t find_transactions_req_approvee_add(find_transactions_req
  * @return A pointer to an approvee hash.
  */
 static inline flex_trit_t* find_transactions_req_approvee_get(find_transactions_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->approvees, index);
+  return hash243_queue_at(req->approvees, index);
 }
 
 #ifdef __cplusplus

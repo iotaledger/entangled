@@ -19,7 +19,7 @@ retcode_t mam_example_announce_channel(mam_api_t* const api, tryte_t const* cons
   tryte_t msg_id_trytes[MAM_MSG_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE];
   mam_psk_t_set_t psks = NULL;
 
-  if (!mam_psk_t_set_contains(&psks, &psk)) {
+  if (!mam_psk_t_set_contains(psks, &psk)) {
     if ((ret = mam_psk_t_set_add(&psks, &psk)) != RC_OK) {
       return ret;
     }
@@ -55,7 +55,7 @@ retcode_t mam_example_announce_endpoint(mam_api_t* const api, tryte_t const* con
   tryte_t msg_id_trytes[MAM_MSG_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE];
   mam_psk_t_set_t psks = NULL;
 
-  if (!mam_psk_t_set_contains(&psks, &psk)) {
+  if (!mam_psk_t_set_contains(psks, &psk)) {
     if ((ret = mam_psk_t_set_add(&psks, &psk)) != RC_OK) {
       return ret;
     }
@@ -90,7 +90,7 @@ retcode_t mam_example_write_header_on_channel(mam_api_t* const api, tryte_t cons
   tryte_t msg_id_trytes[MAM_MSG_ID_SIZE / 3];
   mam_psk_t_set_t psks = NULL;
 
-  if (!mam_psk_t_set_contains(&psks, &psk)) {
+  if (!mam_psk_t_set_contains(psks, &psk)) {
     if ((ret = mam_psk_t_set_add(&psks, &psk)) != RC_OK) {
       return ret;
     }
@@ -118,7 +118,7 @@ retcode_t mam_example_write_header_on_endpoint(mam_api_t* const api, tryte_t con
   tryte_t msg_id_trytes[MAM_MSG_ID_SIZE / 3];
   mam_psk_t_set_t psks = NULL;
 
-  if (!mam_psk_t_set_contains(&psks, &psk)) {
+  if (!mam_psk_t_set_contains(psks, &psk)) {
     if ((ret = mam_psk_t_set_add(&psks, &psk)) != RC_OK) {
       return ret;
     }

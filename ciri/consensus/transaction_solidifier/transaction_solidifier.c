@@ -74,7 +74,7 @@ static retcode_t propagate_solid_transactions(transaction_solidifier_t *const ts
 
     for (size_t approver_index = 0; approver_index < hash_pack.num_loaded; ++approver_index) {
       approver_hash = ((flex_trit_t *)hash_pack.models[approver_index]);
-      if (hash243_set_contains(&transactions_to_propagate, approver_hash)) {
+      if (hash243_set_contains(transactions_to_propagate, approver_hash)) {
         continue;
       }
       if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(ts, tangle, approver_hash)) !=
@@ -111,7 +111,7 @@ static void *spawn_solid_transactions_propagation(void *arg) {
   lock_handle_lock(&lock_cond);
 
   while (ts->running) {
-    while (hash243_set_size(&ts->newly_set_solid_transactions) > 0) {
+    while (hash243_set_size(ts->newly_set_solid_transactions) > 0) {
       if (propagate_solid_transactions(ts, &tangle) != RC_OK) {
         log_error(logger_id, "Solid transaction propagation failed\n");
       }
@@ -159,7 +159,7 @@ retcode_t iota_consensus_transaction_solidifier_start(transaction_solidifier_t *
   log_info(logger_id, "Spawning transaction solidifier thread\n");
   if (thread_handle_create(&ts->thread, (thread_routine_t)spawn_solid_transactions_propagation, ts) != 0) {
     log_critical(logger_id, "Spawning transaction solidifier thread failed\n");
-    return RC_FAILED_THREAD_SPAWN;
+    return RC_THREAD_CREATE;
   }
   return RC_OK;
 }
@@ -178,7 +178,7 @@ retcode_t iota_consensus_transaction_solidifier_stop(transaction_solidifier_t *c
   cond_handle_signal(&ts->cond);
   if (thread_handle_join(ts->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down transaction solidifier thread failed\n");
-    ret = RC_FAILED_THREAD_JOIN;
+    ret = RC_THREAD_JOIN;
   }
   return ret;
 }
@@ -216,7 +216,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
   if (pack->num_loaded == 1 && !((transaction_solid((iota_transaction_t *)pack->models[0])))) {
     *should_branch = true;
     return hash243_set_add(params->solid_transactions_candidates, hash);
-  } else if (pack->num_loaded == 0 && !hash243_set_contains(params->solid_entry_points, hash)) {
+  } else if (pack->num_loaded == 0 && !hash243_set_contains(*params->solid_entry_points, hash)) {
     params->is_solid = false;
     return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
   }

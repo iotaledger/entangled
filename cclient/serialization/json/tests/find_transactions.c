@@ -104,16 +104,16 @@ void test_find_transactions_deserialize_request(void) {
   flex_trit_t tag[FLEX_TRIT_SIZE_81] = {};
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&req->addresses, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(req->addresses, 0), FLEX_TRIT_SIZE_243);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_2, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&req->approvees, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(req->approvees, 0), FLEX_TRIT_SIZE_243);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&req->bundles, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(req->bundles, 0), FLEX_TRIT_SIZE_243);
 
   flex_trits_from_trytes(tag, NUM_TRITS_TAG, (tryte_t const*)TEST_27_TRYTES_1, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
-  TEST_ASSERT_EQUAL_MEMORY(tag, hash81_queue_at(&req->tags, 0), FLEX_TRIT_SIZE_81);
+  TEST_ASSERT_EQUAL_MEMORY(tag, hash81_queue_at(req->tags, 0), FLEX_TRIT_SIZE_81);
 
   find_transactions_req_free(&req);
 }
@@ -179,13 +179,13 @@ void test_find_transactions_deserialize_response(void) {
   serializer.vtable.find_transactions_deserialize_response(json_text, deserialize_find_tran);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_find_tran->hashes, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(deserialize_find_tran->hashes, 0), FLEX_TRIT_SIZE_243);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_2, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_find_tran->hashes, 1), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(deserialize_find_tran->hashes, 1), FLEX_TRIT_SIZE_243);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_find_tran->hashes, 2), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(deserialize_find_tran->hashes, 2), FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT(3, hash243_queue_count(deserialize_find_tran->hashes));
 

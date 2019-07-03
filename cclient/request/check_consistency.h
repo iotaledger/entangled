@@ -69,7 +69,7 @@ static inline retcode_t check_consistency_req_tails_add(check_consistency_req_t*
  * @return A pointer to a tail transaction hash.
  */
 static inline flex_trit_t* check_consistency_req_tails_get(check_consistency_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->tails, index);
+  return hash243_queue_at(req->tails, index);
 }
 
 #ifdef __cplusplus

@@ -212,7 +212,7 @@ static retcode_t update_transactions(storage_connection_t const* const connectio
   {
     bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement, .hash_index = 2};
 
-    if ((ret = hash243_set_for_each(&hashes, (hash243_on_container_func)bind_execute_hash_do_func, &params)) != RC_OK) {
+    if ((ret = hash243_set_for_each(hashes, (hash243_on_container_func)bind_execute_hash_do_func, &params)) != RC_OK) {
       goto done;
     }
   }
@@ -1081,7 +1081,7 @@ retcode_t iota_stor_spent_addresses_store(storage_connection_t const* const conn
   {
     bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement, .hash_index = 1};
 
-    if ((ret = hash243_set_for_each(&addresses, (hash243_on_container_func)bind_execute_hash_do_func, &params)) !=
+    if ((ret = hash243_set_for_each(addresses, (hash243_on_container_func)bind_execute_hash_do_func, &params)) !=
         RC_OK) {
       goto done;
     }

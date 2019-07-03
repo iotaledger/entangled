@@ -109,6 +109,8 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
 
   if (snapshots_service->snapshots_provider->latest_snapshot.metadata.index <=
       snapshots_service->conf->local_snapshots.min_depth) {
+    log_warning(logger_id, "Latest milestone index is %\" PRId64 \" and is below min depth\n",
+                snapshots_service->snapshots_provider->latest_snapshot.metadata.index);
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
 
@@ -116,6 +118,10 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
           snapshots_service->conf->local_snapshots.min_depth;
 
   if (index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
+    log_warning(
+        logger_id,
+        "New candidate milestone for local snapshot is %\" PRId64 \" and is before initial snapshot (too old)\n",
+        snapshots_service->snapshots_provider->inital_snapshot.metadata.index);
     return RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
   }
 
@@ -209,7 +215,7 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
     return RC_OK;
   }
 
-  if (hash_to_uint64_t_map_contains(params->solid_entry_points, hash)) {
+  if (hash_to_uint64_t_map_contains(*params->solid_entry_points, hash)) {
     params->is_orphan = false;
     *should_stop = true;
     return RC_OK;

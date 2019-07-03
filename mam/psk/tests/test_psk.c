@@ -41,7 +41,7 @@ static void test_psks_serialization(void) {
 
   TEST_ASSERT(mam_psks_deserialize(&trits, &psks_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&psks_1, &psks_2));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(psks_1, psks_2));
 
   trits_free(trits);
   mam_psks_destroy(&psks_1);

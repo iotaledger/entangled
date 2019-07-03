@@ -4,7 +4,7 @@ cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//utils/containers/hash:hash8019_queue",
+        "//ciri/node:iota_packet",
         "//utils/handles:cond",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",

@@ -56,7 +56,7 @@ void test_get_trytes_not_found(void) {
   TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->hashes), 1);
 
-  flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION, hash8019_queue_at(&res->trytes, 0),
+  flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION, hash8019_queue_at(res->trytes, 0),
                        NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
   TEST_ASSERT_EQUAL_MEMORY(tx_trytes, NULL_TX_TRYTES, NUM_TRYTES_SERIALIZED_TRANSACTION);
 

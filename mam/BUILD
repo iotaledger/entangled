@@ -11,12 +11,14 @@ cc_library(
 # bazel clean (recommended)
 # bazel build --spawn_strategy=local --define=workspace=$(bazel info workspace)  --define=output_base=$(bazel info output_base)  --config=emscripten //mam:mam.js
 
-emcc_binary(
-    name = "mam.js",
-    deps = [
-        "//mam/api",
-    ],
-)
+#Uncomment the following rule when you want to build it explicitly
+
+#emcc_binary(
+#    name = "mam.js",
+#    deps = [
+#        "//mam/api",
+#    ],
+#)
 
 cc_binary(
     name = "libmam.so",

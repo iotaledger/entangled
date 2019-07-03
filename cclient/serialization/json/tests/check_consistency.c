@@ -37,8 +37,8 @@ static void test_request(void) {
   serializer.vtable.check_consistency_deserialize_request(serializer_out->data, req_de);
 
   TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->tails), hash243_queue_count(req_de->tails));
-  TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(&req->tails, 0), hash243_queue_at(&req_de->tails, 0), FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(&req->tails, 1), hash243_queue_at(&req_de->tails, 1), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(req->tails, 0), hash243_queue_at(req_de->tails, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_queue_at(req->tails, 1), hash243_queue_at(req_de->tails, 1), FLEX_TRIT_SIZE_243);
 
   char_buffer_free(serializer_out);
   check_consistency_req_free(&req);
