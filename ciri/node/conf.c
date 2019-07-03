@@ -23,11 +23,15 @@ retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
   conf->recent_seen_bytes_cache_size = DEFAULT_RECENT_SEEN_BYTES_CACHE_SIZE;
   conf->request_hash_size_trit = HASH_LENGTH_TRIT - DEFAULT_MWN;
   conf->requester_queue_size = DEFAULT_REQUESTER_QUEUE_SIZE;
-  conf->tcp_receiver_port = DEFAULT_TCP_RECEIVER_PORT;
   conf->tips_cache_size = DEFAULT_TIPS_CACHE_SIZE;
   conf->tips_solidifier_enabled = DEFAULT_TIPS_SOLIDIFIER_ENABLED;
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
+  strncpy(conf->neighboring_address, DEFAULT_NEIGHBORING_ADDRESS, sizeof(conf->neighboring_address));
+  conf->neighboring_port = DEFAULT_NEIGHBORING_PORT;
+  conf->auto_tethering_enabled = DEFAULT_AUTO_TETHERING_ENABLED;
+  conf->max_neighbors = DEFAULT_MAX_NEIGHBORS;
+  conf->reconnect_attempt_interval = DEFAULT_RECONNECT_ATTEMPT_INTERVAL;
 
   return RC_OK;
 }

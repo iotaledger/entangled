@@ -83,7 +83,7 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing receiver\n");
-  if ((ret = receiver_init(&node->receiver, node, node->conf.tcp_receiver_port)) != RC_OK) {
+  if ((ret = receiver_init(&node->receiver, node, node->conf.neighboring_port)) != RC_OK) {
     log_critical(logger_id, "Initializing receiver failed\n");
     return ret;
   }

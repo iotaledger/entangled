@@ -197,10 +197,25 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
 
     // Node configuration
+    case CONF_AUTO_TETHERING_ENABLED:  // --auto-tethering-enabled
+      ret = get_true_false(value, &node_conf->auto_tethering_enabled);
+      break;
+    case CONF_MAX_NEIGHBORS:  // --max-neighbors
+      node_conf->max_neighbors = atoi(value);
+      break;
     case CONF_MWM:  // --mwm
       node_conf->mwm = atoi(value);
       node_conf->request_hash_size_trit = HASH_LENGTH_TRIT - node_conf->mwm;
       consensus_conf->mwm = atoi(value);
+      break;
+    case CONF_NEIGHBORING_ADDRESS:  // --neighboring-address
+      if (strlen(value) == 0) {
+        return RC_CONF_INVALID_ARGUMENT;
+      }
+      strncpy(node_conf->neighboring_address, value, sizeof(node_conf->neighboring_address));
+      break;
+    case CONF_NEIGHBORING_PORT:  // --neighboring-port
+      node_conf->neighboring_port = atoi(value);
       break;
     case 'n':  // --neighbors
       if (strlen(value) == 0) {
@@ -226,11 +241,11 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_RECENT_SEEN_BYTES_CACHE_SIZE:  // --recent-seen-bytes-cache-size
       node_conf->recent_seen_bytes_cache_size = atoi(value);
       break;
+    case CONF_RECONNECT_ATTEMPT_INTERVAL:  // --reconnect-attempt-interval
+      node_conf->reconnect_attempt_interval = atoi(value);
+      break;
     case CONF_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
       node_conf->requester_queue_size = atoi(value);
-      break;
-    case 't':  // --tcp-receiver-port
-      node_conf->tcp_receiver_port = atoi(value);
       break;
     case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
       node_conf->tips_cache_size = atoi(value);

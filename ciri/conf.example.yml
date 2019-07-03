@@ -10,7 +10,11 @@
 
 # Node configuration
 
+# auto-tethering-enabled: false
+# max-neighbors: 5
 # mwm: 14
+# neighboring-address: "0.0.0.0"
+# neighboring-port: 15600
 # neighbors: "tcp://127.0.0.1:15600"
 # p-propagate-request: 0.01
 # p-remove-request: 0.01
@@ -18,8 +22,8 @@
 # p-select-milestone: 0.7
 # p-send-milestone: 0.02
 # recent-seen-bytes-cache-size: 1500
+# reconnect-attempt-interval: 60
 # requester-queue-size: 10000
-# tcp-receiver-port: 15600
 # tips-cache-size: 5000
 # tips-solidifier-enabled: true
 

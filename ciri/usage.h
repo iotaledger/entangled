@@ -21,13 +21,18 @@ typedef enum cli_arg_value_e {
 
   // Node configuration
 
+  CONF_AUTO_TETHERING_ENABLED,
+  CONF_MAX_NEIGHBORS,
   CONF_MWM,
+  CONF_NEIGHBORING_ADDRESS,
+  CONF_NEIGHBORING_PORT,
   CONF_P_PROPAGATE_REQUEST,
   CONF_P_REMOVE_REQUEST,
   CONF_P_REPLY_RANDOM_TIP,
   CONF_P_SELECT_MILESTONE,
   CONF_P_SEND_MILESTONE,
   CONF_RECENT_SEEN_BYTES_CACHE_SIZE,
+  CONF_RECONNECT_ATTEMPT_INTERVAL,
   CONF_REQUESTER_QUEUE_SIZE,
   CONF_TIPS_CACHE_SIZE,
   CONF_TIPS_SOLIDIFIER_ENABLED,
@@ -93,10 +98,17 @@ static struct cli_argument_s {
 
     // Node configuration
 
+    {"auto-tethering-enabled", CONF_AUTO_TETHERING_ENABLED,
+     "Whether to accept new connections from unknown neighbors (which are not defined in the config and were not added "
+     "via addNeighbors).",
+     REQUIRED_ARG},
+    {"max-neighbors", CONF_MAX_NEIGHBORS, "The maximum number of neighbors allowed to be connected.", REQUIRED_ARG},
     {"mwm", CONF_MWM,
      "Number of trailing ternary 0s that must appear at the end of a "
      "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
+    {"neighboring-address", CONF_NEIGHBORING_ADDRESS, "The address to bind the TCP server socket to.", REQUIRED_ARG},
+    {"neighboring-port", CONF_NEIGHBORING_PORT, "The TCP receiver port.", REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
     {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
      "Probability of propagating the request of a transaction to a neighbor "
@@ -123,7 +135,8 @@ static struct cli_argument_s {
     {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE, "Size of the transaction requester queue.", REQUIRED_ARG},
     {"recent-seen-bytes-cache-size", CONF_RECENT_SEEN_BYTES_CACHE_SIZE,
      "The number of entries to keep in the network cache.", REQUIRED_ARG},
-    {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
+    {"reconnect-attempt-interval", CONF_RECONNECT_ATTEMPT_INTERVAL,
+     "The interval (in seconds) at which to reconnect to neighbors.", REQUIRED_ARG},
     {"tips-cache-size", CONF_TIPS_CACHE_SIZE,
      "Size of the tips cache. Also bounds the number of tips returned by "
      "getTips API call.",
