@@ -118,7 +118,7 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
           snapshots_service->conf->local_snapshots.min_depth;
 
   if (index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
-      log_warning(logger_id, "New candidate milestone for local snapshot is %\" PRId64 \" and is before initial snapshot (too old) \n", snapshots_service->snapshots_provider->inital_snapshot.metadata.index));
+      log_warning(logger_id, "New candidate milestone for local snapshot is %\" PRId64 \" and is before initial snapshot (too old)\n", snapshots_service->snapshots_provider->inital_snapshot.metadata.index));
       return RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
   }
 
