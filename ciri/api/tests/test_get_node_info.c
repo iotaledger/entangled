@@ -68,7 +68,7 @@ int main(void) {
   rw_lock_handle_init(&api.core->node.neighbors_lock);
   api.core->node.conf.requester_queue_size = 100;
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
-  TEST_ASSERT(broadcaster_init(&api.core->node.broadcaster, &api.core->node) == RC_OK);
+  TEST_ASSERT(broadcaster_stage_init(&api.core->node.broadcaster, &api.core->node) == RC_OK);
   config.db_path = test_db_path;
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK);
   api.core->consensus.milestone_tracker.latest_milestone_index = LATEST_MILESTONE_INDEX;
@@ -121,10 +121,10 @@ int main(void) {
   // Adding broadcasts
 
   iota_packet_t packet;
-  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, &packet) == RC_OK);
-  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, &packet) == RC_OK);
-  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, &packet) == RC_OK);
-  TEST_ASSERT(broadcaster_add(&api.core->node.broadcaster, &packet) == RC_OK);
+  TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);
+  TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);
+  TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);
+  TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);
 
   RUN_TEST(test_get_node_info);
 

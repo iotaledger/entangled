@@ -26,7 +26,7 @@ static logger_id_t logger_id;
  *
  * @return a status pointer
  */
-static void *broadcaster_routine(broadcaster_t *const broadcaster) {
+static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
   tangle_t tangle;
   lock_handle_t cond_lock;
   neighbor_t *neighbor = NULL;
@@ -85,7 +85,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
  * Public functions
  */
 
-retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node) {
+retcode_t broadcaster_stage_init(broadcaster_stage_t *const broadcaster, node_t *const node) {
   if (broadcaster == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -112,22 +112,22 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node)
   return RC_OK;
 }
 
-retcode_t broadcaster_start(broadcaster_t *const broadcaster) {
+retcode_t broadcaster_stage_start(broadcaster_stage_t *const broadcaster) {
   if (broadcaster == NULL) {
     return RC_NULL_PARAM;
   }
 
-  log_info(logger_id, "Spawning broadcaster thread\n");
+  log_info(logger_id, "Spawning broadcaster stage thread\n");
   broadcaster->running = true;
-  if (thread_handle_create(&broadcaster->thread, (thread_routine_t)broadcaster_routine, broadcaster) != 0) {
-    log_critical(logger_id, "Spawning broadcaster thread failed\n");
+  if (thread_handle_create(&broadcaster->thread, (thread_routine_t)broadcaster_stage_routine, broadcaster) != 0) {
+    log_critical(logger_id, "Spawning broadcaster stage thread failed\n");
     return RC_THREAD_CREATE;
   }
 
   return RC_OK;
 }
 
-retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
+retcode_t broadcaster_stage_stop(broadcaster_stage_t *const broadcaster) {
   retcode_t ret = RC_OK;
 
   if (broadcaster == NULL) {
@@ -136,21 +136,21 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
     return RC_OK;
   }
 
-  log_info(logger_id, "Shutting down broadcaster thread\n");
+  log_info(logger_id, "Shutting down broadcaster stage thread\n");
   broadcaster->running = false;
   if (cond_handle_signal(&broadcaster->cond) != 0) {
     log_warning(logger_id, "Signaling condition variable failed\n");
     ret = RC_COND_SIGNAL;
   }
   if (thread_handle_join(broadcaster->thread, NULL) != 0) {
-    log_error(logger_id, "Shutting down broadcaster thread failed\n");
+    log_error(logger_id, "Shutting down broadcaster stage thread failed\n");
     ret = RC_THREAD_JOIN;
   }
 
   return ret;
 }
 
-retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
+retcode_t broadcaster_stage_destroy(broadcaster_stage_t *const broadcaster) {
   retcode_t ret = RC_OK;
 
   if (broadcaster == NULL) {
@@ -180,7 +180,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   return ret;
 }
 
-retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const *const packet) {
+retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, iota_packet_t const *const packet) {
   retcode_t ret = RC_OK;
 
   if (broadcaster == NULL || packet == NULL) {
@@ -192,7 +192,7 @@ retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const 
   rw_lock_handle_unlock(&broadcaster->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id, "Pushing packet to broadcaster queue failed\n");
+    log_warning(logger_id, "Pushing packet to broadcaster stage queue failed\n");
     return ret;
   }
 
@@ -201,7 +201,7 @@ retcode_t broadcaster_add(broadcaster_t *const broadcaster, iota_packet_t const 
   return ret;
 }
 
-size_t broadcaster_size(broadcaster_t *const broadcaster) {
+size_t broadcaster_stage_size(broadcaster_stage_t *const broadcaster) {
   size_t size = 0;
 
   if (broadcaster == NULL) {

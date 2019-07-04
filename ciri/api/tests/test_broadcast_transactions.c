@@ -33,7 +33,7 @@ void test_broadcast_transactions_empty(void) {
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
 
-  TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.core->node.broadcaster), 0);
+  TEST_ASSERT_EQUAL_INT(broadcaster_stage_size(&api.core->node.broadcaster), 0);
 
   broadcast_transactions_req_free(&req);
   error_res_free(&error);
@@ -58,7 +58,7 @@ void test_broadcast_transactions_invalid_tx(void) {
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
 
-  TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.core->node.broadcaster), 0);
+  TEST_ASSERT_EQUAL_INT(broadcaster_stage_size(&api.core->node.broadcaster), 0);
 
   broadcast_transactions_req_free(&req);
   error_res_free(&error);
@@ -86,7 +86,7 @@ void test_broadcast_transactions(void) {
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
 
-  TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.core->node.broadcaster), 4);
+  TEST_ASSERT_EQUAL_INT(broadcaster_stage_size(&api.core->node.broadcaster), 4);
 
   for (size_t i = 0; i < 4; i++) {
     flex_trits_to_bytes(bytes, NUM_TRITS_SERIALIZED_TRANSACTION, broadcat_transactions_req_trytes_get(req, i),
@@ -107,7 +107,7 @@ int main(void) {
 
   config.db_path = test_db_path;
   api.core = &core;
-  broadcaster_init(&api.core->node.broadcaster, &api.core->node);
+  broadcaster_stage_init(&api.core->node.broadcaster, &api.core->node);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
   api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;

@@ -69,28 +69,29 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     return ret;
   }
 
-  log_info(logger_id, "Initializing broadcaster\n");
-  if ((ret = broadcaster_init(&node->broadcaster, node)) != RC_OK) {
-    log_critical(logger_id, "Initializing broadcaster failed\n");
+  log_info(logger_id, "Initializing broadcaster stage\n");
+  if ((ret = broadcaster_stage_init(&node->broadcaster, node)) != RC_OK) {
+    log_critical(logger_id, "Initializing broadcaster stage failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Initializing processor\n");
-  if ((ret = processor_init(&node->processor, node, &core->consensus.transaction_validator,
-                            &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) != RC_OK) {
-    log_critical(logger_id, "Initializing processor failed\n");
+  log_info(logger_id, "Initializing processor stage\n");
+  if ((ret = processor_stage_init(&node->processor, node, &core->consensus.transaction_validator,
+                                  &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) !=
+      RC_OK) {
+    log_critical(logger_id, "Initializing processor stage failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Initializing receiver\n");
-  if ((ret = receiver_init(&node->receiver, node, node->conf.neighboring_port)) != RC_OK) {
-    log_critical(logger_id, "Initializing receiver failed\n");
+  log_info(logger_id, "Initializing receiver stage\n");
+  if ((ret = receiver_stage_init(&node->receiver, node, node->conf.neighboring_port)) != RC_OK) {
+    log_critical(logger_id, "Initializing receiver stage failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Initializing responder\n");
-  if ((ret = responder_init(&node->responder, node)) != RC_OK) {
-    log_critical(logger_id, "Initializing responder failed\n");
+  log_info(logger_id, "Initializing responder stage\n");
+  if ((ret = responder_stage_init(&node->responder, node)) != RC_OK) {
+    log_critical(logger_id, "Initializing responder stage failed\n");
     return ret;
   }
 
@@ -138,27 +139,27 @@ retcode_t node_start(node_t* const node) {
     return RC_NULL_PARAM;
   }
 
-  log_info(logger_id, "Starting broadcaster\n");
-  if ((ret = broadcaster_start(&node->broadcaster)) != RC_OK) {
-    log_critical(logger_id, "Starting broadcaster failed\n");
+  log_info(logger_id, "Starting broadcaster stage\n");
+  if ((ret = broadcaster_stage_start(&node->broadcaster)) != RC_OK) {
+    log_critical(logger_id, "Starting broadcaster stage failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Starting processor\n");
-  if ((ret = processor_start(&node->processor)) != RC_OK) {
-    log_critical(logger_id, "Starting processor failed\n");
+  log_info(logger_id, "Starting processor stage\n");
+  if ((ret = processor_stage_start(&node->processor)) != RC_OK) {
+    log_critical(logger_id, "Starting processor stage failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Starting receiver\n");
-  if ((ret = receiver_start(&node->receiver)) != RC_OK) {
-    log_critical(logger_id, "Starting receiver failed\n");
+  log_info(logger_id, "Starting receiver stage\n");
+  if ((ret = receiver_stage_start(&node->receiver)) != RC_OK) {
+    log_critical(logger_id, "Starting receiver stage failed\n");
     return ret;
   }
 
-  log_info(logger_id, "Starting responder\n");
-  if ((ret = responder_start(&node->responder)) != RC_OK) {
-    log_critical(logger_id, "Starting responder failed\n");
+  log_info(logger_id, "Starting responder stage\n");
+  if ((ret = responder_stage_start(&node->responder)) != RC_OK) {
+    log_critical(logger_id, "Starting responder stage failed\n");
     return ret;
   }
 
@@ -198,24 +199,24 @@ retcode_t node_stop(node_t* const node) {
 
   node->running = false;
 
-  log_info(logger_id, "Stopping broadcaster\n");
-  if ((ret = broadcaster_stop(&node->broadcaster)) != RC_OK) {
-    log_error(logger_id, "Stopping broadcaster failed\n");
+  log_info(logger_id, "Stopping broadcaster stage\n");
+  if ((ret = broadcaster_stage_stop(&node->broadcaster)) != RC_OK) {
+    log_error(logger_id, "Stopping broadcaster stage failed\n");
   }
 
-  log_info(logger_id, "Stopping processor\n");
-  if ((ret = processor_stop(&node->processor)) != RC_OK) {
-    log_error(logger_id, "Stopping processor failed\n");
+  log_info(logger_id, "Stopping processor stage\n");
+  if ((ret = processor_stage_stop(&node->processor)) != RC_OK) {
+    log_error(logger_id, "Stopping processor stage failed\n");
   }
 
-  log_info(logger_id, "Stopping responder\n");
-  if ((ret = responder_stop(&node->responder)) != RC_OK) {
-    log_error(logger_id, "Stopping responder failed\n");
+  log_info(logger_id, "Stopping responder stage\n");
+  if ((ret = responder_stage_stop(&node->responder)) != RC_OK) {
+    log_error(logger_id, "Stopping responder stage failed\n");
   }
 
-  log_info(logger_id, "Stopping receiver\n");
-  if ((ret = receiver_stop(&node->receiver)) != RC_OK) {
-    log_error(logger_id, "Stopping receiver failed\n");
+  log_info(logger_id, "Stopping receiver stage\n");
+  if ((ret = receiver_stage_stop(&node->receiver)) != RC_OK) {
+    log_error(logger_id, "Stopping receiver stage failed\n");
   }
 
   log_info(logger_id, "Stopping tips requester\n");
@@ -264,24 +265,24 @@ retcode_t node_destroy(node_t* const node) {
     log_error(logger_id, "Destroying tips requester failed\n");
   }
 
-  log_info(logger_id, "Destroying broadcaster\n");
-  if ((ret = broadcaster_destroy(&node->broadcaster)) != RC_OK) {
-    log_error(logger_id, "Destroying broadcaster failed\n");
+  log_info(logger_id, "Destroying broadcaster stage\n");
+  if ((ret = broadcaster_stage_destroy(&node->broadcaster)) != RC_OK) {
+    log_error(logger_id, "Destroying broadcaster stage failed\n");
   }
 
-  log_info(logger_id, "Destroying receiver\n");
-  if ((ret = receiver_destroy(&node->receiver)) != RC_OK) {
-    log_error(logger_id, "Destroying receiver failed\n");
+  log_info(logger_id, "Destroying receiver stage\n");
+  if ((ret = receiver_stage_destroy(&node->receiver)) != RC_OK) {
+    log_error(logger_id, "Destroying receiver stage failed\n");
   }
 
-  log_info(logger_id, "Destroying processor\n");
-  if ((ret = processor_destroy(&node->processor)) != RC_OK) {
-    log_error(logger_id, "Destroying processor failed\n");
+  log_info(logger_id, "Destroying processor stage\n");
+  if ((ret = processor_stage_destroy(&node->processor)) != RC_OK) {
+    log_error(logger_id, "Destroying processor stage failed\n");
   }
 
-  log_info(logger_id, "Destroying responder\n");
-  if ((ret = responder_destroy(&node->responder)) != RC_OK) {
-    log_error(logger_id, "Destroying responder failed\n");
+  log_info(logger_id, "Destroying responder stage\n");
+  if ((ret = responder_stage_destroy(&node->responder)) != RC_OK) {
+    log_error(logger_id, "Destroying responder stage failed\n");
   }
 
   log_debug(logger_id, "Destroying neighbors\n");

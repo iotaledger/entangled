@@ -33,10 +33,10 @@ typedef struct node_s {
   iota_node_conf_t conf;
   bool running;
   core_t* core;
-  broadcaster_t broadcaster;
-  processor_t processor;
-  receiver_t receiver;
-  responder_t responder;
+  broadcaster_stage_t broadcaster;
+  processor_stage_t processor;
+  receiver_stage_t receiver;
+  responder_stage_t responder;
   transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
   tips_solidifier_t tips_solidifier;

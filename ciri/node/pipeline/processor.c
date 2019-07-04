@@ -38,7 +38,7 @@ static logger_id_t logger_id;
  *
  * @return a status code
  */
-static retcode_t process_transaction_bytes(processor_t const *const processor, tangle_t *const tangle,
+static retcode_t process_transaction_bytes(processor_stage_t const *const processor, tangle_t *const tangle,
                                            neighbor_t *const neighbor, iota_packet_t const *const packet,
                                            flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
@@ -99,7 +99,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
     // TODO Store transaction metadata
 
     // Broadcast the new transaction
-    if ((ret = broadcaster_add(&processor->node->broadcaster, packet)) != RC_OK) {
+    if ((ret = broadcaster_stage_add(&processor->node->broadcaster, packet)) != RC_OK) {
       log_warning(logger_id, "Propagating packet to broadcaster failed\n");
       goto failure;
     }
@@ -131,7 +131,7 @@ failure:
  *
  * @return a status code
  */
-static retcode_t process_request_bytes(processor_t const *const processor, neighbor_t *const neighbor,
+static retcode_t process_request_bytes(processor_stage_t const *const processor, neighbor_t *const neighbor,
                                        iota_packet_t const *const packet, flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
@@ -155,8 +155,8 @@ static retcode_t process_request_bytes(processor_t const *const processor, neigh
     memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  // Adds request to the responder queue
-  if ((ret = responder_on_next(&processor->node->responder, neighbor, request_hash)) != RC_OK) {
+  // Adds request to the responder stage queue
+  if ((ret = responder_stage_add(&processor->node->responder, neighbor, request_hash)) != RC_OK) {
     log_warning(logger_id, "Propagating request to responder failed\n");
     return ret;
   }
@@ -173,7 +173,7 @@ static retcode_t process_request_bytes(processor_t const *const processor, neigh
  *
  * @return a status code
  */
-static retcode_t process_packet(processor_t const *const processor, tangle_t *const tangle,
+static retcode_t process_packet(processor_stage_t const *const processor, tangle_t *const tangle,
                                 iota_packet_t const *const packet, flex_trit_t const *const hash, bool const cached,
                                 uint64_t const digest) {
   retcode_t ret = RC_OK;
@@ -227,7 +227,7 @@ typedef struct packet_digest_s {
  *
  * @param processor The processor state
  */
-static void *processor_routine(processor_t *const processor) {
+static void *processor_stage_routine(processor_stage_t *const processor) {
   tangle_t tangle;
   size_t j;
 
@@ -336,10 +336,10 @@ static void *processor_routine(processor_t *const processor) {
  * Public functions
  */
 
-retcode_t processor_init(processor_t *const processor, node_t *const node,
-                         transaction_validator_t *const transaction_validator,
-                         transaction_solidifier_t *const transaction_solidifier,
-                         milestone_tracker_t *const milestone_tracker) {
+retcode_t processor_stage_init(processor_stage_t *const processor, node_t *const node,
+                               transaction_validator_t *const transaction_validator,
+                               transaction_solidifier_t *const transaction_solidifier,
+                               milestone_tracker_t *const milestone_tracker) {
   if (processor == NULL || node == NULL || transaction_validator == NULL || transaction_solidifier == NULL ||
       milestone_tracker == NULL) {
     return RC_NULL_PARAM;
@@ -359,40 +359,40 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   return RC_OK;
 }
 
-retcode_t processor_start(processor_t *const processor) {
+retcode_t processor_stage_start(processor_stage_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   }
 
-  log_info(logger_id, "Spawning processor thread\n");
+  log_info(logger_id, "Spawning processor stage thread\n");
   processor->running = true;
-  if (thread_handle_create(&processor->thread, (thread_routine_t)processor_routine, processor) != 0) {
-    log_critical(logger_id, "Spawning processor thread failed\n");
+  if (thread_handle_create(&processor->thread, (thread_routine_t)processor_stage_routine, processor) != 0) {
+    log_critical(logger_id, "Spawning processor stage thread failed\n");
     return RC_THREAD_CREATE;
   }
 
   return RC_OK;
 }
 
-retcode_t processor_stop(processor_t *const processor) {
+retcode_t processor_stage_stop(processor_stage_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   } else if (processor->running == false) {
     return RC_OK;
   }
 
-  log_info(logger_id, "Shutting down processor thread\n");
+  log_info(logger_id, "Shutting down processor stage thread\n");
   processor->running = false;
   cond_handle_signal(&processor->cond);
   if (thread_handle_join(processor->thread, NULL) != 0) {
-    log_error(logger_id, "Shutting down processor thread failed\n");
+    log_error(logger_id, "Shutting down processor stage thread failed\n");
     return RC_THREAD_JOIN;
   }
 
   return RC_OK;
 }
 
-retcode_t processor_destroy(processor_t *const processor) {
+retcode_t processor_stage_destroy(processor_stage_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   } else if (processor->running) {
@@ -412,7 +412,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   return RC_OK;
 }
 
-retcode_t processor_on_next(processor_t *const processor, iota_packet_t const packet) {
+retcode_t processor_stage_add(processor_stage_t *const processor, iota_packet_t const packet) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL) {
@@ -424,7 +424,7 @@ retcode_t processor_on_next(processor_t *const processor, iota_packet_t const pa
   rw_lock_handle_unlock(&processor->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id, "Pushing packet to processor queue failed\n");
+    log_warning(logger_id, "Pushing packet to processor stage queue failed\n");
     return ret;
   } else {
     cond_handle_signal(&processor->cond);
@@ -433,7 +433,7 @@ retcode_t processor_on_next(processor_t *const processor, iota_packet_t const pa
   return RC_OK;
 }
 
-size_t processor_size(processor_t *const processor) {
+size_t processor_stage_size(processor_stage_t *const processor) {
   size_t size = 0;
 
   if (processor == NULL) {

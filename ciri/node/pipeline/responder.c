@@ -34,7 +34,7 @@ static logger_id_t logger_id;
  *
  * @return a status code
  */
-static retcode_t get_transaction_for_request(responder_t const *const responder, tangle_t *const tangle,
+static retcode_t get_transaction_for_request(responder_stage_t const *const responder, tangle_t *const tangle,
                                              neighbor_t *const neighbor, flex_trit_t const *const hash,
                                              iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
@@ -86,7 +86,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
  *
  * @return a status code
  */
-static retcode_t respond_to_request(responder_t const *const responder, tangle_t *const tangle,
+static retcode_t respond_to_request(responder_stage_t const *const responder, tangle_t *const tangle,
                                     neighbor_t *const neighbor, flex_trit_t const *const hash,
                                     iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
@@ -127,12 +127,11 @@ static retcode_t respond_to_request(responder_t const *const responder, tangle_t
 }
 
 /**
- * Continuously looks for a transaction request from a responder queue and
- * process it
+ * Continuously looks for a transaction request from a responder queue and process it
  *
- * @param responder The responder state
+ * @param responder The responder stage
  */
-static void *responder_routine(responder_t *const responder) {
+static void *responder_stage_routine(responder_stage_t *const responder) {
   transaction_request_queue_entry_t *entry = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   tangle_t tangle;
@@ -188,7 +187,7 @@ static void *responder_routine(responder_t *const responder) {
  * Public functions
  */
 
-retcode_t responder_init(responder_t *const responder, node_t *const node) {
+retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node) {
   if (responder == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -204,22 +203,22 @@ retcode_t responder_init(responder_t *const responder, node_t *const node) {
   return RC_OK;
 }
 
-retcode_t responder_start(responder_t *const responder) {
+retcode_t responder_stage_start(responder_stage_t *const responder) {
   if (responder == NULL) {
     return RC_NULL_PARAM;
   }
 
-  log_info(logger_id, "Spawning responder thread\n");
+  log_info(logger_id, "Spawning responder stage thread\n");
   responder->running = true;
-  if (thread_handle_create(&responder->thread, (thread_routine_t)responder_routine, responder) != 0) {
-    log_critical(logger_id, "Spawning responder thread failed\n");
+  if (thread_handle_create(&responder->thread, (thread_routine_t)responder_stage_routine, responder) != 0) {
+    log_critical(logger_id, "Spawning responder stage thread failed\n");
     return RC_THREAD_CREATE;
   }
 
   return RC_OK;
 }
 
-retcode_t responder_stop(responder_t *const responder) {
+retcode_t responder_stage_stop(responder_stage_t *const responder) {
   retcode_t ret = RC_OK;
 
   if (responder == NULL) {
@@ -228,18 +227,18 @@ retcode_t responder_stop(responder_t *const responder) {
     return RC_OK;
   }
 
-  log_info(logger_id, "Shutting down responder thread\n");
+  log_info(logger_id, "Shutting down responder stage thread\n");
   responder->running = false;
   cond_handle_signal(&responder->cond);
   if (thread_handle_join(responder->thread, NULL) != 0) {
-    log_error(logger_id, "Shutting down responder thread failed\n");
+    log_error(logger_id, "Shutting down responder stage thread failed\n");
     ret = RC_THREAD_JOIN;
   }
 
   return ret;
 }
 
-retcode_t responder_destroy(responder_t *const responder) {
+retcode_t responder_stage_destroy(responder_stage_t *const responder) {
   retcode_t ret = RC_OK;
 
   if (responder == NULL) {
@@ -258,7 +257,8 @@ retcode_t responder_destroy(responder_t *const responder) {
   return ret;
 }
 
-retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neighbor, flex_trit_t const *const hash) {
+retcode_t responder_stage_add(responder_stage_t *const responder, neighbor_t *const neighbor,
+                              flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
 
   if (responder == NULL || neighbor == NULL || hash == NULL) {
@@ -270,7 +270,7 @@ retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neig
   rw_lock_handle_unlock(&responder->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id, "Pushing transaction_request to responder queue failed\n");
+    log_warning(logger_id, "Pushing transaction_request to responder stage queue failed\n");
     return ret;
   } else {
     cond_handle_signal(&responder->cond);
@@ -279,7 +279,7 @@ retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neig
   return RC_OK;
 }
 
-size_t responder_size(responder_t *const responder) {
+size_t responder_stage_size(responder_stage_t *const responder) {
   size_t size = 0;
 
   if (responder == NULL) {

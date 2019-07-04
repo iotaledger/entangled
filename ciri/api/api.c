@@ -126,7 +126,7 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
     flex_trits_to_bytes(packet.content, NUM_TRITS_SERIALIZED_TRANSACTION, elt, NUM_TRITS_SERIALIZED_TRANSACTION,
                         NUM_TRITS_SERIALIZED_TRANSACTION);
     // TODO priority queue on weight_magnitude
-    if ((ret = broadcaster_add(&api->core->node.broadcaster, &packet)) != RC_OK) {
+    if ((ret = broadcaster_stage_add(&api->core->node.broadcaster, &packet)) != RC_OK) {
       return ret;
     }
   }
@@ -440,7 +440,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
   res->neighbors = neighbors_count(api->core->node.neighbors);
   rw_lock_handle_unlock(&api->core->node.neighbors_lock);
-  res->packets_queue_size = broadcaster_size(&api->core->node.broadcaster);
+  res->packets_queue_size = broadcaster_stage_size(&api->core->node.broadcaster);
   res->time = current_timestamp_ms();
   res->tips = tips_cache_size(&api->core->node.tips);
   res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
