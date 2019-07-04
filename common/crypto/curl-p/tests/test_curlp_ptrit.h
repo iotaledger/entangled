@@ -77,69 +77,68 @@
       {HIGH_BITS, HIGH_BITS}, {                                                                                       \
     LOW_BITS, HIGH_BITS                                                                                               \
   }
-#define EXP_81                                                                                                         \
-  {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                      \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                      \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                      \
-      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                      \
-      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                      \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                      \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                    \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                  \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                      \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                      \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                    \
-      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                      \
-      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
-      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
-      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                    \
-      {HIGH_BITS, HIGH_BITS}, {                                                                                        \
-    HIGH_BITS, LOW_BITS                                                                                                \
+#define EXP_81                                                                                                        \
+  {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                  \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                   \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                  \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                     \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                     \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                  \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                   \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, LOW_BITS},                     \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS}, {HIGH_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS},                  \
+      {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, LOW_BITS},                    \
+      {LOW_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS}, {HIGH_BITS, HIGH_BITS}, {LOW_BITS, HIGH_BITS},                    \
+      {HIGH_BITS, LOW_BITS}, {                                                                                        \
+    HIGH_BITS, LOW_BITS                                                                                               \
   }
-
 #endif  //__CURL_P_BCT_1_H__
