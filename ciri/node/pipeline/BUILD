@@ -50,22 +50,6 @@ cc_library(
 )
 
 cc_library(
-    name = "receiver_shared",
-    hdrs = ["receiver.h"],
-    deps = ["//utils/handles:thread"],
-)
-
-cc_library(
-    name = "receiver",
-    srcs = ["receiver.c"],
-    deps = [
-        ":receiver_shared",
-        "//ciri/node:node_shared",
-        "//ciri/node/network:event",
-    ],
-)
-
-cc_library(
     name = "transaction_requester_worker_shared",
     hdrs = ["transaction_requester_worker.h"],
     deps = [

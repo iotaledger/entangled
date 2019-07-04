@@ -83,12 +83,6 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     return ret;
   }
 
-  log_info(logger_id, "Initializing receiver stage\n");
-  if ((ret = receiver_stage_init(&node->receiver, node, node->conf.neighboring_port)) != RC_OK) {
-    log_critical(logger_id, "Initializing receiver stage failed\n");
-    return ret;
-  }
-
   log_info(logger_id, "Initializing responder stage\n");
   if ((ret = responder_stage_init(&node->responder, node)) != RC_OK) {
     log_critical(logger_id, "Initializing responder stage failed\n");
@@ -114,6 +108,12 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
       log_critical(logger_id, "Initializing tips solidifier failed\n");
       return ret;
     }
+  }
+
+  log_info(logger_id, "Initializing TCP server\n");
+  if ((ret = tcp_server_init(&node->tcp_server, node)) != RC_OK) {
+    log_critical(logger_id, "Initializing TCP server failed\n");
+    return ret;
   }
 
   log_info(logger_id, "Initializing tips cache\n");
@@ -151,12 +151,6 @@ retcode_t node_start(node_t* const node) {
     return ret;
   }
 
-  log_info(logger_id, "Starting receiver stage\n");
-  if ((ret = receiver_stage_start(&node->receiver)) != RC_OK) {
-    log_critical(logger_id, "Starting receiver stage failed\n");
-    return ret;
-  }
-
   log_info(logger_id, "Starting responder stage\n");
   if ((ret = responder_stage_start(&node->responder)) != RC_OK) {
     log_critical(logger_id, "Starting responder stage failed\n");
@@ -181,6 +175,12 @@ retcode_t node_start(node_t* const node) {
       log_critical(logger_id, "Starting tips solidifier failed\n");
       return ret;
     }
+  }
+
+  log_info(logger_id, "Starting TCP server\n");
+  if ((ret = tcp_server_start(&node->tcp_server)) != RC_OK) {
+    log_critical(logger_id, "Starting TCP server failed\n");
+    return ret;
   }
 
   node->running = true;
@@ -214,11 +214,6 @@ retcode_t node_stop(node_t* const node) {
     log_error(logger_id, "Stopping responder stage failed\n");
   }
 
-  log_info(logger_id, "Stopping receiver stage\n");
-  if ((ret = receiver_stage_stop(&node->receiver)) != RC_OK) {
-    log_error(logger_id, "Stopping receiver stage failed\n");
-  }
-
   log_info(logger_id, "Stopping tips requester\n");
   if ((ret = tips_requester_stop(&node->tips_requester)) != RC_OK) {
     log_error(logger_id, "Stopping tips requester failed\n");
@@ -236,6 +231,11 @@ retcode_t node_stop(node_t* const node) {
     }
   }
 
+  log_info(logger_id, "Stopping TCP server\n");
+  if ((ret = tcp_server_stop(&node->tcp_server)) != RC_OK) {
+    log_error(logger_id, "Stopping TCP server failed\n");
+  }
+
   return ret;
 }
 
@@ -246,6 +246,11 @@ retcode_t node_destroy(node_t* const node) {
     return RC_NULL_PARAM;
   } else if (node->running) {
     return RC_STILL_RUNNING;
+  }
+
+  log_info(logger_id, "Destroying TCP server\n");
+  if ((ret = tcp_server_destroy(&node->tcp_server)) != RC_OK) {
+    log_error(logger_id, "Destroying TCP server failed\n");
   }
 
   log_info(logger_id, "Destroying transaction requester\n");
@@ -268,11 +273,6 @@ retcode_t node_destroy(node_t* const node) {
   log_info(logger_id, "Destroying broadcaster stage\n");
   if ((ret = broadcaster_stage_destroy(&node->broadcaster)) != RC_OK) {
     log_error(logger_id, "Destroying broadcaster stage failed\n");
-  }
-
-  log_info(logger_id, "Destroying receiver stage\n");
-  if ((ret = receiver_stage_destroy(&node->receiver)) != RC_OK) {
-    log_error(logger_id, "Destroying receiver stage failed\n");
   }
 
   log_info(logger_id, "Destroying processor stage\n");

@@ -9,9 +9,9 @@
 #define __NODE_NODE_H__
 
 #include "ciri/node/neighbor.h"
+#include "ciri/node/network/tcp_server.h"
 #include "ciri/node/pipeline/broadcaster.h"
 #include "ciri/node/pipeline/processor.h"
-#include "ciri/node/pipeline/receiver.h"
 #include "ciri/node/pipeline/responder.h"
 #include "ciri/node/pipeline/tips_requester.h"
 #include "ciri/node/pipeline/tips_solidifier.h"
@@ -35,11 +35,11 @@ typedef struct node_s {
   core_t* core;
   broadcaster_stage_t broadcaster;
   processor_stage_t processor;
-  receiver_stage_t receiver;
   responder_stage_t responder;
   transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
   tips_solidifier_t tips_solidifier;
+  tcp_server_t tcp_server;
   neighbor_t* neighbors;
   rw_lock_handle_t neighbors_lock;
   tips_cache_t tips;
