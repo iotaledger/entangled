@@ -48,6 +48,7 @@ void example_send_trytes(iota_client_service_t *s);
 void example_traverse_bundle(iota_client_service_t *s);
 void example_get_bundle(iota_client_service_t *s);
 void example_replay_bundle(iota_client_service_t *s);
+void example_broadcast_bundle(iota_client_service_t *s);
 
 void example_send_data(iota_client_service_t *s);
 void example_send_balance(iota_client_service_t *s);
