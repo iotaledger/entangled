@@ -48,7 +48,7 @@ retcode_t iota_consensus_entry_point_selector_init(entry_point_selector_t *const
  * @return a status code
  */
 retcode_t iota_consensus_entry_point_selector_get_entry_point(entry_point_selector_t *const eps, tangle_t *const tangle,
-                                                              size_t const depth, flex_trit_t *const ep);
+                                                              uint32_t const depth, flex_trit_t *const ep);
 
 /**
  * Destroys an entry point selector
