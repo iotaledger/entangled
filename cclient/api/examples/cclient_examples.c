@@ -101,6 +101,7 @@ int main() {
   // example_traverse_bundle(&serv);
   // example_get_bundle(&serv);
   // example_replay_bundle(&serv);
+  // example_broadcast_bundle(&serv);
 
   /* Send data and balance */
   // example_send_data(&serv);

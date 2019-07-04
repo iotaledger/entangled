@@ -366,7 +366,7 @@ static retcode_t iota_snapshots_service_collect_new_solid_entry_points(
     return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
   }
 
-  while (index > initial_snapshot->metadata.index && index > 1) {
+  while (index > (initial_snapshot->metadata.index + 1) && index > 1) {
     ERR_BIND_RETURN(iota_snapshots_service_find_solid_entry_points_and_update(
                         snapshots_service, target_milestone->index, transaction_timestamp(target_milestone_tx_p),
                         prev_milestone.hash, prev_milestone.index, tangle, solid_entry_points),
