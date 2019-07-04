@@ -398,10 +398,6 @@ retcode_t iota_snapshots_service_update_solid_entry_points(snapshots_service_t *
   retcode_t ret;
   hash_to_uint64_t_map_t solid_entry_points = NULL;
 
-  hash_to_uint64_t_map_copy(&snapshot->metadata.solid_entry_points, &solid_entry_points);
-
-  hash_to_uint64_t_map_remove(&solid_entry_points, snapshots_service->conf->genesis_hash);
-
   ERR_BIND_GOTO(
       hash_to_uint64_t_map_add(&solid_entry_points, snapshots_service->conf->genesis_hash, target_milestone->index),
       ret, cleanup);
