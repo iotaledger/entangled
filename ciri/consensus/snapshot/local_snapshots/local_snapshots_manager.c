@@ -27,6 +27,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   bool skip_check = false;
   tangle_t tangle;
   lock_handle_t lock_cond;
+  uint64_t prev_initial_index;
 
   {
     connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
@@ -43,6 +44,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   while (lsm->running) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
+      prev_initial_index = lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
@@ -51,6 +53,9 @@ static void *local_snapshots_manager_routine(void *arg) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
         }
+        log_info(logger_id, "Local snapshot from % " PRId64 " to % " PRId64 " took % " PRId64 " milliseconds\n",
+                 prev_initial_index, lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index,
+                 end_timestamp - start_timestamp);
       } else {
         exponential_delay_factor *= 2;
         log_warning(logger_id, "Local snapshot is delayed in %d ms, error code: %d\n",
