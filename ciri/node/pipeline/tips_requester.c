@@ -63,7 +63,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     if (iota_packet_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
       continue;
     }
-    if (iota_packet_set_request(&packet, latest_milestone.hash, tips_requester->node->conf.request_hash_size_trit) !=
+    if (iota_packet_set_request(&packet, latest_milestone.hash, HASH_LENGTH_TRIT - tips_requester->node->conf.mwm) !=
         RC_OK) {
       continue;
     }

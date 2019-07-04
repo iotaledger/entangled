@@ -16,6 +16,7 @@
 #include "common/trinary/flex_trit.h"
 
 #define PACKET_TX_SIZE 1604
+#define REQUEST_HASH_SIZE 49
 #define PACKET_SIZE (PACKET_TX_SIZE + REQUEST_HASH_SIZE)
 
 /**

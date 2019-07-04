@@ -42,8 +42,6 @@ typedef struct iota_node_conf_s {
   // Number of trailing ternary 0s that must appear at the end of a transaction
   // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
-  // Size of the request hash in trits, equivalent to HASH_LENGTH_TRIT - mwm
-  uint8_t request_hash_size_trit;
   // URIs of neighbouring nodes, separated by a space
   char* neighbors;
   // Probability of propagating the request of a transaction to a neighbor node

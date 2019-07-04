@@ -21,7 +21,6 @@ retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
   conf->p_select_milestone = DEFAULT_PROBABILITY_SELECT_MILESTONE;
   conf->p_send_milestone = DEFAULT_PROBABILITY_SEND_MILESTONE;
   conf->recent_seen_bytes_cache_size = DEFAULT_RECENT_SEEN_BYTES_CACHE_SIZE;
-  conf->request_hash_size_trit = HASH_LENGTH_TRIT - DEFAULT_MWN;
   conf->requester_queue_size = DEFAULT_REQUESTER_QUEUE_SIZE;
   conf->tips_cache_size = DEFAULT_TIPS_CACHE_SIZE;
   conf->tips_solidifier_enabled = DEFAULT_TIPS_SOLIDIFIER_ENABLED;

@@ -68,7 +68,7 @@ static retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neigh
     return ret;
   }
 
-  if ((ret = iota_packet_set_request(packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
+  if ((ret = iota_packet_set_request(packet, request, HASH_LENGTH_TRIT - node->conf.mwm)) != RC_OK) {
     return ret;
   }
 

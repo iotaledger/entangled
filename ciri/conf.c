@@ -205,7 +205,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_MWM:  // --mwm
       node_conf->mwm = atoi(value);
-      node_conf->request_hash_size_trit = HASH_LENGTH_TRIT - node_conf->mwm;
       consensus_conf->mwm = atoi(value);
       break;
     case CONF_NEIGHBORING_ADDRESS:  // --neighboring-address
