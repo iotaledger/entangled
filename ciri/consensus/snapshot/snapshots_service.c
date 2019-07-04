@@ -109,7 +109,7 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
 
   if (snapshots_service->snapshots_provider->latest_snapshot.metadata.index <=
       snapshots_service->conf->local_snapshots.min_depth) {
-    log_warning(logger_id, "Latest milestone index is %\" PRId64 \" and is below min depth\n",
+    log_warning(logger_id, "Latest milestone index is %" PRId64 " and is below min depth\n",
                 snapshots_service->snapshots_provider->latest_snapshot.metadata.index);
     return RC_SNAPSHOT_SERVICE_NOT_ENOUGH_DEPTH;
   }
@@ -118,10 +118,9 @@ retcode_t iota_snapshots_service_determine_new_entry_point(snapshots_service_t *
           snapshots_service->conf->local_snapshots.min_depth;
 
   if (index <= snapshots_service->snapshots_provider->inital_snapshot.metadata.index) {
-    log_warning(
-        logger_id,
-        "New candidate milestone for local snapshot is %\" PRId64 \" and is before initial snapshot (too old)\n",
-        snapshots_service->snapshots_provider->inital_snapshot.metadata.index);
+    log_warning(logger_id,
+                "New candidate milestone for local snapshot is %" PRId64 " and is before initial snapshot (too old)\n",
+                snapshots_service->snapshots_provider->inital_snapshot.metadata.index);
     return RC_SNAPSHOT_SERVICE_MILESTONE_TOO_OLD;
   }
 
@@ -196,10 +195,6 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
   iota_snapshot_write_lock(&snapshots_service->snapshots_provider->inital_snapshot);
   ret = iota_snapshot_copy(snapshot, &snapshots_service->snapshots_provider->inital_snapshot);
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
-  if (ret == RC_OK) {
-    log_info(logger_id, "Local snapshot updated with snapshot index %" PRIu64 "\n",
-             snapshots_service->snapshots_provider->inital_snapshot.metadata.index);
-  }
 
   return ret;
 }
