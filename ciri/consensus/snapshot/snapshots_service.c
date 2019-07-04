@@ -361,6 +361,8 @@ static retcode_t iota_snapshots_service_collect_new_solid_entry_points(
 
   ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &target_milestone_tx_pack);
   if (target_milestone_tx_pack.num_loaded == 0) {
+    log_warning(logger_id, "Milestone with index (target milestone) %" PRIu64 " could not be loaded\n",
+                target_milestone->index);
     return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
   }
 
@@ -380,6 +382,7 @@ static retcode_t iota_snapshots_service_collect_new_solid_entry_points(
     hash_pack_reset(&prev_milestone_pack);
     ERR_BIND_RETURN(iota_tangle_milestone_load_by_index(tangle, index - 1, &prev_milestone_pack), ret);
     if (prev_milestone_pack.num_loaded == 0) {
+      log_warning(logger_id, "Milestone with index %" PRIu64 " could not be loaded\n", index - 1);
       return RC_SNAPSHOT_MISSING_MILESTONE_TRANSACTION;
     } else {
       index = prev_milestone.index;
