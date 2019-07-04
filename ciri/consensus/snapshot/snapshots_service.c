@@ -195,10 +195,6 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
   iota_snapshot_write_lock(&snapshots_service->snapshots_provider->inital_snapshot);
   ret = iota_snapshot_copy(snapshot, &snapshots_service->snapshots_provider->inital_snapshot);
   iota_snapshot_unlock(&snapshots_service->snapshots_provider->inital_snapshot);
-  if (ret == RC_OK) {
-    log_info(logger_id, "Local snapshot updated with snapshot index %" PRIu64 "\n",
-             snapshots_service->snapshots_provider->inital_snapshot.metadata.index);
-  }
 
   return ret;
 }
