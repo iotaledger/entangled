@@ -30,7 +30,7 @@ static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
   tangle_t tangle;
   lock_handle_t cond_lock;
   neighbor_t *neighbor = NULL;
-  iota_packet_queue_entry_t *entry = NULL;
+  protocol_gossip_queue_entry_t *entry = NULL;
 
   if (broadcaster == NULL) {
     return NULL;
@@ -50,7 +50,7 @@ static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
 
   while (broadcaster->running) {
     rw_lock_handle_wrlock(&broadcaster->lock);
-    entry = iota_packet_queue_pop(&broadcaster->queue);
+    entry = protocol_gossip_queue_pop(&broadcaster->queue);
     rw_lock_handle_unlock(&broadcaster->lock);
 
     if (entry == NULL) {
@@ -173,14 +173,14 @@ retcode_t broadcaster_stage_destroy(broadcaster_stage_t *const broadcaster) {
   // Data
 
   broadcaster->node = NULL;
-  iota_packet_queue_free(&broadcaster->queue);
+  protocol_gossip_queue_free(&broadcaster->queue);
 
   logger_helper_release(logger_id);
 
   return ret;
 }
 
-retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, iota_packet_t const *const packet) {
+retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, protocol_gossip_t const *const packet) {
   retcode_t ret = RC_OK;
 
   if (broadcaster == NULL || packet == NULL) {
@@ -188,7 +188,7 @@ retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, iota_pac
   }
 
   rw_lock_handle_wrlock(&broadcaster->lock);
-  ret = iota_packet_queue_push(&broadcaster->queue, packet);
+  ret = protocol_gossip_queue_push(&broadcaster->queue, packet);
   rw_lock_handle_unlock(&broadcaster->lock);
 
   if (ret != RC_OK) {
@@ -209,7 +209,7 @@ size_t broadcaster_stage_size(broadcaster_stage_t *const broadcaster) {
   }
 
   rw_lock_handle_rdlock(&broadcaster->lock);
-  size = iota_packet_queue_count(broadcaster->queue);
+  size = protocol_gossip_queue_count(broadcaster->queue);
   rw_lock_handle_unlock(&broadcaster->lock);
 
   return size;

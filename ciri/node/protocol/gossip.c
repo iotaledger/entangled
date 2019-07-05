@@ -7,10 +7,10 @@
 
 #include <stdlib.h>
 
-#include "ciri/node/protocol/iota_packet.h"
+#include "ciri/node/protocol/gossip.h"
 #include "common/model/transaction.h"
 
-retcode_t iota_packet_set_transaction(iota_packet_t *const packet, flex_trit_t const *const transaction) {
+retcode_t protocol_gossip_set_transaction(protocol_gossip_t *const packet, flex_trit_t const *const transaction) {
   if (packet == NULL || transaction == NULL) {
     return RC_NULL_PARAM;
   }
@@ -24,20 +24,21 @@ retcode_t iota_packet_set_transaction(iota_packet_t *const packet, flex_trit_t c
   return RC_OK;
 }
 
-retcode_t iota_packet_set_request(iota_packet_t *const packet, flex_trit_t const *const request, uint8_t request_size) {
+retcode_t protocol_gossip_set_request(protocol_gossip_t *const packet, flex_trit_t const *const request,
+                                      uint8_t request_size) {
   if (packet == NULL || request == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if (flex_trits_to_bytes(packet->content + PACKET_TX_SIZE, request_size, request, HASH_LENGTH_TRIT, request_size) !=
-      request_size) {
+  if (flex_trits_to_bytes(packet->content + GOSSIP_TX_BYTES_LENGTH, request_size, request, HASH_LENGTH_TRIT,
+                          request_size) != request_size) {
     return RC_NODE_SET_PACKET_REQUEST_FAILED;
   }
 
   return RC_OK;
 }
 
-retcode_t iota_packet_set_endpoint(iota_packet_t *const packet, char const *const ip, uint16_t const port) {
+retcode_t protocol_gossip_set_endpoint(protocol_gossip_t *const packet, char const *const ip, uint16_t const port) {
   if (packet == NULL) {
     return RC_NULL_PARAM;
   }
@@ -50,10 +51,10 @@ retcode_t iota_packet_set_endpoint(iota_packet_t *const packet, char const *cons
   return RC_OK;
 }
 
-bool iota_packet_queue_empty(iota_packet_queue_t const queue) { return (queue == NULL); }
+bool protocol_gossip_queue_empty(protocol_gossip_queue_t const queue) { return (queue == NULL); }
 
-size_t iota_packet_queue_count(iota_packet_queue_t const queue) {
-  iota_packet_queue_entry_t *iter = NULL;
+size_t protocol_gossip_queue_count(protocol_gossip_queue_t const queue) {
+  protocol_gossip_queue_entry_t *iter = NULL;
   size_t count = 0;
 
   CDL_COUNT(queue, iter, count);
@@ -61,14 +62,14 @@ size_t iota_packet_queue_count(iota_packet_queue_t const queue) {
   return count;
 }
 
-retcode_t iota_packet_queue_push(iota_packet_queue_t *const queue, iota_packet_t const *const packet) {
-  iota_packet_queue_entry_t *entry = NULL;
+retcode_t protocol_gossip_queue_push(protocol_gossip_queue_t *const queue, protocol_gossip_t const *const packet) {
+  protocol_gossip_queue_entry_t *entry = NULL;
 
   if (queue == NULL || packet == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if ((entry = (iota_packet_queue_entry_t *)malloc(sizeof(iota_packet_queue_entry_t))) == NULL) {
+  if ((entry = (protocol_gossip_queue_entry_t *)malloc(sizeof(protocol_gossip_queue_entry_t))) == NULL) {
     return RC_OOM;
   }
 
@@ -78,8 +79,8 @@ retcode_t iota_packet_queue_push(iota_packet_queue_t *const queue, iota_packet_t
   return RC_OK;
 }
 
-iota_packet_queue_entry_t *iota_packet_queue_pop(iota_packet_queue_t *const queue) {
-  iota_packet_queue_entry_t *front = NULL;
+protocol_gossip_queue_entry_t *protocol_gossip_queue_pop(protocol_gossip_queue_t *const queue) {
+  protocol_gossip_queue_entry_t *front = NULL;
 
   if (queue == NULL) {
     return NULL;
@@ -93,8 +94,8 @@ iota_packet_queue_entry_t *iota_packet_queue_pop(iota_packet_queue_t *const queu
   return front;
 }
 
-void iota_packet_queue_free(iota_packet_queue_t *const queue) {
-  iota_packet_queue_entry_t *iter = NULL, *tmp1 = NULL, *tmp2 = NULL;
+void protocol_gossip_queue_free(protocol_gossip_queue_t *const queue) {
+  protocol_gossip_queue_entry_t *iter = NULL, *tmp1 = NULL, *tmp2 = NULL;
 
   if (queue == NULL) {
     return;

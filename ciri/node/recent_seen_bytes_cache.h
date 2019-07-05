@@ -10,7 +10,7 @@
 
 #include "xxhash.h"
 
-#include "ciri/node/protocol/iota_packet.h"
+#include "ciri/node/protocol/gossip.h"
 #include "ciri/node/uint64_t_to_flex_trit_t_map.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
@@ -41,7 +41,7 @@ static inline retcode_t recent_seen_bytes_cache_hash(byte_t const *const bytes, 
     return RC_NULL_PARAM;
   }
 
-  *digest = XXH64(bytes, PACKET_TX_SIZE, 0);
+  *digest = XXH64(bytes, GOSSIP_TX_BYTES_LENGTH, 0);
 
   return RC_OK;
 }

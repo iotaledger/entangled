@@ -99,7 +99,7 @@ static retcode_t respond_to_request(responder_stage_t const *const responder, ta
     // If a transaction or a random tip was found, sends it back to the neighbor
     iota_transaction_t *transaction = ((iota_transaction_t **)(pack->models))[0];
     flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
-    byte_t transaction_bytes[PACKET_TX_SIZE];
+    byte_t transaction_bytes[GOSSIP_TX_BYTES_LENGTH];
     uint64_t digest = 0;
 
     transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);

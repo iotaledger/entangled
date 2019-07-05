@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#include "ciri/node/protocol/iota_packet.h"
+#include "ciri/node/protocol/gossip.h"
 #include "common/errors.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
@@ -34,8 +34,8 @@ typedef struct broadcaster_stage_s {
   bool running;           /*!< State of the broadcaster */
   thread_handle_t thread; /*!< Handle for the broadcaster thread */
   // Data
-  node_t *node;              /*!< The parent node */
-  iota_packet_queue_t queue; /*!< A queue of packets to be broadcasted */
+  node_t *node;                  /*!< The parent node */
+  protocol_gossip_queue_t queue; /*!< A queue of packets to be broadcasted */
 } broadcaster_stage_t;
 
 /**
@@ -83,7 +83,7 @@ retcode_t broadcaster_stage_destroy(broadcaster_stage_t *const broadcaster);
  *
  * @return a status code
  */
-retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, iota_packet_t const *const packet);
+retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, protocol_gossip_t const *const packet);
 
 /**
  * @brief Gets the size of the broadcaster stage queue

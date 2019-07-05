@@ -39,7 +39,7 @@ static logger_id_t logger_id;
  * @return a status code
  */
 static retcode_t process_transaction_bytes(processor_stage_t const *const processor, tangle_t *const tangle,
-                                           neighbor_t *const neighbor, iota_packet_t const *const packet,
+                                           neighbor_t *const neighbor, protocol_gossip_t const *const packet,
                                            flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   bool exists = false;
@@ -132,7 +132,7 @@ failure:
  * @return a status code
  */
 static retcode_t process_request_bytes(processor_stage_t const *const processor, neighbor_t *const neighbor,
-                                       iota_packet_t const *const packet, flex_trit_t const *const hash) {
+                                       protocol_gossip_t const *const packet, flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
 
@@ -141,7 +141,7 @@ static retcode_t process_request_bytes(processor_stage_t const *const processor,
   }
 
   // Retreives the request hash from the packet
-  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + PACKET_TX_SIZE,
+  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + GOSSIP_TX_BYTES_LENGTH,
                             HASH_LENGTH_TRIT - processor->node->conf.mwm,
                             HASH_LENGTH_TRIT - processor->node->conf.mwm) !=
       HASH_LENGTH_TRIT - processor->node->conf.mwm) {
@@ -174,7 +174,7 @@ static retcode_t process_request_bytes(processor_stage_t const *const processor,
  * @return a status code
  */
 static retcode_t process_packet(processor_stage_t const *const processor, tangle_t *const tangle,
-                                iota_packet_t const *const packet, flex_trit_t const *const hash, bool const cached,
+                                protocol_gossip_t const *const packet, flex_trit_t const *const hash, bool const cached,
                                 uint64_t const digest) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
@@ -218,7 +218,7 @@ done:
 }
 
 typedef struct packet_digest_s {
-  iota_packet_queue_entry_t *entry;
+  protocol_gossip_queue_entry_t *entry;
   uint64_t digest;
 } packet_digest_t;
 
@@ -246,7 +246,7 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
 
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
-  iota_packet_queue_entry_t *entry = NULL;
+  protocol_gossip_queue_entry_t *entry = NULL;
   packet_digest_t *packets = (packet_digest_t *)calloc(PACKET_MAX, sizeof(packet_digest_t));
 
   trit_t *tx = (trit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
@@ -269,7 +269,7 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
     packet_cnt = 0;
     while (packet_cnt < PACKET_MAX) {
       rw_lock_handle_wrlock(&processor->lock);
-      entry = iota_packet_queue_pop(&processor->queue);
+      entry = protocol_gossip_queue_pop(&processor->queue);
       rw_lock_handle_unlock(&processor->lock);
       if (entry == NULL) {
         break;
@@ -298,7 +298,7 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
     memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(packets[j].entry->packet.content, PACKET_TX_SIZE, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
+      bytes_to_trits(packets[j].entry->packet.content, GOSSIP_TX_BYTES_LENGTH, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
     }
 
@@ -399,7 +399,7 @@ retcode_t processor_stage_destroy(processor_stage_t *const processor) {
     return RC_STILL_RUNNING;
   }
 
-  iota_packet_queue_free(&processor->queue);
+  protocol_gossip_queue_free(&processor->queue);
   rw_lock_handle_destroy(&processor->lock);
   cond_handle_destroy(&processor->cond);
   processor->node = NULL;
@@ -412,7 +412,7 @@ retcode_t processor_stage_destroy(processor_stage_t *const processor) {
   return RC_OK;
 }
 
-retcode_t processor_stage_add(processor_stage_t *const processor, iota_packet_t const packet) {
+retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const packet) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL) {
@@ -420,7 +420,7 @@ retcode_t processor_stage_add(processor_stage_t *const processor, iota_packet_t 
   }
 
   rw_lock_handle_wrlock(&processor->lock);
-  ret = iota_packet_queue_push(&processor->queue, &packet);
+  ret = protocol_gossip_queue_push(&processor->queue, &packet);
   rw_lock_handle_unlock(&processor->lock);
 
   if (ret != RC_OK) {
@@ -441,7 +441,7 @@ size_t processor_stage_size(processor_stage_t *const processor) {
   }
 
   rw_lock_handle_rdlock(&processor->lock);
-  size = iota_packet_queue_count(processor->queue);
+  size = protocol_gossip_queue_count(processor->queue);
   rw_lock_handle_unlock(&processor->lock);
 
   return size;

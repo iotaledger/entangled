@@ -106,7 +106,7 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
   iota_transaction_t tx;
-  iota_packet_t packet;
+  protocol_gossip_t packet;
 
   if (api == NULL || req == NULL || error == NULL) {
     return RC_NULL_PARAM;
@@ -116,7 +116,7 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
     return ret;
   }
 
-  memset(&packet, 0, sizeof(iota_packet_t));
+  memset(&packet, 0, sizeof(protocol_gossip_t));
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);

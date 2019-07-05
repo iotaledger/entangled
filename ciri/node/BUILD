@@ -25,7 +25,7 @@ cc_library(
     name = "neighbor_shared",
     hdrs = ["neighbor.h"],
     deps = [
-        "//ciri/node/protocol:iota_packet",
+        "//ciri/node/protocol:gossip",
         "//common:errors",
     ],
 )
@@ -61,7 +61,7 @@ cc_library(
     hdrs = ["recent_seen_bytes_cache.h"],
     deps = [
         ":uint64_t_to_flex_trit_t_map",
-        "//ciri/node/protocol:iota_packet",
+        "//ciri/node/protocol:gossip",
         "//common:errors",
         "//common/trinary:flex_trit",
         "//utils/handles:rw_lock",

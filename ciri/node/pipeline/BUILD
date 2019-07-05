@@ -4,7 +4,7 @@ cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//ciri/node/protocol:iota_packet",
+        "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",
@@ -27,7 +27,7 @@ cc_library(
     hdrs = ["processor.h"],
     deps = [
         "//ciri/consensus/transaction_validator",
-        "//ciri/node/protocol:iota_packet",
+        "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
         "//utils/handles:lock",
         "//utils/handles:rw_lock",
@@ -139,7 +139,7 @@ cc_library(
         ":tips_requester_shared",
         "//ciri/consensus/tangle",
         "//ciri/node:node_shared",
-        "//ciri/node/protocol:iota_packet",
+        "//ciri/node/protocol:gossip",
         "//common/model:milestone",
         "//utils:logger_helper",
     ],

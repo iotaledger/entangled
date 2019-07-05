@@ -12,7 +12,7 @@
 
 #include "utlist.h"
 
-#include "ciri/node/protocol/iota_packet.h"
+#include "ciri/node/protocol/gossip.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"
@@ -67,7 +67,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
  *
  * @return a status code
  */
-retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, iota_packet_t const *const packet);
+retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, protocol_gossip_t const *const packet);
 
 /**
  * Sends transaction trits to a neighbor

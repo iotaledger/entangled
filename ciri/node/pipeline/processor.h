@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 #include "ciri/consensus/transaction_validator/transaction_validator.h"
-#include "ciri/node/protocol/iota_packet.h"
+#include "ciri/node/protocol/gossip.h"
 #include "common/errors.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/lock.h"
@@ -30,7 +30,7 @@ typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct processor_stage_s {
   thread_handle_t thread;
   bool running;
-  iota_packet_queue_t queue;
+  protocol_gossip_queue_t queue;
   rw_lock_handle_t lock;
   cond_handle_t cond;
   node_t *node;
@@ -94,7 +94,7 @@ retcode_t processor_stage_destroy(processor_stage_t *const processor);
  *
  * @return a status code
  */
-retcode_t processor_stage_add(processor_stage_t *const processor, iota_packet_t const packet);
+retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const packet);
 
 /**
  * Gets the size of the processor stage queue

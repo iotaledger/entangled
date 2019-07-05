@@ -8,7 +8,7 @@
 #include "ciri/node/pipeline/tips_requester.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/node/node.h"
-#include "ciri/node/protocol/iota_packet.h"
+#include "ciri/node/protocol/gossip.h"
 #include "common/model/milestone.h"
 #include "utils/logger_helper.h"
 
@@ -22,7 +22,7 @@ static logger_id_t logger_id;
  */
 
 static void *tips_requester_routine(tips_requester_t *const tips_requester) {
-  iota_packet_t packet;
+  protocol_gossip_t packet;
   neighbor_t *iter = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
@@ -60,11 +60,11 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       continue;
     }
     transaction_serialize_on_flex_trits(transaction_ptr, transaction_flex_trits);
-    if (iota_packet_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
+    if (protocol_gossip_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
       continue;
     }
-    if (iota_packet_set_request(&packet, latest_milestone.hash, HASH_LENGTH_TRIT - tips_requester->node->conf.mwm) !=
-        RC_OK) {
+    if (protocol_gossip_set_request(&packet, latest_milestone.hash,
+                                    HASH_LENGTH_TRIT - tips_requester->node->conf.mwm) != RC_OK) {
       continue;
     }
 

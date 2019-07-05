@@ -120,7 +120,7 @@ int main(void) {
   TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[2], false) == RC_OK);
   // Adding broadcasts
 
-  iota_packet_t packet;
+  protocol_gossip_t packet;
   TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);
   TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);
   TEST_ASSERT(broadcaster_stage_add(&api.core->node.broadcaster, &packet) == RC_OK);

@@ -2,15 +2,9 @@ load("//ciri/node:conf.bzl", "NODE_MAINNET_VARIABLES")
 load("//ciri/node:conf.bzl", "NODE_TESTNET_VARIABLES")
 
 cc_library(
-    name = "header",
-    hdrs = ["header.h"],
-    visibility = ["//visibility:public"],
-)
-
-cc_library(
-    name = "iota_packet",
-    srcs = ["iota_packet.c"],
-    hdrs = ["iota_packet.h"],
+    name = "gossip",
+    srcs = ["gossip.c"],
+    hdrs = ["gossip.h"],
     defines = select({
         "//ciri:mainnet": NODE_MAINNET_VARIABLES,
         "//ciri:testnet": NODE_TESTNET_VARIABLES,
@@ -25,6 +19,12 @@ cc_library(
         "//common/trinary:flex_trit",
         "@com_github_uthash//:uthash",
     ],
+)
+
+cc_library(
+    name = "header",
+    hdrs = ["header.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
