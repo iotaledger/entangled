@@ -21,7 +21,7 @@ void test_get_transactions_to_approve_serialize_request(void) {
   flex_trit_t reference[FLEX_TRIT_SIZE_243];
   TEST_ASSERT(flex_trits_from_trytes(reference, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH,
                                      NUM_TRYTES_HASH));
-  get_transactions_to_approve_req_set_reference(get_tx_approve, reference);
+  TEST_ASSERT(get_transactions_to_approve_req_set_reference(get_tx_approve, reference) == RC_OK);
 
   get_transactions_to_approve_req_set_depth(get_tx_approve, TEST_TRANSACTION_TO_APPROVE_DEPTH);
 

@@ -61,8 +61,9 @@ retcode_t json_get_transactions_to_approve_deserialize_request(char const *const
   if (cJSON_HasObjectItem(json_obj, "reference")) {
     flex_trit_t hash[FLEX_TRIT_SIZE_243];
 
-    ret = json_string_hash_to_flex_trits(json_obj, "reference", hash);
-    get_transactions_to_approve_req_set_reference(out, hash);
+    if ((ret = json_string_hash_to_flex_trits(json_obj, "reference", hash)) == RC_OK) {
+      ret = get_transactions_to_approve_req_set_reference(out, hash);
+    }
   }
 
 end:
