@@ -48,7 +48,7 @@ static void test_request(void) {
 static void test_response(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_true = "{\"state\":true}";
+  const char* json_true = "{\"state\":true,\"info\":\"\"}";
   const char* json_false = "{\"state\":false,\"info\":\"" CONSISTENCY_INFO "\"}";
 
   check_consistency_res_t* res = check_consistency_res_new();
@@ -56,7 +56,8 @@ static void test_response(void) {
 
   serializer.vtable.check_consistency_deserialize_response(json_true, res);
   TEST_ASSERT_TRUE(res->state == true);
-  TEST_ASSERT_NULL(res->info);
+  TEST_ASSERT_NOT_NULL(res->info);
+  TEST_ASSERT_EQUAL_STRING("", res->info->data);
 
   serializer.vtable.check_consistency_serialize_response(res, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_true, serializer_out->data);
