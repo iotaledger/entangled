@@ -843,7 +843,9 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, t
 done:
   free(trits_buffer);
   free(bytes);
-  fclose(file);
+  if (file) {
+    fclose(file);
+  }
 
   return ret;
 }
@@ -895,7 +897,9 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api, tryte_t
 done:
   free(bytes);
   free(trits_buffer);
-  fclose(file);
+  if (file) {
+    fclose(file);
+  }
 
   return ret;
 }

@@ -486,7 +486,9 @@ done:
   }
   yaml_token_delete(&token);
   yaml_parser_delete(&parser);
-  fclose(file);
+  if (file) {
+    fclose(file);
+  }
   free(long_options);
 
   return ret;
