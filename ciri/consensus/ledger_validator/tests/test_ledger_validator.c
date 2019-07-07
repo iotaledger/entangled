@@ -90,7 +90,7 @@ static void init_test_structs() {
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &transaction_solidifier) == RC_OK);
   TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &milestone_service, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &conf) == RC_OK);
-  TEST_ASSERT(iota_local_snapshots_pruning_manager_init(&pm) == RC_OK);
+  TEST_ASSERT(iota_local_snapshots_pruning_manager_init(&pm, &snapshots_provider, &conf) == RC_OK);
 }
 
 static void destroy_test_structs() {

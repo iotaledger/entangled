@@ -45,7 +45,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":conf",
+        "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/tangle",
+        "//ciri/consensus/tangle:traversal",
         "//common:errors",
         "//utils/handles:cond",
         "//utils/handles:rw_lock",

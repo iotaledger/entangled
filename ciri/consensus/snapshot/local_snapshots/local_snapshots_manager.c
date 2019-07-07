@@ -124,7 +124,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  iota_local_snapshots_pruning_manager_init(&lsm->pm);
+  iota_local_snapshots_pruning_manager_init(&lsm->pm, lsm->snapshots_service->snapshots_provider, conf);
 
   return RC_OK;
 }

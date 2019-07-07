@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "ciri/consensus/conf.h"
+#include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
@@ -23,16 +25,24 @@ typedef struct pruning_manager_s {
   bool running;
   thread_handle_t pruning_manager_thread;
   cond_handle_t cond_pruning_manager;
+  iota_consensus_conf_t *conf;
+  uint64_t current_snapshot_index_to_prune;
+  uint64_t last_snapshot_index_to_prune;
+  rw_lock_handle_t rw_lock;
 } pruning_manager_t;
 
 /**
  * Initializes a pruning manager
  *
  * @param pm The pruning manager
+ * @param snapshot_provider The snapshots provider
+ * @param conf The consensus's conf
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *pm);
+retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *pm,
+                                                    snapshots_provider_t *const snapshot_provider,
+                                                    iota_consensus_conf_t *const conf);
 
 /**
  * Starts a pruning manager
@@ -60,6 +70,17 @@ retcode_t iota_local_snapshots_pruning_manager_stop(pruning_manager_t *const pm)
  * @return a status code
  */
 retcode_t iota_local_snapshots_pruning_manager_destroy(pruning_manager_t *const pm);
+
+/**
+ * Updates the last snapshot index so all transactions before it should be pruned
+ *
+ * @param pm The pruning manager
+ * @param last_snapshot_index The last snapshot index
+ *
+ * @return void
+ */
+void iota_local_snapshots_pruning_manager_update_last_snapshot_index(pruning_manager_t *const pm,
+                                                                     uint64_t last_snapshot_index);
 
 #ifdef __cplusplus
 }
