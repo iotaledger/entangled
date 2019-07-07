@@ -13,6 +13,7 @@
 
 #include "ciri/consensus/conf.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
+#include "ciri/consensus/snapshot/local_snapshots/pruning_manager.h"
 #include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/snapshot/snapshots_service.h"
 #include "ciri/consensus/tangle/tangle.h"
@@ -31,6 +32,7 @@ typedef struct local_snapshots_manager_s {
   milestone_tracker_t const *mt;
   snapshots_service_t *snapshots_service;
   size_t last_snapshot_transactions_count;
+  pruning_manager_t pm;
 } local_snapshots_manager_t;
 
 /**

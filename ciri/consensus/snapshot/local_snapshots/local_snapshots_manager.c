@@ -45,7 +45,7 @@ static void *local_snapshots_manager_routine(void *arg) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
       prev_initial_index = lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
-      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &tangle);
+      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &lsm->pm, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
         end_timestamp = current_timestamp_ms();
@@ -124,10 +124,13 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
+  iota_local_snapshots_pruning_manager_init(&lsm->pm);
+
   return RC_OK;
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
+  retcode_t ret;
   if (lsm == NULL) {
     return RC_NULL_PARAM;
   }
@@ -140,6 +143,8 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
     return RC_THREAD_CREATE;
   }
 
+  ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_start(&lsm->pm), ret);
+
   return RC_OK;
 }
 
@@ -151,6 +156,8 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   } else if (lsm->running == false) {
     return RC_OK;
   }
+
+  ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_stop(&lsm->pm), ret);
 
   lsm->running = false;
   cond_handle_signal(&lsm->cond_local_snapshots);
@@ -171,6 +178,8 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
   } else if (lsm->running) {
     return RC_STILL_RUNNING;
   }
+
+  ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_destroy(&lsm->pm), ret);
 
   cond_handle_destroy(&lsm->cond_local_snapshots);
   memset(lsm, 0, sizeof(local_snapshots_manager_t));

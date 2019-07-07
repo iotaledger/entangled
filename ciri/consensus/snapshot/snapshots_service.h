@@ -13,6 +13,7 @@
 
 #include "ciri/consensus/milestone/milestone_service.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
+#include "ciri/consensus/snapshot/local_snapshots/pruning_manager.h"
 #include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "common/errors.h"
@@ -65,12 +66,13 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
  * Takes a snapshot and applies it
  *
  * @param snapshots_service The service
+ * @param pruning_manager The pruning_manager
  * @param tangle The tangle
  *
  * @return a status code
  */
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
-                                               tangle_t const *const tangle);
+                                               pruning_manager_t *const pm, tangle_t const *const tangle);
 
 /**
  * Generates a new snapshot
