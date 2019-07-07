@@ -64,9 +64,10 @@ void get_transactions_to_approve_req_set_depth(get_transactions_to_approve_req_t
  *
  * @param[in] req The request object.
  * @param[in] reference A reference transaction hash.
+ * @return RC_OK or RC_OOM.
  */
-void get_transactions_to_approve_req_set_reference(get_transactions_to_approve_req_t* const req,
-                                                   flex_trit_t const* const reference);
+retcode_t get_transactions_to_approve_req_set_reference(get_transactions_to_approve_req_t* const req,
+                                                        flex_trit_t const* const reference);
 
 #ifdef __cplusplus
 }

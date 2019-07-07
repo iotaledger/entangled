@@ -31,7 +31,10 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
   }
 
   if (reference) {
-    memcpy(tx_approve_req->reference, reference, FLEX_TRIT_SIZE_243);
+    if ((ret_code = get_transactions_to_approve_req_set_reference(tx_approve_req, reference)) != RC_OK) {
+      log_error(client_extended_logger_id, "set reference failed: %s\n", error_2_string(ret_code));
+      goto done;
+    }
   }
   tx_approve_req->depth = depth;
   // get tx to approve

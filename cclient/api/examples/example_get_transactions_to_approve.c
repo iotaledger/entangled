@@ -27,7 +27,10 @@ void example_get_transactions_to_approve(iota_client_service_t *s) {
     goto done;
   }
 
-  get_transactions_to_approve_req_set_reference(tx_approve_req, reference);
+  if ((ret = get_transactions_to_approve_req_set_reference(tx_approve_req, reference)) != RC_OK) {
+    printf("Error: OOM on setting reference\n");
+    goto done;
+  }
 
   tx_approve_req->depth = 9;  // 14 for mainnet
 

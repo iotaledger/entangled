@@ -67,6 +67,8 @@ const char* error_2_string(retcode_t err) {
       return SRT_CCLIENT_INVALID_BUNDLE;
     case RC_CCLIENT_CHECK_BALANCE:
       return SRT_CCLIENT_CHECK_BALANCE;
+    case RC_CCLIENT_NOT_PROMOTABLE:
+      return SRT_CCLIENT_NOT_PROMOTABLE;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:

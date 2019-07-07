@@ -56,9 +56,7 @@ retcode_t json_check_consistency_serialize_response(check_consistency_res_t *con
 
   cJSON_AddBoolToObject(json_root, kState, obj->state);
 
-  if (!obj->state) {
-    cJSON_AddStringToObject(json_root, kInfo, obj->info->data);
-  }
+  cJSON_AddStringToObject(json_root, kInfo, obj->info->data);
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
@@ -102,12 +100,10 @@ retcode_t json_check_consistency_deserialize_response(char const *const obj, che
 
   out->state = cJSON_IsTrue(json_item);
 
-  if (!out->state) {
-    if (!out->info) {
-      out->info = char_buffer_new();
-    }
-    ret = json_get_string(json_obj, "info", out->info);
+  if (!out->info) {
+    out->info = char_buffer_new();
   }
+  ret = json_get_string(json_obj, "info", out->info);
 
 done:
   cJSON_Delete(json_obj);

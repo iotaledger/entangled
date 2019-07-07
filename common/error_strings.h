@@ -54,6 +54,7 @@ extern "C" {
 #define STR_CCLIENT_INVALID_TAIL_HASH "Invalid tail hash"
 #define SRT_CCLIENT_INVALID_BUNDLE "Invalid bundle"
 #define SRT_CCLIENT_CHECK_BALANCE "Checking balance failed"
+#define SRT_CCLIENT_NOT_PROMOTABLE "Unable to promote this transaction"
 
 #define SRT_COMMON_BUNDLE_SIGN "Signing a bundle failed"
 /** @} */
