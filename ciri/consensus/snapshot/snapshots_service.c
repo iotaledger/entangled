@@ -219,8 +219,9 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
   uint64_t current_attachment_timestamp = transaction_attachment_timestamp((iota_transaction_t *)pack->models[0]);
   uint64_t current_timestamp = transaction_timestamp((iota_transaction_t *)pack->models[0]);
 
-  if (current_attachment_timestamp > params->target_milestone_timestamp * 1000UL ||
-      current_timestamp > params->target_milestone_timestamp) {
+  if (transaction_snapshot_index((iota_transaction_t *)pack->models[0]) == 0 &&
+      (current_attachment_timestamp > params->target_milestone_timestamp * 1000UL ||
+       current_timestamp > params->target_milestone_timestamp)) {
     params->is_orphan = false;
     *should_stop = true;
   }
@@ -300,6 +301,7 @@ static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
   if (!params.is_orphan) {
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, hash, min_snapshot_index), ret);
   }
+
   return RC_OK;
 }
 
