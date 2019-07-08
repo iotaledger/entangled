@@ -46,7 +46,7 @@ static retcode_t process_transaction_bytes(processor_stage_t const *const proces
   iota_transaction_t transaction;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
-  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+  if (processor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -110,13 +110,18 @@ static retcode_t process_transaction_bytes(processor_stage_t const *const proces
       ret = iota_milestone_tracker_add_candidate(processor->milestone_tracker, transaction_hash(&transaction));
     }
 
-    neighbor->nbr_new_txs++;
+    if (neighbor) {
+      neighbor->nbr_new_txs++;
+    }
   }
 
   return ret;
 
 failure:
-  neighbor->nbr_invalid_txs++;
+  if (neighbor) {
+    neighbor->nbr_invalid_txs++;
+  }
+
   return ret;
 }
 
@@ -136,7 +141,11 @@ static retcode_t process_request_bytes(processor_stage_t const *const processor,
   retcode_t ret = RC_OK;
   flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
 
-  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+  if (neighbor == NULL) {
+    return RC_OK;
+  }
+
+  if (processor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -187,10 +196,14 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
 
   neighbor = neighbors_find_by_endpoint(&processor->node->router, &packet->source);
 
-  if (neighbor) {
-    log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.host,
-              neighbor->endpoint.port);
-    neighbor->nbr_all_txs++;
+  if (neighbor || (packet->source.ip[0] == 0 && packet->source.port == 0)) {
+    if (neighbor) {
+      log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.host,
+                neighbor->endpoint.port);
+      neighbor->nbr_all_txs++;
+    } else {
+      log_debug(logger_id, "Processing packet from API\n");
+    }
 
     if (!cached) {
       log_debug(logger_id, "Processing transaction bytes\n");
@@ -201,10 +214,12 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
       recent_seen_bytes_cache_put(&processor->node->recent_seen_bytes, digest, hash);
     }
 
-    log_debug(logger_id, "Processing request bytes\n");
-    if ((ret = process_request_bytes(processor, neighbor, packet, hash)) != RC_OK) {
-      log_warning(logger_id, "Processing request bytes failed\n");
-      goto done;
+    if (neighbor) {
+      log_debug(logger_id, "Processing request bytes\n");
+      if ((ret = process_request_bytes(processor, neighbor, packet, hash)) != RC_OK) {
+        log_warning(logger_id, "Processing request bytes failed\n");
+        goto done;
+      }
     }
   } else {
     log_debug(logger_id, "Discarding packet from non-tethered node tcp://%s:%d\n", packet->source.ip,
@@ -412,7 +427,7 @@ retcode_t processor_stage_destroy(processor_stage_t *const processor) {
   return RC_OK;
 }
 
-retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const packet) {
+retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const *const packet) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL) {
@@ -420,7 +435,7 @@ retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossi
   }
 
   rw_lock_handle_wrlock(&processor->lock);
-  ret = protocol_gossip_queue_push(&processor->queue, &packet);
+  ret = protocol_gossip_queue_push(&processor->queue, packet);
   rw_lock_handle_unlock(&processor->lock);
 
   if (ret != RC_OK) {

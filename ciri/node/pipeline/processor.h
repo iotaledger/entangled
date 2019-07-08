@@ -94,7 +94,7 @@ retcode_t processor_stage_destroy(processor_stage_t *const processor);
  *
  * @return a status code
  */
-retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const packet);
+retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const *const packet);
 
 /**
  * Gets the size of the processor stage queue

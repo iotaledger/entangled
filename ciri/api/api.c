@@ -114,17 +114,12 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
     return ret;
   }
 
-  memset(&packet, 0, sizeof(protocol_gossip_t));
-
   HASH_ARRAY_FOREACH(req->trytes, elt) {
-    transaction_deserialize_from_trits(&tx, elt, true);
-    if (!iota_consensus_transaction_validate(&api->core->consensus.transaction_validator, &tx)) {
-      continue;
-    }
+    memset(&packet, 0, sizeof(protocol_gossip_t));
+    transaction_deserialize_from_trits(&tx, elt, false);
     flex_trits_to_bytes(packet.content, NUM_TRITS_SERIALIZED_TRANSACTION, elt, NUM_TRITS_SERIALIZED_TRANSACTION,
                         NUM_TRITS_SERIALIZED_TRANSACTION);
-    // TODO priority queue on weight_magnitude
-    if ((ret = broadcaster_stage_add(&api->core->node.broadcaster, &packet)) != RC_OK) {
+    if ((ret = processor_stage_add(&api->core->node.processor, &packet)) != RC_OK) {
       return ret;
     }
   }
@@ -435,6 +430,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   res->latest_solid_subtangle_milestone_index =
       api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
   res->milestone_start_index = api->core->consensus.milestone_tracker.milestone_start_index;
+  // TODO connected neighbors count
   res->neighbors = router_neighbors_count(&api->core->node.router);
   res->packets_queue_size = broadcaster_stage_size(&api->core->node.broadcaster);
   res->time = current_timestamp_ms();
