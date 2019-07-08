@@ -352,7 +352,6 @@ static retcode_t iota_snapshots_service_collect_new_solid_entry_points(
   DECLARE_PACK_SINGLE_TX(target_milestone_tx, target_milestone_tx_p, target_milestone_tx_pack);
   prev_milestone = *target_milestone;
   uint64_t index = prev_milestone.index;
-  size_t solid_entry_points_count = hash_to_uint64_t_map_size(*solid_entry_points);
 
   log_info(logger_id, "Collecting new solid entry points\n");
 
@@ -368,14 +367,7 @@ static retcode_t iota_snapshots_service_collect_new_solid_entry_points(
                         snapshots_service, target_milestone->index, transaction_timestamp(target_milestone_tx_p),
                         prev_milestone.hash, prev_milestone.index, tangle, solid_entry_points),
                     ret);
-    if ((hash_to_uint64_t_map_size(*solid_entry_points) - solid_entry_points_count) == 0) {
-      log_info(logger_id,
-               "No solid entry points found at for target milestone %" PRIu64 " under milestone %" PRIu64 "\n",
-               target_milestone->index, prev_milestone.index);
-      break;
-    }
     ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, prev_milestone.hash, prev_milestone.index), ret);
-    solid_entry_points_count = hash_to_uint64_t_map_size(*solid_entry_points);
     hash_pack_reset(&prev_milestone_pack);
     ERR_BIND_RETURN(iota_tangle_milestone_load_by_index(tangle, index - 1, &prev_milestone_pack), ret);
     if (prev_milestone_pack.num_loaded == 0) {
