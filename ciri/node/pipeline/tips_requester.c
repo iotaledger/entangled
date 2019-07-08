@@ -26,9 +26,9 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   neighbor_t *iter = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
-  tangle_t tangle;
-
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  lock_handle_t lock_cond;
+  tangle_t tangle;
 
   if (tips_requester == NULL) {
     return NULL;
@@ -43,7 +43,6 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
