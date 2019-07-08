@@ -49,12 +49,13 @@ static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
   lock_handle_lock(&cond_lock);
 
   while (broadcaster->running) {
+    cond_handle_wait(&broadcaster->cond, &cond_lock);
+
     rw_lock_handle_wrlock(&broadcaster->lock);
     entry = protocol_gossip_queue_pop(&broadcaster->queue);
     rw_lock_handle_unlock(&broadcaster->lock);
 
     if (entry == NULL) {
-      cond_handle_wait(&broadcaster->cond, &cond_lock);
       continue;
     }
 

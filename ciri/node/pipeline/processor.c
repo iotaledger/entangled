@@ -17,7 +17,6 @@
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
-#define PROCESSOR_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 
@@ -281,6 +280,8 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
   lock_handle_lock(&lock_cond);
 
   while (processor->running) {
+    cond_handle_wait(&processor->cond, &lock_cond);
+
     packet_cnt = 0;
     while (packet_cnt < PACKET_MAX) {
       rw_lock_handle_wrlock(&processor->lock);
@@ -304,7 +305,6 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
     }
 
     if (packet_cnt == 0) {
-      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_MS);
       continue;
     }
 

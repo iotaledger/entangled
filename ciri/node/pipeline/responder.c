@@ -13,7 +13,6 @@
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
-#define RESPONDER_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 
@@ -154,12 +153,13 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
   lock_handle_lock(&lock_cond);
 
   while (responder->running) {
+    cond_handle_wait(&responder->cond, &lock_cond);
+
     rw_lock_handle_wrlock(&responder->lock);
     entry = transaction_request_queue_pop(&responder->queue);
     rw_lock_handle_unlock(&responder->lock);
 
     if (entry == NULL) {
-      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_MS);
       continue;
     }
 
