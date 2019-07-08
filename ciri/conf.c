@@ -213,7 +213,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       strncpy(node_conf->neighboring_address, value, sizeof(node_conf->neighboring_address));
       break;
-    case CONF_NEIGHBORING_PORT:  // --neighboring-port
+    case 't':  // --neighboring-port
       node_conf->neighboring_port = atoi(value);
       break;
     case 'n':  // --neighbors

@@ -25,7 +25,6 @@ typedef enum cli_arg_value_e {
   CONF_MAX_NEIGHBORS,
   CONF_MWM,
   CONF_NEIGHBORING_ADDRESS,
-  CONF_NEIGHBORING_PORT,
   CONF_P_PROPAGATE_REQUEST,
   CONF_P_REMOVE_REQUEST,
   CONF_P_REPLY_RANDOM_TIP,
@@ -108,7 +107,7 @@ static struct cli_argument_s {
      "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
     {"neighboring-address", CONF_NEIGHBORING_ADDRESS, "The address to bind the TCP server socket to.", REQUIRED_ARG},
-    {"neighboring-port", CONF_NEIGHBORING_PORT, "The TCP receiver port.", REQUIRED_ARG},
+    {"neighboring-port", 't', "The TCP receiver port.", REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
     {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
      "Probability of propagating the request of a transaction to a neighbor "

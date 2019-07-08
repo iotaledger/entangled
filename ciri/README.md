@@ -92,7 +92,7 @@ Long option | Short option | Description | Example input
 `--max-neighbors` | | The maximum number of neighbors allowed to be connected. | `--max-neighbors 5`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
 `--neighboring-address` | | The address to bind the TCP server socket to. | `--neighboring-address "0.0.0.0"`
-`--neighboring-port` | | The TCP receiver port. | `--neighboring-port 1500`
+`--neighboring-port` | `-t` | The TCP receiver port. | `--neighboring-port 1500`
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "tcp://148.148.148.148:14265 tcp://[2001:db8:a0b:12f0::1]:14265"`
 `--p-propagate-request` |  | Probability of propagating the request of a transaction to a neighbor node if it can't be found. This should be low since we don't want to propagate non-existing transactions that spam the network. Value must be in [0,1]. | `--p-propagate-request 0.01`
 `--p-remove-request` | | Probability of removing a transaction from the request queue without requesting it. Value must be in [0,1]. | `--p-remove-request 0.01`
