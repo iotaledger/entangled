@@ -101,7 +101,7 @@ static void *pruning_manager_routine(void *arg) {
   while (pm->running) {
     while (pm->current_snapshot_index_to_prune < pm->last_snapshot_index_to_prune) {
       collect_transactions_for_pruning_do_func_params_t params;
-      params.min_snapshot_index = ++pm->current_snapshot_index_to_prune;
+      params.min_snapshot_index = pm->current_snapshot_index_to_prune + 1;
       params.tangle = &tangle;
       params.transactions_to_prune = NULL;
       ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(&tangle, pm->current_snapshot_index_to_prune, &pack), err,
@@ -110,12 +110,26 @@ static void *pruning_manager_routine(void *arg) {
                                                  pm->conf->genesis_hash, NULL, &params),
                     err, cleanup);
 
+      bool can_prune_snapshot_index_entirely = true;
+
       hash243_set_entry_t *iter = NULL, *tmp = NULL;
 
       HASH_ITER(hh, params.transactions_to_prune, iter, tmp) {
         if (iota_snapshot_has_solid_entry_point(pm->new_snapshot, iter->hash)) {
+          can_prune_snapshot_index_entirely = false;
+          break;
         }
       }
+
+      if (!can_prune_snapshot_index_entirely) {
+        // Wait for next snapshot, i.e: updated solid entry points
+        break;
+      }
+
+      // TODO - delete milestone
+      // TODO - delete all transactions in set (make sure to add milestone hash)
+      // TODO - remove transaction from queues and caches
+      params.min_snapshot_index++;
 
       hash243_set_free(&params.transactions_to_prune);
     }
