@@ -29,6 +29,8 @@ typedef struct pruning_manager_s {
   uint64_t current_snapshot_index_to_prune;
   uint64_t last_snapshot_index_to_prune;
   rw_lock_handle_t rw_lock;
+  snapshots_provider_t *snapshot_provider;
+  snapshot_t const *new_snapshot;
 } pruning_manager_t;
 
 /**
@@ -75,12 +77,12 @@ retcode_t iota_local_snapshots_pruning_manager_destroy(pruning_manager_t *const 
  * Updates the last snapshot index so all transactions before it should be pruned
  *
  * @param pm The pruning manager
- * @param last_snapshot_index The last snapshot index
+ * @param snapshot The last snapshot
  *
  * @return void
  */
-void iota_local_snapshots_pruning_manager_update_last_snapshot_index(pruning_manager_t *const pm,
-                                                                     uint64_t last_snapshot_index);
+void iota_local_snapshots_pruning_manager_update_current_snapshot(pruning_manager_t *const pm,
+                                                                  snapshot_t const *const snapshot);
 
 #ifdef __cplusplus
 }

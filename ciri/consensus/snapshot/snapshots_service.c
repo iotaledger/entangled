@@ -91,7 +91,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
         iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, tangle, &next_snapshot), ret,
         cleanup);
     // TODO - Implement prunning
-    iota_local_snapshots_pruning_manager_update_last_snapshot_index(pm, next_snapshot.metadata.index);
+    iota_local_snapshots_pruning_manager_update_current_snapshot(pm, &next_snapshot);
     ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(snapshots_service, &next_snapshot), ret, cleanup);
   }
 
