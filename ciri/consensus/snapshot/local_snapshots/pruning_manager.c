@@ -22,6 +22,31 @@ typedef struct collect_transactions_for_pruning_do_func_params_s {
   hash243_set_t transactions_to_prune;
 } collect_transactions_for_pruning_do_func_params_t;
 
+static retcode_t collect_unconfirmed_future_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack,
+                                                                             void *data, bool *should_branch,
+                                                                             bool *should_stop) {
+  retcode_t ret = RC_OK;
+  *should_stop = false;
+  *should_branch = true;
+  collect_transactions_for_pruning_do_func_params_t *params = data;
+
+  if (pack->num_loaded == 0) {
+    *should_branch = false;
+    return RC_OK;
+  }
+
+  transaction_snapshot_index((iota_transaction_t *)pack->models[0]);
+
+  if (transaction_snapshot_index((iota_transaction_t *)pack->models[0]) == 0) {
+    if ((ret = hash243_set_add(&params->transactions_to_prune, hash)) != RC_OK) {
+      return ret;
+    }
+    *should_branch = true;
+  }
+
+  return RC_OK;
+}
+
 static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
                                                           bool *should_branch, bool *should_stop) {
   retcode_t ret = RC_OK;
@@ -40,6 +65,13 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
     if ((ret = hash243_set_add(&params->transactions_to_prune, hash)) != RC_OK) {
       return ret;
     }
+
+    collect_transactions_for_pruning_do_func_params_t params;
+
+    ERR_BIND_RETURN(
+        tangle_traversal_dfs_to_future(params.tangle, collect_unconfirmed_future_transactions_for_pruning_do_func, hash,
+                                       NULL, &params),
+        ret);
   }
 
 cleanup:
