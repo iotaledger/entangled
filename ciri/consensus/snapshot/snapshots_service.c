@@ -219,6 +219,7 @@ static retcode_t check_transaction_is_not_orphan_do_func(flex_trit_t *hash, iota
   uint64_t current_attachment_timestamp = transaction_attachment_timestamp((iota_transaction_t *)pack->models[0]);
   uint64_t current_timestamp = transaction_timestamp((iota_transaction_t *)pack->models[0]);
 
+  log_warning(logger_id, "LS - it's timestamps");
   if ((current_attachment_timestamp > params->target_milestone_timestamp * 1000UL ||
        current_timestamp > params->target_milestone_timestamp)) {
     params->is_orphan = false;
