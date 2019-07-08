@@ -113,7 +113,7 @@ retcode_t router_neighbor_remove(router_t *const router, neighbor_t const *const
   return ret;
 }
 
-static inline size_t router_neighbors_count(router_t *const router) {
+size_t router_neighbors_count(router_t *const router) {
   size_t count = 0;
 
   if (router == NULL) {
@@ -121,7 +121,7 @@ static inline size_t router_neighbors_count(router_t *const router) {
   }
 
   rw_lock_handle_rdlock(&router->neighbors_lock);
-  counter = router->neighbors ? utarray_len(router->neighbors) : 0;
+  count = router->neighbors ? utarray_len(router->neighbors) : 0;
   rw_lock_handle_unlock(&router->neighbors_lock);
 
   return count;

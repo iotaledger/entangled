@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_NEIGHBOR_H__
-#define __NODE_NEIGHBOR_H__
+#ifndef __CIRI_NODE_NETWORK_NEIGHBOR_H__
+#define __CIRI_NODE_NETWORK_NEIGHBOR_H__
 
 #include <stdbool.h>
 
@@ -97,4 +97,4 @@ retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighb
 }
 #endif
 
-#endif  // __NODE_NEIGHBOR_H__
+#endif  // __CIRI_NODE_NETWORK_NEIGHBOR_H__

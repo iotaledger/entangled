@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "ciri/node/neighbor.h"
+#include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
 #include "ciri/node/protocol/gossip.h"
 #include "common/network/uri.h"

@@ -22,27 +22,6 @@ cc_library(
 )
 
 cc_library(
-    name = "neighbor_shared",
-    hdrs = ["neighbor.h"],
-    deps = [
-        "//ciri/node/protocol:gossip",
-        "//common:errors",
-    ],
-)
-
-cc_library(
-    name = "neighbor",
-    srcs = ["neighbor.c"],
-    deps = [
-        ":neighbor_shared",
-        ":node_shared",
-        "//ciri/node/pipeline:transaction_requester",
-        "//common/network:uri",
-        "//utils/handles:rand",
-    ],
-)
-
-cc_library(
     name = "tips_cache",
     srcs = ["tips_cache.c"],
     hdrs = ["tips_cache.h"],

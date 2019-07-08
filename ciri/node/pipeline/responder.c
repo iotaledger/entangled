@@ -7,7 +7,7 @@
 
 #include "ciri/node/pipeline/responder.h"
 #include "ciri/consensus/tangle/tangle.h"
-#include "ciri/node/neighbor.h"
+#include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"

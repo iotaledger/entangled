@@ -9,7 +9,7 @@
 
 #include "ciri/consensus/milestone/milestone_tracker.h"
 #include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
-#include "ciri/node/neighbor.h"
+#include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
 #include "ciri/node/pipeline/processor.h"
 #include "common/crypto/curl-p/ptrit.h"

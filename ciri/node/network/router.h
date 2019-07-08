@@ -11,7 +11,7 @@
 #include "utarray.h"
 
 #include "ciri/node/conf.h"
-#include "ciri/node/neighbor.h"
+#include "ciri/node/network/neighbor.h"
 #include "utils/handles/rw_lock.h"
 
 #define NEIGHBORS_FOREACH(neighbors, neighbor)                              \

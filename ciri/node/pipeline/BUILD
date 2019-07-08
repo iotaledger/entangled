@@ -16,8 +16,8 @@ cc_library(
     srcs = ["broadcaster.c"],
     deps = [
         ":broadcaster_shared",
-        "//ciri/node:neighbor",
         "//ciri/node:node_shared",
+        "//ciri/node/network:neighbor",
         "//utils:logger_helper",
     ],
 )
@@ -42,8 +42,8 @@ cc_library(
         ":processor_shared",
         "//ciri/consensus/milestone:milestone_tracker",
         "//ciri/consensus/transaction_solidifier",
-        "//ciri/node:neighbor",
         "//ciri/node:node_shared",
+        "//ciri/node/network:neighbor",
         "//common/crypto/curl-p:ptrit",
         "//common/trinary:trit_ptrit",
     ],
@@ -64,8 +64,8 @@ cc_library(
     deps = [
         ":transaction_requester_worker_shared",
         "//ciri/consensus/tangle",
-        "//ciri/node:neighbor",
         "//ciri/node:node_shared",
+        "//ciri/node/network:neighbor",
         "//utils:logger_helper",
         "//utils:time",
     ],
@@ -116,8 +116,8 @@ cc_library(
     deps = [
         ":responder_shared",
         "//ciri/consensus/tangle",
-        "//ciri/node:neighbor_shared",
         "//ciri/node:node_shared",
+        "//ciri/node/network:neighbor_shared",
         "//utils/handles:rand",
     ],
 )

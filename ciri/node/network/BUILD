@@ -1,11 +1,34 @@
 cc_library(
+    name = "neighbor_shared",
+    hdrs = ["neighbor.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ciri/node/protocol:gossip",
+        "//common:errors",
+    ],
+)
+
+cc_library(
+    name = "neighbor",
+    srcs = ["neighbor.c"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":neighbor_shared",
+        "//ciri/node:node_shared",
+        "//ciri/node/pipeline:transaction_requester",
+        "//common/network:uri",
+        "//utils/handles:rand",
+    ],
+)
+
+cc_library(
     name = "router",
     srcs = ["router.c"],
     hdrs = ["router.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":neighbor_shared",
         "//ciri/node:conf",
-        "//ciri/node:neighbor_shared",
         "//utils:logger_helper",
         "//utils/handles:rw_lock",
     ],
