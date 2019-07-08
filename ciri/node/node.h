@@ -8,7 +8,7 @@
 #ifndef __NODE_NODE_H__
 #define __NODE_NODE_H__
 
-#include "ciri/node/neighbor.h"
+#include "ciri/node/network/router.h"
 #include "ciri/node/network/tcp_server.h"
 #include "ciri/node/pipeline/broadcaster.h"
 #include "ciri/node/pipeline/processor.h"
@@ -20,7 +20,6 @@
 #include "ciri/node/recent_seen_bytes_cache.h"
 #include "ciri/node/tips_cache.h"
 #include "common/errors.h"
-#include "utils/handles/rw_lock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,8 +39,7 @@ typedef struct node_s {
   tips_requester_t tips_requester;
   tips_solidifier_t tips_solidifier;
   tcp_server_t tcp_server;
-  neighbor_t* neighbors;
-  rw_lock_handle_t neighbors_lock;
+  router_t router;
   tips_cache_t tips;
   recent_seen_bytes_cache_t recent_seen_bytes;
 } iota_node_t;

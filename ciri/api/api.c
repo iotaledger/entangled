@@ -53,14 +53,12 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
       *error = error_res_new(API_ERROR_INVALID_URI_SCHEME);
       return ret;
     }
-    rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
-    if (neighbors_add(&api->core->node.neighbors, &neighbor) == RC_OK) {
+    if (router_neighbor_add(&api->core->node.router, &neighbor) == RC_OK) {
       log_info(logger_id, "Added neighbor %s\n", *uri);
       res->added_neighbors++;
     } else {
       log_warning(logger_id, "Adding neighbor %s failed\n", *uri);
     }
-    rw_lock_handle_unlock(&api->core->node.neighbors_lock);
   }
 
   return ret;
@@ -401,23 +399,23 @@ retcode_t iota_api_get_missing_transactions(iota_api_t const *const api, get_mis
 retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
                                  error_res_t **const error) {
   retcode_t ret = RC_OK;
-  neighbor_t *iter = NULL;
+  neighbor_t *neighbor = NULL;
   char address[MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1];
 
   if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
-  LL_FOREACH(api->core->node.neighbors, iter) {
-    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", iter->endpoint.host, iter->endpoint.port);
-    if ((ret = get_neighbors_res_add_neighbor(res, address, iter->nbr_all_txs, iter->nbr_random_tx_reqs,
-                                              iter->nbr_new_txs, iter->nbr_invalid_txs, iter->nbr_stale_txs,
-                                              iter->nbr_sent_txs, "TCP")) != RC_OK) {
+  rw_lock_handle_rdlock(&api->core->node.router.neighbors_lock);
+  NEIGHBORS_FOREACH(api->core->node.router.neighbors, neighbor) {
+    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", neighbor->endpoint.host, neighbor->endpoint.port);
+    if ((ret = get_neighbors_res_add_neighbor(res, address, neighbor->nbr_all_txs, neighbor->nbr_random_tx_reqs,
+                                              neighbor->nbr_new_txs, neighbor->nbr_invalid_txs, neighbor->nbr_stale_txs,
+                                              neighbor->nbr_sent_txs, "TCP")) != RC_OK) {
       break;
     }
   }
-  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
+  rw_lock_handle_unlock(&api->core->node.router.neighbors_lock);
 
   return ret;
 }
@@ -437,9 +435,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   res->latest_solid_subtangle_milestone_index =
       api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
   res->milestone_start_index = api->core->consensus.milestone_tracker.milestone_start_index;
-  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
-  res->neighbors = neighbors_count(api->core->node.neighbors);
-  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
+  res->neighbors = router_neighbors_count(&api->core->node.router);
   res->packets_queue_size = broadcaster_stage_size(&api->core->node.broadcaster);
   res->time = current_timestamp_ms();
   res->tips = tips_cache_size(&api->core->node.tips);
@@ -546,14 +542,12 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbor
       return ret;
     }
 
-    rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
-    if (neighbors_remove(&api->core->node.neighbors, &neighbor) == RC_OK) {
+    if (router_neighbor_remove(&api->core->node.router, &neighbor) == RC_OK) {
       log_info(logger_id, "Removed neighbor %s\n", *uri);
       res->removed_neighbors++;
     } else {
       log_warning(logger_id, "Removing neighbor %s failed\n", *uri);
     }
-    rw_lock_handle_unlock(&api->core->node.neighbors_lock);
   }
 
   return ret;

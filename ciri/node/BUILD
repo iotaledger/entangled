@@ -81,9 +81,9 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
-        ":neighbor_shared",
         ":recent_seen_bytes_cache",
         ":tips_cache",
+        "//ciri/node/network:router",
         "//ciri/node/network:tcp_server_shared",
         "//ciri/node/pipeline:broadcaster_shared",
         "//ciri/node/pipeline:processor_shared",

@@ -14,41 +14,6 @@
 static logger_id_t logger_id;
 
 /*
- * Private functions
- */
-
-static retcode_t node_neighbors_init(node_t* const node) {
-  neighbor_t neighbor;
-  char *neighbor_uri, *cpy, *ptr;
-
-  if (node == NULL) {
-    return RC_NULL_PARAM;
-  } else if (node->conf.neighbors == NULL) {
-    return RC_OK;
-  }
-
-  node->neighbors = NULL;
-  rw_lock_handle_init(&node->neighbors_lock);
-
-  ptr = cpy = strdup(node->conf.neighbors);
-  while ((neighbor_uri = strsep(&cpy, " ")) != NULL) {
-    if (neighbor_init_with_uri(&neighbor, neighbor_uri) != RC_OK) {
-      log_warning(logger_id, "Initializing neighbor with URI %s failed\n", neighbor_uri);
-      continue;
-    }
-    log_info(logger_id, "Adding neighbor %s\n", neighbor_uri);
-    rw_lock_handle_wrlock(&node->neighbors_lock);
-    if (neighbors_add(&node->neighbors, &neighbor) != RC_OK) {
-      log_warning(logger_id, "Adding neighbor %s failed\n", neighbor_uri);
-    }
-    rw_lock_handle_unlock(&node->neighbors_lock);
-  }
-
-  free(ptr);
-  return RC_OK;
-}
-
-/*
  * Public functions
  */
 
@@ -62,12 +27,6 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   logger_id = logger_helper_enable(NODE_LOGGER_ID, LOGGER_DEBUG, true);
   node->running = false;
   node->core = core;
-
-  log_info(logger_id, "Initializing neighbors\n");
-  if ((ret = node_neighbors_init(node)) != RC_OK) {
-    log_info(logger_id, "Initializing neighbors failed\n");
-    return ret;
-  }
 
   log_info(logger_id, "Initializing broadcaster stage\n");
   if ((ret = broadcaster_stage_init(&node->broadcaster, node)) != RC_OK) {
@@ -118,14 +77,20 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
 
   log_info(logger_id, "Initializing tips cache\n");
   if ((ret = tips_cache_init(&node->tips, node->conf.tips_cache_size)) != RC_OK) {
-    log_error(logger_id, "Initializing tips cache failed\n");
+    log_critical(logger_id, "Initializing tips cache failed\n");
     return ret;
   }
 
   log_info(logger_id, "Initializing recent seen bytes cache\n");
   if ((ret = recent_seen_bytes_cache_init(&node->recent_seen_bytes, node->conf.recent_seen_bytes_cache_size)) !=
       RC_OK) {
-    log_error(logger_id, "Initializing recent seen bytes cache failed\n");
+    log_critical(logger_id, "Initializing recent seen bytes cache failed\n");
+    return ret;
+  }
+
+  log_info(logger_id, "Initializing router\n");
+  if ((ret = router_init(&node->router, &node->conf)) != RC_OK) {
+    log_critical(logger_id, "Initializing router failed\n");
     return ret;
   }
 
@@ -248,6 +213,11 @@ retcode_t node_destroy(node_t* const node) {
     return RC_STILL_RUNNING;
   }
 
+  log_info(logger_id, "Destroying router\n");
+  if ((ret = router_destroy(&node->router)) != RC_OK) {
+    log_error(logger_id, "Destroying router failed\n");
+  }
+
   log_info(logger_id, "Destroying TCP server\n");
   if ((ret = tcp_server_destroy(&node->tcp_server)) != RC_OK) {
     log_error(logger_id, "Destroying TCP server failed\n");
@@ -284,12 +254,6 @@ retcode_t node_destroy(node_t* const node) {
   if ((ret = responder_stage_destroy(&node->responder)) != RC_OK) {
     log_error(logger_id, "Destroying responder stage failed\n");
   }
-
-  log_debug(logger_id, "Destroying neighbors\n");
-  rw_lock_handle_wrlock(&node->neighbors_lock);
-  neighbors_free(&node->neighbors);
-  rw_lock_handle_unlock(&node->neighbors_lock);
-  rw_lock_handle_destroy(&node->neighbors_lock);
 
   tips_cache_destroy(&node->tips);
   recent_seen_bytes_cache_destroy(&node->recent_seen_bytes);

@@ -30,18 +30,18 @@ void test_get_neighbors(void) {
   get_neighbors_res_t *res = get_neighbors_res_new();
   error_res_t *error = NULL;
   char address[MAX_HOST_LENGTH + 6];
-  neighbor_t *neighbor = api.core->node.neighbors;
 
-  TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
+  TEST_ASSERT_EQUAL_INT(router_neighbors_count(&api.core->node.router), 4);
 
   TEST_ASSERT(iota_api_get_neighbors(&api, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
 
-  TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
+  TEST_ASSERT_EQUAL_INT(router_neighbors_count(&api.core->node.router), 4);
   TEST_ASSERT_EQUAL_INT(get_neighbors_res_num(res), 4);
 
   for (size_t i = 0; i < get_neighbors_res_num(res); i++) {
     neighbor_info_t *info = get_neighbors_res_neighbor_at(res, i);
+    neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, i);
 
     snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", neighbor->endpoint.host, neighbor->endpoint.port);
 
@@ -52,11 +52,7 @@ void test_get_neighbors(void) {
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_sent_txs, info->sent_trans_num);
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_random_tx_reqs, info->random_trans_req_num);
     TEST_ASSERT_EQUAL_STRING(address, info->address->data);
-
-    neighbor = neighbor->next;
   }
-
-  TEST_ASSERT_NULL(neighbor);
 
   get_neighbors_res_free(res);
   error_res_free(&error);
@@ -66,8 +62,7 @@ int main(void) {
   UNITY_BEGIN();
 
   api.core = &core;
-  api.core->node.neighbors = NULL;
-  rw_lock_handle_init(&api.core->node.neighbors_lock);
+  TEST_ASSERT(router_init(&api.core->node.router, &api.core->node.conf) == RC_OK);
 
   RUN_TEST(test_get_neighbors_empty);
 
@@ -80,7 +75,7 @@ int main(void) {
   neighbor.nbr_stale_txs = 4;
   neighbor.nbr_sent_txs = 5;
   neighbor.nbr_random_tx_reqs = 6;
-  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
+  TEST_ASSERT(router_neighbor_add(&api.core->node.router, &neighbor) == RC_OK);
 
   TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15002") == RC_OK);
   neighbor.nbr_all_txs = 7;
@@ -89,7 +84,7 @@ int main(void) {
   neighbor.nbr_stale_txs = 10;
   neighbor.nbr_sent_txs = 11;
   neighbor.nbr_random_tx_reqs = 12;
-  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
+  TEST_ASSERT(router_neighbor_add(&api.core->node.router, &neighbor) == RC_OK);
 
   TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15003") == RC_OK);
   neighbor.nbr_all_txs = 13;
@@ -98,7 +93,7 @@ int main(void) {
   neighbor.nbr_stale_txs = 16;
   neighbor.nbr_sent_txs = 17;
   neighbor.nbr_random_tx_reqs = 18;
-  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
+  TEST_ASSERT(router_neighbor_add(&api.core->node.router, &neighbor) == RC_OK);
 
   TEST_ASSERT(neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:15004") == RC_OK);
   neighbor.nbr_all_txs = 19;
@@ -107,12 +102,11 @@ int main(void) {
   neighbor.nbr_stale_txs = 22;
   neighbor.nbr_sent_txs = 23;
   neighbor.nbr_random_tx_reqs = 24;
-  TEST_ASSERT(neighbors_add(&api.core->node.neighbors, &neighbor) == RC_OK);
+  TEST_ASSERT(router_neighbor_add(&api.core->node.router, &neighbor) == RC_OK);
 
   RUN_TEST(test_get_neighbors);
 
-  neighbors_free(&api.core->node.neighbors);
-  rw_lock_handle_destroy(&api.core->node.neighbors_lock);
+  TEST_ASSERT(router_destroy(&api.core->node.router) == RC_OK);
 
   return UNITY_END();
 }

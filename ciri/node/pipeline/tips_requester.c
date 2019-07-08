@@ -23,7 +23,7 @@ static logger_id_t logger_id;
 
 static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   protocol_gossip_t packet;
-  neighbor_t *iter = NULL;
+  neighbor_t *neighbor = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
@@ -67,13 +67,13 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       continue;
     }
 
-    rw_lock_handle_rdlock(&tips_requester->node->neighbors_lock);
-    LL_FOREACH(tips_requester->node->neighbors, iter) {
-      if (neighbor_send_packet(tips_requester->node, iter, &packet) != RC_OK) {
+    rw_lock_handle_rdlock(&tips_requester->node->router.neighbors_lock);
+    NEIGHBORS_FOREACH(tips_requester->node->router.neighbors, neighbor) {
+      if (neighbor_send_packet(tips_requester->node, neighbor, &packet) != RC_OK) {
         log_warning(logger_id, "Sending tip request to neighbor failed\n");
       }
     }
-    rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
+    rw_lock_handle_unlock(&tips_requester->node->router.neighbors_lock);
   }
 
   lock_handle_unlock(&lock_cond);

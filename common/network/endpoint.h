@@ -8,6 +8,7 @@
 #ifndef __COMMON_NETWORK_ENDPOINT_H__
 #define __COMMON_NETWORK_ENDPOINT_H__
 
+#include <arpa/inet.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -16,9 +17,8 @@
 
 typedef struct endpoint_s {
   char host[MAX_HOST_LENGTH];
-  char ip[MAX_HOST_LENGTH];
+  char ip[INET6_ADDRSTRLEN];
   uint16_t port;
-  void *opaque_inetaddr;
 } endpoint_t;
 
 static inline bool endpoint_cmp(endpoint_t const *const lhs, endpoint_t const *const rhs) {

@@ -15,7 +15,6 @@
 #include "ciri/node/protocol/gossip.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utarray.h"
 
 // Forward declarations
 typedef struct node_s node_t;
@@ -30,7 +29,6 @@ typedef struct neighbor_s {
   uint64_t nbr_sent_txs;
   uint64_t nbr_new_txs;
   uint64_t nbr_dropped_send;
-  struct neighbor_s *next;
 } neighbor_t;
 
 #ifdef __cplusplus
@@ -94,71 +92,6 @@ retcode_t neighbor_send_trits(node_t *const node, tangle_t *const tangle, neighb
  */
 retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
                               byte_t const *const bytes);
-
-/**
- * Adds a neighbor to a neighbors list
- * The caller must hold the neighbors lock in write access
- *
- * @param neighbors The neighbors list
- * @param neighbor The neighbor
- *
- * @return a status code
- */
-retcode_t neighbors_add(neighbor_t **const neighbors, neighbor_t const *const neighbor);
-
-/**
- * Removes a neighbor from a neighbors list
- * The caller must hold the neighbors lock in write access
- *
- * @param neighbors The neighbors list
- * @pram neighbor The neighbor
- *
- * @return a status code
- */
-retcode_t neighbors_remove(neighbor_t **const neighbors, neighbor_t *const neighbor);
-
-/**
- * Frees a neighbors list
- * The caller must hold the neighbors lock in write access
- *
- * @param neighbors The neighbors list
- *
- * @return a status code
- */
-retcode_t neighbors_free(neighbor_t **const neighbors);
-
-/**
- * Gives the size of the neighbors list
- * The caller must hold the neighbors lock in read access
- *
- * @param neighbors The neighbors list
- *
- * @return the size of the neighbors list
- */
-size_t neighbors_count(neighbor_t *const neighbors);
-
-/**
- * Finds a neigbor matching given endpoint
- * The caller must hold the neighbors lock in read access
- *
- * @param neighbors The neighbors list
- * @param endpoint The endpoint
- *
- * @return a pointer to the neigbor if found, NULL otherwise
- */
-neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors, endpoint_t const *const endpoint);
-
-/**
- * Finds a neigbor matching given endpoint values
- * The caller must hold the neighbors lock in read access
- *
- * @param neighbors The neighbors list
- * @param ip The endpoint ip
- * @param port The endpoint port
- *
- * @return a pointer to the neigbor if found, NULL otherwise
- */
-neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char const *const ip, uint16_t const port);
 
 #ifdef __cplusplus
 }

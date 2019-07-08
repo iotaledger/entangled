@@ -59,15 +59,15 @@ static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
     }
 
     log_debug(logger_id, "Broadcasting transaction\n");
-    rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
-    LL_FOREACH(broadcaster->node->neighbors, neighbor) {
+    rw_lock_handle_rdlock(&broadcaster->node->router.neighbors_lock);
+    NEIGHBORS_FOREACH(broadcaster->node->router.neighbors, neighbor) {
       if (!endpoint_cmp(&entry->packet.source, &neighbor->endpoint)) {
         if (neighbor_send_bytes(broadcaster->node, &tangle, neighbor, entry->packet.content) != RC_OK) {
           log_warning(logger_id, "Broadcasting transaction failed\n");
         }
       }
     }
-    rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
+    rw_lock_handle_unlock(&broadcaster->node->router.neighbors_lock);
     free(entry);
   }
 

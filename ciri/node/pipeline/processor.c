@@ -183,9 +183,9 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&processor->node->neighbors_lock);
+  rw_lock_handle_rdlock(&processor->node->router.neighbors_lock);
 
-  neighbor = neighbors_find_by_endpoint(processor->node->neighbors, &packet->source);
+  neighbor = neighbors_find_by_endpoint(&processor->node->router, &packet->source);
 
   if (neighbor) {
     log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.host,
@@ -213,7 +213,7 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
   }
 
 done:
-  rw_lock_handle_unlock(&processor->node->neighbors_lock);
+  rw_lock_handle_unlock(&processor->node->router.neighbors_lock);
   return ret;
 }
 
