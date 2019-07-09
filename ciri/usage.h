@@ -25,7 +25,6 @@ typedef enum cli_arg_value_e {
   CONF_MAX_NEIGHBORS,
   CONF_MWM,
   CONF_NEIGHBORING_ADDRESS,
-  CONF_P_PROPAGATE_REQUEST,
   CONF_P_REMOVE_REQUEST,
   CONF_P_REPLY_RANDOM_TIP,
   CONF_P_SELECT_MILESTONE,
@@ -109,12 +108,6 @@ static struct cli_argument_s {
     {"neighboring-address", CONF_NEIGHBORING_ADDRESS, "The address to bind the TCP server socket to.", REQUIRED_ARG},
     {"neighboring-port", 't', "The TCP receiver port.", REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
-    {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
-     "Probability of propagating the request of a transaction to a neighbor "
-     "node if it can't be found. This should be low since we don't want to "
-     "propagate non-existing transactions that spam the network. Value must be "
-     "in [0,1].",
-     REQUIRED_ARG},
     {"p-remove-request", CONF_P_REMOVE_REQUEST,
      "Probability of removing a transaction from the request queue without "
      "requesting it. Value must be in [0,1].",

@@ -222,9 +222,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       node_conf->neighbors = strdup(value);
       break;
-    case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
-      ret = get_probability(value, &node_conf->p_propagate_request);
-      break;
     case CONF_P_REMOVE_REQUEST:  // --p-remove-request
       ret = get_probability(value, &node_conf->p_remove_request);
       break;
