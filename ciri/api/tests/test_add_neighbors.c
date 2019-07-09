@@ -123,6 +123,7 @@ int main(void) {
   UNITY_BEGIN();
 
   api.core = &core;
+  TEST_ASSERT(tcp_server_init(&api.core->node.tcp_server, &api.core->node) == RC_OK);
   TEST_ASSERT(router_init(&api.core->node.router, &api.core->node.conf) == RC_OK);
 
   RUN_TEST(test_add_neighbors);
@@ -130,6 +131,7 @@ int main(void) {
   RUN_TEST(test_add_neighbors_with_invalid);
 
   TEST_ASSERT(router_destroy(&api.core->node.router) == RC_OK);
+  TEST_ASSERT(tcp_server_destroy(&api.core->node.tcp_server) == RC_OK);
 
   return UNITY_END();
 }
