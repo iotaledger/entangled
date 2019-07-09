@@ -44,3 +44,14 @@ cc_library(
         "@com_github_uthash//:uthash",
     ],
 )
+
+cc_library(
+    name = "type",
+    hdrs = ["type.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":gossip",
+        ":handshake",
+        ":header",
+    ],
+)
