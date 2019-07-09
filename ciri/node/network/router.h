@@ -84,7 +84,7 @@ size_t router_neighbors_count(router_t *const router);
  *
  * @return a pointer to the neigbor if found, NULL otherwise
  */
-neighbor_t *neighbors_find_by_endpoint(router_t *const router, endpoint_t const *const endpoint);
+neighbor_t *router_neighbor_find_by_endpoint(router_t *const router, endpoint_t const *const endpoint);
 
 /**
  * Finds a neigbor matching given endpoint values in a router
@@ -95,7 +95,7 @@ neighbor_t *neighbors_find_by_endpoint(router_t *const router, endpoint_t const 
  *
  * @return a pointer to the neigbor if found, NULL otherwise
  */
-neighbor_t *neighbors_find_by_endpoint_values(router_t *const router, char const *const ip, uint16_t const port);
+neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char const *const ip, uint16_t const port);
 
 #ifdef __cplusplus
 }

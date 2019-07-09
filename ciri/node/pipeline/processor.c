@@ -193,7 +193,7 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
 
   rw_lock_handle_rdlock(&processor->node->router.neighbors_lock);
 
-  neighbor = neighbors_find_by_endpoint(&processor->node->router, &packet->source);
+  neighbor = router_neighbor_find_by_endpoint(&processor->node->router, &packet->source);
 
   if (neighbor || (packet->source.ip[0] == 0 && packet->source.port == 0)) {
     if (neighbor) {

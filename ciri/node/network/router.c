@@ -127,15 +127,15 @@ size_t router_neighbors_count(router_t *const router) {
   return count;
 }
 
-neighbor_t *neighbors_find_by_endpoint(router_t *const router, endpoint_t const *const endpoint) {
+neighbor_t *router_neighbor_find_by_endpoint(router_t *const router, endpoint_t const *const endpoint) {
   if (router == NULL || endpoint == NULL) {
     return NULL;
   }
 
-  return neighbors_find_by_endpoint_values(router, endpoint->ip, endpoint->port);
+  return router_neighbor_find_by_endpoint_values(router, endpoint->ip, endpoint->port);
 }
 
-neighbor_t *neighbors_find_by_endpoint_values(router_t *const router, char const *const ip, uint16_t const port) {
+neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char const *const ip, uint16_t const port) {
   neighbor_t cmp;
   neighbor_t *elt;
 
