@@ -19,6 +19,7 @@ typedef struct endpoint_s {
   char domain[MAX_HOST_LENGTH];
   char ip[INET6_ADDRSTRLEN];
   uint16_t port;
+  void *stream;
 } endpoint_t;
 
 static inline bool endpoint_cmp(endpoint_t const *const lhs, endpoint_t const *const rhs) {
