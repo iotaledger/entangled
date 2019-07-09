@@ -6,6 +6,7 @@
  */
 
 #include "ciri/node/network/router.h"
+#include "ciri/node/network/tcp_server.h"
 #include "utils/logger_helper.h"
 
 #define ROUTER_LOGGER_ID "router"
@@ -66,12 +67,16 @@ retcode_t router_destroy(router_t *const router) {
   return RC_OK;
 }
 
-retcode_t router_neighbor_add(router_t *const router, neighbor_t const *const neighbor) {
+retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor) {
   retcode_t ret = RC_OK;
   neighbor_t *elt = NULL;
 
   if (router == NULL || neighbor == NULL) {
     return RC_NULL_PARAM;
+  }
+
+  if ((ret = tcp_server_resolve_domain(neighbor->endpoint.domain, neighbor->endpoint.ip)) != RC_OK) {
+    return ret;
   }
 
   rw_lock_handle_wrlock(&router->neighbors_lock);

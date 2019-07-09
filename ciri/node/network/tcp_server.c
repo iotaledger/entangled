@@ -65,18 +65,6 @@ void on_new_connection(uv_stream_t *server, int status) {
 }
 
 /*
-
-
-
-int r =
-if (r) {
-  fprintf(stderr, "Listen error %s\n", uv_strerror(r));
-  return 1;
-}
-return uv_run(loop, UV_RUN_DEFAULT);
-*/
-
-/*
  * Private functions
  */
 
@@ -157,6 +145,43 @@ retcode_t tcp_server_destroy(tcp_server_t *const tcp_server) {
   }
 
   logger_helper_release(logger_id);
+
+  return RC_OK;
+}
+
+retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip) {
+  struct addrinfo hints;
+  uv_getaddrinfo_t resolver;
+  int r = 0;
+
+  hints.ai_family = PF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
+  hints.ai_flags = 0;
+
+  if ((r = uv_getaddrinfo(loop, &resolver, NULL, domain, NULL, &hints)) != 0) {
+    log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(r));
+    return RC_DOMAIN_RESOLUTION;
+  }
+
+  switch (resolver.addrinfo->ai_family) {
+    case AF_INET: {
+      uv_ip4_name((struct sockaddr_in *)resolver.addrinfo->ai_addr, ip, INET_ADDRSTRLEN);
+      break;
+    }
+    case AF_INET6: {
+      uv_ip6_name((struct sockaddr_in6 *)hints.ai_addr, ip, INET6_ADDRSTRLEN);
+      break;
+    }
+    default:
+      log_error(logger_id, "Can't resolve domain\n");
+      return RC_DOMAIN_RESOLUTION;
+      break;
+  }
+
+  uv_freeaddrinfo(resolver.addrinfo);
+
+  log_debug(logger_id, "%s resolved into %s\n", domain, ip);
 
   return RC_OK;
 }

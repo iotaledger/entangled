@@ -65,6 +65,16 @@ retcode_t tcp_server_stop(tcp_server_t *const tcp_server);
  */
 retcode_t tcp_server_destroy(tcp_server_t *const tcp_server);
 
+/**
+ * Resolves a domain name into an IP address
+ *
+ * @param[in]   domain  The domain name
+ * @param[out]  ip      The IP address
+ *
+ * @return a status code
+ */
+retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip);
+
 #ifdef __cplusplus
 }
 #endif

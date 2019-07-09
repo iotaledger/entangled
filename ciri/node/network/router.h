@@ -55,7 +55,7 @@ retcode_t router_destroy(router_t *const router);
  *
  * @return a status code
  */
-retcode_t router_neighbor_add(router_t *const router, neighbor_t const *const neighbor);
+retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor);
 
 /**
  * Removes a neighbor from a router
