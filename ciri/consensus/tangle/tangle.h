@@ -107,6 +107,8 @@ retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle, 
 
 retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle);
 
+retcode_t iota_tangle_transaction_delete_batch(tangle_t const *const tangle, hash243_set_t const hashes);
+
 /**
  * Find the transactions which match the specified input. The input fields can
  * either be bundles, addresses, tags or approvees. Using multiple of these

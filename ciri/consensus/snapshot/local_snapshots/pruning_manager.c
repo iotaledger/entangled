@@ -170,7 +170,7 @@ static retcode_t iota_local_snapshots_pruning_manager_prune_transactions(pruning
     }
 
     // TODO - delete milestone
-    // TODO - delete all transactions in set (make sure to add milestone hash)
+    ERR_BIND_GOTO(iota_tangle_transaction_delete_batch(&tangle, params.transactions_to_prune), err, cleanup);
     // TODO - remove transaction from queues and caches
     pm->current_snapshot_index_to_prune++;
 

@@ -105,6 +105,9 @@ char *iota_statement_transaction_metadata_clear =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=0," TRANSACTION_COL_SOLID
     "=0," TRANSACTION_COL_VALIDITY "=0";
 
+char *iota_transaction_delete_by_hashes =
+    "DELETE FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH " IN (?)";
+
 /*
  * Partial Transaction statements
  */
