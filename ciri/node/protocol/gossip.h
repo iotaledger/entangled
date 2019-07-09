@@ -26,6 +26,10 @@
 // The amount of bytes making up the transaction gossip payload
 #define GOSSIP_BYTES_LENGTH ((GOSSIP_TX_BYTES_LENGTH) + (GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * The IOTA gossip protocol exchange packet that contains:
  * - A transaction encoded in bytes
@@ -48,10 +52,6 @@ typedef struct protocol_gossip_queue_entry_s {
 } protocol_gossip_queue_entry_t;
 
 typedef protocol_gossip_queue_entry_t* protocol_gossip_queue_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * Sets the transaction of a gossip packet

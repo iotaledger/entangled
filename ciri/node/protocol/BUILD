@@ -22,6 +22,12 @@ cc_library(
 )
 
 cc_library(
+    name = "handshake",
+    hdrs = ["handshake.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "header",
     hdrs = ["header.h"],
     visibility = ["//visibility:public"],
