@@ -16,12 +16,24 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Forward declarations
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
+typedef enum neighbor_state_e {
+  NEIGHBOR_DISCONNECTED,
+  NEIGHBOR_HANDSHAKING,
+  NEIGHBOR_READY_FOR_MESSAGES,
+  NEIGHBOR_MARKED_FOR_DISCONNECT,
+} neighbor_state_t;
+
 typedef struct neighbor_s {
   endpoint_t endpoint;
+  neighbor_state_t state;
   uint64_t nbr_all_txs;
   uint64_t nbr_invalid_txs;
   uint64_t nbr_stale_txs;
@@ -30,10 +42,6 @@ typedef struct neighbor_s {
   uint64_t nbr_new_txs;
   uint64_t nbr_dropped_send;
 } neighbor_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * Initializes a neighbor with an URI

@@ -21,6 +21,8 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
   }
 
   memset(neighbor, 0, sizeof(neighbor_t));
+  neighbor->state = NEIGHBOR_DISCONNECTED;
+
   if (uri_parse(uri, scheme, MAX_SCHEME_LENGTH, neighbor->endpoint.host, MAX_HOST_LENGTH, &neighbor->endpoint.port) ==
       false) {
     return RC_NEIGHBOR_FAILED_URI_PARSING;
@@ -38,6 +40,8 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
   }
 
   memset(neighbor, 0, sizeof(neighbor_t));
+  neighbor->state = NEIGHBOR_DISCONNECTED;
+
   if (ip) {
     if (strlen(ip) > MAX_HOST_LENGTH) {
       return RC_NEIGHBOR_INVALID_HOST;
@@ -45,6 +49,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
     strcpy(neighbor->endpoint.ip, ip);
   }
   neighbor->endpoint.port = port;
+
   return RC_OK;
 }
 
