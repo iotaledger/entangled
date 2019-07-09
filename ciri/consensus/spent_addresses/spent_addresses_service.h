@@ -56,6 +56,22 @@ retcode_t iota_spent_addresses_service_was_address_spent_from(spent_addresses_se
                                                               tangle_t const *const tangle,
                                                               flex_trit_t const *const address, bool *const spent);
 
+/**
+ * Checks whether a transaction is associated with a valid signed output
+ *
+ * @param[in]   sap     A spent addresses provider
+ * @param[in]   tangle  A tangle
+ * @param[in]   tx The Transaction
+ * @param[in]   hash The hash
+ * @param[out]  spent   True if the address was spent from, false otherwise
+ *
+ * @return a status code
+ */
+retcode_t iota_spent_addresses_service_was_tx_spent_from(spent_addresses_provider_t const *const sap,
+                                                         tangle_t const *const tangle,
+                                                         iota_transaction_t const *const tx,
+                                                         flex_trit_t const *const hash, bool *const spent);
+
 #ifdef __cplusplus
 }
 #endif

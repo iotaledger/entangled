@@ -35,6 +35,7 @@ cc_library(
         ":shared_local_snapshots",
         "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/snapshot:snapshots_service",
+        "//ciri/consensus/spent_addresses:spent_addresses_service",
     ],
 )
 
@@ -46,6 +47,7 @@ cc_library(
     deps = [
         ":conf",
         "//ciri/consensus/snapshot:snapshots_provider",
+        "//ciri/consensus/spent_addresses:spent_addresses_service",
         "//ciri/consensus/tangle",
         "//ciri/consensus/tangle:traversal",
         "//common:errors",

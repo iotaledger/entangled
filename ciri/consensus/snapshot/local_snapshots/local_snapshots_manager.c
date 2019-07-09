@@ -110,7 +110,8 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
 
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
                                             snapshots_service_t *const snapshots_service,
-                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt) {
+                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt,
+                                            spent_addresses_service_t *const spent_addresses_service) {
   if (lsm == NULL || mt == NULL || snapshots_service == NULL) {
     return RC_NULL_PARAM;
   }
@@ -124,7 +125,8 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  iota_local_snapshots_pruning_manager_init(&lsm->pm, lsm->snapshots_service->snapshots_provider, conf);
+  iota_local_snapshots_pruning_manager_init(&lsm->pm, lsm->snapshots_service->snapshots_provider,
+                                            spent_addresses_service, conf);
 
   return RC_OK;
 }

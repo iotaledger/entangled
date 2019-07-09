@@ -13,6 +13,7 @@
 
 #include "ciri/consensus/conf.h"
 #include "ciri/consensus/snapshot/snapshots_provider.h"
+#include "ciri/consensus/spent_addresses/spent_addresses_service.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
@@ -31,6 +32,7 @@ typedef struct pruning_manager_s {
   rw_lock_handle_t rw_lock;
   snapshots_provider_t *snapshot_provider;
   snapshot_t const *new_snapshot;
+  spent_addresses_service_t *spent_addresses_service;
 } pruning_manager_t;
 
 /**
@@ -44,6 +46,7 @@ typedef struct pruning_manager_s {
  */
 retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *pm,
                                                     snapshots_provider_t *const snapshot_provider,
+                                                    spent_addresses_service_t const *spent_addresses_service,
                                                     iota_consensus_conf_t *const conf);
 
 /**
