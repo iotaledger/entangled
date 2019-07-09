@@ -16,13 +16,13 @@
 #include "common/network/network.h"
 
 typedef struct endpoint_s {
-  char host[MAX_HOST_LENGTH];
+  char domain[MAX_HOST_LENGTH];
   char ip[INET6_ADDRSTRLEN];
   uint16_t port;
 } endpoint_t;
 
 static inline bool endpoint_cmp(endpoint_t const *const lhs, endpoint_t const *const rhs) {
-  return (lhs != NULL && rhs != NULL && (strcmp(lhs->ip, rhs->ip) == 0 || strcmp(lhs->host, rhs->host) == 0) &&
+  return (lhs != NULL && rhs != NULL && (strcmp(lhs->ip, rhs->ip) == 0 || strcmp(lhs->domain, rhs->domain) == 0) &&
           lhs->port == rhs->port);
 }
 

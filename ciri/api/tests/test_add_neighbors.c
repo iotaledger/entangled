@@ -32,19 +32,19 @@ void test_add_neighbors(void) {
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 4);
 
   neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 0);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.1");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.1");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15001);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 1);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.2");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.2");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15002);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 2);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.3");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.3");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15003);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 3);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.4");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.4");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15004);
 
   add_neighbors_req_free(&req);
@@ -70,7 +70,7 @@ void test_add_neighbors_with_already_paired(void) {
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 1);
 
   neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 4);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.5");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.5");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15005);
 
   add_neighbors_req_free(&req);
@@ -97,7 +97,7 @@ void test_add_neighbors_with_invalid(void) {
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 1);
 
   neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 5);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.6");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.6");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15006);
 
   add_neighbors_req_free(&req);

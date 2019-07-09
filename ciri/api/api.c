@@ -403,7 +403,8 @@ retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_
 
   rw_lock_handle_rdlock(&api->core->node.router.neighbors_lock);
   NEIGHBORS_FOREACH(api->core->node.router.neighbors, neighbor) {
-    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", neighbor->endpoint.host, neighbor->endpoint.port);
+    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", neighbor->endpoint.domain,
+             neighbor->endpoint.port);
     if ((ret = get_neighbors_res_add_neighbor(res, address, neighbor->nbr_all_txs, neighbor->nbr_random_tx_reqs,
                                               neighbor->nbr_new_txs, neighbor->nbr_invalid_txs, neighbor->nbr_stale_txs,
                                               neighbor->nbr_sent_txs, "TCP")) != RC_OK) {

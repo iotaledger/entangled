@@ -197,7 +197,7 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
 
   if (neighbor || (packet->source.ip[0] == 0 && packet->source.port == 0)) {
     if (neighbor) {
-      log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.host,
+      log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.domain,
                 neighbor->endpoint.port);
       neighbor->nbr_all_txs++;
     } else {

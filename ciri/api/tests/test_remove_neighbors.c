@@ -30,19 +30,19 @@ void test_remove_neighbors(void) {
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 2);
 
   neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 0);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.1");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.1");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15001);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 1);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.3");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.3");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15003);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 2);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.5");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.5");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15005);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 3);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.6");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.6");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15006);
 
   remove_neighbors_req_free(&req);
@@ -68,11 +68,11 @@ void test_remove_neighbors_with_not_paired(void) {
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 2);
 
   neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 0);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.5");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.5");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15005);
 
   neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 1);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.6");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.6");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15006);
 
   remove_neighbors_req_free(&req);
@@ -99,7 +99,7 @@ void test_remove_neighbors_with_invalid(void) {
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 1);
 
   neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, 0);
-  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.host, "8.8.8.5");
+  TEST_ASSERT_EQUAL_STRING(neighbor->endpoint.domain, "8.8.8.5");
   TEST_ASSERT_EQUAL_INT(neighbor->endpoint.port, 15005);
 
   remove_neighbors_req_free(&req);

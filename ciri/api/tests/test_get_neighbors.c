@@ -43,7 +43,8 @@ void test_get_neighbors(void) {
     neighbor_info_t *info = get_neighbors_res_neighbor_at(res, i);
     neighbor_t *neighbor = (neighbor_t *)utarray_eltptr(api.core->node.router.neighbors, i);
 
-    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", neighbor->endpoint.host, neighbor->endpoint.port);
+    snprintf(address, MAX_HOST_LENGTH + MAX_PORT_LENGTH + 1, "%s:%d", neighbor->endpoint.domain,
+             neighbor->endpoint.port);
 
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_all_txs, info->all_trans_num);
     TEST_ASSERT_EQUAL_INT(neighbor->nbr_new_txs, info->new_trans_num);
