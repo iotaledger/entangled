@@ -22,15 +22,24 @@ cc_library(
 )
 
 cc_library(
-    name = "router",
-    srcs = ["router.c"],
+    name = "router_shared",
     hdrs = ["router.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":neighbor_shared",
         "//ciri/node:conf",
-        "//utils:logger_helper",
         "//utils/handles:rw_lock",
+    ],
+)
+
+cc_library(
+    name = "router",
+    srcs = ["router.c"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":neighbor",
+        ":router_shared",
+        "//utils:logger_helper",
     ],
 )
 

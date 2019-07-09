@@ -62,7 +62,7 @@ cc_library(
     deps = [
         ":recent_seen_bytes_cache",
         ":tips_cache",
-        "//ciri/node/network:router",
+        "//ciri/node/network:router_shared",
         "//ciri/node/network:tcp_server_shared",
         "//ciri/node/pipeline:broadcaster_shared",
         "//ciri/node/pipeline:processor_shared",
@@ -80,6 +80,7 @@ cc_library(
     deps = [
         ":node_shared",
         "//ciri:core_shared",
+        "//ciri/node/network:router",
         "//ciri/node/network:tcp_server",
         "//ciri/node/pipeline:broadcaster",
         "//ciri/node/pipeline:processor",
