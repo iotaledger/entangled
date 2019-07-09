@@ -34,6 +34,7 @@ typedef enum neighbor_state_e {
 typedef struct neighbor_s {
   endpoint_t endpoint;
   neighbor_state_t state;
+  uint8_t protocol_version;
   uint64_t nbr_all_txs;
   uint64_t nbr_invalid_txs;
   uint64_t nbr_stale_txs;
