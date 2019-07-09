@@ -12,6 +12,7 @@ check_consistency_res_t* check_consistency_res_new() {
 
   if (res) {
     res->info = NULL;
+    res->state = false;
   }
   return res;
 }

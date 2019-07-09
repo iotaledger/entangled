@@ -20,7 +20,8 @@ retcode_t json_find_transactions_serialize_request(find_transactions_req_t const
   }
 
   if (!obj->addresses && !obj->approvees && !obj->bundles && !obj->tags) {
-    ret = RC_CCLIENT_JSON_KEY;
+    log_error(json_logger_id, "[%s:%d] Null parameters\n", __func__, __LINE__);
+    ret = RC_NULL_PARAM;
     goto end;
   }
 
@@ -75,7 +76,8 @@ retcode_t json_find_transactions_deserialize_request(char const* const obj, find
 
   if (!(cJSON_HasObjectItem(json_obj, "bundles") || cJSON_HasObjectItem(json_obj, "addresses") ||
         cJSON_HasObjectItem(json_obj, "tags") || cJSON_HasObjectItem(json_obj, "approvees"))) {
-    ret = RC_CCLIENT_JSON_KEY;
+    ret = RC_NULL_PARAM;
+    log_error(json_logger_id, "[%s:%d] Null parameters\n", __func__, __LINE__);
     goto end;
   }
 

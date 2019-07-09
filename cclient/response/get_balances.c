@@ -16,6 +16,7 @@ get_balances_res_t* get_balances_res_new() {
   if (res) {
     utarray_new(res->balances, &ut_uint64_icd);
     res->references = NULL;
+    res->milestone_index = 0;
   }
   return res;
 }

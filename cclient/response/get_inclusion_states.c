@@ -34,7 +34,12 @@ bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* in, size_t i
   return false;
 }
 
-size_t get_inclusion_states_res_states_count(get_inclusion_states_res_t* in) { return utarray_len(in->states); }
+size_t get_inclusion_states_res_states_count(get_inclusion_states_res_t* in) {
+  if (!in->states) {
+    return 0;
+  }
+  return utarray_len(in->states);
+}
 
 void get_inclusion_states_res_free(get_inclusion_states_res_t** res) {
   if (*res) {
