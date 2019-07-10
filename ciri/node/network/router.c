@@ -14,7 +14,7 @@
 static UT_icd neighbors_icd = {sizeof(neighbor_t), 0, 0, 0};
 static logger_id_t logger_id;
 
-static int neighbor_cmp(void const *const lhs, void const *const rhs) {
+static int router_neighbor_cmp(void const *const lhs, void const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }
@@ -22,22 +22,14 @@ static int neighbor_cmp(void const *const lhs, void const *const rhs) {
   return endpoint_cmp(&((neighbor_t *)lhs)->endpoint, &((neighbor_t *)rhs)->endpoint) == 0 ? -1 : 0;
 }
 
-retcode_t router_init(router_t *const router, iota_node_conf_t *const conf) {
+static retcode_t router_neighbors_init(router_t *const router) {
   neighbor_t neighbor;
   char *neighbor_uri, *cpy, *ptr;
 
-  if (router == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  logger_id = logger_helper_enable(ROUTER_LOGGER_ID, LOGGER_DEBUG, true);
-
-  router->conf = conf;
-  utarray_new(router->neighbors, &neighbors_icd);
-  rw_lock_handle_init(&router->neighbors_lock);
-
   if (router->conf->neighbors != NULL) {
-    ptr = cpy = strdup(router->conf->neighbors);
+    if ((ptr = cpy = strdup(router->conf->neighbors)) == NULL) {
+      return RC_OOM;
+    }
     while ((neighbor_uri = strsep(&cpy, " ")) != NULL) {
       if (neighbor_init_with_uri(&neighbor, neighbor_uri) != RC_OK) {
         log_warning(logger_id, "Initializing neighbor with URI %s failed\n", neighbor_uri);
@@ -52,6 +44,27 @@ retcode_t router_init(router_t *const router, iota_node_conf_t *const conf) {
   }
 
   return RC_OK;
+}
+
+retcode_t router_init(router_t *const router, iota_node_conf_t *const conf) {
+  retcode_t ret = RC_OK;
+
+  if (router == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  logger_id = logger_helper_enable(ROUTER_LOGGER_ID, LOGGER_DEBUG, true);
+
+  router->conf = conf;
+  utarray_new(router->neighbors, &neighbors_icd);
+  rw_lock_handle_init(&router->neighbors_lock);
+
+  if ((ret = router_neighbors_init(router)) != RC_OK) {
+    log_critical(logger_id, "Initializing neighbors failed\n");
+    return ret;
+  }
+
+  return ret;
 }
 
 retcode_t router_destroy(router_t *const router) {
@@ -81,13 +94,13 @@ retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor
 
   rw_lock_handle_wrlock(&router->neighbors_lock);
 
-  elt = utarray_find(router->neighbors, neighbor, neighbor_cmp);
+  elt = utarray_find(router->neighbors, neighbor, router_neighbor_cmp);
 
   if (elt != NULL) {
     ret = RC_NEIGHBOR_ALREADY_PAIRED;
   } else {
     utarray_push_back(router->neighbors, neighbor);
-    utarray_sort(router->neighbors, neighbor_cmp);
+    utarray_sort(router->neighbors, router_neighbor_cmp);
   }
 
   rw_lock_handle_unlock(&router->neighbors_lock);
@@ -105,7 +118,7 @@ retcode_t router_neighbor_remove(router_t *const router, neighbor_t const *const
 
   rw_lock_handle_wrlock(&router->neighbors_lock);
 
-  elt = utarray_find(router->neighbors, neighbor, neighbor_cmp);
+  elt = utarray_find(router->neighbors, neighbor, router_neighbor_cmp);
 
   if (elt == NULL) {
     ret = RC_NEIGHBOR_NOT_PAIRED;
@@ -153,7 +166,7 @@ neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char
   }
 
   rw_lock_handle_rdlock(&router->neighbors_lock);
-  elt = utarray_find(router->neighbors, &cmp, neighbor_cmp);
+  elt = utarray_find(router->neighbors, &cmp, router_neighbor_cmp);
   rw_lock_handle_unlock(&router->neighbors_lock);
 
   return elt;

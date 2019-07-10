@@ -104,6 +104,7 @@ retcode_t tcp_server_init(tcp_server_t *const tcp_server, node_t *const node) {
 
   if ((ret = uv_tcp_init(loop, &server)) != 0 ||
       (ret = uv_ip4_addr(node->conf.neighboring_address, node->conf.neighboring_port, &addr)) != 0 ||
+      (ret = uv_tcp_nodelay(&server, true)) != 0 ||
       (ret = uv_tcp_bind(&server, (const struct sockaddr *)&addr, 0)) != 0 ||
       (ret = uv_listen((uv_stream_t *)&server, node->conf.max_neighbors, tcp_server_on_new_connection)) != 0) {
     log_critical(logger_id, "TCP server initialization failed: %s\n", uv_err_name(ret));
