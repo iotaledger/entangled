@@ -100,15 +100,17 @@ static void *pruning_manager_routine(void *arg) {
   }
 
   spent_addresses_provider_t sap;
-  connection_config_t db_conf = {.db_path = pm->spent_addresses_service->conf->spent_addresses_db_path};
+  {
+    connection_config_t db_conf = {.db_path = pm->spent_addresses_service->conf->spent_addresses_db_path};
 
-  if (pm->spent_addresses_service->conf->spent_addresses_files == NULL) {
-    return RC_OK;
-  }
+    if (pm->spent_addresses_service->conf->spent_addresses_files == NULL) {
+      return RC_OK;
+    }
 
-  if ((err = iota_spent_addresses_provider_init(&sap, &db_conf)) != RC_OK) {
-    log_error(logger_id, "Initializing spent addresses database connection failed\n");
-    goto cleanup;
+    if ((err = iota_spent_addresses_provider_init(&sap, &db_conf)) != RC_OK) {
+      log_error(logger_id, "Initializing spent addresses database connection failed\n");
+      goto cleanup;
+    }
   }
 
   lock_handle_lock(&pm->rw_lock);
@@ -125,6 +127,10 @@ cleanup:
     log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
+  if (iota_spent_addresses_provider_destroy(&sap) != RC_OK) {
+    log_critical(logger_id, "Destroying spent addresses provider failed\n");
+  }
+
   return NULL;
 }
 
@@ -133,9 +139,14 @@ static retcode_t iota_local_snapshots_pruning_manager_prune_transactions(pruning
   retcode_t err;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
   DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
+  collect_transactions_for_pruning_do_func_params_t params;
+  bool can_prune_snapshot_index_entirely = true;
+
+  hash243_set_entry_t *iter = NULL, *tmp = NULL;
+
+  bool spent;
 
   while (pm->current_snapshot_index_to_prune < pm->last_snapshot_index_to_prune) {
-    collect_transactions_for_pruning_do_func_params_t params;
     params.min_snapshot_index = pm->current_snapshot_index_to_prune + 1;
     params.tangle = &tangle;
     params.transactions_to_prune = NULL;
@@ -145,10 +156,9 @@ static retcode_t iota_local_snapshots_pruning_manager_prune_transactions(pruning
                                                pm->conf->genesis_hash, NULL, &params),
                   err, cleanup);
 
-    bool can_prune_snapshot_index_entirely = true;
-
-    hash243_set_entry_t *iter = NULL, *tmp = NULL;
-
+    can_prune_snapshot_index_entirely = true;
+    iter = NULL;
+    tmp = NULL;
     bool spent;
 
     HASH_ITER(hh, params.transactions_to_prune, iter, tmp) {
