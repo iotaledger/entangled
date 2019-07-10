@@ -18,7 +18,6 @@
 #define TCP_SERVER_LOGGER_ID "tcp_server"
 
 static logger_id_t logger_id;
-static uv_loop_t *loop;
 static uv_tcp_t server;
 
 /*
@@ -37,22 +36,22 @@ static void tcp_server_on_close(uv_handle_t *const handle) { free(handle); }
 static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
   neighbor_t *neighbor = (neighbor_t *)client->data;
 
-  log_debug(logger_id, "Packet received from tethered neighbor %s:%d\n", neighbor->endpoint.domain,
+  log_debug(logger_id, "Packet received from tethered neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
             neighbor->endpoint.port);
 
   if (nread < 0) {
     if (nread != UV_EOF) {
-      log_warning(logger_id, "Read error from tethered neighbor %s:%d: %s\n", neighbor->endpoint.domain,
+      log_warning(logger_id, "Read error from tethered neighbor tcp://%s:%d: %s\n", neighbor->endpoint.domain,
                   neighbor->endpoint.port, uv_err_name(nread));
     } else {
-      log_info(logger_id, "Connection with tethered neighbor %s:%d lost\n", neighbor->endpoint.domain,
+      log_info(logger_id, "Connection with tethered neighbor tcp://%s:%d lost\n", neighbor->endpoint.domain,
                neighbor->endpoint.port);
       neighbor->endpoint.stream = NULL;
     }
     uv_close((uv_handle_t *)client, tcp_server_on_close);
   } else if (nread > 0) {
     if (neighbor_read(neighbor, buf->base) != RC_OK) {
-      log_warning(logger_id, "Read error from tethered neighbor %s:%d\n", neighbor->endpoint.domain,
+      log_warning(logger_id, "Read error from tethered neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
                   neighbor->endpoint.port);
     }
   }
@@ -75,7 +74,7 @@ static void tcp_server_on_new_connection(uv_stream_t *const server, int const st
     return;
   }
 
-  if ((ret = uv_tcp_init(loop, client)) != 0 || (ret = uv_tcp_nodelay(client, true)) != 0) {
+  if ((ret = uv_tcp_init(uv_default_loop(), client)) != 0 || (ret = uv_tcp_nodelay(client, true)) != 0) {
     log_warning(logger_id, "Couldn't accept new connection: %s\n", uv_err_name(ret));
     uv_close((uv_handle_t *)client, tcp_server_on_close);
     return;
@@ -100,18 +99,18 @@ static void tcp_server_on_new_connection(uv_stream_t *const server, int const st
     port = atoi(serv);
     neighbor = router_neighbor_find_by_endpoint_values(&((node_t *)server->data)->router, host, port);
     if (neighbor) {
-      log_info(logger_id, "Connection with tethered neighbor %s:%d established\n", neighbor->endpoint.domain,
+      log_info(logger_id, "Connection with tethered neighbor tcp://%s:%d established\n", neighbor->endpoint.domain,
                neighbor->endpoint.port);
       if ((ret = uv_read_start((uv_stream_t *)client, tcp_server_alloc_buffer, tcp_server_on_read)) != 0) {
-        log_error(logger_id, "Starting to read from tethered neighbor %s:%d failed: %s\n", neighbor->endpoint.domain,
-                  neighbor->endpoint.port, uv_err_name(ret));
+        log_error(logger_id, "Starting to read from tethered neighbor tcp://%s:%d failed: %s\n",
+                  neighbor->endpoint.domain, neighbor->endpoint.port, uv_err_name(ret));
         uv_close((uv_handle_t *)client, tcp_server_on_close);
       } else {
         client->data = neighbor;
         neighbor->endpoint.stream = client;
       }
     } else {
-      log_warning(logger_id, "Connection with non-tethered neighbor %s:%d denied\n", host, port);
+      log_warning(logger_id, "Connection with non-tethered neighbor tcp://%s:%d denied\n", host, port);
       uv_close((uv_handle_t *)client, tcp_server_on_close);
     }
   } else {
@@ -124,7 +123,7 @@ static void *tcp_server_routine(void *param) {
   UNUSED(param);
 
   log_info(logger_id, "Starting TCP server on port %d\n", ((node_t *)server.data)->conf.neighboring_port);
-  if (uv_run(loop, UV_RUN_DEFAULT) != 0) {
+  if (uv_run(uv_default_loop(), UV_RUN_DEFAULT) != 0) {
     log_critical(logger_id, "Starting TCP server failed\n");
     return NULL;
   }
@@ -146,15 +145,10 @@ retcode_t tcp_server_init(tcp_server_t *const tcp_server, node_t *const node) {
 
   logger_id = logger_helper_enable(TCP_SERVER_LOGGER_ID, LOGGER_DEBUG, true);
 
-  if ((loop = uv_default_loop()) == NULL) {
-    log_critical(logger_id, "Event loop initialization failed\n");
-    return RC_EVENT_LOOP;
-  }
-
   tcp_server->running = false;
   server.data = node;
 
-  if ((ret = uv_tcp_init(loop, &server)) != 0 ||
+  if ((ret = uv_tcp_init(uv_default_loop(), &server)) != 0 ||
       (ret = uv_ip4_addr(node->conf.neighboring_address, node->conf.neighboring_port, &addr)) != 0 ||
       (ret = uv_tcp_nodelay(&server, true)) != 0 ||
       (ret = uv_tcp_bind(&server, (const struct sockaddr *)&addr, 0)) != 0 ||
@@ -192,7 +186,7 @@ retcode_t tcp_server_stop(tcp_server_t *const tcp_server) {
 
   log_info(logger_id, "Shutting down TCP server thread\n");
   tcp_server->running = false;
-  uv_stop(loop);
+  uv_stop(uv_default_loop());
   if (thread_handle_join(tcp_server->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down TCP server thread failed\n");
     ret = RC_THREAD_JOIN;
@@ -210,7 +204,7 @@ retcode_t tcp_server_destroy(tcp_server_t *const tcp_server) {
     return RC_STILL_RUNNING;
   }
 
-  if (uv_loop_close(loop) != 0) {
+  if (uv_loop_close(uv_default_loop()) != 0) {
     log_error(logger_id, "Closing event loop failed\n");
     ret = RC_EVENT_LOOP;
   }
@@ -231,26 +225,24 @@ retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip) {
   hints.ai_protocol = IPPROTO_TCP;
   hints.ai_flags = 0;
 
-  if ((err = uv_getaddrinfo(loop, &resolver, NULL, domain, NULL, &hints)) != 0) {
+  if ((err = uv_getaddrinfo(uv_default_loop(), &resolver, NULL, domain, NULL, &hints)) != 0) {
     log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(err));
     return RC_DOMAIN_RESOLUTION;
   }
 
   switch (resolver.addrinfo->ai_family) {
-    case AF_INET: {
+    case AF_INET:
       if ((err = uv_ip4_name((struct sockaddr_in *)resolver.addrinfo->ai_addr, ip, INET_ADDRSTRLEN)) != 0) {
         log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(err));
         ret = RC_DOMAIN_RESOLUTION;
       }
       break;
-    }
-    case AF_INET6: {
+    case AF_INET6:
       if ((err = uv_ip6_name((struct sockaddr_in6 *)hints.ai_addr, ip, INET6_ADDRSTRLEN)) != 0) {
         log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(err));
         ret = RC_DOMAIN_RESOLUTION;
       }
       break;
-    }
     default:
       log_error(logger_id, "Can't resolve domain\n");
       ret = RC_DOMAIN_RESOLUTION;
