@@ -31,13 +31,17 @@ static void service_cleanup(void) {
 
 static void test_get_inclusion_status_empty(void) {
   get_inclusion_states_req_t *get_inclusion_req = get_inclusion_states_req_new();
-  get_inclusion_states_res_t *get_inclusion_res = get_inclusion_states_res_new();
   TEST_ASSERT_NOT_NULL(get_inclusion_req);
+  TEST_ASSERT_NULL(get_inclusion_req->transactions);
+  TEST_ASSERT_NULL(get_inclusion_req->tips);
+
+  get_inclusion_states_res_t *get_inclusion_res = get_inclusion_states_res_new();
   TEST_ASSERT_NOT_NULL(get_inclusion_res);
 
-  TEST_ASSERT(iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res) == RC_NULL_PARAM);
+  TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM,
+                          iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res));
   TEST_ASSERT_NULL(get_inclusion_res->states);
-  TEST_ASSERT(get_inclusion_states_res_states_count(get_inclusion_res) == 0);
+  TEST_ASSERT_EQUAL_INT(0, get_inclusion_states_res_states_count(get_inclusion_res));
 
   get_inclusion_states_req_free(&get_inclusion_req);
   TEST_ASSERT_NULL(get_inclusion_req);
@@ -54,13 +58,13 @@ static void test_get_inclusion_status(void) {
 
   TEST_ASSERT(flex_trits_from_trytes(flex_hash, NUM_TRITS_HASH, TEST_BUNDLE_TX_0, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
               0);
-  TEST_ASSERT(get_inclusion_states_req_hash_add(get_inclusion_req, flex_hash) == RC_OK);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, get_inclusion_states_req_hash_add(get_inclusion_req, flex_hash));
 
   TEST_ASSERT(flex_trits_from_trytes(flex_hash, NUM_TRITS_HASH, TEST_MILESTONE_0, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
               0);
-  TEST_ASSERT(get_inclusion_states_req_tip_add(get_inclusion_req, flex_hash) == RC_OK);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, get_inclusion_states_req_tip_add(get_inclusion_req, flex_hash));
 
-  TEST_ASSERT(iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res) == RC_OK);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res));
   TEST_ASSERT_NOT_NULL(get_inclusion_res->states);
   TEST_ASSERT(get_inclusion_states_res_states_count(get_inclusion_res) > 0);
 

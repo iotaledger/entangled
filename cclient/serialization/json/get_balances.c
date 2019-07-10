@@ -12,6 +12,12 @@
 retcode_t json_get_balances_serialize_request(get_balances_req_t const *const obj, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
+
+  if (!obj->addresses) {
+    log_error(json_logger_id, "[%s:%d] The addresses parameter is needed\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);

@@ -33,7 +33,7 @@ static void test_get_node_info(void) {
   get_node_info_res_t *node_res = get_node_info_res_new();
   TEST_ASSERT_NOT_NULL(node_res);
 
-  TEST_ASSERT(iota_client_get_node_info(&g_serv, node_res) == RC_OK);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_get_node_info(&g_serv, node_res));
 
   // node info response
   TEST_ASSERT(strlen(get_node_info_res_app_name(node_res)) > 0);

@@ -19,6 +19,11 @@ retcode_t json_check_consistency_serialize_request(check_consistency_req_t const
   char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
+  if (!obj->tails) {
+    log_error(json_logger_id, "[%s:%d] NULL parameter\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);

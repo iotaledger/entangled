@@ -13,7 +13,7 @@ cc_test(
 
 cc_test(
     name = "test_find_transactions",
-    timeout = "short",
+    timeout = "moderate",
     srcs = [
         "cclient_conf.h",
         "test_find_transactions.c",
