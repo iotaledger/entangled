@@ -33,11 +33,14 @@ void echo_write(uv_write_t *req, int status) {
   free(req);
 }
 
+static void tcp_server_on_close(uv_handle_t *const handle) { free(handle); }
+
 static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
   neighbor_t *neighbor = (neighbor_t *)client->data;
 
   log_debug(logger_id, "Packet received from tethered neighbor %s:%d\n", neighbor->endpoint.domain,
             neighbor->endpoint.port);
+
   if (nread < 0) {
     if (nread != UV_EOF) {
       log_warning(logger_id, "Read error from tethered neighbor %s:%d: %s\n", neighbor->endpoint.domain,
@@ -45,8 +48,9 @@ static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, u
     } else {
       log_info(logger_id, "Connection with tethered neighbor %s:%d lost\n", neighbor->endpoint.domain,
                neighbor->endpoint.port);
+      neighbor->endpoint.stream = NULL;
     }
-    uv_close((uv_handle_t *)client, NULL);
+    uv_close((uv_handle_t *)client, tcp_server_on_close);
   } else if (nread > 0) {
     if (neighbor_read(neighbor, buf->base) != RC_OK) {
       log_warning(logger_id, "Read error from tethered neighbor %s:%d\n", neighbor->endpoint.domain,
