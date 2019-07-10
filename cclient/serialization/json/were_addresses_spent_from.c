@@ -14,6 +14,12 @@ retcode_t json_were_addresses_spent_from_serialize_request(were_addresses_spent_
   retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!req->addresses) {
+    log_error(json_logger_id, "[%s:%d] Null parameter\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);

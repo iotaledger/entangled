@@ -62,3 +62,42 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_get_tips",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_get_tips.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_get_trytes",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_get_trytes.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_were_addresses_spent_from",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_were_addresses_spent_from.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)

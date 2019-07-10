@@ -13,6 +13,11 @@ retcode_t json_get_trytes_serialize_request(get_trytes_req_t const *const req, c
   retcode_t ret = RC_ERROR;
   char const *json_text = NULL;
 
+  if (!req->hashes) {
+    log_error(json_logger_id, "[%s:%d] Null parameter\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {

@@ -74,6 +74,27 @@ static void test_get_inclusion_status(void) {
   TEST_ASSERT_NULL(get_inclusion_res);
 }
 
+static void test_get_inclusion_status_without_tip(void) {
+  flex_trit_t flex_hash[NUM_FLEX_TRITS_HASH];
+  get_inclusion_states_req_t *get_inclusion_req = get_inclusion_states_req_new();
+  get_inclusion_states_res_t *get_inclusion_res = get_inclusion_states_res_new();
+  TEST_ASSERT_NOT_NULL(get_inclusion_req);
+  TEST_ASSERT_NOT_NULL(get_inclusion_res);
+
+  TEST_ASSERT(flex_trits_from_trytes(flex_hash, NUM_TRITS_HASH, TEST_BUNDLE_TX_0, NUM_TRYTES_HASH, NUM_TRYTES_HASH) !=
+              0);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, get_inclusion_states_req_hash_add(get_inclusion_req, flex_hash));
+
+  TEST_ASSERT_EQUAL_INT16(RC_CCLIENT_RES_ERROR,
+                          iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res));
+  TEST_ASSERT_NULL(get_inclusion_res->states);
+
+  get_inclusion_states_req_free(&get_inclusion_req);
+  TEST_ASSERT_NULL(get_inclusion_req);
+  get_inclusion_states_res_free(&get_inclusion_res);
+  TEST_ASSERT_NULL(get_inclusion_res);
+}
+
 int main() {
   UNITY_BEGIN();
 
@@ -81,6 +102,7 @@ int main() {
 
   RUN_TEST(test_get_inclusion_status_empty);
   RUN_TEST(test_get_inclusion_status);
+  RUN_TEST(test_get_inclusion_status_without_tip);
 
   RUN_TEST(service_cleanup);
 
