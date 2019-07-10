@@ -12,7 +12,6 @@
 #include "ciri/node/network/router.h"
 #include "ciri/node/network/tcp_server.h"
 #include "ciri/node/node.h"
-#include "ciri/node/protocol/type.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 
@@ -34,16 +33,25 @@ void echo_write(uv_write_t *req, int status) {
   free(req);
 }
 
-void echo_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
+static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
+  neighbor_t *neighbor = (neighbor_t *)client->data;
+
+  log_debug(logger_id, "Packet received from tethered neighbor %s:%d\n", neighbor->endpoint.domain,
+            neighbor->endpoint.port);
   if (nread < 0) {
     if (nread != UV_EOF) {
-      fprintf(stderr, "Read error %s\n", uv_err_name(nread));
-      uv_close((uv_handle_t *)client, NULL);
+      log_warning(logger_id, "Read error from tethered neighbor %s:%d: %s\n", neighbor->endpoint.domain,
+                  neighbor->endpoint.port, uv_err_name(nread));
+    } else {
+      log_info(logger_id, "Connection with tethered neighbor %s:%d lost\n", neighbor->endpoint.domain,
+               neighbor->endpoint.port);
     }
+    uv_close((uv_handle_t *)client, NULL);
   } else if (nread > 0) {
-    uv_write_t *req = (uv_write_t *)malloc(sizeof(uv_write_t));
-    uv_buf_t wrbuf = uv_buf_init(buf->base, nread);
-    uv_write(req, client, &wrbuf, 1, echo_write);
+    if (neighbor_read(neighbor, buf->base) != RC_OK) {
+      log_warning(logger_id, "Read error from tethered neighbor %s:%d\n", neighbor->endpoint.domain,
+                  neighbor->endpoint.port);
+    }
   }
 
   if (buf->base) {

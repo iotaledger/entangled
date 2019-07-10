@@ -16,6 +16,7 @@ cc_library(
         ":neighbor_shared",
         "//ciri/node:node_shared",
         "//ciri/node/pipeline:transaction_requester",
+        "//ciri/node/protocol:type",
         "//common/network:uri",
         "//utils/handles:rand",
     ],
@@ -61,6 +62,5 @@ cc_library(
         ":router",
         ":tcp_server_shared",
         "//ciri/node:node_shared",
-        "//ciri/node/protocol:type",
     ],
 )
