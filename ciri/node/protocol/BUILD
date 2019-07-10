@@ -12,9 +12,9 @@ cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
+        "//ciri/node/network:endpoint",
         "//common:errors",
         "//common/model:transaction",
-        "//common/network:endpoint",
         "//common/trinary:bytes",
         "//common/trinary:flex_trit",
         "@com_github_uthash//:uthash",

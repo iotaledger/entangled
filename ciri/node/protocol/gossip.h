@@ -10,8 +10,8 @@
 
 #include "utlist.h"
 
+#include "ciri/node/network/endpoint.h"
 #include "common/errors.h"
-#include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
 #include "common/trinary/flex_trit.h"
 

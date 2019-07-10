@@ -1,4 +1,12 @@
 cc_library(
+    name = "endpoint",
+    srcs = ["endpoint.c"],
+    hdrs = ["endpoint.h"],
+    visibility = ["//visibility:public"],
+    deps = ["//common/network"],
+)
+
+cc_library(
     name = "neighbor_shared",
     hdrs = ["neighbor.h"],
     visibility = ["//visibility:public"],

@@ -19,7 +19,7 @@ static int router_neighbor_cmp(void const *const lhs, void const *const rhs) {
     return false;
   }
 
-  return endpoint_cmp(&((neighbor_t *)lhs)->endpoint, &((neighbor_t *)rhs)->endpoint) == 0 ? -1 : 0;
+  return endpoint_cmp(&((neighbor_t *)lhs)->endpoint, &((neighbor_t *)rhs)->endpoint);
 }
 
 static retcode_t router_neighbors_init(router_t *const router) {
