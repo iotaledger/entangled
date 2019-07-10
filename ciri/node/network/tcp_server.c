@@ -18,7 +18,8 @@
 #define TCP_SERVER_LOGGER_ID "tcp_server"
 
 static logger_id_t logger_id;
-static uv_tcp_t server;
+static uv_tcp_t *server = NULL;
+static uv_async_t *async = NULL;
 
 /*
  * Private functions
@@ -31,7 +32,23 @@ static void tcp_server_alloc_buffer(uv_handle_t *const handle, size_t suggested_
   buf->len = suggested_size;
 }
 
-static void tcp_server_on_close(uv_handle_t *const handle) { free(handle); }
+static void tcp_server_on_close(uv_handle_t *const handle) {
+  if (handle != NULL) {
+    free(handle);
+  }
+}
+
+static void tcp_server_on_walk(uv_handle_t *const handle, void *arg) {
+  UNUSED(arg);
+
+  uv_close(handle, tcp_server_on_close);
+}
+
+static void tcp_server_on_async(uv_async_t *const handle) {
+  UNUSED(handle);
+
+  uv_stop(uv_default_loop());
+}
 
 static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
   neighbor_t *neighbor = (neighbor_t *)client->data;
@@ -122,7 +139,7 @@ static void tcp_server_on_new_connection(uv_stream_t *const server, int const st
 static void *tcp_server_routine(void *param) {
   UNUSED(param);
 
-  log_info(logger_id, "Starting TCP server on port %d\n", ((node_t *)server.data)->conf.neighboring_port);
+  log_info(logger_id, "Starting TCP server on port %d\n", ((node_t *)server->data)->conf.neighboring_port);
   if (uv_run(uv_default_loop(), UV_RUN_DEFAULT) != 0) {
     log_critical(logger_id, "Starting TCP server failed\n");
     return NULL;
@@ -145,14 +162,19 @@ retcode_t tcp_server_init(tcp_server_t *const tcp_server, node_t *const node) {
 
   logger_id = logger_helper_enable(TCP_SERVER_LOGGER_ID, LOGGER_DEBUG, true);
 
-  tcp_server->running = false;
-  server.data = node;
+  if ((server = malloc(sizeof(uv_tcp_t))) == NULL || (async = malloc(sizeof(uv_async_t))) == NULL) {
+    return RC_OOM;
+  }
 
-  if ((ret = uv_tcp_init(uv_default_loop(), &server)) != 0 ||
+  tcp_server->running = false;
+  server->data = node;
+
+  if ((ret = uv_tcp_init(uv_default_loop(), server)) != 0 ||
       (ret = uv_ip4_addr(node->conf.neighboring_address, node->conf.neighboring_port, &addr)) != 0 ||
-      (ret = uv_tcp_nodelay(&server, true)) != 0 ||
-      (ret = uv_tcp_bind(&server, (const struct sockaddr *)&addr, 0)) != 0 ||
-      (ret = uv_listen((uv_stream_t *)&server, node->conf.max_neighbors, tcp_server_on_new_connection)) != 0) {
+      (ret = uv_tcp_nodelay(server, true)) != 0 ||
+      (ret = uv_tcp_bind(server, (const struct sockaddr *)&addr, 0)) != 0 ||
+      (ret = uv_listen((uv_stream_t *)server, node->conf.max_neighbors, tcp_server_on_new_connection)) != 0 ||
+      (ret = uv_async_init(uv_default_loop(), async, tcp_server_on_async)) != 0) {
     log_critical(logger_id, "TCP server initialization failed: %s\n", uv_err_name(ret));
     return RC_TCP_SERVER_INIT;
   }
@@ -177,6 +199,7 @@ retcode_t tcp_server_start(tcp_server_t *const tcp_server) {
 
 retcode_t tcp_server_stop(tcp_server_t *const tcp_server) {
   retcode_t ret = RC_OK;
+  int err = 0;
 
   if (tcp_server == NULL) {
     return RC_NULL_PARAM;
@@ -186,7 +209,13 @@ retcode_t tcp_server_stop(tcp_server_t *const tcp_server) {
 
   log_info(logger_id, "Shutting down TCP server thread\n");
   tcp_server->running = false;
-  uv_stop(uv_default_loop());
+
+  uv_walk(uv_default_loop(), tcp_server_on_walk, NULL);
+
+  if ((ret = uv_async_send(async)) != 0) {
+    log_error(logger_id, "Sending async request to stop event loop failed: %s\n", uv_err_name(err));
+  }
+
   if (thread_handle_join(tcp_server->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down TCP server thread failed\n");
     ret = RC_THREAD_JOIN;
