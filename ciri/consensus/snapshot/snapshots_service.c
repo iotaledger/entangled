@@ -288,18 +288,31 @@ static retcode_t iota_snapshots_service_add_entry_point_if_not_orphan(
     uint64_t min_snapshot_index, tangle_t const *const tangle, hash_to_uint64_t_map_t *const solid_entry_points) {
   retcode_t ret;
   check_not_orphan_do_func_params_t params;
+  iota_stor_pack_t hashes_pack;
 
   UNUSED(target_milestone_index);
   params.target_milestone_timestamp = target_milestone_timestamp;
   params.solid_entry_points = solid_entry_points;
   params.is_orphan = true;
 
-  ERR_BIND_RETURN(tangle_traversal_dfs_to_future(tangle, check_transaction_is_not_orphan_do_func, hash, NULL, &params),
-                  ret);
+  ERR_BIND_RETURN(hash_pack_init(&hashes_pack, 8), ret);
 
-  if (!params.is_orphan) {
-    ERR_BIND_RETURN(hash_to_uint64_t_map_add(solid_entry_points, hash, min_snapshot_index), ret);
+  ERR_BIND_GOTO(iota_tangle_transaction_load_hashes_of_approvers(tangle, hash, &hashes_pack, 0), ret, cleanup);
+
+  while (hashes_pack.num_loaded > 0) {
+    // Add each found approver to the currently traversed tx
+    ERR_BIND_GOTO(
+        tangle_traversal_dfs_to_future(tangle, check_transaction_is_not_orphan_do_func,
+                                       ((flex_trit_t *)hashes_pack.models[--hashes_pack.num_loaded]), NULL, &params),
+        ret, cleanup);
+
+    if (!params.is_orphan) {
+      ERR_BIND_GOTO(hash_to_uint64_t_map_add(solid_entry_points, hash, min_snapshot_index), ret, cleanup);
+    }
   }
+
+cleanup:
+  hash_pack_free(&hashes_pack);
 
   return RC_OK;
 }
