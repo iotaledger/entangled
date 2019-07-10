@@ -10,6 +10,7 @@
 #include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
 #include "ciri/node/protocol/gossip.h"
+#include "ciri/node/protocol/type.h"
 #include "common/network/uri.h"
 #include "utils/handles/rand.h"
 
@@ -51,6 +52,30 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
     strcpy(neighbor->endpoint.ip, ip);
   }
   neighbor->endpoint.port = port;
+
+  return RC_OK;
+}
+
+retcode_t neighbor_read(neighbor_t const *const neighbor, void const *const buf) {
+  protocol_header_t const *header = NULL;
+
+  if (neighbor == NULL || buf == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  header = (protocol_header_t const *)buf;
+
+  if (header->type < PACKET_TYPE_NBR) {
+    switch (header->type) {
+      case HANDSHAKE:
+        break;
+      case GOSSIP:
+        break;
+      default:
+        return RC_INVALID_PACKET_TYPE;
+        break;
+    }
+  }
 
   return RC_OK;
 }

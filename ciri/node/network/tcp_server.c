@@ -21,16 +21,15 @@ static logger_id_t logger_id;
 static uv_loop_t *loop;
 static uv_tcp_t server;
 
-void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
+/*
+ * Private functions
+ */
+
+static void tcp_server_alloc_buffer(uv_handle_t *const handle, size_t suggested_size, uv_buf_t *const buf) {
+  UNUSED(handle);
+
   buf->base = (char *)malloc(suggested_size);
   buf->len = suggested_size;
-}
-
-void echo_write(uv_write_t *req, int status) {
-  if (status) {
-    fprintf(stderr, "Write error %s\n", uv_strerror(status));
-  }
-  free(req);
 }
 
 static void tcp_server_on_close(uv_handle_t *const handle) { free(handle); }
@@ -79,13 +78,12 @@ void on_new_connection(uv_stream_t *server, int status) {
   }
 }
 
-/*
- * Private functions
- */
+static void *tcp_server_routine(void *param) {
+  UNUSED(param);
 
-static void *tcp_server_routine(tcp_server_t *const tcp_server) {
+  log_info(logger_id, "Starting TCP server on port %d\n", ((node_t *)server.data)->conf.neighboring_port);
   if (uv_run(loop, UV_RUN_DEFAULT) != 0) {
-    log_critical(logger_id, "Starting tcp server loop failed\n");
+    log_critical(logger_id, "Starting TCP server failed\n");
     return NULL;
   }
 
