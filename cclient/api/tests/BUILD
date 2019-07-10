@@ -101,3 +101,42 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_attach_to_tangle",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_attach_to_tangle.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_add_neighbors",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_add_neighbors.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_broadcast_transactions",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_broadcast_transactions.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)

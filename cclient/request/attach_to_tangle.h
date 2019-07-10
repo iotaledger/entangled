@@ -25,6 +25,9 @@
 extern "C" {
 #endif
 
+#define ATTACH_TO_TANGLE_MAIN_MWM 14
+#define ATTACH_TO_TANGLE_TEST_MWM 9
+
 /**
  * @brief The data structure of the attach to tangle request.
  *

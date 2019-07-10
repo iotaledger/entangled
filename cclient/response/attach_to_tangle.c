@@ -30,7 +30,12 @@ flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res, int ind
   return hash_array_at(res->trytes, index);
 }
 
-size_t attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res) { return hash_array_len(res->trytes); }
+size_t attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res) {
+  if (!res->trytes) {
+    return 0;
+  }
+  return hash_array_len(res->trytes);
+}
 
 void attach_to_tangle_res_free(attach_to_tangle_res_t** res) {
   if (!res || !(*res)) {

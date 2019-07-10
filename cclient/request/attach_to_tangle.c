@@ -7,9 +7,6 @@
 
 #include "cclient/request/attach_to_tangle.h"
 
-#define ATTACH_TO_TANGLE_MAIN_MWM 14
-#define ATTACH_TO_TANGLE_TEST_MWM 9
-
 attach_to_tangle_req_t *attach_to_tangle_req_new() {
   attach_to_tangle_req_t *req = (attach_to_tangle_req_t *)malloc(sizeof(attach_to_tangle_req_t));
   if (req) {

@@ -28,9 +28,18 @@ retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, char const* const
   return RC_OK;
 }
 
-size_t add_neighbors_req_uris_len(add_neighbors_req_t* req) { return utarray_len(req->uris); }
+size_t add_neighbors_req_uris_len(add_neighbors_req_t* req) {
+  if (!req->uris) {
+    return 0;
+  }
+  return utarray_len(req->uris);
+}
 
 const char* add_neighbors_req_uris_at(add_neighbors_req_t* req, size_t idx) {
+  if (!req->uris) {
+    return NULL;
+  }
+
   return *(const char**)utarray_eltptr(req->uris, idx);
 }
 
