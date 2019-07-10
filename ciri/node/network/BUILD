@@ -58,7 +58,9 @@ cc_library(
     srcs = ["tcp_server.c"],
     visibility = ["//visibility:public"],
     deps = [
+        ":router",
         ":tcp_server_shared",
         "//ciri/node:node_shared",
+        "//ciri/node/protocol:type",
     ],
 )

@@ -9,9 +9,12 @@
 
 #include <uv.h>
 
+#include "ciri/node/network/router.h"
 #include "ciri/node/network/tcp_server.h"
 #include "ciri/node/node.h"
+#include "ciri/node/protocol/type.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define TCP_SERVER_LOGGER_ID "tcp_server"
 
@@ -83,21 +86,29 @@ static void *tcp_server_routine(tcp_server_t *const tcp_server) {
 
 retcode_t tcp_server_init(tcp_server_t *const tcp_server, node_t *const node) {
   struct sockaddr_in addr;
+  int ret = 0;
 
   if (tcp_server == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
 
   logger_id = logger_helper_enable(TCP_SERVER_LOGGER_ID, LOGGER_DEBUG, true);
-  loop = uv_default_loop();
+
+  if ((loop = uv_default_loop()) == NULL) {
+    log_critical(logger_id, "Event loop initialization failed\n");
+    return RC_EVENT_LOOP;
+  }
 
   tcp_server->running = false;
-  tcp_server->node = node;
+  server.data = node;
 
-  uv_tcp_init(loop, &server);
-  uv_ip4_addr(tcp_server->node->conf.neighboring_address, tcp_server->node->conf.neighboring_port, &addr);
-  uv_tcp_bind(&server, (const struct sockaddr *)&addr, 0);
-  uv_listen((uv_stream_t *)&server, 128, on_new_connection);
+  if ((ret = uv_tcp_init(loop, &server)) != 0 ||
+      (ret = uv_ip4_addr(node->conf.neighboring_address, node->conf.neighboring_port, &addr)) != 0 ||
+      (ret = uv_tcp_bind(&server, (const struct sockaddr *)&addr, 0)) != 0 ||
+      (ret = uv_listen((uv_stream_t *)&server, node->conf.max_neighbors, tcp_server_on_new_connection)) != 0) {
+    log_critical(logger_id, "TCP server initialization failed: %s\n", uv_err_name(ret));
+    return RC_TCP_SERVER_INIT;
+  }
 
   return RC_OK;
 }
@@ -109,7 +120,7 @@ retcode_t tcp_server_start(tcp_server_t *const tcp_server) {
 
   log_info(logger_id, "Spawning TCP server thread\n");
   tcp_server->running = true;
-  if (thread_handle_create(&tcp_server->thread, (thread_routine_t)tcp_server_routine, tcp_server) != 0) {
+  if (thread_handle_create(&tcp_server->thread, (thread_routine_t)tcp_server_routine, NULL) != 0) {
     log_critical(logger_id, "Spawning TCP server thread failed\n");
     return RC_THREAD_CREATE;
   }
@@ -138,50 +149,66 @@ retcode_t tcp_server_stop(tcp_server_t *const tcp_server) {
 }
 
 retcode_t tcp_server_destroy(tcp_server_t *const tcp_server) {
+  retcode_t ret = RC_OK;
+
   if (tcp_server == NULL) {
     return RC_NULL_PARAM;
   } else if (tcp_server->running) {
     return RC_STILL_RUNNING;
   }
 
+  if (uv_loop_close(loop) != 0) {
+    log_error(logger_id, "Closing event loop failed\n");
+    ret = RC_EVENT_LOOP;
+  }
+
   logger_helper_release(logger_id);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip) {
   struct addrinfo hints;
   uv_getaddrinfo_t resolver;
-  int r = 0;
+  int err = 0;
+  retcode_t ret = RC_OK;
 
   hints.ai_family = PF_INET;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = IPPROTO_TCP;
   hints.ai_flags = 0;
 
-  if ((r = uv_getaddrinfo(loop, &resolver, NULL, domain, NULL, &hints)) != 0) {
-    log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(r));
+  if ((err = uv_getaddrinfo(loop, &resolver, NULL, domain, NULL, &hints)) != 0) {
+    log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(err));
     return RC_DOMAIN_RESOLUTION;
   }
 
   switch (resolver.addrinfo->ai_family) {
     case AF_INET: {
-      uv_ip4_name((struct sockaddr_in *)resolver.addrinfo->ai_addr, ip, INET_ADDRSTRLEN);
+      if ((err = uv_ip4_name((struct sockaddr_in *)resolver.addrinfo->ai_addr, ip, INET_ADDRSTRLEN)) != 0) {
+        log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(err));
+        ret = RC_DOMAIN_RESOLUTION;
+      }
       break;
     }
     case AF_INET6: {
-      uv_ip6_name((struct sockaddr_in6 *)hints.ai_addr, ip, INET6_ADDRSTRLEN);
+      if ((err = uv_ip6_name((struct sockaddr_in6 *)hints.ai_addr, ip, INET6_ADDRSTRLEN)) != 0) {
+        log_error(logger_id, "Can't resolve domain: %s\n", uv_err_name(err));
+        ret = RC_DOMAIN_RESOLUTION;
+      }
       break;
     }
     default:
       log_error(logger_id, "Can't resolve domain\n");
-      return RC_DOMAIN_RESOLUTION;
+      ret = RC_DOMAIN_RESOLUTION;
       break;
   }
 
   uv_freeaddrinfo(resolver.addrinfo);
 
-  log_debug(logger_id, "%s resolved into %s\n", domain, ip);
+  if (ret == RC_OK) {
+    log_debug(logger_id, "%s resolved into %s\n", domain, ip);
+  }
 
-  return RC_OK;
+  return ret;
 }

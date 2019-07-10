@@ -331,6 +331,8 @@ enum retcode_t {
 
   // Network Module
   RC_DOMAIN_RESOLUTION = 0x01 | RC_MODULE_NETWORK | RC_SEVERITY_FATAL,
+  RC_EVENT_LOOP = 0x02 | RC_MODULE_NETWORK | RC_SEVERITY_FATAL,
+  RC_TCP_SERVER_INIT = 0x03 | RC_MODULE_NETWORK | RC_SEVERITY_FATAL,
 };
 
 typedef enum retcode_t retcode_t;
