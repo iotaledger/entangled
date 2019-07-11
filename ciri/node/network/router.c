@@ -181,6 +181,8 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   protocol_header_t const *header = NULL;
   protocol_handshake_t const *handshake = NULL;
   int protocol_version = 0;
+  uint16_t header_length = 0;
+  uint16_t handshake_port = 0;
 
   if (router == NULL || ip == NULL || buf == NULL || neighbor == NULL) {
     return RC_NULL_PARAM;
@@ -202,18 +204,20 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   }
 
   // Check whether we have a complete handshake packet
-  if (nread != HEADER_BYTES_LENGTH + header->length || header->length < HANDSHAKE_MIN_BYTES_LENGTH) {
+  header_length = ntohs(header->length);
+  if (nread != HEADER_BYTES_LENGTH + header_length || header_length < HANDSHAKE_MIN_BYTES_LENGTH) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because invalid packet size %d\n", ip, port,
-                header->length);
+                header_length);
     return RC_INVALID_PACKET;
   }
   handshake = (protocol_handshake_t const *)(buf + HEADER_BYTES_LENGTH);
 
   // Check whether the socket port corresponds to the port advertised in the handshake packet
-  if (port != handshake->port) {
+  handshake_port = ntohs(handshake->port);
+  if (port != handshake_port) {
     log_warning(logger_id,
                 "Failed handshake with tcp://%s:%d because socket port %d doesn't match advertised port %d\n", ip, port,
-                port, handshake->port);
+                port, handshake_port);
     return RC_FAILED_HANDSHAKE;
   }
 
@@ -235,14 +239,14 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   // Check whether we support the supported protocol versions by the neighbor
   if ((protocol_version = handshake_supported_version(
            handshake_supported_protocol_versions, sizeof(handshake_supported_protocol_versions),
-           handshake->supported_versions, header->length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
+           handshake->supported_versions, header_length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because of protocol version %d mismatch\n", ip, port,
                 protocol_version);
     return RC_FAILED_HANDSHAKE;
   }
 
   // Check whether the peer is an allowed neighbor
-  if ((*neighbor = router_neighbor_find_by_endpoint_values(router, ip, handshake->port)) == NULL) {
+  if ((*neighbor = router_neighbor_find_by_endpoint_values(router, ip, handshake_port)) == NULL) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because the peer is a non-tethered neighbor\n", ip, port);
     return RC_FAILED_HANDSHAKE;
   }
