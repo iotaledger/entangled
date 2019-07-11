@@ -11,9 +11,15 @@
 retcode_t iota_client_remove_neighbors(iota_client_service_t const* const service,
                                        remove_neighbors_req_t const* const req, remove_neighbors_res_t* res) {
   retcode_t result = RC_ERROR;
+  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (utarray_len(req->uris) == 0) {
+    log_error(client_core_logger_id, "[%s:%d] The list is empty.\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
-  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
     result = RC_OOM;

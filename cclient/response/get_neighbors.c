@@ -33,7 +33,10 @@ get_neighbors_res_t* get_neighbors_res_new() {
   return nbors;
 }
 
-void get_neighbors_res_free(get_neighbors_res_t* res) { utarray_free(res); }
+void get_neighbors_res_free(get_neighbors_res_t** res) {
+  utarray_free(*res);
+  *res = NULL;
+}
 
 retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* res, char const* const addr, uint32_t all_trans_num,
                                          uint32_t random_trans_req_num, uint32_t new_trans_num,

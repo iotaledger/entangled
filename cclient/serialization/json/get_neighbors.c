@@ -78,16 +78,17 @@ err:
 
 retcode_t json_get_neighbors_deserialize_response(char const *const obj, get_neighbors_res_t *out) {
   retcode_t ret = RC_ERROR;
-  cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
+  cJSON *json_obj = cJSON_Parse(obj);
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
+
   char_buffer_t *addr = char_buffer_new();
   char_buffer_t *connection = char_buffer_new();
   if (!addr || !connection) {
-    return RC_OOM;
+    ret = RC_OOM;
+    goto end;
   }
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
-  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "neighbors");
   if (cJSON_IsArray(json_item)) {

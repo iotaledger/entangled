@@ -140,3 +140,42 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_get_neighbors",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_get_neighbors.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_remove_neighbors",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_remove_neighbors.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_store_transactions",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_store_transactions.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)

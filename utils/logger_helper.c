@@ -19,7 +19,7 @@ retcode_t logger_helper_init() {
   logger_color_prefix_enable();
   logger_color_message_enable();
   logger_output_register(stdout);
-  logger_output_level_set(stdout, LOGGER_WARNING);
+  logger_output_level_set(stdout, LOGGER_DEBUG);
 
   lock_handle_init(&lock);
 

@@ -287,7 +287,7 @@ static inline retcode_t process_get_neighbors_request(iota_api_http_t *const htt
   }
 
 done:
-  get_neighbors_res_free(res);
+  get_neighbors_res_free(&res);
 
   return ret;
 }
