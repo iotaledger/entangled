@@ -38,8 +38,10 @@ extern "C" {
 #endif
 #endif
 
-extern const char* khttp_ApplicationJson;
-extern const char* khttp_ApplicationFormUrlencoded;
+#define CCLIENT_SOCKET_RETRY 5
+
+extern char const* khttp_ApplicationJson;
+extern char const* khttp_ApplicationFormUrlencoded;
 
 /**
  * @brief HTTP/HTTPS Client implementation
