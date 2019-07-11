@@ -249,6 +249,10 @@ retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle, flex_trit_t 
   return iota_stor_milestone_exist(&tangle->connection, hash, exist);
 }
 
+retcode_t iota_tangle_milestone_delete(tangle_t const *const tangle, flex_trit_t const *const hash) {
+  return iota_stor_milestone_delete(&tangle->connection, hash);
+}
+
 /*
  * Utilities
  */

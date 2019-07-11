@@ -42,6 +42,7 @@ typedef struct tangle_statements_s {
   void* milestone_select_next;
   void* milestone_exist;
   void* milestone_exist_by_hash;
+  void* milestone_delete_by_hash;
   void* state_delta_store;
   void* state_delta_load;
 } tangle_statements_t;
@@ -106,6 +107,7 @@ extern char* iota_statement_milestone_select_by_index;
 extern char* iota_statement_milestone_select_next;
 extern char* iota_statement_milestone_exist;
 extern char* iota_statement_milestone_exist_by_hash;
+extern char* iota_statement_milestone_delete_by_hash;
 
 /*
  * State delta statements

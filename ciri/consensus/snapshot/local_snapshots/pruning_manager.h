@@ -27,7 +27,7 @@ typedef struct pruning_manager_s {
   thread_handle_t pruning_manager_thread;
   cond_handle_t cond_pruning_manager;
   iota_consensus_conf_t *conf;
-  uint64_t current_snapshot_index_to_prune;
+  uint64_t last_pruned_snapshot_index;
   uint64_t last_snapshot_index_to_prune;
   rw_lock_handle_t rw_lock;
   snapshots_provider_t *snapshot_provider;

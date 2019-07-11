@@ -1023,6 +1023,27 @@ done:
   return ret;
 }
 
+retcode_t iota_stor_milestone_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+
+  sqlite_statement = sqlite3_connection->statements.milestone_delete_by_hash;
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
 /*
  * State delta operations
  */

@@ -158,6 +158,8 @@ retcode_t iota_tangle_milestone_load_next(tangle_t const *const tangle, uint64_t
 
 retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle, flex_trit_t const *const hash, bool *const exist);
 
+retcode_t iota_tangle_milestone_delete(tangle_t const *const tangle, flex_trit_t const *const hash);
+
 /*
  * State delta operations
  */

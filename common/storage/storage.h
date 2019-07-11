@@ -152,6 +152,9 @@ extern retcode_t iota_stor_milestone_load_next(storage_connection_t const* const
 extern retcode_t iota_stor_milestone_exist(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                            bool* const exist);
 
+extern retcode_t iota_stor_milestone_delete(storage_connection_t const* const connection,
+                                            flex_trit_t const* const hash);
+
 /*
  * State delta operations
  */

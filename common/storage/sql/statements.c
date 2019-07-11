@@ -194,6 +194,7 @@ char *iota_statement_milestone_exist_by_hash =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
 
+char *iota_statement_milestone_delete_by_hash = "DELETE FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
 /*
  * State delta statements
  */

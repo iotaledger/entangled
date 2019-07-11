@@ -183,6 +183,19 @@ void test_stored_milestone(void) {
   }
 }
 
+void test_delete_milestone(void) {
+  DECLARE_PACK_SINGLE_MILESTONE(ms, ms_ptr, ms_pack);
+
+  iota_stor_milestone_load_last(&connection, &ms_pack);
+  TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
+  bool exist = false;
+  TEST_ASSERT(iota_stor_milestone_exist(&connection, ms.hash, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+  TEST_ASSERT(iota_stor_milestone_delete(&connection, ms.hash) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&connection, ms.hash, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
+
 void test_stored_load_hashes_by_address(void) {
   flex_trit_t *hashes[5];
   iota_stor_pack_t pack = {.models = (void **)hashes, .capacity = 5, .num_loaded = 0, .insufficient_capacity = false};
@@ -421,6 +434,7 @@ int main(void) {
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
   RUN_TEST(test_milestone_state_delta);
+  RUN_TEST(test_delete_milestone);
   RUN_TEST(test_transaction_update_snapshot_index);
   RUN_TEST(test_transaction_update_solid_state);
   RUN_TEST(test_transactions_update_solid_states_one_transaction);
