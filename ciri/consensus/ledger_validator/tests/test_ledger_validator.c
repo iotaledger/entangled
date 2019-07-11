@@ -60,6 +60,7 @@ static snapshots_provider_t snapshots_provider;
 static snapshots_service_t snapshots_service;
 static transaction_solidifier_t transaction_solidifier;
 static pruning_manager_t pm;
+static tips_cache_t tips;
 static flex_trit_t g_seed[FLEX_TRIT_SIZE_243];
 
 void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
@@ -90,7 +91,7 @@ static void init_test_structs() {
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &transaction_solidifier) == RC_OK);
   TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &milestone_service, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &conf) == RC_OK);
-  TEST_ASSERT(iota_local_snapshots_pruning_manager_init(&pm, &snapshots_provider, NULL, &conf) == RC_OK);
+  TEST_ASSERT(iota_local_snapshots_pruning_manager_init(&pm, &snapshots_provider, NULL, &conf, &tips) == RC_OK);
 }
 
 static void destroy_test_structs() {

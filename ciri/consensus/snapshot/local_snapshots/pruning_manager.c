@@ -23,8 +23,32 @@ typedef struct collect_transactions_for_pruning_do_func_params_s {
   uint64_t current_snapshot_index;
   tangle_t const *tangle;
   hash243_set_t transactions_to_prune;
-  hash243_set_t const *solid_entry_points;
 } collect_transactions_for_pruning_do_func_params_t;
+
+static retcode_t collect_unconfirmed_future_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack,
+                                                                             void *data, bool *should_branch,
+                                                                             bool *should_stop) {
+  retcode_t ret = RC_OK;
+  *should_stop = false;
+  *should_branch = true;
+  collect_transactions_for_pruning_do_func_params_t *params = data;
+
+  if (pack->num_loaded == 0) {
+    *should_branch = false;
+    return RC_OK;
+  }
+
+  transaction_snapshot_index((iota_transaction_t *)pack->models[0]);
+
+  if (transaction_snapshot_index((iota_transaction_t *)pack->models[0]) == 0) {
+    if ((ret = hash243_set_add(&params->transactions_to_prune, hash)) != RC_OK) {
+      return ret;
+    }
+    *should_branch = true;
+  }
+
+  return RC_OK;
+}
 
 static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
                                                           bool *should_branch, bool *should_stop) {
@@ -44,6 +68,11 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
     if ((ret = hash243_set_add(&params->transactions_to_prune, hash)) != RC_OK) {
       return ret;
     }
+
+    ERR_BIND_RETURN(
+        tangle_traversal_dfs_to_future(params->tangle, collect_unconfirmed_future_transactions_for_pruning_do_func,
+                                       hash, NULL, &params),
+        ret);
   }
 
 cleanup:
@@ -119,7 +148,7 @@ static retcode_t iota_local_snapshots_pruning_manager_prune_transactions(pruning
     params.current_snapshot_index = pm->last_pruned_snapshot_index + 1;
     params.tangle = &tangle;
     params.transactions_to_prune = NULL;
-    ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(&tangle, params.current_snapshot_index, &milestone_pack), err,
+    ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(&tangle, pm->last_pruned_snapshot_index, &milestone_pack), err,
                   cleanup);
     ERR_BIND_GOTO(tangle_traversal_dfs_to_past(&tangle, collect_transactions_for_pruning_do_func, milestone.hash,
                                                pm->conf->genesis_hash, NULL, &params),
@@ -141,6 +170,7 @@ static retcode_t iota_local_snapshots_pruning_manager_prune_transactions(pruning
           cleanup);
       ERR_BIND_GOTO(iota_spent_addresses_service_was_tx_spent_from(sap, &tangle, &tx, iter->hash, &spent), err,
                     cleanup);
+      ERR_BIND_GOTO(tips_cache_remove(pm->tips_cache, iter->hash), err, cleanup);
     }
 
     if (!can_prune_snapshot_index_entirely) {
@@ -169,7 +199,7 @@ cleanup:
 retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *pm,
                                                     snapshots_provider_t *const snapshot_provider,
                                                     spent_addresses_service_t const *spent_addresses_service,
-                                                    iota_consensus_conf_t *const conf) {
+                                                    tips_cache_t *const tips_cache, iota_consensus_conf_t *const conf) {
   logger_id = logger_helper_enable(PRUNING_MANAGER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(pm, 0, sizeof(pruning_manager_t));
   pm->conf = conf;
@@ -177,6 +207,7 @@ retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *pm,
   pm->last_snapshot_index_to_prune = pm->last_pruned_snapshot_index;
   pm->snapshot_provider = snapshot_provider;
   pm->spent_addresses_service = spent_addresses_service;
+  pm->tips_cache = tips_cache;
   rw_lock_handle_init(&pm->rw_lock);
   return RC_OK;
 }

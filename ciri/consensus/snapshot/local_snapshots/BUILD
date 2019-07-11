@@ -36,6 +36,7 @@ cc_library(
         "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/snapshot:snapshots_service",
         "//ciri/consensus/spent_addresses:spent_addresses_service",
+        "//ciri/node:tips_cache",
     ],
 )
 
@@ -50,6 +51,7 @@ cc_library(
         "//ciri/consensus/spent_addresses:spent_addresses_service",
         "//ciri/consensus/tangle",
         "//ciri/consensus/tangle:traversal",
+        "//ciri/node:tips_cache",
         "//common:errors",
         "//utils/handles:cond",
         "//utils/handles:rw_lock",
