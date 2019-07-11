@@ -126,8 +126,10 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  iota_local_snapshots_pruning_manager_init(&lsm->pm, lsm->snapshots_service->snapshots_provider,
-                                            spent_addresses_service, tips_cache, conf);
+  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+    iota_local_snapshots_pruning_manager_init(&lsm->pm, lsm->snapshots_service->snapshots_provider,
+                                              spent_addresses_service, tips_cache, conf);
+  }
 
   return RC_OK;
 }
@@ -146,7 +148,9 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
     return RC_THREAD_CREATE;
   }
 
-  ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_start(&lsm->pm), ret);
+  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_start(&lsm->pm), ret);
+  }
 
   return RC_OK;
 }
@@ -160,7 +164,9 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
     return RC_OK;
   }
 
-  ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_stop(&lsm->pm), ret);
+  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_stop(&lsm->pm), ret);
+  }
 
   lsm->running = false;
   cond_handle_signal(&lsm->cond_local_snapshots);
@@ -182,7 +188,9 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
     return RC_STILL_RUNNING;
   }
 
-  ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_destroy(&lsm->pm), ret);
+  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_manager_destroy(&lsm->pm), ret);
+  }
 
   cond_handle_destroy(&lsm->cond_local_snapshots);
   memset(lsm, 0, sizeof(local_snapshots_manager_t));

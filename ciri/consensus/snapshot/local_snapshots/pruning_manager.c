@@ -6,6 +6,7 @@
  */
 
 #include "ciri/consensus/snapshot/local_snapshots/pruning_manager.h"
+#include <inttypes.h>
 #include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/traversal.h"
 #include "common/errors.h"
@@ -181,7 +182,7 @@ static retcode_t iota_local_snapshots_pruning_manager_prune_transactions(pruning
     hash243_set_add(&params.transactions_to_prune, milestone.hash);
     ERR_BIND_GOTO(iota_tangle_transaction_delete_batch(&tangle, params.transactions_to_prune), err, cleanup);
     ERR_BIND_GOTO(iota_tangle_milestone_delete(&tangle, milestone.hash), err, cleanup);
-    // TODO - remove transaction from queues and caches
+    log_info(logger_id, "Snapshot index % " PRId64 " was pruned successfully\n", pm->last_pruned_snapshot_index);
     pm->last_pruned_snapshot_index++;
 
     hash243_set_free(&params.transactions_to_prune);
