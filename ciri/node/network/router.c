@@ -266,7 +266,6 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   return RC_OK;
 }
 
-
 retcode_t router_neighbors_reconnect_attempt(router_t *const router) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;

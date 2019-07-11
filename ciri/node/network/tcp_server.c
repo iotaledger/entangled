@@ -149,7 +149,6 @@ static void tcp_server_on_connect(uv_connect_t *const connection, int const stat
   if (status < 0) {
     log_warning(logger_id, "Connection to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain,
                 neighbor->endpoint.port, uv_strerror(status));
-    uv_close((uv_handle_t *)client, tcp_server_on_close);
     free(connection);
     return;
   }
