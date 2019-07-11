@@ -89,7 +89,7 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing router\n");
-  if ((ret = router_init(&node->router, &node->conf)) != RC_OK) {
+  if ((ret = router_init(&node->router, node)) != RC_OK) {
     log_critical(logger_id, "Initializing router failed\n");
     return ret;
   }

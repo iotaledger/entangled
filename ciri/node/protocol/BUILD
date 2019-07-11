@@ -23,6 +23,7 @@ cc_library(
 
 cc_library(
     name = "handshake",
+    srcs = ["handshake.c"],
     hdrs = ["handshake.h"],
     visibility = ["//visibility:public"],
 )

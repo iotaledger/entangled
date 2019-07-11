@@ -53,23 +53,51 @@ static void tcp_server_on_async(uv_async_t *const handle) {
 static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
   neighbor_t *neighbor = (neighbor_t *)client->data;
 
-  log_debug(logger_id, "Packet received from tethered neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
-            neighbor->endpoint.port);
-
   if (nread < 0) {
     if (nread != UV_EOF) {
-      log_warning(logger_id, "Read error from tethered neighbor tcp://%s:%d: %s\n", neighbor->endpoint.domain,
-                  neighbor->endpoint.port, uv_err_name(nread));
-    } else {
-      log_info(logger_id, "Connection with tethered neighbor tcp://%s:%d lost\n", neighbor->endpoint.domain,
+      log_warning(logger_id, "Read error: %s\n", uv_err_name(nread));
+    } else if (neighbor != NULL) {
+      log_info(logger_id, "Connection with neighbor tcp://%s:%d lost\n", neighbor->endpoint.domain,
                neighbor->endpoint.port);
+      neighbor->state = NEIGHBOR_HANDSHAKING;
       neighbor->endpoint.stream = NULL;
     }
     uv_close((uv_handle_t *)client, tcp_server_on_close);
   } else if (nread > 0) {
-    if (neighbor_read(neighbor, buf->base) != RC_OK) {
-      log_warning(logger_id, "Read error from tethered neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
-                  neighbor->endpoint.port);
+    if (neighbor == NULL) {
+      char host[NI_MAXHOST];
+      char serv[NI_MAXSERV];
+      uint16_t port;
+      struct sockaddr_storage addr;
+      int len = sizeof(struct sockaddr_storage);
+
+      if (uv_tcp_getpeername(client, (struct sockaddr *)&addr, &len) != 0 ||
+          getnameinfo((struct sockaddr *)&addr, sizeof(addr), host, NI_MAXHOST, serv, NI_MAXSERV,
+                      NI_NUMERICHOST | NI_NUMERICSERV) != 0) {
+        log_warning(logger_id, "Unable to get peer information\n");
+        uv_close((uv_handle_t *)client, tcp_server_on_close);
+        return;
+      }
+      port = atoi(serv);
+
+      log_debug(logger_id, "Initiating handshake with tcp://%s:%d\n", host, port);
+      if (router_neighbor_read_handshake(&((node_t *)server->data)->router, host, port, buf->base, nread, &neighbor) ==
+          RC_OK) {
+        log_info(logger_id, "Connection with neighbor tcp://%s:%d established\n", neighbor->endpoint.domain,
+                 neighbor->endpoint.port);
+        client->data = neighbor;
+        neighbor->endpoint.stream = client;
+      } else {
+        uv_close((uv_handle_t *)client, tcp_server_on_close);
+      }
+    } else {
+      log_debug(logger_id, "Packet received from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
+                neighbor->endpoint.port);
+      // TODO
+      // if (neighbor_read(neighbor, buf->base) != RC_OK) {
+      //   log_warning(logger_id, "Read error from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
+      //               neighbor->endpoint.port);
+      // }
     }
   }
 
@@ -82,56 +110,32 @@ static void tcp_server_on_new_connection(uv_stream_t *const server, int const st
   int ret = 0;
   uv_tcp_t *client = NULL;
 
+  log_debug(logger_id, "New TCP connection\n");
+
   if (status < 0) {
-    log_warning(logger_id, "Couldn't accept new connection: %s\n", uv_strerror(status));
+    log_warning(logger_id, "New connection failed: %s\n", uv_strerror(status));
     return;
   }
 
   if ((client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t))) == NULL) {
+    log_warning(logger_id, "Allocation of new client failed\n");
     return;
   }
+  client->data = NULL;
 
   if ((ret = uv_tcp_init(uv_default_loop(), client)) != 0 || (ret = uv_tcp_nodelay(client, true)) != 0) {
-    log_warning(logger_id, "Couldn't accept new connection: %s\n", uv_err_name(ret));
+    log_warning(logger_id, "Initializing new client failed: %s\n", uv_err_name(ret));
     uv_close((uv_handle_t *)client, tcp_server_on_close);
     return;
   }
 
   if ((ret = uv_accept(server, (uv_stream_t *)client)) == 0) {
-    char host[NI_MAXHOST];
-    char serv[NI_MAXSERV];
-    uint16_t port;
-    struct sockaddr_storage addr;
-    int len = sizeof(struct sockaddr_storage);
-    neighbor_t *neighbor = NULL;
-
-    if (uv_tcp_getpeername(client, (struct sockaddr *)&addr, &len) != 0 ||
-        getnameinfo((struct sockaddr *)&addr, sizeof(addr), host, NI_MAXHOST, serv, NI_MAXSERV,
-                    NI_NUMERICHOST | NI_NUMERICSERV) != 0) {
-      log_warning(logger_id, "Unable to get peer information\n");
-      uv_close((uv_handle_t *)client, tcp_server_on_close);
-      return;
-    }
-
-    port = atoi(serv);
-    neighbor = router_neighbor_find_by_endpoint_values(&((node_t *)server->data)->router, host, port);
-    if (neighbor) {
-      log_info(logger_id, "Connection with tethered neighbor tcp://%s:%d established\n", neighbor->endpoint.domain,
-               neighbor->endpoint.port);
-      if ((ret = uv_read_start((uv_stream_t *)client, tcp_server_alloc_buffer, tcp_server_on_read)) != 0) {
-        log_error(logger_id, "Starting to read from tethered neighbor tcp://%s:%d failed: %s\n",
-                  neighbor->endpoint.domain, neighbor->endpoint.port, uv_err_name(ret));
-        uv_close((uv_handle_t *)client, tcp_server_on_close);
-      } else {
-        client->data = neighbor;
-        neighbor->endpoint.stream = client;
-      }
-    } else {
-      log_warning(logger_id, "Connection with non-tethered neighbor tcp://%s:%d denied\n", host, port);
+    if ((ret = uv_read_start((uv_stream_t *)client, tcp_server_alloc_buffer, tcp_server_on_read)) != 0) {
+      log_error(logger_id, "Starting to read from new client failed: %s\n", uv_err_name(ret));
       uv_close((uv_handle_t *)client, tcp_server_on_close);
     }
   } else {
-    log_warning(logger_id, "Couldn't accept new connection: %s\n", uv_err_name(ret));
+    log_warning(logger_id, "Accepting new connection failed: %s\n", uv_err_name(ret));
     uv_close((uv_handle_t *)client, tcp_server_on_close);
   }
 }

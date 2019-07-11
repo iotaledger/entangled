@@ -10,7 +10,6 @@
 
 #include "utarray.h"
 
-#include "ciri/node/conf.h"
 #include "ciri/node/network/neighbor.h"
 #include "utils/handles/rw_lock.h"
 
@@ -23,7 +22,7 @@ extern "C" {
 #endif
 
 typedef struct router_s {
-  iota_node_conf_t *conf;
+  node_t *node;
   UT_array *neighbors;
   rw_lock_handle_t neighbors_lock;
 } router_t;
@@ -32,11 +31,11 @@ typedef struct router_s {
  * Initializes a router
  *
  * @param router The router
- * @param conf A node configuration
+ * @param node A node
  *
  * @return a status code
  */
-retcode_t router_init(router_t *const router, iota_node_conf_t *const conf);
+retcode_t router_init(router_t *const router, node_t *const node);
 
 /**
  * Destroys a router
@@ -77,25 +76,40 @@ retcode_t router_neighbor_remove(router_t *const router, neighbor_t const *const
 size_t router_neighbors_count(router_t *const router);
 
 /**
- * Finds a neigbor matching given endpoint in a router
+ * Finds a neighbor matching given endpoint in a router
  *
  * @param router The router
  * @param endpoint The endpoint
  *
- * @return a pointer to the neigbor if found, NULL otherwise
+ * @return a pointer to the neighbor if found, NULL otherwise
  */
 neighbor_t *router_neighbor_find_by_endpoint(router_t *const router, endpoint_t const *const endpoint);
 
 /**
- * Finds a neigbor matching given endpoint values in a router
+ * Finds a neighbor matching given endpoint values in a router
  *
  * @param router The router
  * @param ip The endpoint ip
  * @param port The endpoint port
  *
- * @return a pointer to the neigbor if found, NULL otherwise
+ * @return a pointer to the neighbor if found, NULL otherwise
  */
 neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char const *const ip, uint16_t const port);
+
+/**
+ * Reads and validate a handshake and associate it with a neighbor
+ *
+ * @param router The router
+ * @param ip The IP
+ * @param port The port
+ * @param buf The buffer
+ * @param nread The buffer size
+ * @param neighbor The neighbor
+ *
+ * @return a pointer to the neighbor if found, NULL otherwise
+ */
+retcode_t router_neighbor_read_handshake(router_t *const router, char const *const ip, uint16_t const port,
+                                         void const *const buf, size_t const nread, neighbor_t **const neighbor);
 
 #ifdef __cplusplus
 }

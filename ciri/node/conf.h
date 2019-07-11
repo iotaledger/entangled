@@ -65,8 +65,8 @@ typedef struct iota_node_conf_s {
   char tangle_db_path[FILE_PATH_SIZE];
   // Scan the current tips and attempt to mark them as solid
   bool tips_solidifier_enabled;
-  // The address of the coordinator
-  flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
+  // The address of the coordinator encoded in bytes
+  byte_t coordinator_address[HASH_LENGTH_BYTE];
   // The address to bind the TCP server socket to
   char neighboring_address[16];
   // The TCP receiver port

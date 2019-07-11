@@ -5,8 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include "uv.h"
+
 #include "ciri/node/network/router.h"
 #include "ciri/node/network/tcp_server.h"
+#include "ciri/node/node.h"
+#include "ciri/node/protocol/type.h"
 #include "utils/logger_helper.h"
 
 #define ROUTER_LOGGER_ID "router"
@@ -26,8 +30,8 @@ static retcode_t router_neighbors_init(router_t *const router) {
   neighbor_t neighbor;
   char *neighbor_uri, *cpy, *ptr;
 
-  if (router->conf->neighbors != NULL) {
-    if ((ptr = cpy = strdup(router->conf->neighbors)) == NULL) {
+  if (router->node->conf.neighbors != NULL) {
+    if ((ptr = cpy = strdup(router->node->conf.neighbors)) == NULL) {
       return RC_OOM;
     }
     while ((neighbor_uri = strsep(&cpy, " ")) != NULL) {
@@ -46,7 +50,7 @@ static retcode_t router_neighbors_init(router_t *const router) {
   return RC_OK;
 }
 
-retcode_t router_init(router_t *const router, iota_node_conf_t *const conf) {
+retcode_t router_init(router_t *const router, node_t *const node) {
   retcode_t ret = RC_OK;
 
   if (router == NULL) {
@@ -55,7 +59,7 @@ retcode_t router_init(router_t *const router, iota_node_conf_t *const conf) {
 
   logger_id = logger_helper_enable(ROUTER_LOGGER_ID, LOGGER_DEBUG, true);
 
-  router->conf = conf;
+  router->node = node;
   utarray_new(router->neighbors, &neighbors_icd);
   rw_lock_handle_init(&router->neighbors_lock);
 
@@ -171,3 +175,90 @@ neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char
 
   return elt;
 }
+
+retcode_t router_neighbor_read_handshake(router_t *const router, char const *const ip, uint16_t const port,
+                                         void const *buf, size_t const nread, neighbor_t **const neighbor) {
+  protocol_header_t const *header = NULL;
+  protocol_handshake_t const *handshake = NULL;
+  int protocol_version = 0;
+
+  if (router == NULL || ip == NULL || buf == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  *neighbor = NULL;
+
+  // Check whether we have a complete header
+  if (nread < HEADER_BYTES_LENGTH) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because invalid header size %d\n", ip, port, nread);
+    return RC_INVALID_PACKET;
+  }
+  header = (protocol_header_t const *)buf;
+
+  // Check if the packet is really a handshake
+  if (header->type != HANDSHAKE) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because packet is not a handshake\n", ip, port);
+    return RC_INVALID_PACKET_TYPE;
+  }
+
+  // Check whether we have a complete handshake packet
+  if (nread != HEADER_BYTES_LENGTH + header->length || header->length < HANDSHAKE_MIN_BYTES_LENGTH) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because invalid packet size %d\n", ip, port,
+                header->length);
+    return RC_INVALID_PACKET;
+  }
+  handshake = (protocol_handshake_t const *)(buf + HEADER_BYTES_LENGTH);
+
+  // Check whether the socket port corresponds to the port advertised in the handshake packet
+  if (port != handshake->port) {
+    log_warning(logger_id,
+                "Failed handshake with tcp://%s:%d because socket port %d doesn't match advertised port %d\n", ip, port,
+                port, handshake->port);
+    return RC_FAILED_HANDSHAKE;
+  }
+
+  // Check whether the same coordinator address is used
+  if (memcmp(router->node->conf.coordinator_address, handshake->coordinator_address,
+             HANDSHAKE_COORDINATOR_ADDRESS_BYTES_LENGTH) != 0) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because different coordinator addresses are used\n", ip,
+                port);
+    return RC_FAILED_HANDSHAKE;
+  }
+
+  // Check whether the same MWM is used
+  if (router->node->conf.mwm != handshake->mwm) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because different MWM values are used: %d and %d\n", ip,
+                port, router->node->conf.mwm, handshake->mwm);
+    return RC_FAILED_HANDSHAKE;
+  }
+
+  // Check whether we support the supported protocol versions by the neighbor
+  if ((protocol_version = handshake_supported_version(
+           handshake_supported_protocol_versions, sizeof(handshake_supported_protocol_versions),
+           handshake->supported_versions, header->length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because of protocol version %d mismatch\n", ip, port,
+                protocol_version);
+    return RC_FAILED_HANDSHAKE;
+  }
+
+  // Check whether the peer is an allowed neighbor
+  if ((*neighbor = router_neighbor_find_by_endpoint_values(router, ip, handshake->port)) == NULL) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because the peer is a non-tethered neighbor\n", ip, port);
+    return RC_FAILED_HANDSHAKE;
+  }
+  // TODO auto-peering
+
+  // Check if the neighbor is not already connected
+  if ((*neighbor)->endpoint.stream != NULL) {
+    log_warning(logger_id, "Failed handshake with tcp://%s:%d because it's an already connected neighbor\n", ip, port);
+    return RC_FAILED_HANDSHAKE;
+  }
+
+  // The neighbor is now ready to process actual protocol messages
+  // TODO needed ?
+  (*neighbor)->state = NEIGHBOR_READY_FOR_MESSAGES;
+  (*neighbor)->protocol_version = protocol_version;
+
+  return RC_OK;
+}
+

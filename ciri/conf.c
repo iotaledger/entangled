@@ -293,7 +293,11 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_COORDINATOR_ADDRESS:  // --coordinator-address
       ret = get_trytes(value, consensus_conf->coordinator_address, HASH_LENGTH_TRYTE);
       if (ret == RC_OK) {
-        ret = get_trytes(value, node_conf->coordinator_address, HASH_LENGTH_TRYTE);
+        flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
+
+        ret = get_trytes(value, coordinator_address, HASH_LENGTH_TRYTE);
+        flex_trits_to_bytes(node_conf->coordinator_address, HASH_LENGTH_TRIT, coordinator_address, HASH_LENGTH_TRIT,
+                            HASH_LENGTH_TRIT);
       }
       break;
     case CONF_COORDINATOR_DEPTH:  // --coordinator-depth

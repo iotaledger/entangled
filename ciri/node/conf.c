@@ -9,6 +9,8 @@
 #include "common/defs.h"
 
 retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
+  flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
+
   if (conf == NULL) {
     return RC_NULL_PARAM;
   }
@@ -23,8 +25,10 @@ retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
   conf->requester_queue_size = DEFAULT_REQUESTER_QUEUE_SIZE;
   conf->tips_cache_size = DEFAULT_TIPS_CACHE_SIZE;
   conf->tips_solidifier_enabled = DEFAULT_TIPS_SOLIDIFIER_ENABLED;
-  flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
+  flex_trits_from_trytes(coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
+  flex_trits_to_bytes(conf->coordinator_address, HASH_LENGTH_TRIT, coordinator_address, HASH_LENGTH_TRIT,
+                      HASH_LENGTH_TRIT);
   strncpy(conf->neighboring_address, DEFAULT_NEIGHBORING_ADDRESS, sizeof(conf->neighboring_address));
   conf->neighboring_port = DEFAULT_NEIGHBORING_PORT;
   conf->auto_tethering_enabled = DEFAULT_AUTO_TETHERING_ENABLED;

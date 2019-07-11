@@ -22,7 +22,7 @@ extern "C" {
 /**
  * The message header sent in each message denoting the TLV fields
  */
-typedef struct protocol_header_s {
+typedef struct __attribute__((__packed__)) protocol_header_s {
   uint8_t type;
   uint16_t length;
 } protocol_header_t;
