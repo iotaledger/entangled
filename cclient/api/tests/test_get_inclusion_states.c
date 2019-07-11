@@ -20,7 +20,7 @@ static void service_setup(void) {
   g_serv.serializer_type = SR_JSON;
   g_serv.http.ca_pem = amazon_ca1_pem;
 
-  logger_helper_init();
+  logger_helper_init(LOGGER_DEBUG);
   iota_client_core_init(&g_serv);
 }
 

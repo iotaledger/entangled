@@ -64,7 +64,7 @@ int main() {
   serv.serializer_type = SR_JSON;
   serv.http.ca_pem = amazon_ca1_pem;
 #endif
-  logger_helper_init();
+  logger_helper_init(LOGGER_DEBUG);
 
   iota_client_core_init(&serv);
   iota_client_extended_init();

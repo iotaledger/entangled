@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 
   rand_handle_seed(time(NULL));
 
-  if (logger_helper_init() != RC_OK) {
+  if (logger_helper_init(LOGGER_WARNING) != RC_OK) {
     return EXIT_FAILURE;
   }
   logger_id = logger_helper_enable(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
