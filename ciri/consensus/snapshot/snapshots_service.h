@@ -13,7 +13,7 @@
 
 #include "ciri/consensus/milestone/milestone_service.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
-#include "ciri/consensus/snapshot/local_snapshots/pruning_manager.h"
+#include "ciri/consensus/snapshot/local_snapshots/pruning_service.h"
 #include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "common/errors.h"

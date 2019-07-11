@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "ciri/consensus/snapshot/local_snapshots/pruning_manager.h"
+#include "ciri/consensus/snapshot/local_snapshots/pruning_service.h"
 #include <inttypes.h>
 #include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/traversal.h"

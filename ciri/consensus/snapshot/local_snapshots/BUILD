@@ -42,8 +42,8 @@ cc_library(
 
 cc_library(
     name = "pruning_manager",
-    srcs = ["pruning_manager.c"],
-    hdrs = ["pruning_manager.h"],
+    srcs = ["pruning_service.c"],
+    hdrs = ["pruning_service.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":conf",
