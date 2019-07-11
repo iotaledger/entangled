@@ -262,3 +262,21 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   return RC_OK;
 }
 
+
+retcode_t router_neighbors_reconnect_attempt(router_t *const router) {
+  retcode_t ret = RC_OK;
+  neighbor_t *neighbor = NULL;
+
+  rw_lock_handle_wrlock(&router->neighbors_lock);
+  NEIGHBORS_FOREACH(router->neighbors, neighbor) {
+    if (neighbor->state == NEIGHBOR_DISCONNECTED && neighbor->endpoint.stream == NULL) {
+      if ((ret = tcp_server_connect(neighbor)) != RC_OK) {
+        log_warning(logger_id, "Trying to reconnect to neighbor %s:%d failed\n", neighbor->endpoint.domain,
+                    neighbor->endpoint.port);
+      }
+    }
+  }
+  rw_lock_handle_unlock(&router->neighbors_lock);
+
+  return RC_OK;
+}

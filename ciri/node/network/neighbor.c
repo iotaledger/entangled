@@ -22,7 +22,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
   }
 
   memset(neighbor, 0, sizeof(neighbor_t));
-  neighbor->state = NEIGHBOR_HANDSHAKING;
+  neighbor->state = NEIGHBOR_DISCONNECTED;
   neighbor->endpoint.stream = NULL;
 
   if (uri_parse(uri, scheme, MAX_SCHEME_LENGTH, neighbor->endpoint.domain, MAX_HOST_LENGTH, &neighbor->endpoint.port) ==
@@ -42,7 +42,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
   }
 
   memset(neighbor, 0, sizeof(neighbor_t));
-  neighbor->state = NEIGHBOR_HANDSHAKING;
+  neighbor->state = NEIGHBOR_DISCONNECTED;
   neighbor->endpoint.stream = NULL;
 
   if (ip) {

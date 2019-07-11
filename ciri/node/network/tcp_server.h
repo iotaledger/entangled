@@ -20,6 +20,8 @@ typedef struct tcp_server_s {
   // Metadata
   bool running;
   thread_handle_t thread;
+  // Data
+  node_t *node;
 } tcp_server_t;
 
 #ifdef __cplusplus

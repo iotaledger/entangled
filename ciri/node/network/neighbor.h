@@ -25,6 +25,7 @@ typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
 typedef enum neighbor_state_e {
+  NEIGHBOR_DISCONNECTED,
   NEIGHBOR_HANDSHAKING,
   NEIGHBOR_READY_FOR_MESSAGES,
   NEIGHBOR_MARKED_FOR_DISCONNECT,

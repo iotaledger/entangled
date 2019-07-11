@@ -111,6 +111,15 @@ neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char
 retcode_t router_neighbor_read_handshake(router_t *const router, char const *const ip, uint16_t const port,
                                          void const *const buf, size_t const nread, neighbor_t **const neighbor);
 
+/**
+ * Attempts to reconnect all disconnected neighbors
+ *
+ * @param router The router
+ *
+ * @return a status code
+ */
+retcode_t router_neighbors_reconnect_attempt(router_t *const router);
+
 #ifdef __cplusplus
 }
 #endif

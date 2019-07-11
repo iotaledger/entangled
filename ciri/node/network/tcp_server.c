@@ -20,6 +20,7 @@
 static logger_id_t logger_id;
 static uv_tcp_t *server = NULL;
 static uv_async_t *async = NULL;
+static uv_timer_t *reconnect_timer = NULL;
 
 /*
  * Private functions
@@ -59,19 +60,19 @@ static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, u
     } else if (neighbor != NULL) {
       log_info(logger_id, "Connection with neighbor tcp://%s:%d lost\n", neighbor->endpoint.domain,
                neighbor->endpoint.port);
-      neighbor->state = NEIGHBOR_HANDSHAKING;
+      neighbor->state = NEIGHBOR_DISCONNECTED;
       neighbor->endpoint.stream = NULL;
     }
     uv_close((uv_handle_t *)client, tcp_server_on_close);
   } else if (nread > 0) {
-    if (neighbor == NULL) {
+    if (neighbor == NULL || neighbor->state == NEIGHBOR_HANDSHAKING) {
       char host[NI_MAXHOST];
       char serv[NI_MAXSERV];
       uint16_t port;
       struct sockaddr_storage addr;
       int len = sizeof(struct sockaddr_storage);
 
-      if (uv_tcp_getpeername(client, (struct sockaddr *)&addr, &len) != 0 ||
+      if (uv_tcp_getpeername((uv_tcp_t *)client, (struct sockaddr *)&addr, &len) != 0 ||
           getnameinfo((struct sockaddr *)&addr, sizeof(addr), host, NI_MAXHOST, serv, NI_MAXSERV,
                       NI_NUMERICHOST | NI_NUMERICSERV) != 0) {
         log_warning(logger_id, "Unable to get peer information\n");
@@ -140,6 +141,36 @@ static void tcp_server_on_new_connection(uv_stream_t *const server, int const st
   }
 }
 
+static void tcp_server_on_connect(uv_connect_t *const connection, int const status) {
+  int ret = 0;
+  uv_stream_t *client = connection->handle;
+  neighbor_t *neighbor = (neighbor_t *)client->data;
+
+  if (status < 0) {
+    log_warning(logger_id, "Connection to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain,
+                neighbor->endpoint.port, uv_strerror(status));
+    uv_close((uv_handle_t *)client, tcp_server_on_close);
+    free(connection);
+    return;
+  }
+
+  neighbor->state = NEIGHBOR_HANDSHAKING;
+
+  if ((ret = uv_read_start(client, tcp_server_alloc_buffer, tcp_server_on_read)) != 0) {
+    log_error(logger_id, "Starting to read from %s:%d failed: %s\n", neighbor->endpoint.domain, neighbor->endpoint.port,
+              uv_err_name(ret));
+    uv_close((uv_handle_t *)client, tcp_server_on_close);
+  }
+
+  free(connection);
+}
+
+static void tcp_server_on_reconnect_timer(uv_timer_t *const handle) {
+  if (router_neighbors_reconnect_attempt(&((node_t *)handle->data)->router) != RC_OK) {
+    log_warning(logger_id, "Attempt to reconnect disconnected neighbors failed\n");
+  }
+}
+
 static void *tcp_server_routine(void *param) {
   UNUSED(param);
 
@@ -166,19 +197,24 @@ retcode_t tcp_server_init(tcp_server_t *const tcp_server, node_t *const node) {
 
   logger_id = logger_helper_enable(TCP_SERVER_LOGGER_ID, LOGGER_DEBUG, true);
 
-  if ((server = malloc(sizeof(uv_tcp_t))) == NULL || (async = malloc(sizeof(uv_async_t))) == NULL) {
+  if ((server = (uv_tcp_t *)malloc(sizeof(uv_tcp_t))) == NULL ||
+      (async = (uv_async_t *)malloc(sizeof(uv_async_t))) == NULL ||
+      (reconnect_timer = (uv_timer_t *)malloc(sizeof(uv_timer_t))) == NULL) {
     return RC_OOM;
   }
 
   tcp_server->running = false;
+  tcp_server->node = node;
   server->data = node;
+  reconnect_timer->data = node;
 
   if ((ret = uv_tcp_init(uv_default_loop(), server)) != 0 ||
       (ret = uv_ip4_addr(node->conf.neighboring_address, node->conf.neighboring_port, &addr)) != 0 ||
       (ret = uv_tcp_nodelay(server, true)) != 0 ||
       (ret = uv_tcp_bind(server, (const struct sockaddr *)&addr, 0)) != 0 ||
       (ret = uv_listen((uv_stream_t *)server, node->conf.max_neighbors, tcp_server_on_new_connection)) != 0 ||
-      (ret = uv_async_init(uv_default_loop(), async, tcp_server_on_async)) != 0) {
+      (ret = uv_async_init(uv_default_loop(), async, tcp_server_on_async)) != 0 ||
+      (ret = uv_timer_init(uv_default_loop(), reconnect_timer)) != 0) {
     log_critical(logger_id, "TCP server initialization failed: %s\n", uv_err_name(ret));
     return RC_TCP_SERVER_INIT;
   }
@@ -187,6 +223,8 @@ retcode_t tcp_server_init(tcp_server_t *const tcp_server, node_t *const node) {
 }
 
 retcode_t tcp_server_start(tcp_server_t *const tcp_server) {
+  int ret = 0;
+
   if (tcp_server == NULL) {
     return RC_NULL_PARAM;
   }
@@ -196,6 +234,10 @@ retcode_t tcp_server_start(tcp_server_t *const tcp_server) {
   if (thread_handle_create(&tcp_server->thread, (thread_routine_t)tcp_server_routine, NULL) != 0) {
     log_critical(logger_id, "Spawning TCP server thread failed\n");
     return RC_THREAD_CREATE;
+  }
+  if ((ret = uv_timer_start(reconnect_timer, tcp_server_on_reconnect_timer, 0,
+                            tcp_server->node->conf.reconnect_attempt_interval * 1000)) != 0) {
+    log_critical(logger_id, "Starting reconnect attempt timer failed: %s\n", uv_err_name(ret));
   }
 
   return RC_OK;
@@ -289,4 +331,28 @@ retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip) {
   }
 
   return ret;
+}
+
+retcode_t tcp_server_connect(neighbor_t *const neighbor) {
+  struct sockaddr_in addr;
+  uv_tcp_t *client = NULL;
+  uv_connect_t *connection = NULL;
+  int ret = 0;
+
+  if ((client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t))) == NULL ||
+      (connection = (uv_connect_t *)malloc(sizeof(uv_connect_t))) == NULL) {
+    return RC_OOM;
+  }
+
+  client->data = neighbor;
+
+  if ((ret = uv_tcp_init(uv_default_loop(), client)) != 0 ||
+      (ret = uv_ip4_addr(neighbor->endpoint.ip, neighbor->endpoint.port, &addr)) != 0 ||
+      (ret = uv_tcp_nodelay(client, true)) != 0 ||
+      (ret = uv_tcp_connect(connection, client, (struct sockaddr *)&addr, tcp_server_on_connect)) != 0) {
+    log_warning(logger_id, "Connection to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain,
+                neighbor->endpoint.port, uv_err_name(ret));
+  }
+
+  return RC_OK;
 }
