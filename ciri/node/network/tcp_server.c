@@ -161,6 +161,9 @@ static void tcp_server_on_connect(uv_connect_t *const connection, int const stat
   int ret = 0;
   uv_stream_t *client = connection->handle;
   neighbor_t *neighbor = (neighbor_t *)client->data;
+  router_t *router = &((node_t *)server->data)->router;
+  protocol_handshake_t handshake;
+  uint16_t handshake_size = 0;
 
   if (status < 0) {
     log_warning(logger_id, "Connection to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain,
@@ -170,6 +173,13 @@ static void tcp_server_on_connect(uv_connect_t *const connection, int const stat
   }
 
   neighbor->state = NEIGHBOR_HANDSHAKING;
+
+  handshake_init(&handshake, router->node->conf.neighboring_port, router->node->conf.coordinator_address,
+                 router->node->conf.mwm, &handshake_size);
+  if (tcp_server_write((uv_stream_t *)client, HANDSHAKE, &handshake, handshake_size) != RC_OK) {
+    log_error(logger_id, "Sending handshake to new peer failed\n");
+    uv_close((uv_handle_t *)client, tcp_server_on_close);
+  }
 
   if ((ret = uv_read_start(client, tcp_server_alloc_buffer, tcp_server_on_read)) != 0) {
     log_error(logger_id, "Starting to read from %s:%d failed: %s\n", neighbor->endpoint.domain, neighbor->endpoint.port,
