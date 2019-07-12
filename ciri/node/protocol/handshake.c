@@ -15,9 +15,11 @@
 
 void handshake_init(protocol_handshake_t* const handshake, uint16_t const port, byte_t const* const coordinator_address,
                     uint8_t const mwm, uint16_t* const handshake_size) {
+  uint64_t timestamp = current_timestamp_ms();
+
   memset(handshake, 0, sizeof(protocol_handshake_t));
   handshake->port = htons(port);
-  handshake->timestamp = htonll(current_timestamp_ms());
+  handshake->timestamp = htonll(timestamp);
   memcpy(handshake->coordinator_address, coordinator_address, HANDSHAKE_COORDINATOR_ADDRESS_BYTES_LENGTH);
   handshake->mwm = mwm;
   memcpy(handshake->supported_versions, handshake_supported_protocol_versions,
