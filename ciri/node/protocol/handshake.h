@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include "common/trinary/bytes.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,8 +57,20 @@ typedef struct __attribute__((__packed__)) protocol_handshake_s {
 } protocol_handshake_t;
 
 /**
- * Returns the highest supported protocol version by the neighbor or a negative number indicating the highest protocol
- * version the neighbor would have supported but which our node doesn't.
+ * Initializes an handshake packet
+ *
+ * @param handshake The handshake packet
+ * @param port The port used
+ * @param coordinator_address The coordinator address used
+ * @param mwm The MWM used
+ * @param handshake_size The size of the initialized handshake packet
+ */
+void handshake_init(protocol_handshake_t* const handshake, uint16_t const port, byte_t const* const coordinator_address,
+                    uint8_t const mwm, uint16_t* const handshake_size);
+
+/**
+ * Returns the highest supported protocol version by the neighbor or a negative number indicating the highest
+ * protocol version the neighbor would have supported but which our node doesn't.
  *
  * @param own_supported_versions The versions our own node supports
  * @param own_supported_versions_length The length of the versions our own node supports

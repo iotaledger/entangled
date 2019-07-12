@@ -6,8 +6,23 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "ciri/node/protocol/handshake.h"
+#include "utils/macros.h"
+#include "utils/time.h"
+
+void handshake_init(protocol_handshake_t* const handshake, uint16_t const port, byte_t const* const coordinator_address,
+                    uint8_t const mwm, uint16_t* const handshake_size) {
+  memset(handshake, 0, sizeof(protocol_handshake_t));
+  handshake->port = htons(port);
+  handshake->timestamp = htonll(current_timestamp_ms());
+  memcpy(handshake->coordinator_address, coordinator_address, HANDSHAKE_COORDINATOR_ADDRESS_BYTES_LENGTH);
+  handshake->mwm = mwm;
+  memcpy(handshake->supported_versions, handshake_supported_protocol_versions,
+         sizeof(handshake_supported_protocol_versions));
+  *handshake_size = HANDSHAKE_MIN_BYTES_LENGTH + sizeof(handshake_supported_protocol_versions) - 1;
+}
 
 int handshake_supported_version(uint8_t const* const own_supported_versions, size_t const own_supported_versions_length,
                                 uint8_t const* const supported_versions, size_t const supported_versions_length) {

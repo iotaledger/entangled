@@ -26,6 +26,11 @@ cc_library(
     srcs = ["handshake.c"],
     hdrs = ["handshake.h"],
     visibility = ["//visibility:public"],
+    deps = [
+        "//common/trinary:bytes",
+        "//utils:macros",
+        "//utils:time",
+    ],
 )
 
 cc_library(

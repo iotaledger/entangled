@@ -60,6 +60,7 @@ static void tcp_server_on_write(uv_write_t *const req, int const status) {
 
 static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
   neighbor_t *neighbor = (neighbor_t *)client->data;
+  router_t *router = &((node_t *)server->data)->router;
 
   if (nread < 0) {
     if (nread != UV_EOF) {
@@ -89,12 +90,17 @@ static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, u
       port = atoi(serv);
 
       log_debug(logger_id, "Initiating handshake with tcp://%s:%d\n", host, port);
-      if (router_neighbor_read_handshake(&((node_t *)server->data)->router, host, port, buf->base, nread, &neighbor) ==
-          RC_OK) {
+      if (router_neighbor_read_handshake(router, host, port, buf->base, nread, &neighbor) == RC_OK) {
+        protocol_handshake_t handshake;
+        uint16_t handshake_size = 0;
+
         log_info(logger_id, "Connection with neighbor tcp://%s:%d established\n", neighbor->endpoint.domain,
                  neighbor->endpoint.port);
         client->data = neighbor;
         neighbor->endpoint.stream = client;
+        handshake_init(&handshake, router->node->conf.neighboring_port, router->node->conf.coordinator_address,
+                       router->node->conf.mwm, &handshake_size);
+        tcp_server_write(neighbor, HANDSHAKE, &handshake, handshake_size);
       } else {
         uv_close((uv_handle_t *)client, tcp_server_on_close);
       }
@@ -378,7 +384,7 @@ retcode_t tcp_server_write(neighbor_t const *const neighbor, packet_type_t const
   }
 
   header.type = type;
-  header.length = buffer_size;
+  header.length = htons(buffer_size);
   uv_buf_t buffers[] = {{.base = (char *)&header, .len = HEADER_BYTES_LENGTH}, {.base = buffer, .len = buffer_size}};
 
   if ((ret = uv_write(req, neighbor->endpoint.stream, buffers, 2, tcp_server_on_write)) != 0) {
