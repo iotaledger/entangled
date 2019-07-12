@@ -57,6 +57,7 @@ cc_library(
     hdrs = ["tcp_server.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//ciri/node/protocol:type",
         "//utils/handles:thread",
         "@libuv",
     ],

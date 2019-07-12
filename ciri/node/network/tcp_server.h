@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include "ciri/node/protocol/type.h"
 #include "common/errors.h"
 #include "utils/handles/thread.h"
 
@@ -74,6 +75,28 @@ retcode_t tcp_server_destroy(tcp_server_t *const tcp_server);
  * @return a status code
  */
 retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip);
+
+/**
+ * Initiates a connection with a neighbor
+ *
+ * @param[in] neighbor The neighbor
+ *
+ * @return a status code
+ */
+retcode_t tcp_server_connect(neighbor_t *const neighbor);
+
+/**
+ * Writes data to a neighbor
+ *
+ * @param[in] neighbor    The neighbor
+ * @param[in] type        The packet type
+ * @param[in] buffer      The buffer
+ * @param[in] buffer_size The buffer size
+ *
+ * @return a status code
+ */
+retcode_t tcp_server_write(neighbor_t const *const neighbor, packet_type_t const type, void *const buffer,
+                           uint16_t const buffer_size);
 
 #ifdef __cplusplus
 }

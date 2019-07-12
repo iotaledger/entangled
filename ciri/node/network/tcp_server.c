@@ -51,6 +51,13 @@ static void tcp_server_on_async(uv_async_t *const handle) {
   uv_stop(uv_default_loop());
 }
 
+static void tcp_server_on_write(uv_write_t *const req, int const status) {
+  if (status) {
+    log_warning(logger_id, "Writing data failed: %s\n", uv_strerror(status));
+  }
+  free(req);
+}
+
 static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, uv_buf_t const *const buf) {
   neighbor_t *neighbor = (neighbor_t *)client->data;
 
@@ -351,6 +358,33 @@ retcode_t tcp_server_connect(neighbor_t *const neighbor) {
       (ret = uv_tcp_connect(connection, client, (struct sockaddr *)&addr, tcp_server_on_connect)) != 0) {
     log_warning(logger_id, "Connection to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain,
                 neighbor->endpoint.port, uv_err_name(ret));
+  }
+
+  return RC_OK;
+}
+
+retcode_t tcp_server_write(neighbor_t const *const neighbor, packet_type_t const type, void *const buffer,
+                           uint16_t const buffer_size) {
+  int ret = 0;
+  uv_write_t *req = NULL;
+  protocol_header_t header;
+
+  if (neighbor == NULL || neighbor->endpoint.stream == NULL || buffer == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((req = malloc(sizeof(uv_write_t))) == NULL) {
+    return RC_OOM;
+  }
+
+  header.type = type;
+  header.length = buffer_size;
+  uv_buf_t buffers[] = {{.base = (char *)&header, .len = HEADER_BYTES_LENGTH}, {.base = buffer, .len = buffer_size}};
+
+  if ((ret = uv_write(req, neighbor->endpoint.stream, buffers, 2, tcp_server_on_write)) != 0) {
+    log_warning(logger_id, "Writing to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain, neighbor->endpoint.port,
+                uv_err_name(ret));
+    return RC_WRITE_FAILED;
   }
 
   return RC_OK;
