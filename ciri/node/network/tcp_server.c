@@ -7,8 +7,6 @@
 
 #include <stdlib.h>
 
-#include <uv.h>
-
 #include "ciri/node/network/router.h"
 #include "ciri/node/network/tcp_server.h"
 #include "ciri/node/node.h"
@@ -91,16 +89,11 @@ static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, u
 
       log_debug(logger_id, "Initiating handshake with tcp://%s:%d\n", host, port);
       if (router_neighbor_read_handshake(router, host, port, buf->base, nread, &neighbor) == RC_OK) {
-        protocol_handshake_t handshake;
-        uint16_t handshake_size = 0;
-
         log_info(logger_id, "Connection with neighbor tcp://%s:%d established\n", neighbor->endpoint.domain,
                  neighbor->endpoint.port);
         client->data = neighbor;
         neighbor->endpoint.stream = client;
-        handshake_init(&handshake, router->node->conf.neighboring_port, router->node->conf.coordinator_address,
-                       router->node->conf.mwm, &handshake_size);
-        tcp_server_write(neighbor, HANDSHAKE, &handshake, handshake_size);
+        neighbor->state = NEIGHBOR_READY_FOR_MESSAGES;
       } else {
         uv_close((uv_handle_t *)client, tcp_server_on_close);
       }
@@ -123,6 +116,7 @@ static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, u
 static void tcp_server_on_new_connection(uv_stream_t *const server, int const status) {
   int ret = 0;
   uv_tcp_t *client = NULL;
+  router_t *router = &((node_t *)server->data)->router;
 
   log_debug(logger_id, "New TCP connection\n");
 
@@ -144,6 +138,15 @@ static void tcp_server_on_new_connection(uv_stream_t *const server, int const st
   }
 
   if ((ret = uv_accept(server, (uv_stream_t *)client)) == 0) {
+    protocol_handshake_t handshake;
+    uint16_t handshake_size = 0;
+
+    handshake_init(&handshake, router->node->conf.neighboring_port, router->node->conf.coordinator_address,
+                   router->node->conf.mwm, &handshake_size);
+    if (tcp_server_write((uv_stream_t *)client, HANDSHAKE, &handshake, handshake_size) != RC_OK) {
+      log_error(logger_id, "Sending handshake to new peer failed\n");
+      uv_close((uv_handle_t *)client, tcp_server_on_close);
+    }
     if ((ret = uv_read_start((uv_stream_t *)client, tcp_server_alloc_buffer, tcp_server_on_read)) != 0) {
       log_error(logger_id, "Starting to read from new client failed: %s\n", uv_err_name(ret));
       uv_close((uv_handle_t *)client, tcp_server_on_close);
@@ -369,13 +372,13 @@ retcode_t tcp_server_connect(neighbor_t *const neighbor) {
   return RC_OK;
 }
 
-retcode_t tcp_server_write(neighbor_t const *const neighbor, packet_type_t const type, void *const buffer,
+retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, void *const buffer,
                            uint16_t const buffer_size) {
   int ret = 0;
   uv_write_t *req = NULL;
   protocol_header_t header;
 
-  if (neighbor == NULL || neighbor->endpoint.stream == NULL || buffer == NULL) {
+  if (stream == NULL || buffer == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -387,9 +390,8 @@ retcode_t tcp_server_write(neighbor_t const *const neighbor, packet_type_t const
   header.length = htons(buffer_size);
   uv_buf_t buffers[] = {{.base = (char *)&header, .len = HEADER_BYTES_LENGTH}, {.base = buffer, .len = buffer_size}};
 
-  if ((ret = uv_write(req, neighbor->endpoint.stream, buffers, 2, tcp_server_on_write)) != 0) {
-    log_warning(logger_id, "Writing to neighbor %s:%d failed: %s\n", neighbor->endpoint.domain, neighbor->endpoint.port,
-                uv_err_name(ret));
+  if ((ret = uv_write(req, stream, buffers, 2, tcp_server_on_write)) != 0) {
+    log_warning(logger_id, "Writing failed: %s\n", uv_err_name(ret));
     return RC_WRITE_FAILED;
   }
 

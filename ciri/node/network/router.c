@@ -259,9 +259,6 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
     return RC_FAILED_HANDSHAKE;
   }
 
-  // The neighbor is now ready to process actual protocol messages
-  // TODO needed ?
-  (*neighbor)->state = NEIGHBOR_READY_FOR_MESSAGES;
   (*neighbor)->protocol_version = protocol_version;
 
   return RC_OK;
