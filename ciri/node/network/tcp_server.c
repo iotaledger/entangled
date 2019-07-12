@@ -100,11 +100,10 @@ static void tcp_server_on_read(uv_stream_t *const client, ssize_t const nread, u
     } else {
       log_debug(logger_id, "Packet received from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
                 neighbor->endpoint.port);
-      // TODO
-      // if (neighbor_read(neighbor, buf->base) != RC_OK) {
-      //   log_warning(logger_id, "Read error from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
-      //               neighbor->endpoint.port);
-      // }
+      if (router_neighbor_read(router, neighbor, buf->base, nread) != RC_OK) {
+        log_warning(logger_id, "Read error from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
+                    neighbor->endpoint.port);
+      }
     }
   }
 

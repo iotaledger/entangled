@@ -56,30 +56,6 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
   return RC_OK;
 }
 
-retcode_t neighbor_read(neighbor_t const *const neighbor, void const *const buf) {
-  protocol_header_t const *header = NULL;
-
-  if (neighbor == NULL || buf == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  header = (protocol_header_t const *)buf;
-
-  if (header->type < PACKET_TYPE_NBR) {
-    switch (header->type) {
-      case HANDSHAKE:
-        break;
-      case GOSSIP:
-        break;
-      default:
-        return RC_INVALID_PACKET_TYPE;
-        break;
-    }
-  }
-
-  return RC_OK;
-}
-
 retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, protocol_gossip_t const *const packet) {
   if (node == NULL || neighbor == NULL || packet == NULL) {
     return RC_NULL_PARAM;
@@ -131,7 +107,7 @@ retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighb
     return RC_NULL_PARAM;
   }
 
-  memcpy(packet.content, bytes, GOSSIP_BYTES_LENGTH);
+  memcpy(packet.content, bytes, GOSSIP_MAX_BYTES_LENGTH);
 
   return neighbor_send(node, tangle, neighbor, &packet);
 }

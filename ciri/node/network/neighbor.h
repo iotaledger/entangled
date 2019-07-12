@@ -66,16 +66,6 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port);
 
 /**
- * Reads a buffer from a neighbor
- *
- * @param neighbor The neighbor
- * @param buf The buffer
- *
- * @return a status code
- */
-retcode_t neighbor_read(neighbor_t const *const neighbor, void const *const buf);
-
-/**
  * Sends a packet to a neighbor
  *
  * @param node A node

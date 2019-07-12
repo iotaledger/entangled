@@ -30,7 +30,7 @@ typedef struct packet_type_desc_s {
 
 static packet_type_desc_t packet_type_descs[PACKET_TYPE_NBR] = {{HEADER, HEADER_BYTES_LENGTH, false},
                                                                 {HANDSHAKE, HANDSHAKE_MAX_BYTES_LENGTH, true},
-                                                                {GOSSIP, GOSSIP_BYTES_LENGTH, true}};
+                                                                {GOSSIP, GOSSIP_MAX_BYTES_LENGTH, true}};
 
 #ifdef __cplusplus
 }

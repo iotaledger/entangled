@@ -264,6 +264,71 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   return RC_OK;
 }
 
+retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const neighbor, void const *const buffer,
+                               size_t const buffer_size) {
+  retcode_t ret = RC_OK;
+  protocol_header_t const *header = NULL;
+  uint16_t header_length = 0;
+
+  if (router == NULL || neighbor == NULL || buffer == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  // Check whether we have a complete header
+  if (buffer_size < HEADER_BYTES_LENGTH) {
+    log_warning(logger_id, "Invalid header size %d from neighbor tcp://%s:%d\n", buffer_size, neighbor->endpoint.domain,
+                neighbor->endpoint.port);
+    return RC_INVALID_PACKET;
+  }
+  header = (protocol_header_t const *)buffer;
+  header_length = ntohs(header->length);
+
+  if (header->type < PACKET_TYPE_NBR) {
+    switch (header->type) {
+      case HANDSHAKE:
+        break;
+      case GOSSIP: {
+        protocol_gossip_t gossip;
+        void const *ptr = buffer + HEADER_BYTES_LENGTH;
+
+        // Check whether we have a complete gossip packet
+        if (buffer_size != HEADER_BYTES_LENGTH + header_length || header_length < GOSSIP_MIN_BYTES_LENGTH ||
+            header_length > GOSSIP_MAX_BYTES_LENGTH) {
+          log_warning(logger_id, "Invalid packet size %d from neighbor tcp://%s:%d\n", header_length,
+                      neighbor->endpoint.domain, neighbor->endpoint.port);
+          return RC_INVALID_PACKET;
+        }
+
+        memcpy(&gossip, ptr, GOSSIP_NON_SIG_BYTES_LENGTH);
+        ptr += GOSSIP_NON_SIG_BYTES_LENGTH;
+        memcpy(&gossip, ptr, header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
+        ptr += header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+        memset(&gossip, 0,
+               GOSSIP_SIG_MAX_BYTES_LENGTH -
+                   (header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH));
+        memcpy(&gossip, ptr, GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
+        protocol_gossip_set_endpoint(&gossip, neighbor->endpoint.ip, neighbor->endpoint.port);
+        if ((ret = processor_stage_add(&router->node->processor, &gossip)) != RC_OK) {
+          log_warning(logger_id, "Pushing gossip packet from tcp://%s:%d failed\n", neighbor->endpoint.domain,
+                      neighbor->endpoint.port);
+        }
+        break;
+      }
+      default:
+        log_warning(logger_id, "Invalid packet type %d from neighbor tcp://%s:%d\n", header->type,
+                    neighbor->endpoint.domain, neighbor->endpoint.port);
+        return RC_INVALID_PACKET_TYPE;
+        break;
+    }
+  } else {
+    log_warning(logger_id, "Invalid packet type %d from neighbor tcp://%s:%d\n", header->type,
+                neighbor->endpoint.domain, neighbor->endpoint.port);
+    return RC_INVALID_PACKET_TYPE;
+  }
+
+  return ret;
+}
+
 retcode_t router_neighbors_reconnect_attempt(router_t *const router) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;

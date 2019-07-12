@@ -112,6 +112,19 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
                                          void const *const buf, size_t const nread, neighbor_t **const neighbor);
 
 /**
+ * Reads a buffer from a neighbor
+ *
+ * @param router The router
+ * @param neighbor The neighbor
+ * @param buffer The buffer
+ * @param buffer_size The buffer size
+ *
+ * @return a status code
+ */
+retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const neighbor, void const *const buffer,
+                               size_t const buffer_size);
+
+/**
  * Attempts to reconnect all disconnected neighbors
  *
  * @param router The router

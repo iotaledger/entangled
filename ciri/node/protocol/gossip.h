@@ -23,8 +23,10 @@
 #define GOSSIP_TX_BYTES_LENGTH ((GOSSIP_NON_SIG_BYTES_LENGTH) + (GOSSIP_SIG_MAX_BYTES_LENGTH))
 // The amount of bytes used for the requested transaction hash
 #define GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH 49
-// The amount of bytes making up the transaction gossip payload
-#define GOSSIP_BYTES_LENGTH ((GOSSIP_TX_BYTES_LENGTH) + (GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH))
+// The minimum amount of bytes making up the transaction gossip payload
+#define GOSSIP_MIN_BYTES_LENGTH ((GOSSIP_NON_SIG_BYTES_LENGTH) + (GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH))
+// The maximum amount of bytes making up the transaction gossip payload
+#define GOSSIP_MAX_BYTES_LENGTH ((GOSSIP_TX_BYTES_LENGTH) + (GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH))
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +38,8 @@ extern "C" {
  * - A request hash encoded in bytes
  * - A metadata endpoint containing information related to the packet sender
  */
-typedef struct protocol_gossip_s {
-  byte_t content[GOSSIP_BYTES_LENGTH];
+typedef struct __attribute__((__packed__)) protocol_gossip_s {
+  byte_t content[GOSSIP_MAX_BYTES_LENGTH];
   endpoint_t source;
 } protocol_gossip_t;
 
