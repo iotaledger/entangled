@@ -205,7 +205,8 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
 
   // Check whether we have a complete handshake packet
   header_length = ntohs(header->length);
-  if (nread != HEADER_BYTES_LENGTH + header_length || header_length < HANDSHAKE_MIN_BYTES_LENGTH) {
+  if (nread != HEADER_BYTES_LENGTH + header_length || header_length < HANDSHAKE_MIN_BYTES_LENGTH ||
+      header_length > HANDSHAKE_MAX_BYTES_LENGTH) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because invalid packet size %d\n", ip, port,
                 header_length);
     return RC_INVALID_PACKET;
