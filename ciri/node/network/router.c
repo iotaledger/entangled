@@ -290,6 +290,8 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const n
       case GOSSIP: {
         protocol_gossip_t gossip;
         void const *ptr = buffer + HEADER_BYTES_LENGTH;
+        size_t offset = 0;
+        size_t variable_size = 0;
 
         // Check whether we have a complete gossip packet
         if (buffer_size != HEADER_BYTES_LENGTH + header_length || header_length < GOSSIP_MIN_BYTES_LENGTH ||
@@ -299,14 +301,19 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const n
           return RC_INVALID_PACKET;
         }
 
-        memcpy(&gossip, ptr, GOSSIP_NON_SIG_BYTES_LENGTH);
+        memcpy(gossip.content + offset, ptr, GOSSIP_NON_SIG_BYTES_LENGTH);
         ptr += GOSSIP_NON_SIG_BYTES_LENGTH;
-        memcpy(&gossip, ptr, header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
-        ptr += header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
-        memset(&gossip, 0,
-               GOSSIP_SIG_MAX_BYTES_LENGTH -
-                   (header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH));
-        memcpy(&gossip, ptr, GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
+        offset += GOSSIP_NON_SIG_BYTES_LENGTH;
+        variable_size = header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+        memcpy(gossip.content + offset, ptr, variable_size);
+        ptr += variable_size;
+        offset += variable_size;
+        memset(gossip.content + offset, 0, GOSSIP_SIG_MAX_BYTES_LENGTH - variable_size);
+        offset += GOSSIP_SIG_MAX_BYTES_LENGTH - variable_size;
+        memcpy(gossip.content + offset, ptr, GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
+        ptr += GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+        offset += GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+        memset(&gossip.source, 0, sizeof(endpoint_t));
         protocol_gossip_set_endpoint(&gossip, neighbor->endpoint.ip, neighbor->endpoint.port);
         if ((ret = processor_stage_add(&router->node->processor, &gossip)) != RC_OK) {
           log_warning(logger_id, "Pushing gossip packet from tcp://%s:%d failed\n", neighbor->endpoint.domain,

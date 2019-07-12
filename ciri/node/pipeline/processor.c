@@ -197,7 +197,7 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
 
   if (neighbor || (packet->source.ip[0] == 0 && packet->source.port == 0)) {
     if (neighbor) {
-      log_debug(logger_id, "Processing packet from tethered node tcp://%s:%d\n", neighbor->endpoint.domain,
+      log_debug(logger_id, "Processing packet from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
                 neighbor->endpoint.port);
       neighbor->nbr_all_txs++;
     } else {
@@ -220,10 +220,6 @@ static retcode_t process_packet(processor_stage_t const *const processor, tangle
         goto done;
       }
     }
-  } else {
-    log_debug(logger_id, "Discarding packet from non-tethered node tcp://%s:%d\n", packet->source.ip,
-              packet->source.port);
-    // TODO Testnet add non-tethered neighbor
   }
 
 done:
