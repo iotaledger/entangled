@@ -8,6 +8,7 @@
 #ifndef __UTILS_MACROS_H__
 #define __UTILS_MACROS_H__
 
+#include <arpa/inet.h>
 #include <stdint.h>
 
 #ifndef UNUSED

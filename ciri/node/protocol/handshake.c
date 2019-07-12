@@ -5,6 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
 
