@@ -124,11 +124,11 @@ static retcode_t respond_to_request(responder_stage_t const *const responder, ta
     if ((ret = iota_tangle_milestone_load_last(tangle, &milestone_pack)) != RC_OK || milestone_pack.num_loaded == 0 ||
         (ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, latest_milestone.hash, pack)) != RC_OK ||
         pack->num_loaded == 0) {
-      log_warning(logger_id, "Loading last milestone failed\n");
-      return ret;
+      memset(transaction_flex_trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+    } else {
+      transaction = ((iota_transaction_t **)(pack->models))[0];
+      transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);
     }
-    transaction = ((iota_transaction_t **)(pack->models))[0];
-    transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);
     if ((ret = neighbor_send_trits(responder->node, tangle, neighbor, transaction_flex_trits)) != RC_OK) {
       log_warning(logger_id, "Sending transaction failed\n");
       return ret;
