@@ -31,7 +31,7 @@ cc_library(
     hdrs = ["local_snapshots_manager.h"],
     visibility = ["//visibility:public"],
     deps = [
-        ":pruning_manager",
+        ":pruning_service",
         ":shared_local_snapshots",
         "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/snapshot:snapshots_service",
@@ -41,7 +41,7 @@ cc_library(
 )
 
 cc_library(
-    name = "pruning_manager",
+    name = "pruning_service",
     srcs = ["pruning_service.c"],
     hdrs = ["pruning_service.h"],
     visibility = ["//visibility:public"],

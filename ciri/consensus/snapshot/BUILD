@@ -70,7 +70,7 @@ cc_library(
         "//ciri/consensus:conf",
         "//ciri/consensus/milestone:milestone_service",
         "//ciri/consensus/milestone:milestone_tracker",
-        "//ciri/consensus/snapshot/local_snapshots:pruning_manager",
+        "//ciri/consensus/snapshot/local_snapshots:pruning_service",
         "//ciri/consensus/tangle",
         "//common:errors",
     ],

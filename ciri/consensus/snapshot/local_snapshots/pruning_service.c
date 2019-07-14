@@ -263,7 +263,6 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
   ps->conf = conf;
   ps->last_pruned_snapshot_index = snapshot_provider->inital_snapshot.metadata.index;
   ps->last_snapshot_index_to_prune = ps->last_pruned_snapshot_index;
-  ps->snapshot_provider = snapshot_provider;
   ps->spent_addresses_service = spent_addresses_service;
   ps->tips_cache = tips_cache;
   lock_handle_init(&ps->lock_handle);
