@@ -76,7 +76,7 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
 }
 
 retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapshots_service,
-                                               pruning_manager_t *const pm, tangle_t const *const tangle) {
+                                               pruning_service_t *const ps, tangle_t const *const tangle) {
   retcode_t ret = RC_OK;
   snapshot_t next_snapshot;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
@@ -90,8 +90,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
     ERR_BIND_GOTO(
         iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, tangle, &next_snapshot), ret,
         cleanup);
-    // TODO - Implement prunning
-    iota_local_snapshots_pruning_manager_update_current_snapshot(pm, &next_snapshot);
+    iota_local_snapshots_pruning_service_update_current_snapshot(ps, &next_snapshot);
     ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(snapshots_service, &next_snapshot), ret, cleanup);
   }
 

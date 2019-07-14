@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_PRUNING_MANAGER_H__
-#define __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_PRUNING_MANAGER_H__
+#ifndef __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_PRUNING_SERVICE_H__
+#define __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_PRUNING_SERVICE_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -23,10 +23,10 @@
 extern "C" {
 #endif
 
-typedef struct pruning_manager_s {
+typedef struct pruning_service_s {
   bool running;
-  thread_handle_t pruning_manager_thread;
-  cond_handle_t cond_pruning_manager;
+  thread_handle_t pruning_service_thread;
+  cond_handle_t cond_pruning_service;
   iota_consensus_conf_t *conf;
   uint64_t last_pruned_snapshot_index;
   uint64_t last_snapshot_index_to_prune;
@@ -35,62 +35,62 @@ typedef struct pruning_manager_s {
   snapshot_t *new_snapshot;
   spent_addresses_service_t *spent_addresses_service;
   tips_cache_t *tips_cache;
-} pruning_manager_t;
+} pruning_service_t;
 
 /**
- * Initializes a pruning manager
+ * Initializes a pruning service
  *
- * @param pm The pruning manager
+ * @param ps The pruning service
  * @param snapshot_provider The snapshots provider
  * @param conf The consensus's conf
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *const pm,
+retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
                                                     snapshots_provider_t *const snapshot_provider,
                                                     spent_addresses_service_t *const spent_addresses_service,
                                                     tips_cache_t *const tips_cache, iota_consensus_conf_t *const conf);
 
 /**
- * Starts a pruning manager
+ * Starts a pruning service
  *
- * @param pm The pruning manager
+ * @param ps The pruning service
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_pruning_manager_start(pruning_manager_t *const pm);
+retcode_t iota_local_snapshots_pruning_service_start(pruning_service_t *const ps);
 
 /**
- * Stops a local snapshots manager
+ * Stops a local snapshots service
  *
- * @param pm The pruning manager
+ * @param ps The pruning service
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_pruning_manager_stop(pruning_manager_t *const pm);
+retcode_t iota_local_snapshots_pruning_service_stop(pruning_service_t *const ps);
 
 /**
- * Destroys a pruning manager
+ * Destroys a pruning service
  *
- * @param pm The pruning manager
+ * @param ps The pruning service
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_pruning_manager_destroy(pruning_manager_t *const pm);
+retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const ps);
 
 /**
  * Updates the last snapshot index so all transactions before it should be pruned
  *
- * @param pm The pruning manager
+ * @param ps The pruning service
  * @param snapshot The last snapshot
  *
  * @return void
  */
-void iota_local_snapshots_pruning_manager_update_current_snapshot(pruning_manager_t *const pm,
+void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
                                                                   snapshot_t *const snapshot);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_PRUNING_MANAGER_H__
+#endif  // __CONSENSUS_SNAPSHOT_LOCAL_SNAPSHOTS_PRUNING_SERVICE_H__

@@ -59,7 +59,7 @@ static milestone_tracker_t mt;
 static snapshots_provider_t snapshots_provider;
 static snapshots_service_t snapshots_service;
 static transaction_solidifier_t transaction_solidifier;
-static pruning_manager_t pm;
+static pruning_service_t ps;
 static tips_cache_t tips;
 static flex_trit_t g_seed[FLEX_TRIT_SIZE_243];
 
@@ -91,7 +91,7 @@ static void init_test_structs() {
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &transaction_solidifier) == RC_OK);
   TEST_ASSERT(iota_snapshots_service_init(&snapshots_service, &snapshots_provider, &milestone_service, &conf) == RC_OK);
   TEST_ASSERT(iota_milestone_service_init(&milestone_service, &conf) == RC_OK);
-  TEST_ASSERT(iota_local_snapshots_pruning_manager_init(&pm, &snapshots_provider, NULL, &tips, &conf) == RC_OK);
+  TEST_ASSERT(iota_local_snapshots_pruning_service_init(&ps, &snapshots_provider, NULL, &tips, &conf) == RC_OK);
 }
 
 static void destroy_test_structs() {
@@ -169,7 +169,7 @@ static void test_replay_several_milestones() {
     mt.latest_milestone_index = milestone.index;
     TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_milestone(&mt, &tangle));
     TEST_ASSERT_EQUAL_INT64(num_milestones * (i + 1), snapshots_provider.latest_snapshot.metadata.index);
-    TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &pm, &tangle));
+    TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &ps, &tangle));
     TEST_ASSERT_EQUAL_INT64(snapshots_provider.inital_snapshot.metadata.index,
                             (num_milestones * (i + 1) - conf.local_snapshots.min_depth - 1));
     snapshot_t tmp;
