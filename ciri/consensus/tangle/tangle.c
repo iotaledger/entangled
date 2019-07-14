@@ -235,6 +235,10 @@ retcode_t iota_tangle_milestone_load_last(tangle_t const *const tangle, iota_sto
   return iota_stor_milestone_load_last(&tangle->connection, pack);
 }
 
+retcode_t iota_tangle_milestone_load_first(tangle_t const *const tangle, iota_stor_pack_t *const pack) {
+  return iota_stor_milestone_load_first(&tangle->connection, pack);
+}
+
 retcode_t iota_tangle_milestone_load_by_index(tangle_t const *const tangle, uint64_t const index,
                                               iota_stor_pack_t *const pack) {
   return iota_stor_milestone_load_by_index(&tangle->connection, index, pack);

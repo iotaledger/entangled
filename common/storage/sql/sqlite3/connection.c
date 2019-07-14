@@ -75,6 +75,8 @@ static retcode_t prepare_tangle_statements(sqlite3_tangle_connection_t* const co
                            iota_statement_milestone_select_by_hash);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_last),
                            iota_statement_milestone_select_last);
+  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_first),
+                           iota_statement_milestone_select_first);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_by_index),
                            iota_statement_milestone_select_by_index);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_next),
@@ -138,6 +140,7 @@ static retcode_t finalize_tangle_statements(sqlite3_tangle_connection_t* const c
   ret |= finalize_statement(connection->statements.milestone_insert);
   ret |= finalize_statement(connection->statements.milestone_select_by_hash);
   ret |= finalize_statement(connection->statements.milestone_select_last);
+  ret |= finalize_statement(connection->statements.milestone_select_first);
   ret |= finalize_statement(connection->statements.milestone_select_by_index);
   ret |= finalize_statement(connection->statements.milestone_select_next);
   ret |= finalize_statement(connection->statements.milestone_exist);

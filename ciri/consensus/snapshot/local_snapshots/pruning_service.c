@@ -12,6 +12,7 @@
 #include "common/errors.h"
 #include "common/model/milestone.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define PRUNING_SERVICE_LOGGER_ID "pruning_service"
 
@@ -86,11 +87,11 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
 }
 
 static void *pruning_service_routine(void *arg) {
-  pruning_service_t *pm = (pruning_service_t *)arg;
+  pruning_service_t *ps = (pruning_service_t *)arg;
   tangle_t tangle;
 
   {
-    connection_config_t db_conf = {.db_path = pm->conf->tangle_db_path};
+    connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Failed in initializing db\n");
@@ -100,9 +101,9 @@ static void *pruning_service_routine(void *arg) {
 
   spent_addresses_provider_t sap;
   {
-    connection_config_t db_conf = {.db_path = pm->spent_addresses_service->conf->spent_addresses_db_path};
+    connection_config_t db_conf = {.db_path = ps->spent_addresses_service->conf->spent_addresses_db_path};
 
-    if (pm->spent_addresses_service->conf->spent_addresses_files == NULL) {
+    if (ps->spent_addresses_service->conf->spent_addresses_files == NULL) {
       return RC_OK;
     }
 
@@ -112,12 +113,15 @@ static void *pruning_service_routine(void *arg) {
     }
   }
 
-  lock_handle_lock(&pm->lock_handle);
-  while (pm->running) {
-    if (iota_local_snapshots_pruning_service_prune_transactions(pm, &tangle, &sap) != RC_OK) {
+  lock_handle_lock(&ps->lock_handle);
+  DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
+  iota_tangle_milestone_load_first(&tangle, &milestone_pack);
+  ps->last_pruned_snapshot_index = MIN(MIN(0, milestone.index - 1), ps->last_pruned_snapshot_index);
+  while (ps->running) {
+    if (iota_local_snapshots_pruning_service_prune_transactions(ps, &tangle, &sap) != RC_OK) {
       goto cleanup;
     }
-    cond_handle_wait(&pm->cond_pruning_service, &pm->lock_handle);
+    cond_handle_wait(&ps->cond_pruning_service, &ps->lock_handle);
   }
 
 cleanup:
