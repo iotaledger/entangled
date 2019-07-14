@@ -264,24 +264,38 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
   return RC_OK;
 }
 
-retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const neighbor, void const *const buffer,
+retcode_t router_neighbor_read(router_t *const router, neighbor_t *const neighbor, void const *const buffer,
                                size_t const buffer_size) {
   retcode_t ret = RC_OK;
   protocol_header_t const *header = NULL;
   uint16_t header_length = 0;
+  size_t chunk_size = 0;
 
   if (router == NULL || neighbor == NULL || buffer == NULL) {
     return RC_NULL_PARAM;
   }
 
-  // Check whether we have a complete header
-  if (buffer_size < HEADER_BYTES_LENGTH) {
-    log_warning(logger_id, "Invalid header size %d from neighbor tcp://%s:%d\n", buffer_size, neighbor->endpoint.domain,
-                neighbor->endpoint.port);
-    return RC_INVALID_PACKET;
+  if (buffer_size == 0) {
+    return RC_OK;
   }
-  header = (protocol_header_t const *)buffer;
+
+  // We concatenate read data to previously read data
+  chunk_size = MIN(PACKET_MAX_BYTES_LENGTH - neighbor->buffer_size, buffer_size);
+  memcpy(neighbor->buffer + neighbor->buffer_size, buffer, chunk_size);
+  neighbor->buffer_size += chunk_size;
+
+  // We haven't received a full header yet
+  if (neighbor->buffer_size <= HEADER_BYTES_LENGTH) {
+    return RC_OK;
+  }
+
+  header = (protocol_header_t const *)neighbor->buffer;
   header_length = ntohs(header->length);
+
+  // We haven't received the full packet yet
+  if (neighbor->buffer_size - HEADER_BYTES_LENGTH < header_length) {
+    return RC_OK;
+  }
 
   if (header->type < PACKET_TYPE_NBR) {
     switch (header->type) {
@@ -289,13 +303,12 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const n
         break;
       case GOSSIP: {
         protocol_gossip_t gossip;
-        void const *ptr = buffer + HEADER_BYTES_LENGTH;
+        void const *ptr = neighbor->buffer + HEADER_BYTES_LENGTH;
         size_t offset = 0;
         size_t variable_size = 0;
 
-        // Check whether we have a complete gossip packet
-        if (buffer_size != HEADER_BYTES_LENGTH + header_length || header_length < GOSSIP_MIN_BYTES_LENGTH ||
-            header_length > GOSSIP_MAX_BYTES_LENGTH) {
+        // Check whether the packet length matches gossip packet length
+        if (header_length < GOSSIP_MIN_BYTES_LENGTH || header_length > GOSSIP_MAX_BYTES_LENGTH) {
           log_warning(logger_id, "Invalid packet size %d from neighbor tcp://%s:%d\n", header_length,
                       neighbor->endpoint.domain, neighbor->endpoint.port);
           return RC_INVALID_PACKET;
@@ -333,7 +346,11 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const n
     return RC_INVALID_PACKET_TYPE;
   }
 
-  return ret;
+  memmove(neighbor->buffer, neighbor->buffer + HEADER_BYTES_LENGTH + header_length,
+          PACKET_MAX_BYTES_LENGTH - (HEADER_BYTES_LENGTH + header_length));
+  neighbor->buffer_size -= (HEADER_BYTES_LENGTH + header_length);
+
+  return router_neighbor_read(router, neighbor, buffer + chunk_size, buffer_size - chunk_size);
 }
 
 retcode_t router_neighbors_reconnect_attempt(router_t *const router) {

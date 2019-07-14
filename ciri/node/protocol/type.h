@@ -32,6 +32,8 @@ static packet_type_desc_t packet_type_descs[PACKET_TYPE_NBR] = {{HEADER, HEADER_
                                                                 {HANDSHAKE, HANDSHAKE_MAX_BYTES_LENGTH, true},
                                                                 {GOSSIP, GOSSIP_MAX_BYTES_LENGTH, true}};
 
+#define PACKET_MAX_BYTES_LENGTH ((HEADER_BYTES_LENGTH) + (GOSSIP_MAX_BYTES_LENGTH))
+
 #ifdef __cplusplus
 }
 #endif

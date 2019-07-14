@@ -121,7 +121,7 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
  *
  * @return a status code
  */
-retcode_t router_neighbor_read(router_t *const router, neighbor_t const *const neighbor, void const *const buffer,
+retcode_t router_neighbor_read(router_t *const router, neighbor_t *const neighbor, void const *const buffer,
                                size_t const buffer_size);
 
 /**

@@ -12,7 +12,7 @@
 
 #include "utlist.h"
 
-#include "ciri/node/protocol/gossip.h"
+#include "ciri/node/protocol/type.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
@@ -32,6 +32,8 @@ typedef enum neighbor_state_e {
 } neighbor_state_t;
 
 typedef struct neighbor_s {
+  byte_t buffer[PACKET_MAX_BYTES_LENGTH];
+  size_t buffer_size;
   endpoint_t endpoint;
   neighbor_state_t state;
   uint8_t protocol_version;
