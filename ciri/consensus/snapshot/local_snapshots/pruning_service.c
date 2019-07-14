@@ -13,6 +13,7 @@
 #include "common/model/milestone.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 #define PRUNING_RESCAN_INTERVAL_SHORT_MS 100ULL
 #define PRUNING_RESCAN_INTERVAL_MS 1000ULL
@@ -21,13 +22,22 @@
 
 static logger_id_t logger_id;
 
-static retcode_t iota_local_snapshots_pruning_service_prune_transactions(pruning_service_t *const ps,
-                                                                         tangle_t const *const tangle,
-                                                                         spent_addresses_provider_t *const sap);
+static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const *const tangle,
+                                    spent_addresses_provider_t *const sap);
 
-static retcode_t iota_local_snapshots_pruning_service_collect_transactions_to_prune(
-    pruning_service_t *const ps, tangle_t const *const tangle, spent_addresses_provider_t *const sap,
-    flex_trit_t const *const entry_point_hash, hash243_set_t *const transactions_to_prune);
+static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tangle_t const *const tangle,
+                                               spent_addresses_provider_t *const sap,
+                                               flex_trit_t const *const entry_point_hash,
+                                               hash243_set_t *const transactions_to_prune);
+
+static retcode_t collect_unconfirmed_future_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack,
+                                                                             void *data, bool *should_branch,
+                                                                             bool *should_stop);
+
+static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
+                                                          bool *should_branch, bool *should_stop);
+
+static void *pruning_service_routine(void *arg);
 
 typedef struct collect_transactions_for_pruning_do_func_params_s {
   uint64_t current_snapshot_index;
@@ -96,6 +106,8 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
 static void *pruning_service_routine(void *arg) {
   pruning_service_t *ps = (pruning_service_t *)arg;
   tangle_t tangle;
+  uint64_t start_timestamp, end_timestamp;
+  uint64_t start_index;
 
   {
     connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
@@ -126,13 +138,18 @@ static void *pruning_service_routine(void *arg) {
   lock_handle_lock(&ps->lock_handle);
   ps->last_pruned_snapshot_index = MIN(MIN(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
   while (ps->running) {
+    start_index = ps->last_pruned_snapshot_index;
     while (ps->last_pruned_snapshot_index < ps->last_snapshot_index_to_prune) {
-      if (iota_local_snapshots_pruning_service_prune_transactions(ps, &tangle, &sap) != RC_OK) {
+      start_timestamp = current_timestamp_ms();
+      if (prune_transactions(ps, &tangle, &sap) != RC_OK) {
         goto cleanup;
       }
       cond_handle_timedwait(&ps->cond_pruning_service, &ps->lock_handle, PRUNING_RESCAN_INTERVAL_SHORT_MS);
     }
     lock_handle_lock(&ps->lock_handle);
+    end_timestamp = current_timestamp_ms();
+    log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
+             ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
     cond_handle_timedwait(&ps->cond_pruning_service, &ps->lock_handle, PRUNING_RESCAN_INTERVAL_MS);
   }
 
@@ -149,9 +166,10 @@ cleanup:
   return NULL;
 }
 
-static retcode_t iota_local_snapshots_pruning_service_collect_transactions_to_prune(
-    pruning_service_t *const ps, tangle_t const *const tangle, spent_addresses_provider_t *const sap,
-    flex_trit_t const *const entry_point_hash, hash243_set_t *const transactions_to_prune) {
+static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tangle_t const *const tangle,
+                                               spent_addresses_provider_t *const sap,
+                                               flex_trit_t const *const entry_point_hash,
+                                               hash243_set_t *const transactions_to_prune) {
   retcode_t err;
   DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
   collect_transactions_for_pruning_do_func_params_t params = {.tangle = tangle,
@@ -200,21 +218,17 @@ cleanup:
   return RC_OK;
 }
 
-static retcode_t iota_local_snapshots_pruning_service_prune_transactions(pruning_service_t *const ps,
-                                                                         tangle_t const *const tangle,
-                                                                         spent_addresses_provider_t *const sap) {
+static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const *const tangle,
+                                    spent_addresses_provider_t *const sap) {
   retcode_t err;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
-  DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
   hash243_set_t transactions_to_prune = NULL;
 
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index, &milestone_pack), err,
                 cleanup);
   hash243_set_add(&transactions_to_prune, milestone.hash);
 
-  ERR_BIND_GOTO(iota_local_snapshots_pruning_service_collect_transactions_to_prune(ps, tangle, sap, milestone.hash,
-                                                                                   &transactions_to_prune),
-                err, cleanup);
+  ERR_BIND_GOTO(collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune), err, cleanup);
   ERR_BIND_GOTO(iota_tangle_transaction_delete_batch(tangle, transactions_to_prune), err, cleanup);
   ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
   log_info(logger_id,
