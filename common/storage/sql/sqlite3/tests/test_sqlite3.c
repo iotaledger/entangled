@@ -417,6 +417,7 @@ void test_transactions_delete_one_transaction(void) {
               RC_OK);
   TEST_ASSERT(exist == false);
 
+  hash243_set_free(&transactions_to_delete);
   transaction_free(test_tx);
 }
 
