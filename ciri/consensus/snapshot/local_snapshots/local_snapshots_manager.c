@@ -126,7 +126,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
     iota_local_snapshots_pruning_service_init(&lsm->ps, lsm->snapshots_service->snapshots_provider,
                                               spent_addresses_service, tips_cache, conf);
   }
@@ -148,7 +148,7 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
     return RC_THREAD_CREATE;
   }
 
-  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
     ERR_BIND_RETURN(iota_local_snapshots_pruning_service_start(&lsm->ps), ret);
   }
 
@@ -164,7 +164,7 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
     return RC_OK;
   }
 
-  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
     ERR_BIND_RETURN(iota_local_snapshots_pruning_service_stop(&lsm->ps), ret);
   }
 
@@ -188,7 +188,7 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
     return RC_STILL_RUNNING;
   }
 
-  if (lsm->conf->local_snapshots.prunning_is_enabled) {
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
     ERR_BIND_RETURN(iota_local_snapshots_pruning_service_destroy(&lsm->ps), ret);
   }
 

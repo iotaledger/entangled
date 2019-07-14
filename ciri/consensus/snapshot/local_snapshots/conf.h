@@ -19,7 +19,7 @@ extern "C" {
 
 typedef struct iota_consensus_local_snapshots_conf_s {
   bool local_snapshots_is_enabled;
-  bool prunning_is_enabled;
+  bool pruning_is_enabled;
   size_t transactions_growth_threshold;
   size_t min_depth;
   char local_snapshots_path_base[FILE_PATH_SIZE];
