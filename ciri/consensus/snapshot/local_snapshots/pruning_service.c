@@ -136,7 +136,10 @@ static void *pruning_service_routine(void *arg) {
   iota_tangle_milestone_load_first(&tangle, &milestone_pack);
 
   lock_handle_lock(&ps->lock_handle);
-  ps->last_pruned_snapshot_index = MIN(MIN(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
+  if (milestone_pack.num_loaded > 0) {
+    ps->last_pruned_snapshot_index = MIN(MIN(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
+  }
+
   while (ps->running) {
     start_index = ps->last_pruned_snapshot_index;
     while (ps->last_pruned_snapshot_index < ps->last_snapshot_index_to_prune) {
@@ -226,10 +229,12 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
 
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index, &milestone_pack), err,
                 cleanup);
-  hash243_set_add(&transactions_to_prune, milestone.hash);
 
   ERR_BIND_GOTO(collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune), err, cleanup);
   ERR_BIND_GOTO(iota_tangle_transaction_delete_batch(tangle, transactions_to_prune), err, cleanup);
+  hash243_set_free(&transactions_to_prune);
+  // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle transactions
+  hash243_set_add(&transactions_to_prune, milestone.hash);
   ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
   log_info(logger_id,
            "Snapshot index % " PRIu64 " was pruned successfully, % " PRIu64 " transactions were removed from db\n",
