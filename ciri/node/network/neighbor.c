@@ -57,13 +57,30 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
 }
 
 retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, protocol_gossip_t const *const packet) {
-  if (node == NULL || neighbor == NULL || packet == NULL) {
+  retcode_t ret = RC_OK;
+  byte_t content[GOSSIP_MAX_BYTES_LENGTH];
+  size_t content_length = GOSSIP_SIG_MAX_BYTES_LENGTH;
+
+  if (node == NULL || neighbor == NULL || neighbor->endpoint.stream == NULL || packet == NULL) {
     return RC_NULL_PARAM;
+  }
+
+  for (int i = GOSSIP_SIG_MAX_BYTES_LENGTH - 1; i >= 0 && packet->content[i] == 0; i--) {
+    content_length--;
+  }
+
+  memcpy(content, packet->content, content_length);
+  memcpy(content + content_length, packet->content + GOSSIP_SIG_MAX_BYTES_LENGTH,
+         GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
+  content_length += GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+
+  if ((ret = tcp_server_write((uv_stream_t *)neighbor->endpoint.stream, GOSSIP, content, content_length)) != RC_OK) {
+    return ret;
   }
 
   neighbor->nbr_sent_txs++;
 
-  return RC_OK;
+  return ret;
 }
 
 static retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,

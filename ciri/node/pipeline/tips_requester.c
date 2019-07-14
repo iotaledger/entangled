@@ -69,8 +69,10 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
 
     rw_lock_handle_rdlock(&tips_requester->node->router.neighbors_lock);
     NEIGHBORS_FOREACH(tips_requester->node->router.neighbors, neighbor) {
-      if (neighbor_send_packet(tips_requester->node, neighbor, &packet) != RC_OK) {
-        log_warning(logger_id, "Sending tip request to neighbor failed\n");
+      if (neighbor->endpoint.stream != NULL) {
+        if (neighbor_send_packet(tips_requester->node, neighbor, &packet) != RC_OK) {
+          log_warning(logger_id, "Sending tip request to neighbor failed\n");
+        }
       }
     }
     rw_lock_handle_unlock(&tips_requester->node->router.neighbors_lock);

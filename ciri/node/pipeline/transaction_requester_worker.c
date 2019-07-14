@@ -63,8 +63,10 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
     }
     rw_lock_handle_rdlock(&transaction_requester->node->router.neighbors_lock);
     NEIGHBORS_FOREACH(transaction_requester->node->router.neighbors, neighbor) {
-      if (neighbor_send_trits(transaction_requester->node, &tangle, neighbor, transaction) != RC_OK) {
-        log_warning(logger_id, "Sending request failed\n");
+      if (neighbor->endpoint.stream != NULL) {
+        if (neighbor_send_trits(transaction_requester->node, &tangle, neighbor, transaction) != RC_OK) {
+          log_warning(logger_id, "Sending request failed\n");
+        }
       }
     }
     rw_lock_handle_unlock(&transaction_requester->node->router.neighbors_lock);
