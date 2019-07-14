@@ -314,20 +314,26 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t *const neighbo
           return RC_INVALID_PACKET;
         }
 
-        memcpy(gossip.content + offset, ptr, GOSSIP_NON_SIG_BYTES_LENGTH);
-        ptr += GOSSIP_NON_SIG_BYTES_LENGTH;
-        offset += GOSSIP_NON_SIG_BYTES_LENGTH;
         variable_size = header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
         memcpy(gossip.content + offset, ptr, variable_size);
         ptr += variable_size;
         offset += variable_size;
+
         memset(gossip.content + offset, 0, GOSSIP_SIG_MAX_BYTES_LENGTH - variable_size);
         offset += GOSSIP_SIG_MAX_BYTES_LENGTH - variable_size;
+
+        memcpy(gossip.content + offset, ptr, GOSSIP_NON_SIG_BYTES_LENGTH);
+        ptr += GOSSIP_NON_SIG_BYTES_LENGTH;
+        offset += GOSSIP_NON_SIG_BYTES_LENGTH;
+
         memcpy(gossip.content + offset, ptr, GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
         ptr += GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
         offset += GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+
         memset(&gossip.source, 0, sizeof(endpoint_t));
+
         protocol_gossip_set_endpoint(&gossip, neighbor->endpoint.ip, neighbor->endpoint.port);
+
         if ((ret = processor_stage_add(&router->node->processor, &gossip)) != RC_OK) {
           log_warning(logger_id, "Pushing gossip packet from tcp://%s:%d failed\n", neighbor->endpoint.domain,
                       neighbor->endpoint.port);
