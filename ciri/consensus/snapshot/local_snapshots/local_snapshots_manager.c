@@ -45,7 +45,7 @@ static void *local_snapshots_manager_routine(void *arg) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
       prev_initial_index = lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
-      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &lsm->pm, &tangle);
+      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &lsm->ps, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
         end_timestamp = current_timestamp_ms();
@@ -127,7 +127,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
   cond_handle_init(&lsm->cond_local_snapshots);
 
   if (lsm->conf->local_snapshots.prunning_is_enabled) {
-    iota_local_snapshots_pruning_service_init(&lsm->pm, lsm->snapshots_service->snapshots_provider,
+    iota_local_snapshots_pruning_service_init(&lsm->ps, lsm->snapshots_service->snapshots_provider,
                                               spent_addresses_service, tips_cache, conf);
   }
 
@@ -149,7 +149,7 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
   }
 
   if (lsm->conf->local_snapshots.prunning_is_enabled) {
-    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_start(&lsm->pm), ret);
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_start(&lsm->ps), ret);
   }
 
   return RC_OK;
@@ -165,7 +165,7 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   }
 
   if (lsm->conf->local_snapshots.prunning_is_enabled) {
-    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_stop(&lsm->pm), ret);
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_stop(&lsm->ps), ret);
   }
 
   lsm->running = false;
@@ -189,7 +189,7 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
   }
 
   if (lsm->conf->local_snapshots.prunning_is_enabled) {
-    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_destroy(&lsm->pm), ret);
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_destroy(&lsm->ps), ret);
   }
 
   cond_handle_destroy(&lsm->cond_local_snapshots);
