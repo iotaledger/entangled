@@ -251,7 +251,8 @@ cleanup:
 retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
                                                     snapshots_provider_t *const snapshot_provider,
                                                     spent_addresses_service_t *const spent_addresses_service,
-                                                    tips_cache_t *const tips_cache, iota_consensus_conf_t *const conf) {
+                                                    tips_cache_t *const tips_cache,
+                                                    iota_consensus_conf_t const *const conf) {
   logger_id = logger_helper_enable(PRUNING_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   memset(ps, 0, sizeof(pruning_service_t));
   ps->conf = conf;
