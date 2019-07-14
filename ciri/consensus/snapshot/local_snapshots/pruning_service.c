@@ -15,7 +15,7 @@
 #include "utils/macros.h"
 #include "utils/time.h"
 
-#define PRUNING_RESCAN_INTERVAL_SHORT_MS 100ULL
+#define PRUNING_RESCAN_INTERVAL_SHORT_MS 1ULL
 #define PRUNING_RESCAN_INTERVAL_MS 1000ULL
 
 #define PRUNING_SERVICE_LOGGER_ID "pruning_service"
