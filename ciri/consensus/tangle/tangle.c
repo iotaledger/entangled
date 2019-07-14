@@ -164,7 +164,7 @@ retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle) {
 }
 
 retcode_t iota_tangle_transaction_delete_batch(tangle_t const *const tangle, hash243_set_t const hashes) {
-  return iota_stor_transaction_delete_batch(tangle, hashes);
+  return iota_stor_transaction_delete_batch(&tangle->connection, hashes);
 }
 
 /*

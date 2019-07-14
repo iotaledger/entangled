@@ -30,9 +30,9 @@ typedef struct pruning_manager_s {
   iota_consensus_conf_t *conf;
   uint64_t last_pruned_snapshot_index;
   uint64_t last_snapshot_index_to_prune;
-  rw_lock_handle_t rw_lock;
+  lock_handle_t lock_handle;
   snapshots_provider_t *snapshot_provider;
-  snapshot_t const *new_snapshot;
+  snapshot_t *new_snapshot;
   spent_addresses_service_t *spent_addresses_service;
   tips_cache_t *tips_cache;
 } pruning_manager_t;
@@ -46,9 +46,9 @@ typedef struct pruning_manager_s {
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *pm,
+retcode_t iota_local_snapshots_pruning_manager_init(pruning_manager_t *const pm,
                                                     snapshots_provider_t *const snapshot_provider,
-                                                    spent_addresses_service_t const *spent_addresses_service,
+                                                    spent_addresses_service_t *const spent_addresses_service,
                                                     tips_cache_t *const tips_cache, iota_consensus_conf_t *const conf);
 
 /**
@@ -87,7 +87,7 @@ retcode_t iota_local_snapshots_pruning_manager_destroy(pruning_manager_t *const 
  * @return void
  */
 void iota_local_snapshots_pruning_manager_update_current_snapshot(pruning_manager_t *const pm,
-                                                                  snapshot_t const *const snapshot);
+                                                                  snapshot_t *const snapshot);
 
 #ifdef __cplusplus
 }

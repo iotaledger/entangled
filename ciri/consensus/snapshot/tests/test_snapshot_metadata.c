@@ -46,7 +46,7 @@ void test_metadata_serialization() {
   buffer = calloc(serialized_size, sizeof(char));
 
   TEST_ASSERT(iota_snapshot_metadata_serialize_str(&metadata_orig, buffer) == RC_OK);
-  /*TEST_ASSERT(iota_snapshot_metadata_deserialize_str(buffer, &metadata_deserialized) == RC_OK);
+  TEST_ASSERT(iota_snapshot_metadata_deserialize_str(buffer, &metadata_deserialized) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT64(metadata_orig.index, metadata_deserialized.index);
   TEST_ASSERT_EQUAL_INT64(metadata_orig.timestamp, metadata_deserialized.timestamp);
@@ -56,7 +56,7 @@ void test_metadata_serialization() {
   iota_snapshot_metadata_destroy(&metadata_orig);
   iota_snapshot_metadata_destroy(&metadata_deserialized);
 
-  free(buffer);*/
+  free(buffer);
 }
 
 int main() {
