@@ -53,6 +53,7 @@ static void tcp_server_on_write(uv_write_t *const req, int const status) {
   if (status) {
     log_warning(logger_id, "Writing data failed: %s\n", uv_strerror(status));
   }
+  free(req->data);
   free(req);
 }
 
@@ -397,9 +398,14 @@ retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, 
 
   header.type = type;
   header.length = htons(buffer_size);
-  uv_buf_t buffers[] = {{.base = (char *)&header, .len = HEADER_BYTES_LENGTH}, {.base = buffer, .len = buffer_size}};
 
-  if ((ret = uv_write(req, stream, buffers, 2, tcp_server_on_write)) != 0) {
+  uv_buf_t buf = uv_buf_init(malloc(HEADER_BYTES_LENGTH + buffer_size), HEADER_BYTES_LENGTH + buffer_size);
+  memcpy(buf.base, &header, HEADER_BYTES_LENGTH);
+  memcpy(buf.base + HEADER_BYTES_LENGTH, buffer, buffer_size);
+
+  req->data = buf.base;
+
+  if ((ret = uv_write(req, stream, &buf, 1, tcp_server_on_write)) != 0) {
     log_warning(logger_id, "Writing failed: %s\n", uv_err_name(ret));
     return RC_WRITE_FAILED;
   }
