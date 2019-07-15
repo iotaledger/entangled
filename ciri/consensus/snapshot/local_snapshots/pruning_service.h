@@ -39,10 +39,11 @@ typedef struct pruning_service_s {
 /**
  * Initializes a pruning service
  *
- * @param ps[out] The pruning service
- * @param snapshot_provider[in] The snapshots provider
- * @param spent_addresses_service[in, out] The spent addresses service
- * @param conf The consensus's conf [in]
+ * @param[out] ps The pruning service
+ * @param[in] snapshot_provider The snapshots provider
+ * @param[in, out] spent_addresses_service The spent addresses service
+ * @param[out] tips_cache The tips cache
+ * @param[in] conf The consensus's conf
  *
  * @return a status code
  */
@@ -55,7 +56,7 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
 /**
  * Starts a pruning service
  *
- * @param ps[in, out] The pruning service
+ * @param[in, out] ps The pruning service
  *
  * @return a status code
  */
@@ -64,7 +65,7 @@ retcode_t iota_local_snapshots_pruning_service_start(pruning_service_t *const ps
 /**
  * Stops a local snapshots service
  *
- * @param ps[in, out] The pruning service
+ * @param[in, out] ps The pruning service
  *
  * @return a status code
  */
@@ -73,7 +74,7 @@ retcode_t iota_local_snapshots_pruning_service_stop(pruning_service_t *const ps)
 /**
  * Destroys a pruning service
  *
- * @param ps[in, out] The pruning service
+ * @param[in, out] ps The pruning service
  *
  * @return a status code
  */
@@ -82,7 +83,7 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
 /**
  * Updates the last snapshot index so all transactions before it should be pruned
  *
- * @param ps[out] The pruning service
+ * @param[out] ps The pruning service
  * @param snapshot[in] The last snapshot
  *
  * @return void
