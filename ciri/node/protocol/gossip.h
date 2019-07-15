@@ -58,8 +58,8 @@ typedef protocol_gossip_queue_entry_t* protocol_gossip_queue_t;
 /**
  * Sets the transaction of a gossip packet
  *
- * @param packet The gossip packet
- * @param transaction The transaction flex trits
+ * @param[out]  packet      The gossip packet
+ * @param[in]   transaction The transaction flex trits
  *
  * @return a status code
  */
@@ -68,9 +68,9 @@ retcode_t protocol_gossip_set_transaction(protocol_gossip_t* const packet, flex_
 /**
  * Sets the request of a gossip packet
  *
- * @param packet The gossip packet
- * @param request The request flex trits
- * @param request_size The size of the request hash in trits
+ * @param[out]  packet        The gossip packet
+ * @param[in]   request       The request flex trits
+ * @param[in]   request_size  The size of the request hash in trits
  *
  * @return a status code
  */
@@ -80,9 +80,9 @@ retcode_t protocol_gossip_set_request(protocol_gossip_t* const packet, flex_trit
 /**
  * Sets the endpoint of a gossip packet
  *
- * @param packet The gossip packet
- * @param ip The endpoint ip
- * @param port The endpoint port
+ * @param[out]  packet  The gossip packet
+ * @param[in]   ip      The endpoint ip
+ * @param[in]   port    The endpoint port
  *
  * @return a status code
  */
@@ -91,7 +91,7 @@ retcode_t protocol_gossip_set_endpoint(protocol_gossip_t* const packet, char con
 /**
  * Tells whether a gossip packet queue is empty or not
  *
- * @param queue The gossip packet queue
+ * @param[in] queue The gossip packet queue
  *
  * @return true if empty, false otherwise
  */
@@ -100,7 +100,7 @@ bool protocol_gossip_queue_empty(protocol_gossip_queue_t const queue);
 /**
  * Gets the size of a gossip packet queue
  *
- * @param queue The gossip packet queue
+ * @param[in] queue The gossip packet queue
  *
  * @return the size of the packet queue
  */
@@ -109,8 +109,8 @@ size_t protocol_gossip_queue_count(protocol_gossip_queue_t const queue);
 /**
  * Pushes a packet to a gossip packet queue
  *
- * @param queue The gossip packet queue
- * @param packet The gossip packet
+ * @param[out]  queue   The gossip packet queue
+ * @param[in]   packet  The gossip packet
  *
  * @return a status code
  */
@@ -119,7 +119,7 @@ retcode_t protocol_gossip_queue_push(protocol_gossip_queue_t* const queue, proto
 /**
  * Pops a packet from a gossip packet queue
  *
- * @param queue The gossip packet queue
+ * @param[out]  queue The gossip packet queue
  *
  * @return the gossip packet
  */
@@ -128,7 +128,7 @@ protocol_gossip_queue_entry_t* protocol_gossip_queue_pop(protocol_gossip_queue_t
 /**
  * Frees a gossip packet queue
  *
- * @param queue The gossip packet queue
+ * @param[out]  queue The gossip packet queue
  *
  * @return a status code
  */
