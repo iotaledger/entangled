@@ -407,7 +407,7 @@ retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, 
 
   if ((ret = uv_write(req, stream, &buf, 1, tcp_server_on_write)) != 0) {
     log_warning(logger_id, "Writing failed: %s\n", uv_err_name(ret));
-    return RC_WRITE_FAILED;
+    return RC_WRITE_TCP_FAILED;
   }
 
   return RC_OK;
