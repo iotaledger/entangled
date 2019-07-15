@@ -42,8 +42,6 @@ static void test_attach_to_tangle_empty(void) {
   TEST_ASSERT_NOT_NULL(attach_res->trytes);
 
   TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM, iota_client_attach_to_tangle(&g_serv, attach_req, attach_res));
-  TEST_ASSERT_NOT_NULL(attach_res);
-  TEST_ASSERT_NOT_NULL(attach_res->trytes);
 
   attach_to_tangle_res_free(&attach_res);
   TEST_ASSERT_NULL(attach_res);
@@ -69,8 +67,6 @@ static void test_attach_to_tangle_empty_trunk_branch(void) {
   TEST_ASSERT_EQUAL_INT16(RC_OK, attach_to_tangle_req_trytes_add(attach_req, raw_trits));
 
   TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM, iota_client_attach_to_tangle(&g_serv, attach_req, attach_res));
-  TEST_ASSERT_NOT_NULL(attach_res);
-  TEST_ASSERT_NOT_NULL(attach_res->trytes);
 
   attach_to_tangle_res_free(&attach_res);
   TEST_ASSERT_NULL(attach_res);
@@ -99,8 +95,6 @@ static void test_attach_to_tangle_empty_branch(void) {
                                      NUM_TRYTES_HASH) != 0);
 
   TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM, iota_client_attach_to_tangle(&g_serv, attach_req, attach_res));
-  TEST_ASSERT_NOT_NULL(attach_res);
-  TEST_ASSERT_NOT_NULL(attach_res->trytes);
 
   attach_to_tangle_res_free(&attach_res);
   TEST_ASSERT_NULL(attach_res);
@@ -129,8 +123,6 @@ static void test_attach_to_tangle_empty_trunk(void) {
                                      NUM_TRYTES_HASH) != 0);
 
   TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM, iota_client_attach_to_tangle(&g_serv, attach_req, attach_res));
-  TEST_ASSERT_NOT_NULL(attach_res);
-  TEST_ASSERT_NOT_NULL(attach_res->trytes);
 
   attach_to_tangle_res_free(&attach_res);
   TEST_ASSERT_NULL(attach_res);

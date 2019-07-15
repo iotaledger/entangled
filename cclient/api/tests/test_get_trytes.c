@@ -60,7 +60,6 @@ static void test_get_trytes(void) {
   TEST_ASSERT_EQUAL_INT16(RC_OK, get_trytes_req_hash_add(trytes_req, flex_hash));
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_get_trytes(&g_serv, trytes_req, trytes_res));
-  TEST_ASSERT_NOT_NULL(trytes_res->trytes);
 
   get_trytes_res_free(&trytes_res);
   TEST_ASSERT_NULL(trytes_res);

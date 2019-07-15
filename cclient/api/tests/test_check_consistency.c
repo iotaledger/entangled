@@ -46,25 +46,6 @@ static void test_check_consistency_empty(void) {
   TEST_ASSERT_NULL(consistency_res);
 }
 
-static void test_check_consistency_tail(void) {
-  flex_trit_t flex_tx[NUM_FLEX_TRITS_HASH];
-  check_consistency_req_t *consistency_req = check_consistency_req_new();
-  check_consistency_res_t *consistency_res = check_consistency_res_new();
-  TEST_ASSERT_NOT_NULL(consistency_req);
-  TEST_ASSERT_NOT_NULL(consistency_res);
-
-  TEST_ASSERT(flex_trits_from_trytes(flex_tx, NUM_TRITS_HASH, TEST_BUNDLE_TX_0, NUM_TRYTES_HASH, NUM_TRYTES_HASH) != 0);
-  TEST_ASSERT_EQUAL_INT16(RC_OK, check_consistency_req_tails_add(consistency_req, flex_tx));
-
-  TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_check_consistency(&g_serv, consistency_req, consistency_res));
-  TEST_ASSERT_NOT_NULL(consistency_res->info);
-
-  check_consistency_req_free(&consistency_req);
-  TEST_ASSERT_NULL(consistency_req);
-  check_consistency_res_free(&consistency_res);
-  TEST_ASSERT_NULL(consistency_res);
-}
-
 static void test_check_consistency_not_tail(void) {
   flex_trit_t flex_tx[NUM_FLEX_TRITS_HASH];
   check_consistency_req_t *consistency_req = check_consistency_req_new();
@@ -111,7 +92,6 @@ int main() {
   RUN_TEST(service_setup);
 
   RUN_TEST(test_check_consistency_empty);
-  RUN_TEST(test_check_consistency_tail);
   RUN_TEST(test_check_consistency_not_tail);
   RUN_TEST(test_check_consistency_empty_tail);
 

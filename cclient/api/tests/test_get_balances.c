@@ -66,7 +66,6 @@ static void test_get_balances(void) {
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_get_balances(&g_serv, balance_req, balance_res));
 
-  TEST_ASSERT(get_balances_res_balances_num(balance_res) != 0);
   TEST_ASSERT_NOT_NULL(balance_res->references);
   TEST_ASSERT(!flex_trits_are_null(balance_res->references->hash, NUM_FLEX_TRITS_HASH));
   TEST_ASSERT(balance_res->milestone_index > STARTING_MILESTONE_INDEX);
@@ -97,7 +96,6 @@ static void test_get_balances_with_tip(void) {
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_get_balances(&g_serv, balance_req, balance_res));
 
-  TEST_ASSERT(get_balances_res_balances_num(balance_res) != 0);
   TEST_ASSERT_NOT_NULL(balance_res->references);
   TEST_ASSERT(!flex_trits_are_null(balance_res->references->hash, NUM_FLEX_TRITS_HASH));
   TEST_ASSERT(balance_res->milestone_index > STARTING_MILESTONE_INDEX);

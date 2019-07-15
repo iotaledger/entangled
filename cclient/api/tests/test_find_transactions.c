@@ -62,7 +62,6 @@ static void test_find_tx_by_bundle(void) {
   TEST_ASSERT_EQUAL_INT16(RC_OK, find_transactions_req_bundle_add(find_tx_req, flex_hash));
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_find_transactions(&g_serv, find_tx_req, find_tx_res));
-  TEST_ASSERT_NOT_NULL(find_tx_res->hashes);
 
   find_transactions_req_free(&find_tx_req);
   TEST_ASSERT_NULL(find_tx_req);
@@ -101,7 +100,6 @@ static void test_find_tx_by_address(void) {
   TEST_ASSERT_EQUAL_INT16(RC_OK, find_transactions_req_address_add(find_tx_req, flex_addr));
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_find_transactions(&g_serv, find_tx_req, find_tx_res));
-  TEST_ASSERT_NOT_NULL(find_tx_res->hashes);
 
   find_transactions_req_free(&find_tx_req);
   TEST_ASSERT_NULL(find_tx_req);
@@ -139,7 +137,6 @@ static void test_find_tx_by_tag(void) {
   TEST_ASSERT_EQUAL_INT16(RC_OK, find_transactions_req_tag_add(find_tx_req, flex_tag));
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_find_transactions(&g_serv, find_tx_req, find_tx_res));
-  TEST_ASSERT_NOT_NULL(find_tx_res->hashes);
 
   find_transactions_req_free(&find_tx_req);
   TEST_ASSERT_NULL(find_tx_req);
@@ -178,7 +175,6 @@ static void test_find_tx_by_approvee(void) {
   TEST_ASSERT_EQUAL_INT16(RC_OK, find_transactions_req_approvee_add(find_tx_req, flex_hash));
 
   TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_find_transactions(&g_serv, find_tx_req, find_tx_res));
-  TEST_ASSERT_NOT_NULL(find_tx_res->hashes);
 
   find_transactions_req_free(&find_tx_req);
   TEST_ASSERT_NULL(find_tx_req);
