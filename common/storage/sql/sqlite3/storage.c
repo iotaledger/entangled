@@ -790,7 +790,8 @@ done:
   return ret;
 }
 
-retcode_t iota_stor_transaction_delete(storage_connection_t const* const connection, hash243_set_t const hashes) {
+retcode_t iota_stor_transaction_delete_transactions(storage_connection_t const* const connection,
+                                                    hash243_set_t const hashes) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   retcode_t ret_rollback;

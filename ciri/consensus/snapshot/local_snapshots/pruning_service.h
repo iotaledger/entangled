@@ -84,7 +84,7 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
  * Updates the last snapshot index so all transactions before it should be pruned
  *
  * @param[out] ps The pruning service
- * @param snapshot[in] The last snapshot
+ * @param[in] snapshot The last snapshot
  *
  * @return void
  */

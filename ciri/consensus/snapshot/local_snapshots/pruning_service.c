@@ -50,20 +50,13 @@ static retcode_t collect_unconfirmed_future_transactions_for_pruning_do_func(fle
                                                                              bool *should_stop) {
   retcode_t ret = RC_OK;
   *should_stop = false;
-  *should_branch = true;
-  collect_transactions_for_pruning_do_func_params_t *params = data;
+  *should_branch = false;
 
   if (pack->num_loaded == 0) {
-    *should_branch = false;
     return RC_OK;
   }
 
-  transaction_snapshot_index((iota_transaction_t *)pack->models[0]);
-
   if (transaction_snapshot_index((iota_transaction_t *)pack->models[0]) == 0) {
-    if ((ret = hash243_set_add(params->transactions_to_prune, hash)) != RC_OK) {
-      return ret;
-    }
     *should_branch = true;
   }
 
@@ -85,13 +78,9 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
 
   if (current_snapshot_index >= params->current_snapshot_index) {
     *should_branch = true;
-    if ((ret = hash243_set_add(params->transactions_to_prune, hash)) != RC_OK) {
-      return ret;
-    }
-
     ERR_BIND_RETURN(
         tangle_traversal_dfs_to_future(params->tangle, collect_unconfirmed_future_transactions_for_pruning_do_func,
-                                       hash, NULL, &params),
+                                       hash, params->transactions_to_prune, &params),
         ret);
   }
 
@@ -108,6 +97,7 @@ static void *pruning_service_routine(void *arg) {
   tangle_t tangle;
   uint64_t start_timestamp, end_timestamp;
   uint64_t start_index;
+  spent_addresses_provider_t sap;
 
   {
     connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
@@ -118,7 +108,6 @@ static void *pruning_service_routine(void *arg) {
     }
   }
 
-  spent_addresses_provider_t sap;
   {
     connection_config_t db_conf = {.db_path = ps->spent_addresses_service->conf->spent_addresses_db_path};
 
@@ -177,17 +166,16 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
   DECLARE_PACK_SINGLE_TX(tx, txp, tx_pack);
   collect_transactions_for_pruning_do_func_params_t params = {.tangle = tangle,
                                                               .transactions_to_prune = transactions_to_prune};
-  bool entry_point_has_no_solid_entry_points_in_past_cone;
+  bool entry_point_has_no_solid_entry_points_in_past_cone = true;
   hash243_set_entry_t *iter = NULL, *tmp = NULL;
   bool spent;
 
   params.current_snapshot_index = ps->last_pruned_snapshot_index + 1;
 
   ERR_BIND_GOTO(tangle_traversal_dfs_to_past(params.tangle, collect_transactions_for_pruning_do_func, entry_point_hash,
-                                             ps->conf->genesis_hash, NULL, &params),
+                                             ps->conf->genesis_hash, transactions_to_prune, &params),
                 err, cleanup);
 
-  entry_point_has_no_solid_entry_points_in_past_cone = true;
   iter = NULL;
   tmp = NULL;
 
@@ -209,7 +197,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
     }
   }
 
-  if (!entry_point_has_no_solid_entry_points_in_past_cone) {
+  if (!entry_point_has_no_solid_entry_points_in_past_cone && err == RC_OK) {
     hash243_set_free(params.transactions_to_prune);
   }
 
@@ -226,19 +214,22 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
   retcode_t err;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
   hash243_set_t transactions_to_prune = NULL;
+  size_t num_pruned_transactions;
 
-  ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index, &milestone_pack), err,
+  ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index + 1, &milestone_pack), err,
                 cleanup);
 
   ERR_BIND_GOTO(collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune), err, cleanup);
-  ERR_BIND_GOTO(iota_tangle_transaction_delete(tangle, transactions_to_prune), err, cleanup);
+  hash243_set_remove(&transactions_to_prune, milestone.hash);
+  ERR_BIND_GOTO(iota_tangle_transaction_delete_transactions(tangle, transactions_to_prune), err, cleanup);
+  num_pruned_transactions = hash243_set_size(transactions_to_prune);
   hash243_set_free(&transactions_to_prune);
   // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle transactions
   hash243_set_add(&transactions_to_prune, milestone.hash);
   ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
   log_info(logger_id,
            "Snapshot index % " PRIu64 " was pruned successfully, % " PRIu64 " transactions were removed from db\n",
-           ps->last_pruned_snapshot_index, hash243_set_size(transactions_to_prune));
+           ps->last_pruned_snapshot_index, num_pruned_transactions + 1);
   ps->last_pruned_snapshot_index++;
 
   hash243_set_free(&transactions_to_prune);
