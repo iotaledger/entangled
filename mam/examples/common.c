@@ -156,7 +156,7 @@ retcode_t get_bundle_transactions(iota_client_service_t *const serv, flex_trit_t
 // TODO Merge into cclient
 retcode_t receive_bundle(char const *const host, uint16_t const port, tryte_t const *const bundle_hash,
                          bundle_transactions_t *const bundle) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   iota_client_service_t serv;
   recv_example_init_client_service(&serv, host, port);
   iota_client_extended_init();
