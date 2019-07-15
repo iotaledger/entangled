@@ -24,6 +24,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
   memset(neighbor, 0, sizeof(neighbor_t));
   neighbor->state = NEIGHBOR_DISCONNECTED;
   neighbor->endpoint.stream = NULL;
+  lock_handle_init(&neighbor->buffer_lock);
 
   if (uri_parse(uri, scheme, MAX_SCHEME_LENGTH, neighbor->endpoint.domain, MAX_HOST_LENGTH, &neighbor->endpoint.port) ==
       false) {
@@ -44,6 +45,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
   memset(neighbor, 0, sizeof(neighbor_t));
   neighbor->state = NEIGHBOR_DISCONNECTED;
   neighbor->endpoint.stream = NULL;
+  lock_handle_init(&neighbor->buffer_lock);
 
   if (ip) {
     if (strlen(ip) > MAX_HOST_LENGTH) {

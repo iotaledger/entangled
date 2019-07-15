@@ -384,7 +384,8 @@ retcode_t tcp_server_connect(neighbor_t *const neighbor) {
 
 retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, void *const buffer,
                            uint16_t const buffer_size) {
-  int ret = 0;
+  retcode_t ret = RC_OK;
+  int err = 0;
   uv_write_t *req = NULL;
   protocol_header_t header;
 
@@ -405,10 +406,12 @@ retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, 
 
   req->data = buf.base;
 
-  if ((ret = uv_write(req, stream, &buf, 1, tcp_server_on_write)) != 0) {
-    log_warning(logger_id, "Writing failed: %s\n", uv_err_name(ret));
-    return RC_WRITE_TCP_FAILED;
+  lock_handle_lock(&((neighbor_t *)stream->data)->buffer_lock);
+  if ((err = uv_write(req, stream, &buf, 1, tcp_server_on_write)) != 0) {
+    log_warning(logger_id, "Writing failed: %s\n", uv_err_name(err));
+    ret = RC_WRITE_TCP_FAILED;
   }
+  lock_handle_unlock(&((neighbor_t *)stream->data)->buffer_lock);
 
-  return RC_OK;
+  return ret;
 }
