@@ -790,16 +790,18 @@ done:
   return ret;
 }
 
-retcode_t iota_stor_transaction_delete_batch(storage_connection_t const* const connection, hash243_set_t const hashes) {
-  retcode_t ret = RC_OK;
+retcode_t iota_stor_transaction_delete(storage_connection_t const* const connection, hash243_set_t const hashes) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_delete_by_hashes;
+  retcode_t ret = RC_OK;
   retcode_t ret_rollback;
-  bool should_rollback_if_failed = true;
+  bool should_rollback_if_failed = false;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_delete;
 
   if ((ret = begin_transaction(sqlite3_connection->db)) != RC_OK) {
     return ret;
   }
+
+  should_rollback_if_failed = true;
 
   {
     bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement, .hash_index = 1};

@@ -117,8 +117,7 @@ extern retcode_t iota_stor_transaction_find(storage_connection_t const* const co
 
 extern retcode_t iota_stor_transaction_metadata_clear(storage_connection_t const* const connection);
 
-extern retcode_t iota_stor_transaction_delete_batch(storage_connection_t const* const connection,
-                                                    hash243_set_t const hashes);
+extern retcode_t iota_stor_transaction_delete(storage_connection_t const* const connection, hash243_set_t const hashes);
 
 /*
  * Bundle operations

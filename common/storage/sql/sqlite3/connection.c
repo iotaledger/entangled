@@ -52,8 +52,8 @@ static retcode_t prepare_tangle_statements(sqlite3_tangle_connection_t* const co
                            iota_statement_transaction_approvers_count);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_count),
                            iota_statement_transaction_count);
-  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_delete_by_hashes),
-                           iota_transaction_delete_by_hashes);
+  ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_delete),
+                           iota_transaction_delete);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_essence_and_metadata),
                            iota_statement_transaction_select_essence_and_metadata);
@@ -135,7 +135,7 @@ static retcode_t finalize_tangle_statements(sqlite3_tangle_connection_t* const c
   ret |= finalize_statement(connection->statements.transaction_select_essence_and_consensus);
   ret |= finalize_statement(connection->statements.transaction_select_metadata);
   ret |= finalize_statement(connection->statements.transaction_metadata_clear);
-  ret |= finalize_statement(connection->statements.transaction_delete_by_hashes);
+  ret |= finalize_statement(connection->statements.transaction_delete);
   ret |= finalize_statement(connection->statements.milestone_clear);
   ret |= finalize_statement(connection->statements.milestone_insert);
   ret |= finalize_statement(connection->statements.milestone_select_by_hash);

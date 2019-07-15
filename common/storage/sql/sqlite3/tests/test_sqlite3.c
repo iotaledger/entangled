@@ -394,11 +394,20 @@ void test_transactions_arrival_time(void) {
   transaction_free(test_tx);
 }
 
-void test_transactions_delete_one_transaction(void) {
+void test_transactions_delete_two_transactions(void) {
   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
+  iota_transaction_t second_test_transaction = *test_tx;
+  // Make them distinguishable
+  trit_t modified_trit = flex_trits_at(transaction_hash(test_tx), FLEX_TRIT_SIZE_243, 0);
+  if (abs(modified_trit) > 0) {
+    modified_trit = 0;
+  } else {
+    modified_trit = 1;
+  }
+  flex_trits_set_at(second_test_transaction.consensus.hash, FLEX_TRIT_SIZE_243, 0, modified_trit);
 
   hash243_set_t transactions_to_delete = NULL;
 
@@ -407,14 +416,22 @@ void test_transactions_delete_one_transaction(void) {
               RC_OK);
   TEST_ASSERT(exist == true);
 
-  TEST_ASSERT(iota_stor_transaction_delete_batch(&connection, transactions_to_delete) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH,
+                                          transaction_hash(&second_test_transaction), &exist) == RC_OK);
+  TEST_ASSERT(exist == true);
+
+  TEST_ASSERT(iota_stor_transaction_delete(&connection, transactions_to_delete) == RC_OK);
 
   hash243_set_add(&transactions_to_delete, transaction_hash(test_tx));
+  hash243_set_add(&transactions_to_delete, transaction_hash(&second_test_transaction));
 
-  TEST_ASSERT(iota_stor_transaction_delete_batch(&connection, transactions_to_delete) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_delete(&connection, transactions_to_delete) == RC_OK);
 
   TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &exist) ==
               RC_OK);
+  TEST_ASSERT(exist == false);
+  TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH,
+                                          transaction_hash(&second_test_transaction), &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 
   hash243_set_free(&transactions_to_delete);
@@ -441,7 +458,7 @@ int main(void) {
   RUN_TEST(test_transactions_update_solid_states_one_transaction);
   RUN_TEST(test_transactions_update_solid_states_two_transaction);
   RUN_TEST(test_transactions_arrival_time);
-  RUN_TEST(test_transactions_delete_one_transaction);
+  RUN_TEST(test_transactions_delete_two_transactions);
   RUN_TEST(test_destroy_connection);
 
   TEST_ASSERT(storage_destroy() == RC_OK);

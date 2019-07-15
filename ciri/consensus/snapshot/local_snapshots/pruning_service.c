@@ -231,7 +231,7 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
                 cleanup);
 
   ERR_BIND_GOTO(collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune), err, cleanup);
-  ERR_BIND_GOTO(iota_tangle_transaction_delete_batch(tangle, transactions_to_prune), err, cleanup);
+  ERR_BIND_GOTO(iota_tangle_transaction_delete(tangle, transactions_to_prune), err, cleanup);
   hash243_set_free(&transactions_to_prune);
   // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle transactions
   hash243_set_add(&transactions_to_prune, milestone.hash);
