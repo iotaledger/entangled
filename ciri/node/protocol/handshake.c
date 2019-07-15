@@ -31,12 +31,7 @@ int handshake_supported_version(uint8_t const* const own_supported_versions, siz
                                 uint8_t const* const supported_versions, size_t const supported_versions_length) {
   int highest_supported_version = 0;
 
-  for (size_t i = 0; i < own_supported_versions_length; i++) {
-    // max check up to advertised versions by the neighbor
-    if (i > supported_versions_length - 1) {
-      break;
-    }
-
+  for (size_t i = 0; i < MIN(own_supported_versions_length, supported_versions_length); i++) {
     // get versions matched by both
     int supported = (uint8_t)(supported_versions[i] & own_supported_versions[i]);
 
