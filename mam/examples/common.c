@@ -144,7 +144,7 @@ retcode_t get_bundle_transactions(iota_client_service_t *const serv, flex_trit_t
   flex_trits_from_trytes(bundle_hash_flex, NUM_TRITS_BUNDLE, bundle_hash, NUM_TRITS_HASH, NUM_TRYTES_BUNDLE);
   hash243_queue_push(&recv_example_req.bundles, bundle_hash);
   // TODO - replace with iota_client_get_bundle when it's implemented
-  retcode_t err = iota_client_find_transaction_objects(serv, &recv_example_req, out_tx_objs);
+  retcode_t err = iota_client_find_transaction_objects(serv, &recv_example_req, *out_tx_objs);
   if (err != RC_OK) {
     fprintf(stderr, "iota_client_find_transaction_objects failed with %d\n", err);
     return err;
