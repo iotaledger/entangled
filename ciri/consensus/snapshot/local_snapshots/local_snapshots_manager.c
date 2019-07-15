@@ -113,6 +113,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
                                             iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt,
                                             spent_addresses_service_t *const spent_addresses_service,
                                             tips_cache_t *const tips_cache) {
+  retcode_t ret = RC_OK;
   if (lsm == NULL || mt == NULL || snapshots_service == NULL) {
     return RC_NULL_PARAM;
   }
@@ -127,11 +128,12 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
   cond_handle_init(&lsm->cond_local_snapshots);
 
   if (lsm->conf->local_snapshots.pruning_is_enabled) {
-    iota_local_snapshots_pruning_service_init(&lsm->ps, lsm->snapshots_service->snapshots_provider,
-                                              spent_addresses_service, tips_cache, conf);
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_init(&lsm->ps, lsm->snapshots_service->snapshots_provider,
+                                                              spent_addresses_service, tips_cache, conf),
+                    ret);
   }
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
@@ -165,7 +167,7 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   }
 
   if (lsm->conf->local_snapshots.pruning_is_enabled) {
-    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_stop(&lsm->ps), ret);
+    ret = iota_local_snapshots_pruning_service_stop(&lsm->ps);
   }
 
   lsm->running = false;
@@ -173,7 +175,10 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
   log_info(logger_id, "Shutting down local snapshots manager thread\n");
   if (thread_handle_join(lsm->local_snapshots_thread, NULL) != 0) {
     log_error(logger_id, "Shutting down local snapshots manager thread failed\n");
-    ret = RC_THREAD_JOIN;
+    // We want to return the first error
+    if (ret == RC_OK) {
+      ret = RC_THREAD_JOIN;
+    }
   }
 
   return ret;
@@ -189,7 +194,7 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
   }
 
   if (lsm->conf->local_snapshots.pruning_is_enabled) {
-    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_destroy(&lsm->ps), ret);
+    ret = iota_local_snapshots_pruning_service_destroy(&lsm->ps);
   }
 
   cond_handle_destroy(&lsm->cond_local_snapshots);
