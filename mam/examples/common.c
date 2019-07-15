@@ -132,10 +132,10 @@ static void recv_example_init_client_service(iota_client_service_t *const serv, 
   iota_client_core_init(serv);
 }
 
-static transaction_array_t *get_bundle_transactions(iota_client_service_t *const serv,
-                                                    flex_trit_t const *const bundle_hash) {
+retcode_t get_bundle_transactions(iota_client_service_t *const serv, flex_trit_t const *const bundle_hash,
+                                  transaction_array_t **const out_tx_objs) {
   flex_trit_t bundle_hash_flex[FLEX_TRIT_SIZE_243];
-  transaction_array_t *out_tx_objs = transaction_array_new();
+  *out_tx_objs = transaction_array_new();
   recv_example_req.approvees = NULL;
   recv_example_req.bundles = NULL;
   recv_example_req.tags = NULL;
@@ -147,22 +147,26 @@ static transaction_array_t *get_bundle_transactions(iota_client_service_t *const
   retcode_t err = iota_client_find_transaction_objects(serv, &recv_example_req, out_tx_objs);
   if (err != RC_OK) {
     fprintf(stderr, "iota_client_find_transaction_objects failed with %d\n", err);
-    return out_tx_objs;
+    return err;
   }
 
-  return out_tx_objs;
+  return RC_OK;
 }
 
 // TODO Merge into cclient
 retcode_t receive_bundle(char const *const host, uint16_t const port, tryte_t const *const bundle_hash,
                          bundle_transactions_t *const bundle) {
+  retcode_t ret;
   iota_client_service_t serv;
   recv_example_init_client_service(&serv, host, port);
   iota_client_extended_init();
 
-  transaction_array_t *out_tx_objs = get_bundle_transactions(&serv, bundle_hash);
+  transaction_array_t *out_tx_objs = NULL;
+  ERR_BIND_GOTO(get_bundle_transactions(&serv, bundle_hash, &out_tx_objs), ret, cleanup);
 
   get_first_bundle_from_transactions(out_tx_objs, bundle);
+
+cleanup:
 
   transaction_array_free(out_tx_objs);
 
@@ -171,5 +175,5 @@ retcode_t receive_bundle(char const *const host, uint16_t const port, tryte_t co
 
   hash243_queue_free(&recv_example_req.bundles);
   recv_example_req.bundles = NULL;
-  return RC_OK;
+  return ret;
 }
