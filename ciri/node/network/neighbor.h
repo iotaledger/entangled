@@ -49,8 +49,8 @@ typedef struct neighbor_s {
 /**
  * Initializes a neighbor with an URI
  *
- * @param neighbor The neighbor
- * @param uri The URI (e.g tcp://8.8.8.8:14265)
+ * @param[out]  neighbor  The neighbor
+ * @param[in]   uri       The URI (e.g tcp://8.8.8.8:14265)
  *
  * @return a status code
  */
@@ -59,9 +59,9 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
 /**
  * Initializes a neighbor with endpoint values
  *
- * @param neighbor The neighbor
- * @param ip The endpoint ip
- * @param port The endpoint port
+ * @param[out]  neighbor  The neighbor
+ * @param[in]   ip        The endpoint ip
+ * @param[in]   port      The endpoint port
  *
  * @return a status code
  */
@@ -70,9 +70,9 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
 /**
  * Sends a packet to a neighbor
  *
- * @param node A node
- * @param neighbor The neighbor
- * @param packet The packet
+ * @param[in,out] node      A node
+ * @param[in,out] neighbor  The neighbor
+ * @param[in]     packet    The packet
  *
  * @return a status code
  */
@@ -81,27 +81,27 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
 /**
  * Sends transaction trits to a neighbor
  *
- * @param node A node
- * @param tangle A tangle
- * @param neighbor The neighbor
- * @param trits The transaction trits
+ * @param[in,out] node      A node
+ * @param[in]     tangle    A tangle
+ * @param[in,out] neighbor  The neighbor
+ * @param[in]     trits     The transaction trits
  *
  * @return a status code
  */
-retcode_t neighbor_send_trits(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+retcode_t neighbor_send_trits(node_t *const node, tangle_t const *const tangle, neighbor_t *const neighbor,
                               flex_trit_t const *const trits);
 
 /**
  * Sends transaction bytes to a neighbor
  *
- * @param node A node
- * @param tangle A tangle
- * @param neighbor The neighbor
- * @param bytes The transaction bytes
+ * @param[in,out] node A node
+ * @param[in]     tangle A tangle
+ * @param[in,out] neighbor The neighbor
+ * @param[in]     bytes The transaction bytes
  *
  * @return a status code
  */
-retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+retcode_t neighbor_send_bytes(node_t *const node, tangle_t const *const tangle, neighbor_t *const neighbor,
                               byte_t const *const bytes);
 
 #ifdef __cplusplus

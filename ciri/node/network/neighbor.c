@@ -83,7 +83,7 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
   return ret;
 }
 
-static retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+static retcode_t neighbor_send(node_t *const node, tangle_t const *const tangle, neighbor_t *const neighbor,
                                protocol_gossip_t *const packet) {
   retcode_t ret = RC_OK;
   flex_trit_t request[FLEX_TRIT_SIZE_243];
@@ -100,7 +100,7 @@ static retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neigh
   return neighbor_send_packet(node, neighbor, packet);
 }
 
-retcode_t neighbor_send_trits(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+retcode_t neighbor_send_trits(node_t *const node, tangle_t const *const tangle, neighbor_t *const neighbor,
                               flex_trit_t const *const trits) {
   retcode_t ret = RC_OK;
   protocol_gossip_t packet;
@@ -116,7 +116,7 @@ retcode_t neighbor_send_trits(node_t *const node, tangle_t *const tangle, neighb
   return neighbor_send(node, tangle, neighbor, &packet);
 }
 
-retcode_t neighbor_send_bytes(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
+retcode_t neighbor_send_bytes(node_t *const node, tangle_t const *const tangle, neighbor_t *const neighbor,
                               byte_t const *const bytes) {
   protocol_gossip_t packet;
 
