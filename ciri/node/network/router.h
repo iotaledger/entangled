@@ -30,8 +30,8 @@ typedef struct router_s {
 /**
  * Initializes a router
  *
- * @param router The router
- * @param node A node
+ * @param[in,out] router  The router
+ * @param[in]     node    A node
  *
  * @return a status code
  */
@@ -40,7 +40,7 @@ retcode_t router_init(router_t *const router, node_t *const node);
 /**
  * Destroys a router
  *
- * @param router The router
+ * @param[in,out] router  The router
  *
  * @return a status code
  */
@@ -49,8 +49,8 @@ retcode_t router_destroy(router_t *const router);
 /**
  * Adds a neighbor to a router
  *
- * @param Router The router
- * @param neighbor The neighbor
+ * @param[in,out] router    The router
+ * @param[in,out] neighbor  The neighbor
  *
  * @return a status code
  */
@@ -59,8 +59,8 @@ retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor
 /**
  * Removes a neighbor from a router
  *
- * @param Router The router
- * @pram neighbor The neighbor
+ * @param[in,out] router    The router
+ * @param[in]     neighbor  The neighbor
  *
  * @return a status code
  */
@@ -69,7 +69,7 @@ retcode_t router_neighbor_remove(router_t *const router, neighbor_t const *const
 /**
  * Gives the number of neighbors in a router
  *
- * @param Router The router
+ * @param Router[in]  router  The router
  *
  * @return the number of neighbors in the router
  */
@@ -78,8 +78,8 @@ size_t router_neighbors_count(router_t *const router);
 /**
  * Finds a neighbor matching given endpoint in a router
  *
- * @param router The router
- * @param endpoint The endpoint
+ * @param[in,out] router    The router
+ * @param[in]     endpoint  The endpoint
  *
  * @return a pointer to the neighbor if found, NULL otherwise
  */
@@ -88,9 +88,9 @@ neighbor_t *router_neighbor_find_by_endpoint(router_t *const router, endpoint_t 
 /**
  * Finds a neighbor matching given endpoint values in a router
  *
- * @param router The router
- * @param ip The endpoint ip
- * @param port The endpoint port
+ * @param[in,out] router  The router
+ * @param[in]     ip      The endpoint ip
+ * @param[in]     port    The endpoint port
  *
  * @return a pointer to the neighbor if found, NULL otherwise
  */
@@ -99,12 +99,12 @@ neighbor_t *router_neighbor_find_by_endpoint_values(router_t *const router, char
 /**
  * Reads and validate a handshake and associate it with a neighbor
  *
- * @param router The router
- * @param ip The IP
- * @param port The port
- * @param buf The buffer
- * @param nread The buffer size
- * @param neighbor The neighbor
+ * @param[in,out] router    The router
+ * @param[in]     ip        The IP
+ * @param[in]     port      The port
+ * @param[in]     buf       The buffer
+ * @param[in]     nread     The buffer size
+ * @param[in,out] neighbor  The neighbor
  *
  * @return a pointer to the neighbor if found, NULL otherwise
  */
@@ -114,10 +114,10 @@ retcode_t router_neighbor_read_handshake(router_t *const router, char const *con
 /**
  * Reads a buffer from a neighbor
  *
- * @param router The router
- * @param neighbor The neighbor
- * @param buffer The buffer
- * @param buffer_size The buffer size
+ * @param[in,out] router      The router
+ * @param[in]     neighbor    The neighbor
+ * @param[in]     buffer      The buffer
+ * @param[in]     buffer_size The buffer size
  *
  * @return a status code
  */
@@ -127,7 +127,7 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t *const neighbo
 /**
  * Attempts to reconnect all disconnected neighbors
  *
- * @param router The router
+ * @param[in,out] router  The router
  *
  * @return a status code
  */
