@@ -45,6 +45,8 @@ static retcode_t router_neighbors_init(router_t *const router) {
       }
     }
     free(ptr);
+  } else {
+    log_warning(logger_id, "Running node with no neighbors\n");
   }
 
   return RC_OK;
