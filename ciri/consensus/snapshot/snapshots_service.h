@@ -66,7 +66,7 @@ retcode_t iota_snapshots_service_destroy(snapshots_service_t *const snapshots_se
  * Takes a snapshot and applies it
  *
  * @param snapshots_service The service
- * @param pruning_manager The pruning_manager
+ * @param ps The pruning service
  * @param tangle The tangle
  *
  * @return a status code
