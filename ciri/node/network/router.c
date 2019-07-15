@@ -299,7 +299,7 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t *const neighbo
     return RC_OK;
   }
 
-  if (header->type < PACKET_TYPE_NBR) {
+  if (header->type < PACKET_TYPES_NUM) {
     switch (header->type) {
       case HANDSHAKE:
         break;

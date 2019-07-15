@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define PACKET_TYPE_NBR 3
+#define PACKET_TYPES_NUM 3
 
 typedef enum packet_type_e { HEADER = 0, HANDSHAKE = 1, GOSSIP = 2 } packet_type_t;
 
@@ -28,9 +28,9 @@ typedef struct packet_type_desc_s {
   bool dynamic_length;
 } packet_type_desc_t;
 
-static packet_type_desc_t packet_type_descs[PACKET_TYPE_NBR] = {{HEADER, HEADER_BYTES_LENGTH, false},
-                                                                {HANDSHAKE, HANDSHAKE_MAX_BYTES_LENGTH, true},
-                                                                {GOSSIP, GOSSIP_MAX_BYTES_LENGTH, true}};
+static packet_type_desc_t packet_type_descs[PACKET_TYPES_NUM] = {{HEADER, HEADER_BYTES_LENGTH, false},
+                                                                 {HANDSHAKE, HANDSHAKE_MAX_BYTES_LENGTH, true},
+                                                                 {GOSSIP, GOSSIP_MAX_BYTES_LENGTH, true}};
 
 #define PACKET_MAX_BYTES_LENGTH ((HEADER_BYTES_LENGTH) + (GOSSIP_MAX_BYTES_LENGTH))
 
