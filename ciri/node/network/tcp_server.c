@@ -415,20 +415,26 @@ retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, 
 }
 
 void tcp_server_on_async_write(uv_async_t *const handle) {
-  neighbor_write_req_t *write_req = (neighbor_write_req_t *)handle->data;
+  neighbor_t *neighbor = (neighbor_t *)handle->data;
+  uv_buf_t_queue_entry_t *entry = NULL;
   uv_write_t *req = NULL;
   int err = 0;
 
   if ((req = malloc(sizeof(uv_write_t))) == NULL) {
     log_warning(logger_id, "Allocating write request failed\n");
-    free(write_req);
     return;
   }
 
-  req->data = write_req->buf.base;
-  if ((err = uv_write(req, write_req->neighbor->endpoint.stream, &write_req->buf, 1, tcp_server_on_write)) != 0) {
-    log_warning(logger_id, "Writing failed: %s\n", uv_err_name(err));
+  rw_lock_handle_wrlock(&neighbor->write_queue_lock);
+  entry = neighbor_write_queue_pop(neighbor);
+  rw_lock_handle_unlock(&neighbor->write_queue_lock);
+
+  if (entry != NULL) {
+    req->data = entry->buf.base;
+    if ((err = uv_write(req, neighbor->endpoint.stream, &entry->buf, 1, tcp_server_on_write)) != 0) {
+      log_warning(logger_id, "Writing failed: %s\n", uv_err_name(err));
+    }
+    neighbor->nbr_sent_txs++;
+    free(entry);
   }
-  write_req->neighbor->nbr_sent_txs++;
-  free(write_req);
 }

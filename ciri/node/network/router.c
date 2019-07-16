@@ -108,7 +108,7 @@ retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor
   } else {
     utarray_push_back(router->neighbors, neighbor);
     elt = (neighbor_t *)utarray_back(router->neighbors);
-    lock_handle_init(&elt->buffer_lock);
+    rw_lock_handle_init(&elt->write_queue_lock);
     if ((elt->writer = (uv_async_t *)malloc(sizeof(uv_async_t))) == NULL) {
       ret = RC_OOM;
       goto done;

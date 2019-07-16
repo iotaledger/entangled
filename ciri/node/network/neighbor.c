@@ -23,6 +23,7 @@ retcode_t neighbor_init(neighbor_t *const neighbor) {
   neighbor->writer = NULL;
   neighbor->endpoint.stream = NULL;
   neighbor->state = NEIGHBOR_DISCONNECTED;
+  neighbor->write_queue = NULL;
 
   return RC_OK;
 }
@@ -78,7 +79,6 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
   size_t content_length = GOSSIP_SIG_MAX_BYTES_LENGTH;
   void *buffer = NULL;
   size_t buffer_size = 0;
-  neighbor_write_req_t *req = NULL;
   size_t offset = 0;
 
   if (node == NULL || neighbor == NULL || neighbor->endpoint.stream == NULL || packet == NULL) {
@@ -91,25 +91,26 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
 
   buffer_size = content_length + GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
 
-  if ((req = malloc(sizeof(neighbor_write_req_t))) == NULL ||
-      (buffer = malloc(HEADER_BYTES_LENGTH + buffer_size)) == NULL) {
+  if ((buffer = malloc(HEADER_BYTES_LENGTH + buffer_size)) == NULL) {
     return RC_OOM;
   }
-
-  req->neighbor = neighbor;
-  req->buf = uv_buf_init(buffer, HEADER_BYTES_LENGTH + buffer_size);
 
   header.type = GOSSIP;
   header.length = htons(buffer_size);
 
-  memcpy(req->buf.base + offset, &header, HEADER_BYTES_LENGTH);
+  memcpy(buffer + offset, &header, HEADER_BYTES_LENGTH);
   offset += HEADER_BYTES_LENGTH;
-  memcpy(req->buf.base + offset, packet->content, content_length);
+  memcpy(buffer + offset, packet->content, content_length);
   offset += content_length;
-  memcpy(req->buf.base + offset, packet->content + GOSSIP_SIG_MAX_BYTES_LENGTH,
+  memcpy(buffer + offset, packet->content + GOSSIP_SIG_MAX_BYTES_LENGTH,
          GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
 
-  neighbor->writer->data = req;
+  rw_lock_handle_wrlock(&neighbor->write_queue_lock);
+  neighbor_write_queue_push(neighbor, buffer, HEADER_BYTES_LENGTH + buffer_size);
+  rw_lock_handle_unlock(&neighbor->write_queue_lock);
+
+  // TODO not here
+  neighbor->writer->data = neighbor;
   if (uv_async_send(neighbor->writer) != 0) {
     return RC_ASYNC_CALL_FAILED;
   }
@@ -161,4 +162,35 @@ retcode_t neighbor_send_bytes(node_t *const node, tangle_t const *const tangle, 
   memcpy(packet.content, bytes, GOSSIP_MAX_BYTES_LENGTH);
 
   return neighbor_send(node, tangle, neighbor, &packet);
+}
+
+retcode_t neighbor_write_queue_push(neighbor_t *const neighbor, void *const buffer, size_t const buffer_size) {
+  uv_buf_t_queue_entry_t *entry = NULL;
+
+  if (neighbor == NULL || buffer == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((entry = (uv_buf_t_queue_entry_t *)malloc(sizeof(uv_buf_t_queue_entry_t))) == NULL) {
+    return RC_OOM;
+  }
+  entry->buf = uv_buf_init(buffer, buffer_size);
+  CDL_APPEND(neighbor->write_queue, entry);
+
+  return RC_OK;
+}
+
+uv_buf_t_queue_entry_t *neighbor_write_queue_pop(neighbor_t *const neighbor) {
+  uv_buf_t_queue_entry_t *front = NULL;
+
+  if (neighbor == NULL) {
+    return NULL;
+  }
+
+  front = neighbor->write_queue;
+  if (front != NULL) {
+    CDL_DELETE(neighbor->write_queue, front);
+  }
+
+  return front;
 }

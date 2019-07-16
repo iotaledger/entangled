@@ -16,7 +16,7 @@
 #include "ciri/node/protocol/type.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/handles/lock.h"
+#include "utils/handles/rw_lock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,11 +33,20 @@ typedef enum neighbor_state_e {
   NEIGHBOR_MARKED_FOR_DISCONNECT,
 } neighbor_state_t;
 
+typedef struct uv_buf_t_queue_entry_s {
+  uv_buf_t buf;
+  struct uv_buf_t_queue_entry_s *next;
+  struct uv_buf_t_queue_entry_s *prev;
+} uv_buf_t_queue_entry_t;
+
+typedef uv_buf_t_queue_entry_t *uv_buf_t_queue_t;
+
 typedef struct neighbor_s {
   byte_t buffer[PACKET_MAX_BYTES_LENGTH];
   size_t buffer_size;
-  lock_handle_t buffer_lock;
   uv_async_t *writer;
+  uv_buf_t_queue_t write_queue;
+  rw_lock_handle_t write_queue_lock;
   endpoint_t endpoint;
   neighbor_state_t state;
   uint8_t protocol_version;
@@ -49,11 +58,6 @@ typedef struct neighbor_s {
   uint64_t nbr_new_txs;
   uint64_t nbr_dropped_send;
 } neighbor_t;
-
-typedef struct neighbor_write_req_s {
-  neighbor_t *neighbor;
-  uv_buf_t buf;
-} neighbor_write_req_t;
 
 /**
  * Initializes a neighbor
@@ -121,6 +125,9 @@ retcode_t neighbor_send_trits(node_t *const node, tangle_t const *const tangle, 
  */
 retcode_t neighbor_send_bytes(node_t *const node, tangle_t const *const tangle, neighbor_t *const neighbor,
                               byte_t const *const bytes);
+
+retcode_t neighbor_write_queue_push(neighbor_t *const neighbor, void *const buffer, size_t const buffer_size);
+uv_buf_t_queue_entry_t *neighbor_write_queue_pop(neighbor_t *const neighbor);
 
 #ifdef __cplusplus
 }
