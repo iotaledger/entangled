@@ -433,8 +433,9 @@ void tcp_server_on_async_write(uv_async_t *const handle) {
     req->data = entry->buf.base;
     if ((err = uv_write(req, neighbor->endpoint.stream, &entry->buf, 1, tcp_server_on_write)) != 0) {
       log_warning(logger_id, "Writing failed: %s\n", uv_err_name(err));
+    } else {
+      neighbor->nbr_sent_txs++;
     }
-    neighbor->nbr_sent_txs++;
     free(entry);
   }
 }
