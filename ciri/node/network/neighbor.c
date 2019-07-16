@@ -14,17 +14,30 @@
 #include "common/network/uri.h"
 #include "utils/handles/rand.h"
 
+retcode_t neighbor_init(neighbor_t *const neighbor) {
+  if (neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  memset(neighbor, 0, sizeof(neighbor_t));
+  neighbor->writer = NULL;
+  neighbor->endpoint.stream = NULL;
+  neighbor->state = NEIGHBOR_DISCONNECTED;
+
+  return RC_OK;
+}
+
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
+  retcode_t ret = RC_OK;
   char scheme[MAX_SCHEME_LENGTH];
 
   if (neighbor == NULL || uri == NULL) {
     return RC_NULL_PARAM;
   }
 
-  memset(neighbor, 0, sizeof(neighbor_t));
-  neighbor->state = NEIGHBOR_DISCONNECTED;
-  neighbor->endpoint.stream = NULL;
-  lock_handle_init(&neighbor->buffer_lock);
+  if ((ret = neighbor_init(neighbor)) != RC_OK) {
+    return ret;
+  }
 
   if (uri_parse(uri, scheme, MAX_SCHEME_LENGTH, neighbor->endpoint.domain, MAX_HOST_LENGTH, &neighbor->endpoint.port) ==
       false) {
@@ -38,14 +51,15 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const u
 }
 
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port) {
+  retcode_t ret = RC_OK;
+
   if (neighbor == NULL) {
     return RC_NULL_PARAM;
   }
 
-  memset(neighbor, 0, sizeof(neighbor_t));
-  neighbor->state = NEIGHBOR_DISCONNECTED;
-  neighbor->endpoint.stream = NULL;
-  lock_handle_init(&neighbor->buffer_lock);
+  if ((ret = neighbor_init(neighbor)) != RC_OK) {
+    return ret;
+  }
 
   if (ip) {
     if (strlen(ip) > MAX_HOST_LENGTH) {
@@ -60,8 +74,12 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *cons
 
 retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, protocol_gossip_t const *const packet) {
   retcode_t ret = RC_OK;
-  byte_t content[GOSSIP_MAX_BYTES_LENGTH];
+  protocol_header_t header;
   size_t content_length = GOSSIP_SIG_MAX_BYTES_LENGTH;
+  void *buffer = NULL;
+  size_t buffer_size = 0;
+  neighbor_write_req_t *req = NULL;
+  size_t offset = 0;
 
   if (node == NULL || neighbor == NULL || neighbor->endpoint.stream == NULL || packet == NULL) {
     return RC_NULL_PARAM;
@@ -71,16 +89,28 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
     content_length--;
   }
 
-  memcpy(content, packet->content, content_length);
-  memcpy(content + content_length, packet->content + GOSSIP_SIG_MAX_BYTES_LENGTH,
-         GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
-  content_length += GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
+  buffer_size = content_length + GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
 
-  if ((ret = tcp_server_write((uv_stream_t *)neighbor->endpoint.stream, GOSSIP, content, content_length)) != RC_OK) {
-    return ret;
+  if ((req = malloc(sizeof(neighbor_write_req_t))) == NULL ||
+      (buffer = malloc(HEADER_BYTES_LENGTH + buffer_size)) == NULL) {
+    return RC_OOM;
   }
 
-  neighbor->nbr_sent_txs++;
+  req->neighbor = neighbor;
+  req->buf = uv_buf_init(buffer, HEADER_BYTES_LENGTH + buffer_size);
+
+  header.type = GOSSIP;
+  header.length = htons(buffer_size);
+
+  memcpy(req->buf.base + offset, &header, HEADER_BYTES_LENGTH);
+  offset += HEADER_BYTES_LENGTH;
+  memcpy(req->buf.base + offset, packet->content, content_length);
+  offset += content_length;
+  memcpy(req->buf.base + offset, packet->content + GOSSIP_SIG_MAX_BYTES_LENGTH,
+         GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
+
+  neighbor->writer->data = req;
+  uv_async_send(neighbor->writer);
 
   return ret;
 }

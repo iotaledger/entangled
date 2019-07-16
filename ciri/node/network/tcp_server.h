@@ -100,6 +100,8 @@ retcode_t tcp_server_connect(neighbor_t *const neighbor);
 retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, void *const buffer,
                            uint16_t const buffer_size);
 
+void tcp_server_on_async_write(uv_async_t *const handle);
+
 #ifdef __cplusplus
 }
 #endif

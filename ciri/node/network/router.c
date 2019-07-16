@@ -89,6 +89,7 @@ retcode_t router_destroy(router_t *const router) {
 retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor) {
   retcode_t ret = RC_OK;
   neighbor_t *elt = NULL;
+  int err = 0;
 
   if (router == NULL || neighbor == NULL) {
     return RC_NULL_PARAM;
@@ -106,8 +107,22 @@ retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor
     ret = RC_NEIGHBOR_ALREADY_PAIRED;
   } else {
     utarray_push_back(router->neighbors, neighbor);
+    elt = (neighbor_t *)utarray_back(router->neighbors);
+    lock_handle_init(&elt->buffer_lock);
+    if ((elt->writer = (uv_async_t *)malloc(sizeof(uv_async_t))) == NULL) {
+      ret = RC_OOM;
+      goto done;
+    }
+    if ((err = uv_async_init(uv_default_loop(), elt->writer, tcp_server_on_async_write)) != 0) {
+      log_warning(logger_id, "Initializing async writer failed: %s\n", uv_err_name(err));
+      ret = RC_ASYNC_INIT_FAILED;
+      goto done;
+    }
+    elt->writer->data = elt;
     utarray_sort(router->neighbors, router_neighbor_cmp);
   }
+
+done:
 
   rw_lock_handle_unlock(&router->neighbors_lock);
 

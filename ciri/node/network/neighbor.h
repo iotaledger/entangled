@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include <uv.h>
 #include "utlist.h"
 
 #include "ciri/node/protocol/type.h"
@@ -36,6 +37,7 @@ typedef struct neighbor_s {
   byte_t buffer[PACKET_MAX_BYTES_LENGTH];
   size_t buffer_size;
   lock_handle_t buffer_lock;
+  uv_async_t *writer;
   endpoint_t endpoint;
   neighbor_state_t state;
   uint8_t protocol_version;
@@ -47,6 +49,20 @@ typedef struct neighbor_s {
   uint64_t nbr_new_txs;
   uint64_t nbr_dropped_send;
 } neighbor_t;
+
+typedef struct neighbor_write_req_s {
+  neighbor_t *neighbor;
+  uv_buf_t buf;
+} neighbor_write_req_t;
+
+/**
+ * Initializes a neighbor
+ *
+ * @param[out]  neighbor  The neighbor
+ *
+ * @return a status code
+ */
+retcode_t neighbor_init(neighbor_t *const neighbor);
 
 /**
  * Initializes a neighbor with an URI
