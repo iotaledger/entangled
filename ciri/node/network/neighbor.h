@@ -69,6 +69,15 @@ typedef struct neighbor_s {
 retcode_t neighbor_init(neighbor_t *const neighbor);
 
 /**
+ * Destroys a neighbor
+ *
+ * @param[out]  neighbor  The neighbor
+ *
+ * @return a status code
+ */
+retcode_t neighbor_destroy(neighbor_t *const neighbor);
+
+/**
  * Initializes a neighbor with an URI
  *
  * @param[out]  neighbor  The neighbor
@@ -128,6 +137,7 @@ retcode_t neighbor_send_bytes(node_t *const node, tangle_t const *const tangle, 
 
 retcode_t neighbor_write_queue_push(neighbor_t *const neighbor, void *const buffer, size_t const buffer_size);
 uv_buf_t_queue_entry_t *neighbor_write_queue_pop(neighbor_t *const neighbor);
+void neighbor_write_queue_free(neighbor_t *const neighbor);
 
 #ifdef __cplusplus
 }

@@ -74,10 +74,13 @@ retcode_t router_init(router_t *const router, node_t *const node) {
 }
 
 retcode_t router_destroy(router_t *const router) {
+  neighbor_t *neighbor = NULL;
+
   if (router == NULL) {
     return RC_NULL_PARAM;
   }
 
+  NEIGHBORS_FOREACH(router->neighbors, neighbor) { neighbor_destroy(neighbor); }
   utarray_free(router->neighbors);
   rw_lock_handle_destroy(&router->neighbors_lock);
 
@@ -331,7 +334,7 @@ retcode_t router_neighbor_read(router_t *const router, neighbor_t *const neighbo
           return RC_INVALID_PACKET;
         }
 
-        memset(gossip, 0, sizeof(protocol_gossip_t));
+        memset(&gossip, 0, sizeof(protocol_gossip_t));
 
         variable_size = header_length - GOSSIP_NON_SIG_BYTES_LENGTH - GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH;
         memcpy(gossip.content + offset, ptr, variable_size);

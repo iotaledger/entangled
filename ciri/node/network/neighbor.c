@@ -28,6 +28,17 @@ retcode_t neighbor_init(neighbor_t *const neighbor) {
   return RC_OK;
 }
 
+retcode_t neighbor_destroy(neighbor_t *const neighbor) {
+  if (neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  neighbor_write_queue_free(neighbor);
+  rw_lock_handle_destroy(&neighbor->write_queue_lock);
+
+  return RC_OK;
+}
+
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
   retcode_t ret = RC_OK;
   char scheme[MAX_SCHEME_LENGTH];
@@ -193,4 +204,19 @@ uv_buf_t_queue_entry_t *neighbor_write_queue_pop(neighbor_t *const neighbor) {
   }
 
   return front;
+}
+
+void neighbor_write_queue_free(neighbor_t *const neighbor) {
+  uv_buf_t_queue_entry_t *iter = NULL, *tmp1 = NULL, *tmp2 = NULL;
+
+  if (neighbor == NULL || neighbor->write_queue == NULL) {
+    return;
+  }
+
+  CDL_FOREACH_SAFE(neighbor->write_queue, iter, tmp1, tmp2) {
+    CDL_DELETE(neighbor->write_queue, iter);
+    free(iter->buf.base);
+    free(iter);
+  }
+  neighbor->write_queue = NULL;
 }
