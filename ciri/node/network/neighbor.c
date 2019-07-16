@@ -110,7 +110,9 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
          GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
 
   neighbor->writer->data = req;
-  uv_async_send(neighbor->writer);
+  if (uv_async_send(neighbor->writer) != 0) {
+    return RC_ASYNC_CALL_FAILED;
+  }
 
   return ret;
 }
