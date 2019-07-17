@@ -15,9 +15,6 @@
 #include "utils/macros.h"
 #include "utils/time.h"
 
-#define PRUNING_RESCAN_INTERVAL_SHORT_MS 1ULL
-#define PRUNING_RESCAN_INTERVAL_MS 1000ULL
-
 #define PRUNING_SERVICE_LOGGER_ID "pruning_service"
 
 static logger_id_t logger_id;
@@ -36,6 +33,8 @@ static retcode_t collect_unconfirmed_future_transactions_for_pruning_do_func(fle
 
 static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack, void *data,
                                                           bool *should_branch, bool *should_stop);
+
+static uint64_t get_last_snapshot_to_prune_index(pruning_service_t *const ps);
 
 static void *pruning_service_routine(void *arg);
 
@@ -121,7 +120,10 @@ static void *pruning_service_routine(void *arg) {
 
   iota_tangle_milestone_load_first(&tangle, &milestone_pack);
 
-  lock_handle_lock(&ps->lock_handle);
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   if (milestone_pack.num_loaded > 0) {
     ps->last_pruned_snapshot_index = MIN(MIN(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
   }
@@ -129,20 +131,25 @@ static void *pruning_service_routine(void *arg) {
   while (ps->running) {
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
-    while (ps->last_pruned_snapshot_index < ps->last_snapshot_index_to_prune) {
+    while (ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) {
       if (prune_transactions(ps, &tangle, &sap) != RC_OK) {
         goto cleanup;
       }
-      cond_handle_timedwait(&ps->cond_pruning_service, &ps->lock_handle, PRUNING_RESCAN_INTERVAL_SHORT_MS);
     }
-    lock_handle_lock(&ps->lock_handle);
     end_timestamp = current_timestamp_ms();
     log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
              ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
-    cond_handle_timedwait(&ps->cond_pruning_service, &ps->lock_handle, PRUNING_RESCAN_INTERVAL_MS);
+    // wait could be timed because other thread could have called
+    // "iota_local_snapshots_pruning_service_update_current_snapshot" after looping (very unlikely) and the routine
+    // could have missed the signal because it wasn't blocking, but it will be signaled again a snapshot later in any
+    // case
+    cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
   }
 
 cleanup:
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -234,7 +241,6 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
 cleanup:
 
   if (err != RC_OK) {
-    lock_handle_unlock(&ps->lock_handle);
     log_warning(logger_id, "Local snapshots pruning has failed with error code: %d\n", err);
   }
 
@@ -253,7 +259,7 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
   ps->last_snapshot_index_to_prune = ps->last_pruned_snapshot_index;
   ps->spent_addresses_service = spent_addresses_service;
   ps->tips_cache = tips_cache;
-  lock_handle_init(&ps->lock_handle);
+  rw_lock_handle_init(&ps->rw_lock);
   return RC_OK;
 }
 
@@ -305,17 +311,25 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
   cond_handle_destroy(&ps->cond_pruning_service);
   memset(ps, 0, sizeof(pruning_service_t));
   logger_helper_release(logger_id);
-  lock_handle_destroy(&ps->lock_handle);
+  rw_lock_handle_destroy(&ps->rw_lock);
 
   return ret;
 }
 
 void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
                                                                   snapshot_t *const snapshot) {
-  lock_handle_lock(&ps->lock_handle);
+  rw_lock_handle_wrlock(&ps->rw_lock);
   ps->last_snapshot_index_to_prune = snapshot->metadata.index;
-  lock_handle_unlock(&ps->lock_handle);
+  rw_lock_handle_unlock(&ps->rw_lock);
 
   ps->new_snapshot = snapshot;
   cond_handle_signal(&ps->cond_pruning_service);
+}
+
+static uint64_t get_last_snapshot_to_prune_index(pruning_service_t *const ps) {
+  uint64_t index;
+  rw_lock_handle_rdlock(&ps->rw_lock);
+  index = ps->last_pruned_snapshot_index;
+  rw_lock_handle_unlock(&ps->rw_lock);
+  return index;
 }

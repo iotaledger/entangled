@@ -30,7 +30,7 @@ typedef struct pruning_service_s {
   iota_consensus_conf_t const *conf;
   uint64_t last_pruned_snapshot_index;
   uint64_t last_snapshot_index_to_prune;
-  lock_handle_t lock_handle;
+  rw_lock_handle_t rw_lock;
   snapshot_t *new_snapshot;
   spent_addresses_service_t *spent_addresses_service;
   tips_cache_t *tips_cache;
