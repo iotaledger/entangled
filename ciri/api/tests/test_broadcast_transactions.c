@@ -46,10 +46,10 @@ void test_broadcast_transactions(void) {
   tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
                                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  byte_t bytes[GOSSIP_BYTES_LENGTH];
+  byte_t bytes[GOSSIP_MAX_BYTES_LENGTH];
   protocol_gossip_queue_entry_t *entry = NULL;
 
-  memset(bytes, 0, GOSSIP_BYTES_LENGTH);
+  memset(bytes, 0, GOSSIP_MAX_BYTES_LENGTH);
 
   // Broadcasting 4 transactions
 
@@ -67,7 +67,7 @@ void test_broadcast_transactions(void) {
     flex_trits_to_bytes(bytes, NUM_TRITS_SERIALIZED_TRANSACTION, broadcat_transactions_req_trytes_get(req, i),
                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
     entry = protocol_gossip_queue_pop(&api.core->node.processor.queue);
-    TEST_ASSERT_EQUAL_MEMORY(entry->packet.content, bytes, GOSSIP_BYTES_LENGTH);
+    TEST_ASSERT_EQUAL_MEMORY(entry->packet.content, bytes, GOSSIP_MAX_BYTES_LENGTH);
     free(entry);
   }
 

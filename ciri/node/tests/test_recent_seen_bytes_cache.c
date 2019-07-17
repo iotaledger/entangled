@@ -16,7 +16,7 @@ void test_recent_seen_bytes_cache() {
   tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
                                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   flex_trit_t tx_trits[4][FLEX_TRIT_SIZE_8019];
-  byte_t tx_bytes[4][GOSSIP_BYTES_LENGTH];
+  byte_t tx_bytes[4][GOSSIP_MAX_BYTES_LENGTH];
   iota_transaction_t *txs[4];
   uint64_t digest = 0;
   bool digest_found = false;

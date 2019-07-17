@@ -64,8 +64,7 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   api.core = &core;
-  TEST_ASSERT(tcp_server_init(&api.core->node.tcp_server, &api.core->node) == RC_OK);
-  TEST_ASSERT(router_init(&api.core->node.router, &api.core->node.conf) == RC_OK);
+  TEST_ASSERT(router_init(&api.core->node.router, &api.core->node) == RC_OK);
   api.core->node.conf.requester_queue_size = 100;
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(broadcaster_stage_init(&api.core->node.broadcaster, &api.core->node) == RC_OK);
@@ -129,7 +128,6 @@ int main(void) {
   RUN_TEST(test_get_node_info);
 
   TEST_ASSERT(router_destroy(&api.core->node.router) == RC_OK);
-  TEST_ASSERT(tcp_server_destroy(&api.core->node.tcp_server) == RC_OK);
   TEST_ASSERT(requester_destroy(&api.core->node.transaction_requester) == RC_OK);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 
