@@ -111,10 +111,8 @@ static void *pruning_service_routine(void *arg) {
   {
     connection_config_t db_conf = {.db_path = ps->spent_addresses_service->conf->spent_addresses_db_path};
 
-    if (ps->spent_addresses_service->conf->spent_addresses_files != NULL) {
-      if (iota_spent_addresses_provider_init(&sap, &db_conf) != RC_OK) {
-        log_error(logger_id, "Initializing spent addresses database connection failed\n");
-      }
+    if (iota_spent_addresses_provider_init(&sap, &db_conf) != RC_OK) {
+      log_error(logger_id, "Initializing spent addresses database connection failed\n");
     }
   }
 
@@ -180,9 +178,6 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
                                              ps->conf->genesis_hash, transactions_to_prune, &params),
                 err, cleanup);
 
-  iter = NULL;
-  tmp = NULL;
-
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
     if (iota_snapshot_has_solid_entry_point(ps->new_snapshot, iter->hash)) {
       entry_point_has_no_solid_entry_points_in_past_cone = false;
@@ -230,6 +225,7 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
   hash243_set_free(&transactions_to_prune);
   // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle transactions
   hash243_set_add(&transactions_to_prune, milestone.hash);
+  ERR_BIND_GOTO(iota_tangle_transaction_delete_transactions(tangle, transactions_to_prune), err, cleanup);
   ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
   log_info(logger_id,
            "Snapshot index % " PRIu64 " was pruned successfully, % " PRIu64 " transactions were removed from db\n",
