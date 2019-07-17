@@ -296,6 +296,7 @@ retcode_t tcp_server_stop(tcp_server_t *const tcp_server) {
 }
 
 retcode_t tcp_server_destroy(tcp_server_t *const tcp_server) {
+  int err = 0;
   retcode_t ret = RC_OK;
 
   if (tcp_server == NULL) {
@@ -304,8 +305,8 @@ retcode_t tcp_server_destroy(tcp_server_t *const tcp_server) {
     return RC_STILL_RUNNING;
   }
 
-  if (uv_loop_close(uv_default_loop()) != 0) {
-    log_error(logger_id, "Closing event loop failed\n");
+  if ((err = uv_loop_close(uv_default_loop())) != 0) {
+    log_error(logger_id, "Closing event loop failed: %s\n", uv_err_name(err));
     ret = RC_EVENT_LOOP;
   }
 
