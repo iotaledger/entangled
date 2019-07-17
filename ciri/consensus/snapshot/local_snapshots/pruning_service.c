@@ -220,12 +220,12 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
 
   ERR_BIND_GOTO(collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune), err, cleanup);
   hash243_set_remove(&transactions_to_prune, milestone.hash);
-  ERR_BIND_GOTO(iota_tangle_transaction_delete_transactions(tangle, transactions_to_prune), err, cleanup);
+  ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
   num_pruned_transactions = hash243_set_size(transactions_to_prune);
   hash243_set_free(&transactions_to_prune);
   // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle transactions
   hash243_set_add(&transactions_to_prune, milestone.hash);
-  ERR_BIND_GOTO(iota_tangle_transaction_delete_transactions(tangle, transactions_to_prune), err, cleanup);
+  ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
   ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
   log_info(logger_id,
            "Snapshot index % " PRIu64 " was pruned successfully, % " PRIu64 " transactions were removed from db\n",

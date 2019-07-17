@@ -420,12 +420,12 @@ void test_transactions_delete_two_transactions(void) {
                                           transaction_hash(&second_test_transaction), &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  TEST_ASSERT(iota_stor_transaction_delete_transactions(&connection, transactions_to_delete) == RC_OK);
+  TEST_ASSERT(iota_stor_transactions_delete(&connection, transactions_to_delete) == RC_OK);
 
   hash243_set_add(&transactions_to_delete, transaction_hash(test_tx));
   hash243_set_add(&transactions_to_delete, transaction_hash(&second_test_transaction));
 
-  TEST_ASSERT(iota_stor_transaction_delete_transactions(&connection, transactions_to_delete) == RC_OK);
+  TEST_ASSERT(iota_stor_transactions_delete(&connection, transactions_to_delete) == RC_OK);
 
   TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &exist) ==
               RC_OK);
