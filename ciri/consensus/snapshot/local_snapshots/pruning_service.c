@@ -98,6 +98,7 @@ static void *pruning_service_routine(void *arg) {
   uint64_t start_timestamp, end_timestamp;
   uint64_t start_index;
   spent_addresses_provider_t sap;
+  DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
 
   {
     connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
@@ -111,17 +112,13 @@ static void *pruning_service_routine(void *arg) {
   {
     connection_config_t db_conf = {.db_path = ps->spent_addresses_service->conf->spent_addresses_db_path};
 
-    if (ps->spent_addresses_service->conf->spent_addresses_files == NULL) {
-      return RC_OK;
-    }
-
-    if (iota_spent_addresses_provider_init(&sap, &db_conf) != RC_OK) {
-      log_error(logger_id, "Initializing spent addresses database connection failed\n");
-      goto cleanup;
+    if (ps->spent_addresses_service->conf->spent_addresses_files != NULL) {
+      if (iota_spent_addresses_provider_init(&sap, &db_conf) != RC_OK) {
+        log_error(logger_id, "Initializing spent addresses database connection failed\n");
+      }
     }
   }
 
-  DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
   iota_tangle_milestone_load_first(&tangle, &milestone_pack);
 
   lock_handle_lock(&ps->lock_handle);
