@@ -7,8 +7,10 @@
 
 #include "utarray.h"
 
+#include <inttypes.h>
 #include "ciri/consensus/tip_selection/exit_probability_validator/exit_probability_validator.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define WALKER_VALIDATOR_LOGGER_ID "walker_validator"
 
@@ -138,6 +140,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
                                       ? epv->mt->latest_solid_subtangle_milestone_index
                                       : epv->mt->latest_solid_subtangle_milestone_index - epv->conf->max_depth;
 
+  uint64_t start_timestamp, end_timestamp;
+  start_timestamp = current_timestamp_ms();
+
   *is_valid = false;
 
   if ((ret = iota_tangle_transaction_load_partial(tangle, tail_hash, &tx_pack,
@@ -179,6 +184,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
     log_error(logger_id, "Validation failed, tail is inconsistent\n");
     return RC_OK;
   }
+
+  end_timestamp = current_timestamp_ms();
+  log_info(logger_id, "%s took % " PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
