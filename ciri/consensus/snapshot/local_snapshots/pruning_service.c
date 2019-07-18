@@ -136,8 +136,10 @@ static void *pruning_service_routine(void *arg) {
       }
     }
     end_timestamp = current_timestamp_ms();
-    log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
-             ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
+    if (ps->last_pruned_snapshot_index > start_index) {
+      log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
+               ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
+    }
     // wait could be timed because other thread could have called
     // "iota_local_snapshots_pruning_service_update_current_snapshot" after looping (very unlikely) and the routine
     // could have missed the signal because it wasn't blocking, but it will be signaled again a snapshot later in any
