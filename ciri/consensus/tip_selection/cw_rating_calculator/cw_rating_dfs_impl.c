@@ -31,6 +31,10 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   iota_stor_pack_t approvers_pack;
   hash243_stack_t stack = NULL;
   flex_trit_t *curr_tx_hash = NULL;
+  hash243_set_t approvees = NULL;
+  hash243_set_entry_t *iter = NULL;
+  hash243_set_entry_t *tmp = NULL;
+  bool both_approvees_exist;
 
   uint64_t start_timestamp, end_timestamp;
 
@@ -68,10 +72,27 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
                       ret, done)
 
         ERR_BIND_GOTO(hash243_stack_push(&stack, curr_tx_hash), ret, done);
+        both_approvees_exist = true;
+        if (!transaction_solid(&tx)) {
+          hash243_set_add(&approvees, transaction_branch(&tx));
+          hash243_set_add(&approvees, transaction_trunk(&tx));
+
+          HASH_SET_ITER(approvees, iter, tmp) {
+            ERR_BIND_GOTO(
+                iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, iter->hash, &both_approvees_exist), ret,
+                done);
+            if (!both_approvees_exist) {
+              break;
+            }
+          }
+        }
+
         // Add each found approver which has both approvees to the currently traversed tx
-        if (transaction_solid(&tx)) {
+        if (both_approvees_exist) {
           ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
         }
+
+        hash243_set_free(&approvees);
       }
       continue;
     }
