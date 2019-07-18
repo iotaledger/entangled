@@ -28,7 +28,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
                                               int64_t subtangle_before_timestamp) {
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
   retcode_t ret = RC_OK;
-  iota_stor_pack_t apprvoers_pack;
+  iota_stor_pack_t approvers_pack;
   iota_stor_pack_t approvees_pack;
   hash243_stack_t stack = NULL;
   hash243_queue_t approvees = NULL;
@@ -43,7 +43,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
 
   *subtangle_size = 0;
 
-  ERR_BIND_GOTO(hash_pack_init(&apprvoers_pack, 10), ret, done);
+  ERR_BIND_GOTO(hash_pack_init(&approvers_pack, 10), ret, done);
   ERR_BIND_GOTO(hash_pack_init(&approvees_pack, 2), ret, done);
   ERR_BIND_GOTO(hash243_stack_push(&stack, entry_point), ret, done);
 
@@ -51,8 +51,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
     curr_tx_hash = hash243_stack_peek(stack);
 
     if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
-      hash_pack_reset(&apprvoers_pack);
-      if ((ret = iota_tangle_transaction_load_hashes_of_approvers(tangle, curr_tx_hash, &apprvoers_pack,
+      hash_pack_reset(&approvers_pack);
+      if ((ret = iota_tangle_transaction_load_hashes_of_approvers(tangle, curr_tx_hash, &approvers_pack,
                                                                   subtangle_before_timestamp)) != RC_OK) {
         log_error(logger_id, "Failed in loading approvers, error code is: %" PRIu64 "\n", ret);
         goto done;
@@ -62,8 +62,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
           hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash, &curr_tx, (*subtangle_size)++), ret,
           done);
       hash243_stack_pop(&stack);
-      while (apprvoers_pack.num_loaded > 0) {
-        curr_tx_hash = ((flex_trit_t *)apprvoers_pack.models[--apprvoers_pack.num_loaded]);
+      while (approvers_pack.num_loaded > 0) {
+        curr_tx_hash = ((flex_trit_t *)approvers_pack.models[--approvers_pack.num_loaded]);
 
         ERR_BIND_GOTO(iota_tangle_transaction_load_partial(tangle, curr_tx_hash, &transaction_pack,
                                                            PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA),
@@ -92,7 +92,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   }
 
 done:
-  hash_pack_free(&apprvoers_pack);
+  hash_pack_free(&approvers_pack);
   hash_pack_free(&approvees_pack);
   hash243_stack_free(&stack);
   hash243_queue_free(&approvees);
