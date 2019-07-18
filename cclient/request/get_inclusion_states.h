@@ -64,6 +64,9 @@ void get_inclusion_states_req_free(get_inclusion_states_req_t** req);
  */
 static inline retcode_t get_inclusion_states_req_hash_add(get_inclusion_states_req_t* const req,
                                                           flex_trit_t const* const hash) {
+  if (!req || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&req->transactions, hash);
 }
 
@@ -75,6 +78,9 @@ static inline retcode_t get_inclusion_states_req_hash_add(get_inclusion_states_r
  * @return A pointer to a transaction hash.
  */
 static inline flex_trit_t* get_inclusion_states_req_hash_get(get_inclusion_states_req_t* const req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
   return hash243_queue_at(req->transactions, index);
 }
 
@@ -87,6 +93,9 @@ static inline flex_trit_t* get_inclusion_states_req_hash_get(get_inclusion_state
  */
 static inline retcode_t get_inclusion_states_req_tip_add(get_inclusion_states_req_t* const req,
                                                          flex_trit_t const* const hash) {
+  if (!req || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&req->tips, hash);
 }
 
@@ -98,6 +107,9 @@ static inline retcode_t get_inclusion_states_req_tip_add(get_inclusion_states_re
  * @return A pointer to a tip transaction hash.
  */
 static inline flex_trit_t* get_inclusion_states_req_tip_get(get_inclusion_states_req_t* const req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
   return hash243_queue_at(req->tips, index);
 }
 

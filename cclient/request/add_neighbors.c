@@ -17,6 +17,10 @@ add_neighbors_req_t* add_neighbors_req_new() {
 }
 
 retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, char const* const uri) {
+  if (!req) {
+    return RC_NULL_PARAM;
+  }
+
   if (!req->uris) {
     utarray_new(req->uris, &ut_str_icd);
   }
@@ -29,13 +33,22 @@ retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, char const* const
 }
 
 size_t add_neighbors_req_uris_len(add_neighbors_req_t* req) {
+  if (!req) {
+    return 0;
+  }
+
   if (!req->uris) {
     return 0;
   }
+
   return utarray_len(req->uris);
 }
 
 const char* add_neighbors_req_uris_at(add_neighbors_req_t* req, size_t idx) {
+  if (!req) {
+    return NULL;
+  }
+
   if (!req->uris) {
     return NULL;
   }

@@ -58,6 +58,9 @@ void check_consistency_req_free(check_consistency_req_t** req);
  */
 static inline retcode_t check_consistency_req_tails_add(check_consistency_req_t* const req,
                                                         flex_trit_t const* const hash) {
+  if (!req || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&req->tails, hash);
 }
 
@@ -69,6 +72,9 @@ static inline retcode_t check_consistency_req_tails_add(check_consistency_req_t*
  * @return A pointer to a tail transaction hash.
  */
 static inline flex_trit_t* check_consistency_req_tails_get(check_consistency_req_t* const req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
   return hash243_queue_at(req->tails, index);
 }
 

@@ -18,6 +18,10 @@ check_consistency_res_t* check_consistency_res_new() {
 }
 
 retcode_t check_consistency_res_info_set(check_consistency_res_t* res, char const* const info) {
+  if (!res || !info) {
+    return RC_NULL_PARAM;
+  }
+
   if (!res->info) {
     res->info = char_buffer_new();
   }

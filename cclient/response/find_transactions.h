@@ -63,6 +63,9 @@ void find_transactions_res_free(find_transactions_res_t** res);
  */
 static inline retcode_t find_transactions_res_hashes_add(find_transactions_res_t* const res,
                                                          flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&res->hashes, hash);
 }
 
@@ -74,6 +77,9 @@ static inline retcode_t find_transactions_res_hashes_add(find_transactions_res_t
  * @return A pointer to the hash. NULL if the index is invalid.
  */
 static inline flex_trit_t* find_transactions_res_hashes_get(find_transactions_res_t* const res, size_t index) {
+  if (!res) {
+    return NULL;
+  }
   return hash243_queue_at(res->hashes, index);
 }
 

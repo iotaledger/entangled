@@ -34,6 +34,10 @@ get_neighbors_res_t* get_neighbors_res_new() {
 }
 
 void get_neighbors_res_free(get_neighbors_res_t** res) {
+  if (!res || !(*res)) {
+    return;
+  }
+
   utarray_free(*res);
   *res = NULL;
 }
@@ -79,6 +83,10 @@ neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* res, size_t 
 }
 
 void get_neighbors_res_dump(get_neighbors_res_t* res) {
+  if (!res) {
+    return;
+  }
+
   printf("neighbors %d\n", utarray_len(res));
   neighbor_info_t* nb = NULL;
   for (nb = (neighbor_info_t*)utarray_front(res); nb != NULL; nb = (neighbor_info_t*)utarray_next(res, nb)) {

@@ -58,6 +58,9 @@ void get_trytes_res_free(get_trytes_res_t** const res);
  * @return #retcode_t
  */
 static inline retcode_t get_trytes_res_trytes_add(get_trytes_res_t* const res, flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash8019_queue_push(&res->trytes, hash);
 }
 
@@ -69,6 +72,9 @@ static inline retcode_t get_trytes_res_trytes_add(get_trytes_res_t* const res, f
  * @return A pointer to a raw transaction hash.
  */
 static inline flex_trit_t* get_trytes_res_trytes_get(get_trytes_res_t* const res, size_t index) {
+  if (!res) {
+    return NULL;
+  }
   return hash8019_queue_at(res->trytes, index);
 }
 

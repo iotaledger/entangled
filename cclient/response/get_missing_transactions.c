@@ -18,6 +18,9 @@ get_missing_transactions_res_t* get_missing_transactions_res_new() {
 }
 
 size_t get_missing_transactions_res_hash_num(get_missing_transactions_res_t* res) {
+  if (!res) {
+    return 0;
+  }
   return hash243_stack_count(res->hashes);
 }
 

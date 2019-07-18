@@ -33,12 +33,19 @@ void attach_to_tangle_req_free(attach_to_tangle_req_t **req) {
 
 void attach_to_tangle_req_init(attach_to_tangle_req_t *req, flex_trit_t const *const trunk,
                                flex_trit_t const *const branch, uint8_t mwm) {
+  if (!req || !trunk || !branch) {
+    return;
+  }
   memcpy(req->trunk, trunk, FLEX_TRIT_SIZE_243);
   memcpy(req->branch, branch, FLEX_TRIT_SIZE_243);
   req->mwm = mwm;
 }
 
 retcode_t attach_to_tangle_req_trytes_add(attach_to_tangle_req_t *req, flex_trit_t const *const raw_trytes) {
+  if (!req || !raw_trytes) {
+    return RC_NULL_PARAM;
+  }
+
   if (!req->trytes) {
     req->trytes = hash8019_array_new();
   }
@@ -50,8 +57,13 @@ retcode_t attach_to_tangle_req_trytes_add(attach_to_tangle_req_t *req, flex_trit
 }
 
 flex_trit_t *attach_to_tangle_req_trytes_get(attach_to_tangle_req_t *req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
+
   if (!req->trytes) {
     return NULL;
   }
+
   return hash_array_at(req->trytes, index);
 }

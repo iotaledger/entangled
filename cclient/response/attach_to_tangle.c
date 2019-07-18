@@ -11,14 +11,23 @@ attach_to_tangle_res_t* attach_to_tangle_res_new() {
   attach_to_tangle_res_t* res = (attach_to_tangle_res_t*)malloc(sizeof(attach_to_tangle_res_t));
   if (res) {
     res->trytes = hash8019_array_new();
+    if (!res->trytes) {
+      free(res);
+      return NULL;
+    }
   }
   return res;
 }
 
 retcode_t attach_to_tangle_res_trytes_add(attach_to_tangle_res_t* res, flex_trit_t const* const trytes) {
+  if (!res) {
+    return RC_NULL_PARAM;
+  }
+
   if (!res->trytes) {
     res->trytes = hash8019_array_new();
   }
+
   if (!res->trytes) {
     return RC_OOM;
   }
@@ -27,13 +36,21 @@ retcode_t attach_to_tangle_res_trytes_add(attach_to_tangle_res_t* res, flex_trit
 }
 
 flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res, int index) {
+  if (!res) {
+    return NULL;
+  }
   return hash_array_at(res->trytes, index);
 }
 
 size_t attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res) {
+  if (!res) {
+    return 0;
+  }
+
   if (!res->trytes) {
     return 0;
   }
+
   return hash_array_len(res->trytes);
 }
 

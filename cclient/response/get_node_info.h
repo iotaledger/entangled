@@ -114,6 +114,9 @@ void get_node_info_res_free(get_node_info_res_t** res);
  * @return #retcode_t
  */
 static inline retcode_t get_node_info_res_app_name_set(get_node_info_res_t* const res, char const* const name) {
+  if (!res || !name) {
+    return RC_NULL_PARAM;
+  }
   return char_buffer_set(res->app_name, name);
 }
 
@@ -124,6 +127,14 @@ static inline retcode_t get_node_info_res_app_name_set(get_node_info_res_t* cons
  * @return A pointer to the application name.
  */
 static inline char const* get_node_info_res_app_name(get_node_info_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
+
+  if (!res->app_name) {
+    return NULL;
+  }
+
   return res->app_name->data;
 }
 
@@ -135,6 +146,10 @@ static inline char const* get_node_info_res_app_name(get_node_info_res_t const* 
  * @return #retcode_t
  */
 static inline retcode_t get_node_info_res_app_version_set(get_node_info_res_t* const res, char const* const version) {
+  if (!res || !version) {
+    return RC_NULL_PARAM;
+  }
+
   return char_buffer_set(res->app_version, version);
 }
 
@@ -145,6 +160,13 @@ static inline retcode_t get_node_info_res_app_version_set(get_node_info_res_t* c
  * @return A pointer to the application version.
  */
 static inline char const* get_node_info_res_app_version(get_node_info_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
+
+  if (!res->app_version) {
+    return NULL;
+  }
   return res->app_version->data;
 }
 
@@ -153,9 +175,14 @@ static inline char const* get_node_info_res_app_version(get_node_info_res_t cons
  *
  * @param[in] res The response object
  * @param[in] hash A milestone hash.
+ * @return #retcode_t
  */
-static inline void get_node_info_res_lm_set(get_node_info_res_t* const res, flex_trit_t const* const hash) {
+static inline retcode_t get_node_info_res_lm_set(get_node_info_res_t* const res, flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   memcpy(res->latest_milestone, hash, FLEX_TRIT_SIZE_243);
+  return RC_OK;
 }
 
 /**
@@ -165,6 +192,9 @@ static inline void get_node_info_res_lm_set(get_node_info_res_t* const res, flex
  * @return A pointer to the hash of latest milestone.
  */
 static inline flex_trit_t const* get_node_info_res_lm(get_node_info_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
   return res->latest_milestone;
 }
 
@@ -173,9 +203,14 @@ static inline flex_trit_t const* get_node_info_res_lm(get_node_info_res_t const*
  *
  * @param[in] res The response object.
  * @param[in] hash A pointer to the hash of latest solid subtangle milestone.
+ * @return #retcode_t
  */
-static inline void get_node_info_res_lssm_set(get_node_info_res_t* const res, flex_trit_t const* const hash) {
+static inline retcode_t get_node_info_res_lssm_set(get_node_info_res_t* const res, flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   memcpy(res->latest_solid_subtangle_milestone, hash, FLEX_TRIT_SIZE_243);
+  return RC_OK;
 }
 
 /**
@@ -185,6 +220,9 @@ static inline void get_node_info_res_lssm_set(get_node_info_res_t* const res, fl
  * @return A pointer to the hash of latest solid subtangle milestone.
  */
 static inline flex_trit_t const* get_node_info_res_lssm(get_node_info_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
   return res->latest_solid_subtangle_milestone;
 }
 
@@ -193,18 +231,34 @@ static inline flex_trit_t const* get_node_info_res_lssm(get_node_info_res_t cons
  *
  * @param[in] res The response object.
  * @param[in] hash A coordinator hash.
+ * @return #retcode_t
  */
-static inline void get_node_info_res_coordinator_address_set(get_node_info_res_t* const res,
-                                                             flex_trit_t const* const hash) {
+static inline retcode_t get_node_info_res_coordinator_address_set(get_node_info_res_t* const res,
+                                                                  flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   memcpy(res->coordinator_address, hash, FLEX_TRIT_SIZE_243);
+  return RC_OK;
 }
 static inline flex_trit_t const* get_node_info_res_coordinator_address(get_node_info_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
   return res->coordinator_address;
 }
 static inline char const* get_node_info_res_features_at(get_node_info_res_t* res, size_t idx) {
+  if (!res) {
+    return NULL;
+  }
   return *(const char**)utarray_eltptr(res->features, idx);
 }
-static inline size_t get_node_info_req_features_len(get_node_info_res_t* res) { return utarray_len(res->features); }
+static inline size_t get_node_info_req_features_len(get_node_info_res_t* res) {
+  if (!res) {
+    return 0;
+  }
+  return utarray_len(res->features);
+}
 
 #ifdef __cplusplus
 }

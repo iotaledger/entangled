@@ -232,6 +232,10 @@ static retcode_t cclient_socket_send(void const* const service_opaque, char_buff
 
 retcode_t iota_service_query(void const* const service_opaque, char_buffer_t const* const obj,
                              char_buffer_t* const response) {
+  if (!service_opaque || !obj || !response) {
+    return RC_NULL_PARAM;
+  }
+
   retcode_t ret = cclient_socket_send(service_opaque, obj, response);
   size_t retry = 0;
   while (ret == RC_UTILS_SOCKET_RECV) {
