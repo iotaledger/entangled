@@ -11,8 +11,9 @@
 retcode_t iota_client_broadcast_transactions(iota_client_service_t const* const service,
                                              broadcast_transactions_req_t* req) {
   retcode_t result = RC_ERROR;
-  if (!req->trytes) {
-    log_error(client_core_logger_id, "[%s:%d] Null parameter\n", __func__, __LINE__);
+
+  if (!service || !req) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
     return RC_NULL_PARAM;
   }
 

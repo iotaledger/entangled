@@ -12,7 +12,12 @@
 retcode_t json_were_addresses_spent_from_serialize_request(were_addresses_spent_from_req_t const *const req,
                                                            char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  char const *json_text = NULL;
+
+  if (!req || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   if (!req->addresses) {
@@ -33,7 +38,7 @@ retcode_t json_were_addresses_spent_from_serialize_request(were_addresses_spent_
     goto done;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -47,10 +52,15 @@ done:
 retcode_t json_were_addresses_spent_from_deserialize_request(char const *const obj,
                                                              were_addresses_spent_from_req_t *const req) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!req || !obj) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_array_to_hash243_queue(json_obj, "addresses", &req->addresses);
@@ -62,9 +72,13 @@ retcode_t json_were_addresses_spent_from_deserialize_request(char const *const o
 retcode_t json_were_addresses_spent_from_serialize_response(were_addresses_spent_from_res_t const *const res,
                                                             char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  char const *json_text = NULL;
-
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!res || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -76,7 +90,7 @@ retcode_t json_were_addresses_spent_from_serialize_response(were_addresses_spent
     goto done;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -90,11 +104,12 @@ done:
 retcode_t json_were_addresses_spent_from_deserialize_response(char const *const obj,
                                                               were_addresses_spent_from_res_t *const res) {
   retcode_t ret = RC_ERROR;
-  cJSON *json_obj = cJSON_Parse(obj);
-  cJSON *json_item = NULL;
-
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
-  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
+
+  if (!res || !obj) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   if (!res->states) {
     utarray_new(res->states, &ut_int_icd);
@@ -102,6 +117,10 @@ retcode_t json_were_addresses_spent_from_deserialize_response(char const *const 
   if (!res->states) {
     return RC_OOM;
   }
+
+  cJSON *json_obj = cJSON_Parse(obj);
+  cJSON *json_item = NULL;
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_boolean_array_to_utarray(json_obj, "states", res->states);
 

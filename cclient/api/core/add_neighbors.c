@@ -12,8 +12,8 @@ retcode_t iota_client_add_neighbors(iota_client_service_t const* const service, 
                                     add_neighbors_res_t* res) {
   retcode_t result = RC_ERROR;
 
-  if (utarray_len(req->uris) == 0) {
-    log_error(client_core_logger_id, "[%s:%d] Empty URI list\n", __func__, __LINE__);
+  if (!service || !req || !res) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
     return RC_NULL_PARAM;
   }
 

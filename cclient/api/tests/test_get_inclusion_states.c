@@ -85,9 +85,8 @@ static void test_get_inclusion_status_without_tip(void) {
               0);
   TEST_ASSERT_EQUAL_INT16(RC_OK, get_inclusion_states_req_hash_add(get_inclusion_req, flex_hash));
 
-  TEST_ASSERT_EQUAL_INT16(RC_CCLIENT_RES_ERROR,
-                          iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res));
-  TEST_ASSERT_NULL(get_inclusion_res->states);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, iota_client_get_inclusion_states(&g_serv, get_inclusion_req, get_inclusion_res));
+  TEST_ASSERT_NOT_NULL(get_inclusion_res->states);
 
   get_inclusion_states_req_free(&get_inclusion_req);
   TEST_ASSERT_NULL(get_inclusion_req);

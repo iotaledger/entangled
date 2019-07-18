@@ -13,8 +13,8 @@ retcode_t iota_client_remove_neighbors(iota_client_service_t const* const servic
   retcode_t result = RC_ERROR;
   log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  if (utarray_len(req->uris) == 0) {
-    log_error(client_core_logger_id, "[%s:%d] The list is empty.\n", __func__, __LINE__);
+  if (!service || !req || !res) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
     return RC_NULL_PARAM;
   }
 

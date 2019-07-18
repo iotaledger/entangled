@@ -11,8 +11,13 @@
 
 retcode_t json_find_transactions_serialize_request(find_transactions_req_t const* const obj, char_buffer_t* out) {
   retcode_t ret = RC_ERROR;
-  char const* json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -55,7 +60,7 @@ retcode_t json_find_transactions_serialize_request(find_transactions_req_t const
     }
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const* json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void*)json_text);
@@ -68,10 +73,15 @@ end:
 
 retcode_t json_find_transactions_deserialize_request(char const* const obj, find_transactions_req_t* out) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   if (!(cJSON_HasObjectItem(json_obj, "bundles") || cJSON_HasObjectItem(json_obj, "addresses") ||
@@ -116,10 +126,14 @@ end:
 
 retcode_t json_find_transactions_serialize_response(find_transactions_res_t const* const obj, char_buffer_t* out) {
   retcode_t ret = RC_ERROR;
-  char const* json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
-  cJSON* json_root = cJSON_CreateObject();
 
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
+  cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
     ret = RC_CCLIENT_JSON_CREATE;
@@ -131,7 +145,7 @@ retcode_t json_find_transactions_serialize_response(find_transactions_res_t cons
     goto end;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const* json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void*)json_text);
@@ -144,10 +158,15 @@ end:
 
 retcode_t json_find_transactions_deserialize_response(char const* const obj, find_transactions_res_t* out) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_array_to_hash243_queue(json_obj, "hashes", &out->hashes);

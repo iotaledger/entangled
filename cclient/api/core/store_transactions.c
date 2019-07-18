@@ -13,8 +13,8 @@ retcode_t iota_client_store_transactions(iota_client_service_t const* const serv
   retcode_t result = RC_ERROR;
   log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  if (hash_array_len(req->trytes) == 0) {
-    log_error(client_core_logger_id, "[%s:%d] The list is empty\n", __func__, __LINE__);
+  if (!service || !req) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
     return RC_NULL_PARAM;
   }
 

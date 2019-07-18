@@ -10,10 +10,16 @@
 
 retcode_t iota_client_get_trytes(iota_client_service_t const* const service, get_trytes_req_t const* const req,
                                  get_trytes_res_t* res) {
+  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   retcode_t result = RC_ERROR;
+
+  if (!service || !req || !res) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
-  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
     result = RC_OOM;
