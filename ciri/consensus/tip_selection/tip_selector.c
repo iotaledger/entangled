@@ -14,6 +14,7 @@
 #include "ciri/consensus/tip_selection/exit_probability_validator/exit_probability_validator.h"
 #include "ciri/consensus/tip_selection/tip_selector.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define TIP_SELECTOR_LOGGER_ID "tip_selector"
 
@@ -47,6 +48,8 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t
   bool consistent = false;
   hash243_stack_t tips_stack = NULL;
   exit_prob_transaction_validator_t walker_validator;
+  uint64_t start_timestamp, end_timestamp;
+  start_timestamp = current_timestamp_ms();
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(tip_selector->conf, tip_selector->milestone_tracker,
                                                                  tip_selector->ledger_validator, &walker_validator)) !=
@@ -114,6 +117,9 @@ done:
   if ((ret = iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator)) != RC_OK) {
     log_error(logger_id, "Destroying exit probability transaction validator failed\n");
   }
+
+  end_timestamp = current_timestamp_ms();
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
