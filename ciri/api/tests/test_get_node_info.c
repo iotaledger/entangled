@@ -64,6 +64,7 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   api.core = &core;
+  TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(router_init(&api.core->node.router, &api.core->node) == RC_OK);
   api.core->node.conf.requester_queue_size = 100;
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);

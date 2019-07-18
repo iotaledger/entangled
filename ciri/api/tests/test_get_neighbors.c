@@ -63,6 +63,7 @@ int main(void) {
   UNITY_BEGIN();
 
   api.core = &core;
+  TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(router_init(&api.core->node.router, &api.core->node) == RC_OK);
 
   RUN_TEST(test_get_neighbors_empty);
