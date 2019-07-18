@@ -179,3 +179,16 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_get_transactions_to_approve",
+    timeout = "short",
+    srcs = [
+        "cclient_conf.h",
+        "test_get_transactions_to_approve.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
