@@ -186,7 +186,7 @@ done:
   return ret;
 }
 
-retcode_t get_transaction_to_request(transaction_requester_t *const transaction_requester, tangle_t *const tangle,
+retcode_t get_transaction_to_request(transaction_requester_t *const transaction_requester, tangle_t const *const tangle,
                                      flex_trit_t *const hash, bool const milestone) {
   retcode_t ret = RC_OK;
   hash243_set_t *request_set = NULL;

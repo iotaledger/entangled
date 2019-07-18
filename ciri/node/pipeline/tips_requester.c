@@ -7,8 +7,8 @@
 
 #include "ciri/node/pipeline/tips_requester.h"
 #include "ciri/consensus/tangle/tangle.h"
-#include "ciri/node/iota_packet.h"
 #include "ciri/node/node.h"
+#include "ciri/node/protocol/gossip.h"
 #include "common/model/milestone.h"
 #include "utils/logger_helper.h"
 
@@ -22,13 +22,13 @@ static logger_id_t logger_id;
  */
 
 static void *tips_requester_routine(tips_requester_t *const tips_requester) {
-  iota_packet_t packet;
-  neighbor_t *iter = NULL;
+  protocol_gossip_t packet;
+  neighbor_t *neighbor = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
-  tangle_t tangle;
-
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  lock_handle_t lock_cond;
+  tangle_t tangle;
 
   if (tips_requester == NULL) {
     return NULL;
@@ -43,7 +43,6 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
@@ -60,21 +59,23 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       continue;
     }
     transaction_serialize_on_flex_trits(transaction_ptr, transaction_flex_trits);
-    if (iota_packet_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
+    if (protocol_gossip_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
       continue;
     }
-    if (iota_packet_set_request(&packet, latest_milestone.hash, tips_requester->node->conf.request_hash_size_trit) !=
-        RC_OK) {
+    if (protocol_gossip_set_request(&packet, latest_milestone.hash,
+                                    HASH_LENGTH_TRIT - tips_requester->node->conf.mwm) != RC_OK) {
       continue;
     }
 
-    rw_lock_handle_rdlock(&tips_requester->node->neighbors_lock);
-    LL_FOREACH(tips_requester->node->neighbors, iter) {
-      if (neighbor_send_packet(tips_requester->node, iter, &packet) != RC_OK) {
-        log_warning(logger_id, "Sending tip request to neighbor failed\n");
+    rw_lock_handle_rdlock(&tips_requester->node->router.neighbors_lock);
+    NEIGHBORS_FOREACH(tips_requester->node->router.neighbors, neighbor) {
+      if (neighbor->endpoint.stream != NULL) {
+        if (neighbor_send_packet(tips_requester->node, neighbor, &packet) != RC_OK) {
+          log_warning(logger_id, "Sending tip request to neighbor failed\n");
+        }
       }
     }
-    rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
+    rw_lock_handle_unlock(&tips_requester->node->router.neighbors_lock);
   }
 
   lock_handle_unlock(&lock_cond);

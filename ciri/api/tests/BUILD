@@ -176,7 +176,7 @@ cc_test(
 
 cc_test(
     name = "test_were_addresses_spent_from",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_were_addresses_spent_from.c"],
     data = [
         ":spent_addresses_db_file",
