@@ -325,7 +325,7 @@ void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_servic
 static uint64_t get_last_snapshot_to_prune_index(pruning_service_t *const ps) {
   uint64_t index;
   rw_lock_handle_rdlock(&ps->rw_lock);
-  index = ps->last_pruned_snapshot_index;
+  index = ps->last_snapshot_index_to_prune;
   rw_lock_handle_unlock(&ps->rw_lock);
   return index;
 }
