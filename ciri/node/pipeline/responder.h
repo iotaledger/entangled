@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#include "ciri/node/transaction_request.h"
+#include "ciri/node/protocol/transaction_request.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/handles/cond.h"
@@ -23,78 +23,78 @@ typedef struct neighbor_s neighbor_t;
 typedef struct node_s node_t;
 
 /**
- * A responder is responsible for responding to transaction requests sent by
- * neighbors.
+ * A responder stage is responsible for responding to transaction requests sent by neighbors.
  */
-typedef struct responder_s {
+typedef struct responder_stage_s {
   thread_handle_t thread;
   bool running;
   transaction_request_queue_t queue;
   rw_lock_handle_t lock;
   cond_handle_t cond;
   node_t *node;
-} responder_t;
+} responder_stage_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * Initializes a responder
+ * Initializes a responder stage
  *
- * @param responder The responder state
+ * @param responder The responder stage
  * @param node A node
  *
  * @return a status code
  */
-retcode_t responder_init(responder_t *const responder, node_t *const node);
+retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node);
 
 /**
- * Starts a responder
+ * Starts a responder stage
  *
- * @param responder The responder state
+ * @param responder The responder stage
  *
  * @return a status code
  */
-retcode_t responder_start(responder_t *const responder);
+retcode_t responder_stage_start(responder_stage_t *const responder);
 
 /**
- * Stops a responder
+ * Stops a responder stage
  *
- * @param responder The responder state
+ * @param responder The responder stage
  *
  * @return a status code
  */
-retcode_t responder_stop(responder_t *const responder);
+retcode_t responder_stage_stop(responder_stage_t *const responder);
 
 /**
- * Destroys a responder
+ * Destroys a responder stage
  *
- * @param responder The responder state
+ * @param responder The responder stage
  *
  * @return a status code
  */
-retcode_t responder_destroy(responder_t *const responder);
+retcode_t responder_stage_destroy(responder_stage_t *const responder);
 
 /**
- * Adds a request to a responder
+ * Adds a request to a responder stage
  *
- * @param responder The responder state
+ * @param responder The responder stage
  * @param neighbor Requesting neighbor
  * @param hash Requested hash
  *
  * @return a status code
  */
-retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neighbor, flex_trit_t const *const hash);
+retcode_t responder_stage_add(responder_stage_t *const responder, neighbor_t *const neighbor,
+                              flex_trit_t const *const hash);
 
 /**
  * Gets the size of the responder queue
  *
- * @param responder The responder
+ * @param responder The responder stage
  *
  * @return a status code
  */
-size_t responder_size(responder_t *const responder);
+size_t responder_stage_size(responder_stage_t *const responder);
 
 #ifdef __cplusplus
 }

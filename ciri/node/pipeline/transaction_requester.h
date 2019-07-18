@@ -129,7 +129,7 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
  *
  * @return a status code
  */
-retcode_t get_transaction_to_request(transaction_requester_t *const transaction_requester, tangle_t *const tangle,
+retcode_t get_transaction_to_request(transaction_requester_t *const transaction_requester, tangle_t const *const tangle,
                                      flex_trit_t *const hash, bool const milestone);
 
 /**

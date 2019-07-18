@@ -1,6 +1,6 @@
 cc_test(
     name = "test_ftroika",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_ftroika.c"],
     deps = [
         "//common/crypto/ftroika",

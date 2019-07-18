@@ -22,55 +22,6 @@ cc_library(
 )
 
 cc_library(
-    name = "iota_packet",
-    srcs = ["iota_packet.c"],
-    hdrs = ["iota_packet.h"],
-    deps = [
-        ":conf",
-        "//common:errors",
-        "//common/model:transaction",
-        "//common/network:endpoint",
-        "//common/trinary:bytes",
-        "//common/trinary:flex_trit",
-        "@com_github_uthash//:uthash",
-    ],
-)
-
-cc_library(
-    name = "neighbor_shared",
-    hdrs = ["neighbor.h"],
-    deps = [
-        ":iota_packet",
-        "//common:errors",
-    ],
-)
-
-cc_library(
-    name = "neighbor",
-    srcs = ["neighbor.c"],
-    deps = [
-        ":neighbor_shared",
-        ":node_shared",
-        "//ciri/node/pipeline:transaction_requester",
-        "//ciri/node/services:tcp_sender",
-        "//ciri/node/services:udp_sender",
-        "//common/network:uri",
-        "//utils/handles:rand",
-    ],
-)
-
-cc_library(
-    name = "transaction_request",
-    srcs = ["transaction_request.c"],
-    hdrs = ["transaction_request.h"],
-    deps = [
-        "//common:errors",
-        "//common/trinary:flex_trit",
-        "@com_github_uthash//:uthash",
-    ],
-)
-
-cc_library(
     name = "tips_cache",
     srcs = ["tips_cache.c"],
     hdrs = ["tips_cache.h"],
@@ -88,8 +39,8 @@ cc_library(
     srcs = ["recent_seen_bytes_cache.c"],
     hdrs = ["recent_seen_bytes_cache.h"],
     deps = [
-        ":iota_packet",
         ":uint64_t_to_flex_trit_t_map",
+        "//ciri/node/protocol:gossip",
         "//common:errors",
         "//common/trinary:flex_trit",
         "//utils/handles:rw_lock",
@@ -109,12 +60,11 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
-        ":neighbor_shared",
         ":recent_seen_bytes_cache",
         ":tips_cache",
+        "//ciri/node/network:router_shared",
         "//ciri/node/pipeline:broadcaster_shared",
         "//ciri/node/pipeline:processor_shared",
-        "//ciri/node/pipeline:receiver_shared",
         "//ciri/node/pipeline:responder_shared",
         "//ciri/node/pipeline:tips_requester_shared",
         "//ciri/node/pipeline:tips_solidifier_shared",
@@ -129,9 +79,9 @@ cc_library(
     deps = [
         ":node_shared",
         "//ciri:core_shared",
+        "//ciri/node/network:router",
         "//ciri/node/pipeline:broadcaster",
         "//ciri/node/pipeline:processor",
-        "//ciri/node/pipeline:receiver",
         "//ciri/node/pipeline:responder",
         "//ciri/node/pipeline:tips_requester",
         "//ciri/node/pipeline:tips_solidifier",
