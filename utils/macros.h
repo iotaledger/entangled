@@ -8,10 +8,30 @@
 #ifndef __UTILS_MACROS_H__
 #define __UTILS_MACROS_H__
 
-#define UNUSED(...) (void)(__VA_ARGS__)
+#include <arpa/inet.h>
+#include <stdint.h>
 
+#ifndef UNUSED
+#define UNUSED(...) (void)(__VA_ARGS__)
+#endif
+
+#ifndef MAX
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#endif
+
+#ifndef MIN
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#endif
+
+#ifndef htonll
+#if __BIG_ENDIAN__
+#define htonll(x) (x)
+#define ntohll(x) (x)
+#else
+#define htonll(x) (((uint64_t)htonl((x)&0xFFFFFFFF) << 32) | htonl((x) >> 32))
+#define ntohll(x) (((uint64_t)ntohl((x)&0xFFFFFFFF) << 32) | ntohl((x) >> 32))
+#endif
+#endif
 
 // max uint64 18446744073709551616
 #define MAX_CHARS_UINT64 20
