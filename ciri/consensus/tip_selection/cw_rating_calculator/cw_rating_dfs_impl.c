@@ -29,9 +29,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
   retcode_t ret = RC_OK;
   iota_stor_pack_t approvers_pack;
-  iota_stor_pack_t approvees_pack;
   hash243_stack_t stack = NULL;
-  hash243_queue_t approvees = NULL;
+  hash243_set_t approvees = NULL;
   flex_trit_t *curr_tx_hash = NULL;
   uint64_t start_timestamp, end_timestamp;
 
@@ -39,12 +38,15 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
 
   start_timestamp = current_timestamp_ms();
 
+  hash243_set_entry_t *iter = NULL;
+  hash243_set_entry_t *tmp = NULL;
+  bool both_approvees_exist;
+
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
 
   *subtangle_size = 0;
 
   ERR_BIND_GOTO(hash_pack_init(&approvers_pack, 10), ret, done);
-  ERR_BIND_GOTO(hash_pack_init(&approvees_pack, 2), ret, done);
   ERR_BIND_GOTO(hash243_stack_push(&stack, entry_point), ret, done);
 
   while (!hash243_stack_empty(stack)) {
@@ -68,23 +70,29 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
         ERR_BIND_GOTO(iota_tangle_transaction_load_partial(tangle, curr_tx_hash, &transaction_pack,
                                                            PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA),
                       ret, done)
-        hash_pack_reset(&approvees_pack);
 
-        if (transaction_trunk(&tx) == transaction_branch(&tx)) {
-          hash243_queue_push(&approvees, transaction_branch(&tx));
-        } else {
-          hash243_queue_push(&approvees, transaction_branch(&tx));
-          hash243_queue_push(&approvees, transaction_trunk(&tx));
+        both_approvees_exist = true;
+        if (!transaction_solid(&tx)) {
+          hash243_set_add(&approvees, transaction_branch(&tx));
+          hash243_set_add(&approvees, transaction_trunk(&tx));
+
+          HASH_SET_ITER(approvees, iter, tmp) {
+            ERR_BIND_GOTO(
+                iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, iter->hash, &both_approvees_exist), ret,
+                done);
+            if (!both_approvees_exist) {
+              break;
+            }
+          }
         }
 
-        ERR_BIND_GOTO(iota_tangle_transaction_find(tangle, NULL, NULL, NULL, approvees, &approvees_pack), ret, done);
-        // Add each found approver to the currently traversed tx
         ERR_BIND_GOTO(hash243_stack_push(&stack, curr_tx_hash), ret, done);
-        if (approvees_pack.num_loaded == hash243_queue_count(approvees)) {
+        // Add each found approver which has both approvees to the currently traversed tx
+        if (both_approvees_exist) {
           ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
         }
 
-        hash243_queue_free(&approvees);
+        hash243_set_free(&approvees);
       }
       continue;
     }
@@ -93,9 +101,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
 
 done:
   hash_pack_free(&approvers_pack);
-  hash_pack_free(&approvees_pack);
   hash243_stack_free(&stack);
-  hash243_queue_free(&approvees);
+  hash243_set_free(&approvees);
 
   end_timestamp = current_timestamp_ms();
   log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
