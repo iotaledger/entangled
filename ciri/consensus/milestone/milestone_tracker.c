@@ -268,8 +268,7 @@ retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt,
       break;
     }
     pack.num_loaded = 0;
-    if ((ret = iota_tangle_milestone_load_by_index(tangle, mt->latest_solid_subtangle_milestone_index + 1, &pack)) !=
-        RC_OK) {
+    if ((ret = iota_tangle_milestone_load_next(tangle, mt->latest_solid_subtangle_milestone_index, &pack)) != RC_OK) {
       return ret;
     }
   }
