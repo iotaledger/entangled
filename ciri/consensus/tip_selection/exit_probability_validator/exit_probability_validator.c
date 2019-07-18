@@ -186,7 +186,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
   }
 
   end_timestamp = current_timestamp_ms();
-  log_debug(logger_id, "%s took % " PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
