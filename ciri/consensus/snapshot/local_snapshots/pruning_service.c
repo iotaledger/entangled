@@ -179,7 +179,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
                 err, cleanup);
 
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
-    if (iota_snapshot_has_solid_entry_point(ps->new_snapshot, iter->hash)) {
+    if (iota_snapshot_has_solid_entry_point(&ps->new_snapshot, iter->hash)) {
       entry_point_has_no_solid_entry_points_in_past_cone = false;
       break;
     }
@@ -309,6 +309,8 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
   logger_helper_release(logger_id);
   rw_lock_handle_destroy(&ps->rw_lock);
 
+  iota_snapshot_destroy(&ps->new_snapshot);
+
   return ret;
 }
 
@@ -318,7 +320,7 @@ void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_servic
   ps->last_snapshot_index_to_prune = snapshot->metadata.index;
   rw_lock_handle_unlock(&ps->rw_lock);
 
-  ps->new_snapshot = snapshot;
+  iota_snapshot_copy(snapshot, &ps->new_snapshot);
   cond_handle_signal(&ps->cond_pruning_service);
 }
 
