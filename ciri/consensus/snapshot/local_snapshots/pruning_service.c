@@ -248,6 +248,7 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
                                                     spent_addresses_service_t *const spent_addresses_service,
                                                     tips_cache_t *const tips_cache,
                                                     iota_consensus_conf_t const *const conf) {
+  retcode_t ret;
   logger_id = logger_helper_enable(PRUNING_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   memset(ps, 0, sizeof(pruning_service_t));
   ps->conf = conf;
@@ -256,6 +257,9 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
   ps->spent_addresses_service = spent_addresses_service;
   ps->tips_cache = tips_cache;
   rw_lock_handle_init(&ps->rw_lock);
+
+  ERR_BIND_RETURN(iota_snapshot_reset(&ps->new_snapshot, conf), ret);
+  ERR_BIND_RETURN(iota_snapshot_init(&ps->new_snapshot, conf), ret);
   return RC_OK;
 }
 
