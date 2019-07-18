@@ -69,12 +69,6 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     }
   }
 
-  log_info(logger_id, "Initializing TCP server\n");
-  if ((ret = tcp_server_init(&node->tcp_server, node)) != RC_OK) {
-    log_critical(logger_id, "Initializing TCP server failed\n");
-    return ret;
-  }
-
   log_info(logger_id, "Initializing tips cache\n");
   if ((ret = tips_cache_init(&node->tips, node->conf.tips_cache_size)) != RC_OK) {
     log_critical(logger_id, "Initializing tips cache failed\n");
@@ -142,9 +136,9 @@ retcode_t node_start(node_t* const node) {
     }
   }
 
-  log_info(logger_id, "Starting TCP server\n");
-  if ((ret = tcp_server_start(&node->tcp_server)) != RC_OK) {
-    log_critical(logger_id, "Starting TCP server failed\n");
+  log_info(logger_id, "Starting router\n");
+  if ((ret = router_start(&node->router)) != RC_OK) {
+    log_critical(logger_id, "Starting router failed\n");
     return ret;
   }
 
@@ -196,9 +190,9 @@ retcode_t node_stop(node_t* const node) {
     }
   }
 
-  log_info(logger_id, "Stopping TCP server\n");
-  if ((ret = tcp_server_stop(&node->tcp_server)) != RC_OK) {
-    log_error(logger_id, "Stopping TCP server failed\n");
+  log_info(logger_id, "Stopping router\n");
+  if ((ret = router_stop(&node->router)) != RC_OK) {
+    log_error(logger_id, "Stopping router failed\n");
   }
 
   return ret;
@@ -216,11 +210,6 @@ retcode_t node_destroy(node_t* const node) {
   log_info(logger_id, "Destroying router\n");
   if ((ret = router_destroy(&node->router)) != RC_OK) {
     log_error(logger_id, "Destroying router failed\n");
-  }
-
-  log_info(logger_id, "Destroying TCP server\n");
-  if ((ret = tcp_server_destroy(&node->tcp_server)) != RC_OK) {
-    log_error(logger_id, "Destroying TCP server failed\n");
   }
 
   log_info(logger_id, "Destroying transaction requester\n");

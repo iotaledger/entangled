@@ -37,7 +37,10 @@ cc_library(
     deps = [
         ":neighbor_shared",
         "//ciri/node:conf",
+        "//ciri/node/protocol:type",
         "//utils/handles:rw_lock",
+        "//utils/handles:thread",
+        "@libuv",
     ],
 )
 
@@ -48,42 +51,7 @@ cc_library(
     deps = [
         ":neighbor",
         ":router_shared",
-        ":tcp_server_shared",
-        ":tcp_utils",
-        "//utils:logger_helper",
-    ],
-)
-
-cc_library(
-    name = "tcp_server_shared",
-    hdrs = ["tcp_server.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//ciri/node/protocol:type",
-        "//utils/handles:thread",
-        "@libuv",
-    ],
-)
-
-cc_library(
-    name = "tcp_server",
-    srcs = ["tcp_server.c"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":router",
-        ":tcp_server_shared",
         "//ciri/node:node_shared",
-    ],
-)
-
-cc_library(
-    name = "tcp_utils",
-    srcs = ["tcp_utils.c"],
-    hdrs = ["tcp_utils.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":neighbor",
-        ":tcp_server_shared",
-        "//common:errors",
+        "//utils:logger_helper",
     ],
 )

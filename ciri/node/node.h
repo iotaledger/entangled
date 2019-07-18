@@ -9,7 +9,6 @@
 #define __NODE_NODE_H__
 
 #include "ciri/node/network/router.h"
-#include "ciri/node/network/tcp_server.h"
 #include "ciri/node/pipeline/broadcaster.h"
 #include "ciri/node/pipeline/processor.h"
 #include "ciri/node/pipeline/responder.h"
@@ -38,7 +37,6 @@ typedef struct node_s {
   transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
   tips_solidifier_t tips_solidifier;
-  tcp_server_t tcp_server;
   router_t router;
   tips_cache_t tips;
   recent_seen_bytes_cache_t recent_seen_bytes;
