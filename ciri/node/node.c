@@ -60,15 +60,6 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     return ret;
   }
 
-  if (node->conf.tips_solidifier_enabled) {
-    log_info(logger_id, "Initializing tips solidifier\n");
-    if ((ret = tips_solidifier_init(&node->tips_solidifier, &node->conf, &node->tips,
-                                    &core->consensus.transaction_solidifier)) != RC_OK) {
-      log_critical(logger_id, "Initializing tips solidifier failed\n");
-      return ret;
-    }
-  }
-
   log_info(logger_id, "Initializing tips cache\n");
   if ((ret = tips_cache_init(&node->tips, node->conf.tips_cache_size)) != RC_OK) {
     log_critical(logger_id, "Initializing tips cache failed\n");
@@ -128,14 +119,6 @@ retcode_t node_start(node_t* const node) {
     return ret;
   }
 
-  if (node->conf.tips_solidifier_enabled) {
-    log_info(logger_id, "Starting tips solidifier\n");
-    if ((ret = tips_solidifier_start(&node->tips_solidifier)) != RC_OK) {
-      log_critical(logger_id, "Starting tips solidifier failed\n");
-      return ret;
-    }
-  }
-
   log_info(logger_id, "Starting router\n");
   if ((ret = router_start(&node->router)) != RC_OK) {
     log_critical(logger_id, "Starting router failed\n");
@@ -183,13 +166,6 @@ retcode_t node_stop(node_t* const node) {
     log_error(logger_id, "Stopping transaction requester failed\n");
   }
 
-  if (node->conf.tips_solidifier_enabled) {
-    log_info(logger_id, "Stopping tips solidifier\n");
-    if ((ret = tips_solidifier_stop(&node->tips_solidifier)) != RC_OK) {
-      log_error(logger_id, "Stopping tips solidifier failed\n");
-    }
-  }
-
   log_info(logger_id, "Stopping router\n");
   if ((ret = router_stop(&node->router)) != RC_OK) {
     log_error(logger_id, "Stopping router failed\n");
@@ -215,13 +191,6 @@ retcode_t node_destroy(node_t* const node) {
   log_info(logger_id, "Destroying transaction requester\n");
   if ((ret = requester_destroy(&node->transaction_requester)) != RC_OK) {
     log_error(logger_id, "Destroying transaction requester failed\n");
-  }
-
-  if (node->conf.tips_solidifier_enabled) {
-    log_info(logger_id, "Destroying tips solidifier\n");
-    if ((ret = tips_solidifier_destroy(&node->tips_solidifier)) != RC_OK) {
-      log_error(logger_id, "Destroying tips solidifier failed\n");
-    }
   }
 
   log_info(logger_id, "Destroying tips requester\n");

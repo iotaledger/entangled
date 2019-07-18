@@ -144,26 +144,3 @@ cc_library(
         "//utils:logger_helper",
     ],
 )
-
-cc_library(
-    name = "tips_solidifier_shared",
-    hdrs = ["tips_solidifier.h"],
-    deps = [
-        "//ciri/node:conf",
-        "//ciri/node:tips_cache",
-        "//common:errors",
-        "//utils/handles:cond",
-        "//utils/handles:thread",
-    ],
-)
-
-cc_library(
-    name = "tips_solidifier",
-    srcs = ["tips_solidifier.c"],
-    deps = [
-        ":tips_solidifier_shared",
-        "//ciri/consensus/tangle",
-        "//ciri/consensus/transaction_solidifier",
-        "//utils:logger_helper",
-    ],
-)
