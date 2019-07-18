@@ -48,6 +48,8 @@ cc_library(
     deps = [
         ":neighbor",
         ":router_shared",
+        ":tcp_server_shared",
+        ":tcp_utils",
         "//utils:logger_helper",
     ],
 )
@@ -71,5 +73,17 @@ cc_library(
         ":router",
         ":tcp_server_shared",
         "//ciri/node:node_shared",
+    ],
+)
+
+cc_library(
+    name = "tcp_utils",
+    srcs = ["tcp_utils.c"],
+    hdrs = ["tcp_utils.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":neighbor",
+        ":tcp_server_shared",
+        "//common:errors",
     ],
 )

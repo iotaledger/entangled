@@ -9,6 +9,7 @@
 
 #include "ciri/node/network/router.h"
 #include "ciri/node/network/tcp_server.h"
+#include "ciri/node/network/tcp_utils.h"
 #include "ciri/node/node.h"
 #include "ciri/node/protocol/type.h"
 #include "utils/logger_helper.h"
@@ -98,7 +99,7 @@ retcode_t router_neighbor_add(router_t *const router, neighbor_t *const neighbor
     return RC_NULL_PARAM;
   }
 
-  if ((ret = tcp_server_resolve_domain(neighbor->endpoint.domain, neighbor->endpoint.ip)) != RC_OK) {
+  if ((ret = tcp_resolve(neighbor->endpoint.domain, neighbor->endpoint.ip)) != RC_OK) {
     return ret;
   }
 
@@ -386,7 +387,7 @@ retcode_t router_neighbors_reconnect_attempt(router_t *const router) {
   rw_lock_handle_wrlock(&router->neighbors_lock);
   NEIGHBORS_FOREACH(router->neighbors, neighbor) {
     if (neighbor->state == NEIGHBOR_DISCONNECTED && neighbor->endpoint.stream == NULL) {
-      if ((ret = tcp_server_connect(neighbor)) != RC_OK) {
+      if ((ret = tcp_connect(neighbor)) != RC_OK) {
         log_warning(logger_id, "Trying to reconnect to neighbor %s:%d failed\n", neighbor->endpoint.domain,
                     neighbor->endpoint.port);
       }

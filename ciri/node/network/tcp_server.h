@@ -69,25 +69,6 @@ retcode_t tcp_server_stop(tcp_server_t *const tcp_server);
 retcode_t tcp_server_destroy(tcp_server_t *const tcp_server);
 
 /**
- * Resolves a domain name into an IP address
- *
- * @param[in]   domain  The domain name
- * @param[out]  ip      The IP address
- *
- * @return a status code
- */
-retcode_t tcp_server_resolve_domain(char const *const domain, char *const ip);
-
-/**
- * Initiates a connection with a neighbor
- *
- * @param[in] neighbor The neighbor
- *
- * @return a status code
- */
-retcode_t tcp_server_connect(neighbor_t *const neighbor);
-
-/**
  * Writes data to a stream
  *
  * @param[in] stream      The stream
@@ -101,6 +82,7 @@ retcode_t tcp_server_write(uv_stream_t *const stream, packet_type_t const type, 
                            uint16_t const buffer_size);
 
 void tcp_server_on_async_write(uv_async_t *const handle);
+void tcp_server_on_connect(uv_connect_t *const connection, int const status);
 
 #ifdef __cplusplus
 }
