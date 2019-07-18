@@ -156,7 +156,7 @@ retcode_t iota_consensus_random_walker_randomize(ep_randomizer_t const *const ex
   log_debug(logger_id, "Number of tails traversed to find tip: %" PRIu64 "\n", num_traversed_tails);
 
   end_timestamp = current_timestamp_ms();
-  log_debug(logger_id, "%s took % " PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
