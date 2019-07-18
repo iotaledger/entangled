@@ -123,7 +123,7 @@ static void *pruning_service_routine(void *arg) {
   lock_handle_lock(&lock_cond);
 
   if (milestone_pack.num_loaded > 0) {
-    ps->last_pruned_snapshot_index = MIN(MIN(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
+    ps->last_pruned_snapshot_index = MIN(MAX(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
   }
 
   while (ps->running) {

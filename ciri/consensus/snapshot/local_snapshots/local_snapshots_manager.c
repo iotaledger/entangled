@@ -127,7 +127,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  if (lsm->conf->local_snapshots.pruning_is_enabled || true) {
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
     ERR_BIND_RETURN(iota_local_snapshots_pruning_service_init(&lsm->ps, lsm->snapshots_service->snapshots_provider,
                                                               spent_addresses_service, tips_cache, conf),
                     ret);
