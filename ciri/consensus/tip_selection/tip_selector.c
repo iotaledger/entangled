@@ -119,7 +119,7 @@ done:
   }
 
   end_timestamp = current_timestamp_ms();
-  log_debug(logger_id, "%s took % " PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
