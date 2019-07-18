@@ -30,17 +30,13 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   retcode_t ret = RC_OK;
   iota_stor_pack_t approvers_pack;
   hash243_stack_t stack = NULL;
-  hash243_set_t approvees = NULL;
   flex_trit_t *curr_tx_hash = NULL;
+
   uint64_t start_timestamp, end_timestamp;
 
   *subtangle_size = 0;
 
   start_timestamp = current_timestamp_ms();
-
-  hash243_set_entry_t *iter = NULL;
-  hash243_set_entry_t *tmp = NULL;
-  bool both_approvees_exist;
 
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
 
@@ -71,28 +67,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
                                                            PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA),
                       ret, done)
 
-        both_approvees_exist = true;
-        if (!transaction_solid(&tx)) {
-          hash243_set_add(&approvees, transaction_branch(&tx));
-          hash243_set_add(&approvees, transaction_trunk(&tx));
-
-          HASH_SET_ITER(approvees, iter, tmp) {
-            ERR_BIND_GOTO(
-                iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, iter->hash, &both_approvees_exist), ret,
-                done);
-            if (!both_approvees_exist) {
-              break;
-            }
-          }
-        }
-
         ERR_BIND_GOTO(hash243_stack_push(&stack, curr_tx_hash), ret, done);
         // Add each found approver which has both approvees to the currently traversed tx
-        if (both_approvees_exist) {
+        if (transaction_solid(&tx)) {
           ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
         }
-
-        hash243_set_free(&approvees);
       }
       continue;
     }
@@ -102,7 +81,6 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
 done:
   hash_pack_free(&approvers_pack);
   hash243_stack_free(&stack);
-  hash243_set_free(&approvees);
 
   end_timestamp = current_timestamp_ms();
   log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
