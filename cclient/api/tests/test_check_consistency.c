@@ -5,29 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "cclient/api/tests/cclient_conf.h"
+#include "cclient/api/tests/cclient_test_defs.h"
 
 static iota_client_service_t g_serv;
-
-static void service_setup(void) {
-  // init service
-  g_serv.http.path = "/";
-  g_serv.http.content_type = "application/json";
-  g_serv.http.accept = "application/json";
-  g_serv.http.host = NODE_HOST;
-  g_serv.http.port = NODE_PORT;
-  g_serv.http.api_version = 1;
-  g_serv.serializer_type = SR_JSON;
-  g_serv.http.ca_pem = amazon_ca1_pem;
-
-  logger_helper_init(LOGGER_DEBUG);
-  iota_client_core_init(&g_serv);
-}
-
-static void service_cleanup(void) {
-  iota_client_core_destroy(&g_serv);
-  logger_helper_destroy();
-}
 
 static void test_check_consistency_empty(void) {
   check_consistency_req_t *consistency_req = check_consistency_req_new();
@@ -89,13 +69,13 @@ static void test_check_consistency_empty_tail(void) {
 int main() {
   UNITY_BEGIN();
 
-  RUN_TEST(service_setup);
+  cclient_service_setup(&g_serv);
 
   RUN_TEST(test_check_consistency_empty);
   RUN_TEST(test_check_consistency_not_tail);
   RUN_TEST(test_check_consistency_empty_tail);
 
-  RUN_TEST(service_cleanup);
+  cclient_service_cleanup(&g_serv);
 
   return UNITY_END();
 }
