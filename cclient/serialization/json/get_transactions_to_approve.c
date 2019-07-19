@@ -12,7 +12,11 @@
 retcode_t json_get_transactions_to_approve_serialize_request(get_transactions_to_approve_req_t const *const obj,
                                                              char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  char const *json_text = NULL;
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
@@ -33,7 +37,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(get_transactions_to
     }
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -47,10 +51,16 @@ done:
 retcode_t json_get_transactions_to_approve_deserialize_request(char const *const obj,
                                                                get_transactions_to_approve_req_t *out) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_get_uint32(json_obj, "depth", &out->depth);
@@ -74,9 +84,12 @@ end:
 retcode_t json_get_transactions_to_approve_serialize_response(get_transactions_to_approve_res_t const *const obj,
                                                               char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  char const *json_text = NULL;
-
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -93,7 +106,7 @@ retcode_t json_get_transactions_to_approve_serialize_response(get_transactions_t
     goto done;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  const char *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -107,10 +120,15 @@ done:
 retcode_t json_get_transactions_to_approve_deserialize_response(char const *const obj,
                                                                 get_transactions_to_approve_res_t *out) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_string_hash_to_flex_trits(json_obj, "trunkTransaction", out->trunk);

@@ -11,9 +11,15 @@
 retcode_t iota_client_store_transactions(iota_client_service_t const* const service,
                                          store_transactions_req_t const* const req) {
   retcode_t result = RC_ERROR;
+  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!service || !req) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
-  log_debug(client_core_logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
     log_critical(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_OOM);
     result = RC_OOM;

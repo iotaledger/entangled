@@ -17,6 +17,10 @@ remove_neighbors_req_t* remove_neighbors_req_new() {
 }
 
 retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req, char const* uri) {
+  if (!req || !uri) {
+    return RC_NULL_PARAM;
+  }
+
   if (!req->uris) {
     utarray_new(req->uris, &ut_str_icd);
   }
@@ -27,10 +31,18 @@ retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req, char const* uri)
   return RC_OK;
 }
 
-size_t remove_neighbors_req_uris_len(remove_neighbors_req_t* req) { return utarray_len(req->uris); }
+size_t remove_neighbors_req_uris_len(remove_neighbors_req_t* req) {
+  if (!req) {
+    return 0;
+  }
+  return utarray_len(req->uris);
+}
 
-const char* remove_neighbors_req_uris_at(remove_neighbors_req_t* req, size_t idx) {
-  return *(const char**)utarray_eltptr(req->uris, idx);
+char const* remove_neighbors_req_uris_at(remove_neighbors_req_t* req, size_t idx) {
+  if (!req) {
+    return NULL;
+  }
+  return *(char const**)utarray_eltptr(req->uris, idx);
 }
 
 void remove_neighbors_req_free(remove_neighbors_req_t** req) {

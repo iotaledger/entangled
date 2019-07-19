@@ -10,7 +10,7 @@
 
 static lock_handle_t lock;
 
-retcode_t logger_helper_init() {
+retcode_t logger_helper_init(logger_level_t level) {
   if (LOGGER_VERSION != logger_version()) {
     return RC_UTILS_INVALID_LOGGER_VERSION;
   }
@@ -19,7 +19,7 @@ retcode_t logger_helper_init() {
   logger_color_prefix_enable();
   logger_color_message_enable();
   logger_output_register(stdout);
-  logger_output_level_set(stdout, LOGGER_WARNING);
+  logger_output_level_set(stdout, level);
 
   lock_handle_init(&lock);
 

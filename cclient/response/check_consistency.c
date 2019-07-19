@@ -12,11 +12,16 @@ check_consistency_res_t* check_consistency_res_new() {
 
   if (res) {
     res->info = NULL;
+    res->state = false;
   }
   return res;
 }
 
 retcode_t check_consistency_res_info_set(check_consistency_res_t* res, char const* const info) {
+  if (!res || !info) {
+    return RC_NULL_PARAM;
+  }
+
   if (!res->info) {
     res->info = char_buffer_new();
   }

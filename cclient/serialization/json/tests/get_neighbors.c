@@ -62,7 +62,8 @@ void test_get_neighbors_serialize_response(void) {
   TEST_ASSERT_EQUAL_STRING(TEST_JSON_TEXT, out->data);
 
   char_buffer_free(out);
-  get_neighbors_res_free(res);
+  get_neighbors_res_free(&res);
+  TEST_ASSERT_NULL(res);
 }
 
 void test_get_neighbors_deserialize_response(void) {
@@ -113,7 +114,8 @@ void test_get_neighbors_deserialize_response(void) {
 
   nb = get_neighbors_res_neighbor_at(nbors, 2);
   TEST_ASSERT_NULL(nb);
-  get_neighbors_res_free(nbors);
+  get_neighbors_res_free(&nbors);
+  TEST_ASSERT_NULL(nbors);
 }
 
 int main(void) {
