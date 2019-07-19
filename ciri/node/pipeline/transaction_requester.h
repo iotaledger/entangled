@@ -24,7 +24,7 @@ typedef struct node_s node_t;
 typedef struct transaction_requester_s {
   thread_handle_t thread;
   bool running;
-  hash243_set_t transactions;
+  hash243_set_t hashes;
   node_t *node;
   rw_lock_handle_t lock;
   cond_handle_t cond;
@@ -135,9 +135,7 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
  *
  * @return true if empty, false otherwise
  */
-static inline bool requester_is_empty(transaction_requester_t *const requester) {
-  return requester->transactions == NULL;
-}
+static inline bool requester_is_empty(transaction_requester_t *const requester) { return requester->hashes == NULL; }
 
 #ifdef __cplusplus
 }

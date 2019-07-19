@@ -28,7 +28,7 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester, n
   memset(transaction_requester, 0, sizeof(transaction_requester_t));
   transaction_requester->node = node;
   transaction_requester->running = false;
-  transaction_requester->transactions = NULL;
+  transaction_requester->hashes = NULL;
   rw_lock_handle_init(&transaction_requester->lock);
   cond_handle_init(&transaction_requester->cond);
 
@@ -42,7 +42,7 @@ retcode_t requester_destroy(transaction_requester_t *const transaction_requester
     return RC_STILL_RUNNING;
   }
 
-  hash243_set_free(&transaction_requester->transactions);
+  hash243_set_free(&transaction_requester->hashes);
   transaction_requester->node = NULL;
   rw_lock_handle_destroy(&transaction_requester->lock);
   cond_handle_destroy(&transaction_requester->cond);
@@ -63,7 +63,7 @@ retcode_t requester_get_requested_transactions(transaction_requester_t *const tr
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
 
-  HASH_SET_ITER(transaction_requester->transactions, iter, tmp) {
+  HASH_SET_ITER(transaction_requester->hashes, iter, tmp) {
     if ((ret = hash243_stack_push(hashes, iter->hash)) != RC_OK) {
       break;
     }
@@ -82,7 +82,7 @@ size_t requester_size(transaction_requester_t *const transaction_requester) {
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
-  size = hash243_set_size(transaction_requester->transactions);
+  size = hash243_set_size(transaction_requester->hashes);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
   return size;
@@ -96,7 +96,7 @@ bool requester_is_full(transaction_requester_t *const transaction_requester) {
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
-  size = hash243_set_size(transaction_requester->transactions);
+  size = hash243_set_size(transaction_requester->hashes);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
   return size >= transaction_requester->node->conf.requester_queue_size;
@@ -108,7 +108,7 @@ retcode_t requester_clear_request(transaction_requester_t *const transaction_req
   }
 
   rw_lock_handle_wrlock(&transaction_requester->lock);
-  hash243_set_remove(&transaction_requester->transactions, hash);
+  hash243_set_remove(&transaction_requester->hashes, hash);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
   return RC_OK;
@@ -121,7 +121,7 @@ retcode_t requester_is_requested(transaction_requester_t *const transaction_requ
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
-  *is_requested = hash243_set_contains(transaction_requester->transactions, hash);
+  *is_requested = hash243_set_contains(transaction_requester->hashes, hash);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
   return RC_OK;
@@ -149,13 +149,12 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
 
   rw_lock_handle_wrlock(&transaction_requester->lock);
 
-  if (hash243_set_size(transaction_requester->transactions) >= transaction_requester->node->conf.requester_queue_size) {
-    if ((ret = hash243_set_remove_entry(&transaction_requester->transactions, transaction_requester->transactions)) !=
-        RC_OK) {
+  if (hash243_set_size(transaction_requester->hashes) >= transaction_requester->node->conf.requester_queue_size) {
+    if ((ret = hash243_set_remove_entry(&transaction_requester->hashes, transaction_requester->hashes)) != RC_OK) {
       goto done;
     }
   }
-  if ((ret = hash243_set_add(&transaction_requester->transactions, hash)) != RC_OK) {
+  if ((ret = hash243_set_add(&transaction_requester->hashes, hash)) != RC_OK) {
     goto done;
   }
 
@@ -173,9 +172,9 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
 
   rw_lock_handle_wrlock(&transaction_requester->lock);
 
-  if (transaction_requester->transactions != NULL) {
-    memcpy(hash, transaction_requester->transactions->hash, FLEX_TRIT_SIZE_243);
-    hash243_set_remove_entry(&transaction_requester->transactions, transaction_requester->transactions);
+  if (transaction_requester->hashes != NULL) {
+    memcpy(hash, transaction_requester->hashes->hash, FLEX_TRIT_SIZE_243);
+    hash243_set_remove_entry(&transaction_requester->hashes, transaction_requester->hashes);
   } else {
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
