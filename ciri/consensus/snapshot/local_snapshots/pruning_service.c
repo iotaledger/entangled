@@ -151,7 +151,9 @@ static void *pruning_service_routine(void *arg) {
     // "iota_local_snapshots_pruning_service_update_current_solid_entry_points" after looping (very unlikely) and the
     // routine could have missed the signal because it wasn't blocking, but it will be signaled again a snapshot later
     // in any case
-    cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
+    if (ps->running) {
+      cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
+    }
   }
 
 cleanup:
