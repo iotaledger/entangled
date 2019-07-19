@@ -100,16 +100,20 @@ static void router_on_async_write(uv_async_t *const handle) {
   uv_write_t *req = NULL;
   int err = 0;
 
-  if ((req = malloc(sizeof(uv_write_t))) == NULL) {
-    log_warning(logger_id, "Allocating write request failed\n");
-    return;
-  }
+  while (true) {
+    if ((req = malloc(sizeof(uv_write_t))) == NULL) {
+      log_warning(logger_id, "Allocating write request failed\n");
+      return;
+    }
 
-  rw_lock_handle_wrlock(&neighbor->write_queue_lock);
-  entry = neighbor_write_queue_pop(neighbor);
-  rw_lock_handle_unlock(&neighbor->write_queue_lock);
+    rw_lock_handle_wrlock(&neighbor->write_queue_lock);
+    entry = neighbor_write_queue_pop(neighbor);
+    rw_lock_handle_unlock(&neighbor->write_queue_lock);
 
-  if (entry != NULL) {
+    if (entry == NULL) {
+      break;
+    }
+
     req->data = entry->buf.base;
     if ((err = uv_write(req, neighbor->endpoint.stream, &entry->buf, 1, router_on_write)) != 0) {
       log_warning(logger_id, "Writing failed: %s\n", uv_err_name(err));
