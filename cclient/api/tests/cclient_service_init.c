@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "cclient/api/tests/cclient_test_defs.h"
 
 static char const *amazon_ca1_pem =

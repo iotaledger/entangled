@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2019 IOTA Stiftung
  * https://github.com/iotaledger/entangled

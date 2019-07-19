@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef TEST_CCLIENT_CONF_H
-#define TEST_CCLIENT_CONF_H
+#ifndef TEST_CCLIENT_TEST_DEFS_H
+#define TEST_CCLIENT_TEST_DEFS_H
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -92,4 +92,4 @@ static tryte_t const *const TEST_TX_HASH = (tryte_t*) "BYSWEAUTWXHXZ9YBZISEK9LUH
   "99IROUICDOXKSYZTDPEDKOQENTJOWJONDEWROCEJIEWFWLUAACVSJFTMCHHXJBJRKAAPUDXX"
   "VXFWP9X9999";
 
-#endif  // TEST_CCLIENT_CONF_H
+#endif  // TEST_CCLIENT_TEST_DEFS_H
