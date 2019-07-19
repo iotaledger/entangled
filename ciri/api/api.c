@@ -263,8 +263,7 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tan
       iota_snapshot_get_index(&api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot);
 
   if (req->tips == NULL) {
-    if ((ret = hash243_queue_push(&tips, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone)) !=
-        RC_OK) {
+    if ((ret = hash243_queue_push(&tips, api->core->consensus.milestone_tracker.latest_solid_milestone)) != RC_OK) {
       goto done;
     }
   } else {
@@ -362,7 +361,7 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
   {
     hash243_queue_entry_t *iter = NULL;
     DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-    uint64_t lssm_index = api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+    uint64_t lsm_index = api->core->consensus.milestone_tracker.latest_solid_milestone_index;
 
     CDL_FOREACH(req->transactions, iter) {
       hash_pack_reset(&pack);
@@ -370,10 +369,9 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
         return ret;
       }
 
-      if (pack.num_loaded == 0 || transaction_snapshot_index(txp) == 0 ||
-          transaction_snapshot_index(txp) > lssm_index) {
+      if (pack.num_loaded == 0 || transaction_snapshot_index(txp) == 0 || transaction_snapshot_index(txp) > lsm_index) {
         get_inclusion_states_res_states_add(res, false);
-      } else if (transaction_snapshot_index(txp) <= lssm_index) {
+      } else if (transaction_snapshot_index(txp) <= lsm_index) {
         get_inclusion_states_res_states_add(res, true);
       }
     }
@@ -426,10 +424,9 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   char_buffer_set(res->app_version, CIRI_VERSION);
   memcpy(res->latest_milestone, api->core->consensus.milestone_tracker.latest_milestone, FLEX_TRIT_SIZE_243);
   res->latest_milestone_index = api->core->consensus.milestone_tracker.latest_milestone_index;
-  memcpy(res->latest_solid_subtangle_milestone, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone,
+  memcpy(res->latest_solid_subtangle_milestone, api->core->consensus.milestone_tracker.latest_solid_milestone,
          FLEX_TRIT_SIZE_243);
-  res->latest_solid_subtangle_milestone_index =
-      api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+  res->latest_solid_subtangle_milestone_index = api->core->consensus.milestone_tracker.latest_solid_milestone_index;
   res->milestone_start_index = api->core->consensus.milestone_tracker.milestone_start_index;
   // TODO connected neighbors count
   res->neighbors = router_neighbors_count(&api->core->node.router);

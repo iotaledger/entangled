@@ -134,9 +134,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
   bool below_max_depth = false;
-  uint32_t lowest_allowed_index = epv->mt->latest_solid_subtangle_milestone_index < epv->conf->max_depth
-                                      ? epv->mt->latest_solid_subtangle_milestone_index
-                                      : epv->mt->latest_solid_subtangle_milestone_index - epv->conf->max_depth;
+  uint32_t lowest_allowed_index = epv->mt->latest_solid_milestone_index < epv->conf->max_depth
+                                      ? epv->mt->latest_solid_milestone_index
+                                      : epv->mt->latest_solid_milestone_index - epv->conf->max_depth;
 
   *is_valid = false;
 

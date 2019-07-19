@@ -226,11 +226,11 @@ void test_transaction_valid() {
 
   TEST_ASSERT(exist == true);
 
-  epv.mt->latest_solid_subtangle_milestone_index = max_depth;
+  epv.mt->latest_solid_milestone_index = max_depth;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(txs[0]),
                                                                       &is_valid) == RC_OK);
   TEST_ASSERT(is_valid);
-  epv.mt->latest_solid_subtangle_milestone_index = 0;
+  epv.mt->latest_solid_milestone_index = 0;
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }

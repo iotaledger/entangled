@@ -49,8 +49,8 @@ typedef struct milestone_tracker_s {
   flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   thread_handle_t milestone_solidifier;
   cond_handle_t cond_solidifier;
-  uint64_t latest_solid_subtangle_milestone_index;
-  flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
+  uint64_t latest_solid_milestone_index;
+  flex_trit_t latest_solid_milestone[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;
@@ -116,7 +116,7 @@ retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const m
                                                     iota_milestone_t* const candidate,
                                                     milestone_status_t* const milestone_status);
 
-retcode_t update_latest_solid_subtangle_milestone(milestone_tracker_t* const mt, tangle_t* const tangle);
+retcode_t update_latest_solid_milestone(milestone_tracker_t* const mt, tangle_t* const tangle);
 
 #ifdef __cplusplus
 }
