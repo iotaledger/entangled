@@ -20,7 +20,7 @@
 static logger_id_t logger_id;
 
 static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const *const tangle,
-                                    spent_addresses_provider_t *const sap);
+                                    spent_addresses_provider_t *const sap, bool *should_wait_for_next_snapshot);
 
 static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tangle_t const *const tangle,
                                                spent_addresses_provider_t *const sap,
@@ -100,6 +100,7 @@ static void *pruning_service_routine(void *arg) {
   uint64_t start_timestamp, end_timestamp;
   uint64_t start_index;
   spent_addresses_provider_t sap;
+  bool should_wait_for_next_snapshot;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
 
   {
@@ -134,8 +135,11 @@ static void *pruning_service_routine(void *arg) {
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
-      if (prune_transactions(ps, &tangle, &sap) != RC_OK) {
+      if (prune_transactions(ps, &tangle, &sap, &should_wait_for_next_snapshot) != RC_OK) {
         goto cleanup;
+      }
+      if (should_wait_for_next_snapshot) {
+        break;
       }
     }
     end_timestamp = current_timestamp_ms();
@@ -219,11 +223,13 @@ cleanup:
 }
 
 static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const *const tangle,
-                                    spent_addresses_provider_t *const sap) {
+                                    spent_addresses_provider_t *const sap, bool *should_wait_for_next_snapshot) {
   retcode_t err;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
   hash243_set_t transactions_to_prune = NULL;
   bool has_solid_entry_points;
+
+  *should_wait_for_next_snapshot = false;
 
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index + 1, &milestone_pack), err,
                 cleanup);
@@ -243,6 +249,8 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
     ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
     ps->last_pruned_snapshot_index++;
     hash243_set_free(&transactions_to_prune);
+  } else {
+    *should_wait_for_next_snapshot = true;
   }
 
 cleanup:
