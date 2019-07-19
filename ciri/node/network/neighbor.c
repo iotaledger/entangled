@@ -131,9 +131,8 @@ static retcode_t neighbor_send(node_t *const node, tangle_t const *const tangle,
                                protocol_gossip_t *const packet) {
   retcode_t ret = RC_OK;
   flex_trit_t request[FLEX_TRIT_SIZE_243];
-  bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
 
-  if ((ret = get_transaction_to_request(&node->transaction_requester, tangle, request, is_milestone)) != RC_OK) {
+  if ((ret = get_transaction_to_request(&node->transaction_requester, tangle, request)) != RC_OK) {
     return ret;
   }
 
