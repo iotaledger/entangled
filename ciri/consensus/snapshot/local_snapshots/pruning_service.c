@@ -48,9 +48,11 @@ typedef struct collect_transactions_for_pruning_do_func_params_s {
 static retcode_t collect_unconfirmed_future_transactions_for_pruning_do_func(flex_trit_t *hash, iota_stor_pack_t *pack,
                                                                              void *data, bool *should_branch,
                                                                              bool *should_stop) {
-  retcode_t ret = RC_OK;
   *should_stop = false;
   *should_branch = false;
+
+  UNUSED(data);
+  UNUSED(hash);
 
   if (pack->num_loaded == 0) {
     return RC_OK;
@@ -124,7 +126,8 @@ static void *pruning_service_routine(void *arg) {
   lock_handle_lock(&lock_cond);
 
   if (milestone_pack.num_loaded > 0) {
-    ps->last_pruned_snapshot_index = MIN(MAX(0UL, milestone.index - 1), ps->last_pruned_snapshot_index);
+    ps->last_pruned_snapshot_index =
+        MIN(MAX(0LL, (int64_t)milestone.index - 1LL), (int64_t)ps->last_pruned_snapshot_index);
   }
 
   while (ps->running) {
@@ -256,7 +259,6 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
                                                     spent_addresses_service_t *const spent_addresses_service,
                                                     tips_cache_t *const tips_cache,
                                                     iota_consensus_conf_t const *const conf) {
-  retcode_t ret;
   logger_id = logger_helper_enable(PRUNING_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   memset(ps, 0, sizeof(pruning_service_t));
   ps->conf = conf;
