@@ -338,9 +338,6 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts, 
 
   if (pack.num_loaded == 0) {
     *solid = false;
-    if ((ret = request_transaction(ts->transaction_requester, tangle, approvee)) != RC_OK) {
-      log_error(logger_id, "Requesting missing approvee failed\n");
-    }
     return ret;
   }
 
