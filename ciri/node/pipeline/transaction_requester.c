@@ -183,6 +183,7 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
 
 done:
   rw_lock_handle_unlock(&transaction_requester->lock);
+
   return ret;
 }
 
@@ -222,12 +223,13 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  if (rand_handle_probability() < transaction_requester->node->conf.p_remove_request &&
-      request_set != &transaction_requester->milestones) {
-    hash243_set_remove(request_set, hash);
-  }
+  // if (rand_handle_probability() < transaction_requester->node->conf.p_remove_request &&
+  //     request_set != &transaction_requester->milestones) {
+  //   hash243_set_remove(request_set, hash);
+  // }
 
 done:
   rw_lock_handle_unlock(&transaction_requester->lock);
+
   return ret;
 }

@@ -94,7 +94,6 @@ Long option | Short option | Description | Example input
 `--neighboring-address` | | The address to bind the TCP server socket to. | `--neighboring-address "0.0.0.0"`
 `--neighboring-port` | `-t` | The TCP receiver port. | `--neighboring-port 1500`
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "tcp://148.148.148.148:14265 tcp://[2001:db8:a0b:12f0::1]:14265"`
-`--p-remove-request` | | Probability of removing a transaction from the request queue without requesting it. Value must be in [0,1]. | `--p-remove-request 0.01`
 `--p-reply-random-tip` | | Probability of replying to a random transaction request, even though your node doesn't have anything to request. Value must be in [0,1]. | `--p-reply-random-tip 0.66`
 `--p-select-milestone` | | Probability of sending a current milestone request to a neighbour. Value must be in [0,1]. | `--p-select-milestone 0.7`
 `--p-send-milestone` | | Probability of sending a milestone transaction when the node looks for a random transaction to send to a neighbor. Value must be in [0,1]. | `--p-send-milestone 0.02`

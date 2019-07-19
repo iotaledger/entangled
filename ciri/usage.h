@@ -25,7 +25,6 @@ typedef enum cli_arg_value_e {
   CONF_MAX_NEIGHBORS,
   CONF_MWM,
   CONF_NEIGHBORING_ADDRESS,
-  CONF_P_REMOVE_REQUEST,
   CONF_P_REPLY_RANDOM_TIP,
   CONF_P_SELECT_MILESTONE,
   CONF_P_SEND_MILESTONE,
@@ -107,10 +106,6 @@ static struct cli_argument_s {
     {"neighboring-address", CONF_NEIGHBORING_ADDRESS, "The address to bind the TCP server socket to.", REQUIRED_ARG},
     {"neighboring-port", 't', "The TCP receiver port.", REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
-    {"p-remove-request", CONF_P_REMOVE_REQUEST,
-     "Probability of removing a transaction from the request queue without "
-     "requesting it. Value must be in [0,1].",
-     REQUIRED_ARG},
     {"p-reply-random-tip", CONF_P_REPLY_RANDOM_TIP,
      "Probability of replying to a random transaction request, even though "
      "your node doesn't have anything to request. Value must be in [0,1].",

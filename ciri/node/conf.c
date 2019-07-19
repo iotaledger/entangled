@@ -17,7 +17,6 @@ retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
 
   conf->mwm = DEFAULT_MWN;
   conf->neighbors = DEFAULT_NEIGHBORS;
-  conf->p_remove_request = DEFAULT_PROBABILITY_REMOVE_REQUEST;
   conf->p_reply_random_tip = DEFAULT_PROBABILITY_REPLY_RANDOM_TIP;
   conf->p_select_milestone = DEFAULT_PROBABILITY_SELECT_MILESTONE;
   conf->p_send_milestone = DEFAULT_PROBABILITY_SEND_MILESTONE;
