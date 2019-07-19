@@ -133,7 +133,7 @@ static void *pruning_service_routine(void *arg) {
   while (ps->running) {
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
-    while (ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) {
+    while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
       if (prune_transactions(ps, &tangle, &sap) != RC_OK) {
         goto cleanup;
       }
