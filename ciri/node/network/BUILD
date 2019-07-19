@@ -24,7 +24,7 @@ cc_library(
         ":neighbor_shared",
         "//ciri/node:node_shared",
         "//ciri/node/pipeline:transaction_requester",
-        "//ciri/node/protocol:type",
+        "//ciri/node/protocol",
         "//common/network:uri",
         "//utils/handles:rand",
     ],
@@ -37,7 +37,7 @@ cc_library(
     deps = [
         ":neighbor_shared",
         "//ciri/node:conf",
-        "//ciri/node/protocol:type",
+        "//ciri/node/protocol",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",
         "@libuv",
