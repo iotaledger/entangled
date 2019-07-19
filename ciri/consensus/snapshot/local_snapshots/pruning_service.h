@@ -24,14 +24,14 @@ extern "C" {
 #endif
 
 typedef struct pruning_service_s {
-  volatile bool running;
+  bool running;
   thread_handle_t pruning_service_thread;
   cond_handle_t cond_pruning_service;
   iota_consensus_conf_t const *conf;
   uint64_t last_pruned_snapshot_index;
   uint64_t last_snapshot_index_to_prune;
   rw_lock_handle_t rw_lock;
-  snapshot_t new_snapshot;
+  hash243_set_t solid_entry_points;
   spent_addresses_service_t *spent_addresses_service;
   tips_cache_t *tips_cache;
 } pruning_service_t;
@@ -88,8 +88,8 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
  *
  * @return void
  */
-void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
-                                                                  snapshot_t *const snapshot);
+void iota_local_snapshots_pruning_service_update_current_solid_entry_points(pruning_service_t *const ps,
+                                                                            snapshot_t *const snapshot);
 
 #ifdef __cplusplus
 }

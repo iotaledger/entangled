@@ -90,7 +90,7 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
     ERR_BIND_GOTO(
         iota_snapshots_service_generate_snapshot_metadata(snapshots_service, &milestone, tangle, &next_snapshot), ret,
         cleanup);
-    iota_local_snapshots_pruning_service_update_current_snapshot(ps, &next_snapshot);
+    iota_local_snapshots_pruning_service_update_current_solid_entry_points(ps, &next_snapshot);
     ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(snapshots_service, &next_snapshot), ret, cleanup);
   }
 

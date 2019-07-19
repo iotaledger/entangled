@@ -141,9 +141,9 @@ static void *pruning_service_routine(void *arg) {
                ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
     }
     // wait could be timed because other thread could have called
-    // "iota_local_snapshots_pruning_service_update_current_snapshot" after looping (very unlikely) and the routine
-    // could have missed the signal because it wasn't blocking, but it will be signaled again a snapshot later in any
-    // case
+    // "iota_local_snapshots_pruning_service_update_current_solid_entry_points" after looping (very unlikely) and the
+    // routine could have missed the signal because it wasn't blocking, but it will be signaled again a snapshot later
+    // in any case
     cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
   }
 
@@ -183,7 +183,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
                 err, cleanup);
 
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
-    if (iota_snapshot_has_solid_entry_point(&ps->new_snapshot, iter->hash)) {
+    if (hash243_set_contains(ps->solid_entry_points, iter->hash)) {
       *has_solid_entry_points = true;
       break;
     }
@@ -266,8 +266,8 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
   ps->tips_cache = tips_cache;
   rw_lock_handle_init(&ps->rw_lock);
 
-  ERR_BIND_RETURN(iota_snapshot_reset(&ps->new_snapshot, conf), ret);
-  ERR_BIND_RETURN(iota_snapshot_init(&ps->new_snapshot, conf), ret);
+  ps->solid_entry_points = NULL;
+
   return RC_OK;
 }
 
@@ -321,18 +321,18 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
   logger_helper_release(logger_id);
   rw_lock_handle_destroy(&ps->rw_lock);
 
-  iota_snapshot_destroy(&ps->new_snapshot);
+  hash243_set_free(&ps->solid_entry_points);
 
   return ret;
 }
 
-void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
-                                                                  snapshot_t *const snapshot) {
+void iota_local_snapshots_pruning_service_update_current_solid_entry_points(pruning_service_t *const ps,
+                                                                            snapshot_t *const snapshot) {
   rw_lock_handle_wrlock(&ps->rw_lock);
   ps->last_snapshot_index_to_prune = snapshot->metadata.index;
   rw_lock_handle_unlock(&ps->rw_lock);
 
-  iota_snapshot_copy(snapshot, &ps->new_snapshot);
+  iota_snapshot_solid_entry_points_set(snapshot, &ps->solid_entry_points);
   cond_handle_signal(&ps->cond_pruning_service);
 }
 
