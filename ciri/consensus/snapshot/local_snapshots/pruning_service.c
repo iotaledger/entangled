@@ -339,6 +339,7 @@ void iota_local_snapshots_pruning_service_update_current_solid_entry_points(prun
   ps->last_snapshot_index_to_prune = snapshot->metadata.index;
   rw_lock_handle_unlock(&ps->rw_lock);
 
+  hash243_set_free(&ps->solid_entry_points);
   iota_snapshot_solid_entry_points_set(snapshot, &ps->solid_entry_points);
   cond_handle_signal(&ps->cond_pruning_service);
 }
