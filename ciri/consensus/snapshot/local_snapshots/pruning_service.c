@@ -132,6 +132,7 @@ static void *pruning_service_routine(void *arg) {
   }
 
   while (ps->running) {
+    cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
@@ -146,13 +147,6 @@ static void *pruning_service_routine(void *arg) {
     if (ps->last_pruned_snapshot_index > start_index) {
       log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
                ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
-    }
-    // wait could be timed because other thread could have called
-    // "iota_local_snapshots_pruning_service_update_current_solid_entry_points" after looping (very unlikely) and the
-    // routine could have missed the signal because it wasn't blocking, but it will be signaled again a snapshot later
-    // in any case
-    if (ps->running) {
-      cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
     }
   }
 
