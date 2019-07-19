@@ -95,7 +95,6 @@ Long option | Short option | Description | Example input
 `--neighboring-port` | `-t` | The TCP receiver port. | `--neighboring-port 1500`
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "tcp://148.148.148.148:14265 tcp://[2001:db8:a0b:12f0::1]:14265"`
 `--p-reply-random-tip` | | Probability of replying to a random transaction request, even though your node doesn't have anything to request. Value must be in [0,1]. | `--p-reply-random-tip 0.66`
-`--p-select-milestone` | | Probability of sending a current milestone request to a neighbour. Value must be in [0,1]. | `--p-select-milestone 0.7`
 `--p-send-milestone` | | Probability of sending a milestone transaction when the node looks for a random transaction to send to a neighbor. Value must be in [0,1]. | `--p-send-milestone 0.02`
 `--recent-seen-bytes-cache-size` | | The number of entries to keep in the network cache. | `--recent-seen-bytes-cache-size 1500`
 `--reconnect-attempt-interval` | | The interval (in seconds) at which to reconnect to neighbors. | `--reconnect-attempt-interval 60`

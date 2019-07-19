@@ -23,7 +23,6 @@
 #define DEFAULT_NEIGHBORING_PORT 15600
 #define DEFAULT_NEIGHBORS NULL
 #define DEFAULT_PROBABILITY_REPLY_RANDOM_TIP 0.66
-#define DEFAULT_PROBABILITY_SELECT_MILESTONE 0.7
 #define DEFAULT_PROBABILITY_SEND_MILESTONE 0.02
 #define DEFAULT_RECENT_SEEN_BYTES_CACHE_SIZE 1500
 #define DEFAULT_RECONNECT_ATTEMPT_INTERVAL 60
@@ -44,9 +43,6 @@ typedef struct iota_node_conf_s {
   // Probability of replying to a random transaction request, even though your
   // node doesn't have anything to request. Value must be in [0,1]
   double p_reply_random_tip;
-  // Probability of sending a current milestone request to a neighbour. Value
-  // must be in [0,1]
-  double p_select_milestone;
   // Probability of sending a milestone transaction when the node looks for a
   // random transaction to send to a neighbor. Value must be in [0,1]
   double p_send_milestone;

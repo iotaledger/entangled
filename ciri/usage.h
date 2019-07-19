@@ -26,7 +26,6 @@ typedef enum cli_arg_value_e {
   CONF_MWM,
   CONF_NEIGHBORING_ADDRESS,
   CONF_P_REPLY_RANDOM_TIP,
-  CONF_P_SELECT_MILESTONE,
   CONF_P_SEND_MILESTONE,
   CONF_RECENT_SEEN_BYTES_CACHE_SIZE,
   CONF_RECONNECT_ATTEMPT_INTERVAL,
@@ -109,10 +108,6 @@ static struct cli_argument_s {
     {"p-reply-random-tip", CONF_P_REPLY_RANDOM_TIP,
      "Probability of replying to a random transaction request, even though "
      "your node doesn't have anything to request. Value must be in [0,1].",
-     REQUIRED_ARG},
-    {"p-select-milestone", CONF_P_SELECT_MILESTONE,
-     "Probability of sending a current milestone request to a neighbour. "
-     "Value must be in [0,1].",
      REQUIRED_ARG},
     {"p-send-milestone", CONF_P_SEND_MILESTONE,
      "Probability of sending a milestone transaction when the node looks for a "
