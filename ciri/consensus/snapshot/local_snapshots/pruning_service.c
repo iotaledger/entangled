@@ -197,10 +197,11 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
           cleanup);
       ERR_BIND_GOTO(tips_cache_remove(ps->tips_cache, iter->hash), err, cleanup);
       if (tx_pack.num_loaded > 0) {
+        log_warning(logger_id, "transaction was found\n");
         ERR_BIND_GOTO(iota_spent_addresses_service_was_tx_spent_from(sap, tangle, &tx, iter->hash, &spent), err,
                       cleanup);
       } else {
-        log_warning(logger_id, "transaction could not be loaded");
+        log_warning(logger_id, "transaction could not be loaded\n");
       }
     }
   }
@@ -222,7 +223,6 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
   retcode_t err;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
   hash243_set_t transactions_to_prune = NULL;
-  size_t num_pruned_transactions;
   bool has_solid_entry_points;
 
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index + 1, &milestone_pack), err,
@@ -235,16 +235,12 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
   if (!has_solid_entry_points) {
     hash243_set_remove(&transactions_to_prune, milestone.hash);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
-    num_pruned_transactions = hash243_set_size(transactions_to_prune);
     hash243_set_free(&transactions_to_prune);
     // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle
     // transactions
     hash243_set_add(&transactions_to_prune, milestone.hash);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
     ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
-    log_info(logger_id,
-             "Snapshot index % " PRIu64 " was pruned successfully, % " PRIu64 " transactions were removed from db\n",
-             ps->last_pruned_snapshot_index, num_pruned_transactions + 1);
     ps->last_pruned_snapshot_index++;
     hash243_set_free(&transactions_to_prune);
   }
