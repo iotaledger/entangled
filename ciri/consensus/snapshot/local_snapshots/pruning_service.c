@@ -265,6 +265,7 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
   ps->spent_addresses_service = spent_addresses_service;
   ps->tips_cache = tips_cache;
   rw_lock_handle_init(&ps->rw_lock);
+  cond_handle_init(&ps->cond_pruning_service);
 
   ps->solid_entry_points = NULL;
 
