@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 typedef struct pruning_service_s {
-  bool running;
+  volatile bool running;
   thread_handle_t pruning_service_thread;
   cond_handle_t cond_pruning_service;
   iota_consensus_conf_t const *conf;
