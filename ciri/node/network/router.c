@@ -547,9 +547,8 @@ retcode_t router_read_handshake(router_t *const router, char const *const ip, ui
   }
 
   // Check whether we support the supported protocol versions by the neighbor
-  if ((protocol_version = handshake_supported_version(
-           handshake_supported_protocol_versions, sizeof(handshake_supported_protocol_versions),
-           handshake->supported_versions, header_length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
+  if ((protocol_version = handshake_supported_version(handshake->supported_versions,
+                                                      header_length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because of protocol version %d mismatch\n", ip, port,
                 protocol_version);
     return RC_FAILED_HANDSHAKE;
