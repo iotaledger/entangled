@@ -62,6 +62,9 @@ void get_missing_transactions_res_free(get_missing_transactions_res_t** res);
  */
 static inline retcode_t get_missing_transactions_res_hashes_add(get_missing_transactions_res_t* const res,
                                                                 flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_stack_push(&res->hashes, hash);
 }
 

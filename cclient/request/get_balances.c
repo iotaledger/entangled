@@ -14,6 +14,7 @@ get_balances_req_t* get_balances_req_new() {
   if (req) {
     req->addresses = NULL;
     req->tips = NULL;
+    req->threshold = 0;
   }
   return req;
 }

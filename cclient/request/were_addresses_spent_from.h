@@ -56,6 +56,9 @@ void were_addresses_spent_from_req_free(were_addresses_spent_from_req_t** const 
  */
 static inline retcode_t were_addresses_spent_from_req_add(were_addresses_spent_from_req_t* const req,
                                                           flex_trit_t const* const address) {
+  if (!req || !address) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&req->addresses, address);
 }
 
@@ -67,6 +70,9 @@ static inline retcode_t were_addresses_spent_from_req_add(were_addresses_spent_f
  * @return A pointer to an address hash.
  */
 static inline flex_trit_t* were_addresses_spent_from_req_get(were_addresses_spent_from_req_t* const req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
   return hash243_queue_at(req->addresses, index);
 }
 

@@ -89,7 +89,7 @@ get_neighbors_res_t* get_neighbors_res_new();
  *
  * @param[in] res The response object.
  */
-void get_neighbors_res_free(get_neighbors_res_t* res);
+void get_neighbors_res_free(get_neighbors_res_t** res);
 
 /**
  * @brief Gets the number of neighbors in the response.

@@ -11,9 +11,18 @@
 
 retcode_t json_store_transactions_serialize_request(store_transactions_req_t const *const req, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  const char *json_text = NULL;
-
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!req || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
+  if (hash_array_len(req->trytes) == 0) {
+    log_error(json_logger_id, "[%s:%d] The list is empty\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -28,7 +37,7 @@ retcode_t json_store_transactions_serialize_request(store_transactions_req_t con
     return ret;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -40,6 +49,12 @@ retcode_t json_store_transactions_serialize_request(store_transactions_req_t con
 
 retcode_t json_store_transactions_deserialize_request(char const *const obj, store_transactions_req_t *const out) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   if (out->trytes == NULL) {
     return RC_NULL_PARAM;
@@ -47,8 +62,6 @@ retcode_t json_store_transactions_deserialize_request(char const *const obj, sto
 
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_array_to_hash8019_array(json_obj, "trytes", out->trytes);

@@ -30,6 +30,10 @@ void store_transactions_req_free(store_transactions_req_t** const req) {
 }
 
 retcode_t store_transactions_req_trytes_add(store_transactions_req_t* req, flex_trit_t const* const raw_trytes) {
+  if (!req || !raw_trytes) {
+    return RC_NULL_PARAM;
+  }
+
   if (!req->trytes) {
     req->trytes = hash8019_array_new();
   }
@@ -41,6 +45,10 @@ retcode_t store_transactions_req_trytes_add(store_transactions_req_t* req, flex_
 }
 
 flex_trit_t* store_transactions_req_trytes_get(store_transactions_req_t* req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
+
   if (!req->trytes) {
     return NULL;
   }

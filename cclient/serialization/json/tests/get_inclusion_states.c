@@ -15,7 +15,7 @@ void test_get_inclusion_states_serialize_request(void) {
       "\"" TEST_81_TRYTES_1 "\"],\"tips\":[\"" TEST_81_TRYTES_2 "\"]}";
   char const* json_text_no_tips =
       "{\"command\":\"getInclusionStates\",\"transactions\":["
-      "\"" TEST_81_TRYTES_1 "\"]}";
+      "\"" TEST_81_TRYTES_1 "\"],\"tips\":[]}";
 
   get_inclusion_states_req_t* get_is = get_inclusion_states_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
@@ -47,7 +47,7 @@ void test_get_inclusion_states_deserialize_request(void) {
   char const* json_text = "{\"transactions\": [\"" TEST_81_TRYTES_1
                           "\"],"
                           "\"tips\": [\"" TEST_81_TRYTES_2 "\"]}";
-  char const* json_text_no_tips = "{\"transactions\": [\"" TEST_81_TRYTES_1 "\"]}";
+  char const* json_text_no_tips = "{\"transactions\": [\"" TEST_81_TRYTES_1 "\"],\"tips\":[]}";
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t* req_transaction = NULL;
   get_inclusion_states_req_t* deserialize_get_is = get_inclusion_states_req_new();

@@ -22,7 +22,7 @@ void test_get_neighbors_empty(void) {
 
   TEST_ASSERT_EQUAL_INT(get_neighbors_res_num(res), 0);
 
-  get_neighbors_res_free(res);
+  get_neighbors_res_free(&res);
   error_res_free(&error);
 }
 
@@ -55,7 +55,7 @@ void test_get_neighbors(void) {
     TEST_ASSERT_EQUAL_STRING(address, info->address->data);
   }
 
-  get_neighbors_res_free(res);
+  get_neighbors_res_free(&res);
   error_res_free(&error);
 }
 

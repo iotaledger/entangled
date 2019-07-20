@@ -79,7 +79,10 @@ void example_attach_to_tangle(iota_client_service_t *s) {
     goto done;
   }
 
-  hash_array_push(attach_req->trytes, raw_trits);
+  if ((ret = attach_to_tangle_req_trytes_add(attach_req, raw_trits)) != RC_OK) {
+    printf("Adding trytes error: %s\n", error_2_string(ret));
+    goto done;
+  }
 
   if ((ret = iota_client_attach_to_tangle(s, attach_req, attach_res)) == RC_OK) {
     flex_trit_t *array_elt = NULL;
