@@ -31,9 +31,6 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   iota_stor_pack_t approvers_pack;
   hash243_stack_t stack = NULL;
   flex_trit_t *curr_tx_hash = NULL;
-  bool trunk_exist = false;
-  bool branch_exist = false;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
 
   uint64_t start_timestamp, end_timestamp;
 
@@ -62,26 +59,10 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
       while (approvers_pack.num_loaded > 0) {
         curr_tx_hash = ((flex_trit_t *)approvers_pack.models[--approvers_pack.num_loaded]);
 
-        ERR_BIND_GOTO(iota_tangle_transaction_load_partial(tangle, curr_tx_hash, &transaction_pack,
-                                                           PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA),
-                      ret, done)
         ERR_BIND_GOTO(hash243_stack_push(&stack, curr_tx_hash), ret, done);
 
-        if (!transaction_solid(&tx)) {
-          ERR_BIND_GOTO(
-              iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_branch(&tx), &branch_exist),
-              ret, done);
-          if (branch_exist) {
-            ERR_BIND_GOTO(
-                iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_trunk(&tx), &trunk_exist),
-                ret, done);
-          }
-        }
-
         // Add each found approver which has both approvees to the currently traversed tx
-        if (transaction_solid(&tx) || (branch_exist && trunk_exist)) {
-          ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
-        }
+        ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
       }
       continue;
     }
