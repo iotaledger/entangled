@@ -244,25 +244,21 @@ retcode_t update_latest_solid_milestone(milestone_tracker_t* const mt, tangle_t*
     has_snapshot = false;
     is_solid = false;
 
-    if (milestone.index > mt->latest_solid_milestone_index) {
-      if ((ret = iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, tangle,
-                                                                      milestone.hash, true, &is_solid)) != RC_OK) {
-        return ret;
-      }
-      if (!is_solid) {
-        break;
-      }
+    if ((ret = iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, tangle, milestone.hash,
+                                                                    true, &is_solid)) != RC_OK) {
+      return ret;
+    }
+    if (!is_solid) {
+      break;
+    }
 
-      if ((ret = iota_consensus_ledger_validator_update_snapshot(mt->ledger_validator, tangle, &milestone,
-                                                                 &has_snapshot)) != RC_OK) {
-        log_error(logger_id, "Updating snapshot failed\n");
-        return ret;
-      } else if (has_snapshot) {
-        mt->latest_solid_milestone_index = milestone.index;
-        memcpy(mt->latest_solid_milestone, milestone.hash, FLEX_TRIT_SIZE_243);
-      } else {
-        break;
-      }
+    if ((ret = iota_consensus_ledger_validator_update_snapshot(mt->ledger_validator, tangle, &milestone,
+                                                               &has_snapshot)) != RC_OK) {
+      log_error(logger_id, "Updating snapshot failed\n");
+      return ret;
+    } else if (has_snapshot) {
+      mt->latest_solid_milestone_index = milestone.index;
+      memcpy(mt->latest_solid_milestone, milestone.hash, FLEX_TRIT_SIZE_243);
     } else {
       break;
     }
@@ -277,6 +273,7 @@ retcode_t update_latest_solid_milestone(milestone_tracker_t* const mt, tangle_t*
 static void* milestone_solidifier(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   uint64_t previous_solid_latest_milestone_index = 0;
+  lock_handle_t lock_cond;
   tangle_t tangle;
 
   if (mt == NULL) {
@@ -292,22 +289,21 @@ static void* milestone_solidifier(void* arg) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
   while (mt->running) {
     log_debug(logger_id, "Scanning for latest solid milestone\n");
-    previous_solid_latest_milestone_index = mt->latest_solid_milestone_index;
     if (mt->latest_solid_milestone_index < mt->latest_milestone_index) {
+      previous_solid_latest_milestone_index = mt->latest_solid_milestone_index;
       if (update_latest_solid_milestone(mt, &tangle) != RC_OK) {
         log_warning(logger_id, "Updating latest solid milestone failed\n");
       }
-    }
-    if (previous_solid_latest_milestone_index != mt->latest_solid_milestone_index) {
-      log_info(logger_id, "Latest solid milestone has changed from #%" PRIu64 " to #%" PRIu64 "\n",
-               previous_solid_latest_milestone_index, mt->latest_solid_milestone_index);
-      continue;
+      if (previous_solid_latest_milestone_index != mt->latest_solid_milestone_index) {
+        log_info(logger_id, "Latest solid milestone has changed from #%" PRIu64 " to #%" PRIu64 "\n",
+                 previous_solid_latest_milestone_index, mt->latest_solid_milestone_index);
+        continue;
+      }
     }
     cond_handle_timedwait(&mt->cond_solidifier, &lock_cond, SOLID_MILESTONE_RESCAN_INTERVAL_MS);
   }
