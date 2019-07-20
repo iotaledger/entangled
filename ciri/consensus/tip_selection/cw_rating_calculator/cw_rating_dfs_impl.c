@@ -31,20 +31,15 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   iota_stor_pack_t approvers_pack;
   hash243_stack_t stack = NULL;
   flex_trit_t *curr_tx_hash = NULL;
-  hash243_set_t approvees = NULL;
-  hash243_set_entry_t *iter = NULL;
-  hash243_set_entry_t *tmp = NULL;
-  bool both_approvees_exist;
+  bool trunk_exist;
+  bool branch_exist;
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
 
   uint64_t start_timestamp, end_timestamp;
 
   *subtangle_size = 0;
 
   start_timestamp = current_timestamp_ms();
-
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
-
-  *subtangle_size = 0;
 
   ERR_BIND_GOTO(hash_pack_init(&approvers_pack, 10), ret, done);
   ERR_BIND_GOTO(hash243_stack_push(&stack, entry_point), ret, done);
@@ -70,29 +65,23 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
         ERR_BIND_GOTO(iota_tangle_transaction_load_partial(tangle, curr_tx_hash, &transaction_pack,
                                                            PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA),
                       ret, done)
-
         ERR_BIND_GOTO(hash243_stack_push(&stack, curr_tx_hash), ret, done);
-        both_approvees_exist = true;
-        if (!transaction_solid(&tx)) {
-          hash243_set_add(&approvees, transaction_branch(&tx));
-          hash243_set_add(&approvees, transaction_trunk(&tx));
 
-          HASH_SET_ITER(approvees, iter, tmp) {
+        if (!transaction_solid(&tx)) {
+          ERR_BIND_GOTO(
+              iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_branch(&tx), &branch_exist),
+              ret, done);
+          if (branch_exist) {
             ERR_BIND_GOTO(
-                iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, iter->hash, &both_approvees_exist), ret,
-                done);
-            if (!both_approvees_exist) {
-              break;
-            }
+                iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_trunk(&tx), &trunk_exist),
+                ret, done);
           }
         }
 
         // Add each found approver which has both approvees to the currently traversed tx
-        if (both_approvees_exist) {
+        if (transaction_solid(&tx) || (branch_exist && trunk_exist)) {
           ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
         }
-
-        hash243_set_free(&approvees);
       }
       continue;
     }
