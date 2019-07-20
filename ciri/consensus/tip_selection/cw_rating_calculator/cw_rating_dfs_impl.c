@@ -32,7 +32,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   hash243_stack_t stack = NULL;
   flex_trit_t *curr_tx_hash = NULL;
   bool trunk_exist = false;
-  bool branch_exist;
+  bool branch_exist = false;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, transaction_pack);
 
   uint64_t start_timestamp, end_timestamp;
