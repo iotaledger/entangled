@@ -225,9 +225,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       }
       node_conf->neighbors = strdup(value);
       break;
-    case CONF_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
-      ret = get_probability(value, &node_conf->p_reply_random_tip);
-      break;
     case CONF_P_SEND_MILESTONE:  // --p-send-milestone
       ret = get_probability(value, &node_conf->p_send_milestone);
       break;

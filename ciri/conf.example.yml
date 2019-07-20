@@ -16,7 +16,6 @@
 # neighboring-address: "0.0.0.0"
 # neighboring-port: 15600
 # neighbors: "tcp://127.0.0.1:15600"
-# p-reply-random-tip: 0.66
 # p-send-milestone: 0.02
 # recent-seen-bytes-cache-size: 1500
 # reconnect-attempt-interval: 60
