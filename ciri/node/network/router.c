@@ -531,15 +531,6 @@ retcode_t router_read_handshake(router_t *const router, char const *const ip, ui
   }
   handshake = (protocol_handshake_t const *)(buf + HEADER_BYTES_LENGTH);
 
-  // Check whether the socket port corresponds to the port advertised in the handshake packet
-  handshake_port = ntohs(handshake->port);
-  if (port != handshake_port) {
-    log_warning(logger_id,
-                "Failed handshake with tcp://%s:%d because socket port %d doesn't match advertised port %d\n", ip, port,
-                port, handshake_port);
-    return RC_FAILED_HANDSHAKE;
-  }
-
   // Check whether the same coordinator address is used
   if (memcmp(router->node->conf.coordinator_address, handshake->coordinator_address,
              HANDSHAKE_COORDINATOR_ADDRESS_BYTES_LENGTH) != 0) {
@@ -565,6 +556,7 @@ retcode_t router_read_handshake(router_t *const router, char const *const ip, ui
   }
 
   // Check whether the peer is an allowed neighbor
+  handshake_port = ntohs(handshake->port);
   if ((*neighbor = router_neighbor_find_by_endpoint_values(router, ip, handshake_port)) == NULL) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because the peer is a non-tethered neighbor\n", ip, port);
     return RC_FAILED_HANDSHAKE;

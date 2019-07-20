@@ -25,6 +25,9 @@
 extern "C" {
 #endif
 
+#define ATTACH_TO_TANGLE_MAIN_MWM 14
+#define ATTACH_TO_TANGLE_TEST_MWM 9
+
 /**
  * @brief The data structure of the attach to tangle request.
  *
@@ -96,7 +99,10 @@ flex_trit_t* attach_to_tangle_req_trytes_get(attach_to_tangle_req_t* req, size_t
  * @param[in] req The attach to tangle request object.
  * @return The pointer of trunk transaction hash.
  */
-static inline flex_trit_t* attach_to_tangle_req_trunk(attach_to_tangle_req_t* const req) { return req->trunk; }
+static inline flex_trit_t* attach_to_tangle_req_trunk(attach_to_tangle_req_t* const req) {
+  if (!req) return NULL;
+  return req->trunk;
+}
 
 /**
  * @brief Get branch hash from the request object.
@@ -104,7 +110,10 @@ static inline flex_trit_t* attach_to_tangle_req_trunk(attach_to_tangle_req_t* co
  * @param[in] req The attach to tangle request object.
  * @return The pointer of branch transaction hash.
  */
-static inline flex_trit_t* attach_to_tangle_req_branch(attach_to_tangle_req_t* const req) { return req->branch; }
+static inline flex_trit_t* attach_to_tangle_req_branch(attach_to_tangle_req_t* const req) {
+  if (!req) return NULL;
+  return req->branch;
+}
 
 /**
  * @brief Get MWM from the request object.
@@ -112,7 +121,10 @@ static inline flex_trit_t* attach_to_tangle_req_branch(attach_to_tangle_req_t* c
  * @param[in] req The attach to tangle request object.
  * @return The value of MWM.
  */
-static inline uint8_t attach_to_tangle_req_mwm(attach_to_tangle_req_t* const req) { return req->mwm; }
+static inline uint8_t attach_to_tangle_req_mwm(attach_to_tangle_req_t* const req) {
+  if (!req) return 0;
+  return req->mwm;
+}
 
 #ifdef __cplusplus
 }

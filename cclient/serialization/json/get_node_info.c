@@ -27,13 +27,21 @@ static char const *coordinator_address = "coordinatorAddress";
 retcode_t json_get_node_info_serialize_request(char_buffer_t *out) {
   char const *req_text = "{\"command\":\"getNodeInfo\"}";
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  if (!out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
   return char_buffer_set(out, req_text);
 }
 
 retcode_t json_get_node_info_serialize_response(get_node_info_res_t const *const obj, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -75,7 +83,7 @@ retcode_t json_get_node_info_serialize_response(get_node_info_res_t const *const
     goto done;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -88,10 +96,16 @@ done:
 
 retcode_t json_get_node_info_deserialize_response(char const *const obj, get_node_info_res_t *out) {
   retcode_t ret = RC_ERROR;
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_get_string(json_obj, app_name, out->app_name);

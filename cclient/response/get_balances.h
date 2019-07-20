@@ -67,6 +67,9 @@ void get_balances_res_free(get_balances_res_t** res);
  * @return #retcode_t
  */
 static inline retcode_t get_balances_res_reference_add(get_balances_res_t* const res, flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&res->references, hash);
 }
 
@@ -78,6 +81,9 @@ static inline retcode_t get_balances_res_reference_add(get_balances_res_t* const
  * @return A pointer to a reference hash. NULL if index is invalid.
  */
 static inline flex_trit_t* get_balances_res_reference_get(get_balances_res_t* const res, size_t index) {
+  if (!res) {
+    return NULL;
+  }
   return hash243_queue_at(res->references, index);
 }
 

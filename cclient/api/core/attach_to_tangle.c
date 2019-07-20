@@ -18,6 +18,21 @@ retcode_t iota_client_attach_to_tangle(iota_client_service_t const* const servic
   char_buffer_t* req_buff = NULL;
   bundle_transactions_t* bundle = NULL;
 
+  if (!req || !res) {
+    log_error(client_core_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
+  if (!req->trytes) {
+    log_error(client_core_logger_id, "[%s:%d] Empty trytes list.\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
+  if (flex_trits_are_null(req->branch, NUM_FLEX_TRITS_HASH) || flex_trits_are_null(req->trunk, NUM_FLEX_TRITS_HASH)) {
+    log_error(client_core_logger_id, "[%s:%d] Empty branch or trunk hash.\n", __func__, __LINE__);
+    return RC_NULL_PARAM;
+  }
+
   if (service == NULL) {
     log_info(client_core_logger_id, "[%s:%d] local PoW\n", __func__, __LINE__);
     iota_transaction_t tx = {};

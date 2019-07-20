@@ -62,6 +62,9 @@ void get_tips_res_free(get_tips_res_t** res);
  * @return #retcode_t
  */
 static inline retcode_t get_tips_res_hashes_push(get_tips_res_t* res, flex_trit_t const* const hash) {
+  if (!res || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_stack_push(&res->hashes, hash);
 }
 
@@ -70,10 +73,15 @@ static inline retcode_t get_tips_res_hashes_push(get_tips_res_t* res, flex_trit_
  *
  * @param[in] res The response object.
  * @param[in] buf A tip transaction hash.
+ * @return #retcode_t
  */
-static inline void get_tips_res_hashes_pop(get_tips_res_t* res, flex_trit_t* const buf) {
+static inline retcode_t get_tips_res_hashes_pop(get_tips_res_t* res, flex_trit_t* const buf) {
+  if (!res || !buf) {
+    return RC_NULL_PARAM;
+  }
   memcpy(buf, hash243_stack_peek(res->hashes), FLEX_TRIT_SIZE_243);
   hash243_stack_pop(&res->hashes);
+  return RC_OK;
 }
 
 #ifdef __cplusplus

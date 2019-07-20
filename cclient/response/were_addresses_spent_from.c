@@ -17,9 +17,14 @@ were_addresses_spent_from_res_t* were_addresses_spent_from_res_new() {
 }
 
 retcode_t were_addresses_spent_from_res_states_add(were_addresses_spent_from_res_t* res, int state) {
+  if (!res) {
+    return RC_NULL_PARAM;
+  }
+
   if (!res->states) {
     utarray_new(res->states, &ut_int_icd);
   }
+
   if (!res->states) {
     return RC_OOM;
   }
@@ -28,6 +33,10 @@ retcode_t were_addresses_spent_from_res_states_add(were_addresses_spent_from_res
 }
 
 bool were_addresses_spent_from_res_states_at(were_addresses_spent_from_res_t* in, size_t index) {
+  if (!in) {
+    return false;
+  }
+
   int* b = (int*)utarray_eltptr(in->states, index);
   if (b != NULL) {
     return (*b > 0) ? true : false;
@@ -36,6 +45,10 @@ bool were_addresses_spent_from_res_states_at(were_addresses_spent_from_res_t* in
 }
 
 size_t were_addresses_spent_from_res_states_count(were_addresses_spent_from_res_t* in) {
+  if (!in) {
+    return 0;
+  }
+
   if (in->states == NULL) {
     return 0;
   }
@@ -43,11 +56,13 @@ size_t were_addresses_spent_from_res_states_count(were_addresses_spent_from_res_
 }
 
 void were_addresses_spent_from_res_free(were_addresses_spent_from_res_t** res) {
-  if (*res) {
-    if ((*res)->states) {
-      utarray_free((*res)->states);
-    }
-    free(*res);
-    *res = NULL;
+  if (!res || !(*res)) {
+    return;
   }
+
+  if ((*res)->states) {
+    utarray_free((*res)->states);
+  }
+  free(*res);
+  *res = NULL;
 }

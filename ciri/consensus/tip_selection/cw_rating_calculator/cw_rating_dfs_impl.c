@@ -13,6 +13,7 @@
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "cw_rating_calculator"
 
@@ -30,8 +31,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   iota_stor_pack_t pack;
   hash243_stack_t stack = NULL;
   flex_trit_t *curr_tx_hash = NULL;
+  uint64_t start_timestamp, end_timestamp;
 
   *subtangle_size = 0;
+
+  start_timestamp = current_timestamp_ms();
 
   if ((ret = hash_pack_init(&pack, 10)) != RC_OK) {
     goto done;
@@ -74,6 +78,9 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
 done:
   hash_pack_free(&pack);
   hash243_stack_free(&stack);
+
+  end_timestamp = current_timestamp_ms();
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
@@ -137,6 +144,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   uint64_t sub_tangle_size = 0;
   uint64_t max_subtangle_size = 0;
   uint64_t bitset_size = 0;
+  uint64_t start_timestamp, end_timestamp;
   UNUSED(cw_calc);
 
   out->cw_ratings = NULL;
@@ -145,6 +153,8 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   if (!entry_point) {
     return RC_NULL_PARAM;
   }
+
+  start_timestamp = current_timestamp_ms();
 
   if ((ret = cw_rating_dfs_do_dfs_from_db(tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size, 0)) !=
       RC_OK) {
@@ -189,6 +199,9 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
       }
     }
   }
+
+  end_timestamp = current_timestamp_ms();
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }

@@ -29,7 +29,7 @@ typedef struct logger_t logger_t;
 #define log_alert(id, ...) logger_helper_print(id, LOGGER_ALERT, __VA_ARGS__)
 #define log_emergency(id, ...) logger_helper_print(id, LOGGER_EMERG, __VA_ARGS__)
 
-retcode_t logger_helper_init();
+retcode_t logger_helper_init(logger_level_t level);
 retcode_t logger_helper_destroy();
 logger_id_t logger_helper_enable(char const* const logger_name, logger_level_t const level, bool const enable_color);
 void logger_helper_release(logger_id_t const logger_id);
