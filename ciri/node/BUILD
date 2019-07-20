@@ -68,7 +68,6 @@ cc_library(
         "//ciri/node/pipeline:responder_shared",
         "//ciri/node/pipeline:tips_requester_shared",
         "//ciri/node/pipeline:transaction_requester_shared",
-        "//ciri/node/pipeline:transaction_requester_worker_shared",
     ],
 )
 
@@ -84,6 +83,5 @@ cc_library(
         "//ciri/node/pipeline:responder",
         "//ciri/node/pipeline:tips_requester",
         "//ciri/node/pipeline:transaction_requester",
-        "//ciri/node/pipeline:transaction_requester_worker",
     ],
 )
