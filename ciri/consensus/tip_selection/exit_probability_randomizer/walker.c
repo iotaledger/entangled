@@ -108,7 +108,7 @@ static retcode_t random_walker_select_approver_tail(ep_randomizer_t const *const
   }
 
   if (!has_approver_tail) {
-    log_info(logger_id, "Selected tip has no solid direct approvers\n");
+    log_debug(logger_id, "Selected hash has no solid direct approvers and is actually not a tip\n");
   }
 
   return ret;
