@@ -129,12 +129,15 @@ static void *pruning_service_routine(void *arg) {
   if (milestone_pack.num_loaded > 0) {
     ps->last_pruned_snapshot_index =
         MIN(MAX(0LL, (int64_t)milestone.index - 1LL), (int64_t)ps->last_pruned_snapshot_index);
+    printf("%s, last_pruned_snapshot_index = %d\n", __FUNCTION__, ps->last_pruned_snapshot_index);
+  } else {
+    printf("%s, No milestone loaded, last_pruned_snapshot_index = %d\n", __FUNCTION__, ps->last_pruned_snapshot_index);
   }
 
   while (ps->running) {
-    printf("%s, Blocking on conditional", __FUNCTION__);
+    printf("%s, Blocking on conditional\n", __FUNCTION__);
     cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
-    printf("%s was signaled", __FUNCTION__);
+    printf("%s was signaled\n", __FUNCTION__);
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
