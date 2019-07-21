@@ -220,7 +220,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       if (strlen(value) == 0) {
         return RC_CONF_INVALID_ARGUMENT;
       }
-      node_conf->neighbors = strdup(value);
+      node_conf->neighbors = value;
       break;
     case CONF_P_REMOVE_REQUEST:  // --p-remove-request
       ret = get_probability(value, &node_conf->p_remove_request);
@@ -245,9 +245,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
       node_conf->tips_cache_size = atoi(value);
-      break;
-    case CONF_TIPS_SOLIDIFIER_ENABLED:  // --tips-solidifier-enabled
-      ret = get_true_false(value, &node_conf->tips_solidifier_enabled);
       break;
 
     // API configuration

@@ -132,13 +132,13 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(exit_prob_trans
 retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_transaction_validator_t *const epv,
                                                                   tangle_t *const tangle,
                                                                   flex_trit_t const *const tail_hash,
-                                                                  bool *const is_valid) {
+                                                                  bool *const is_valid, bool error_when_not_valid) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
   bool below_max_depth = false;
-  uint32_t lowest_allowed_index = epv->mt->latest_solid_subtangle_milestone_index < epv->conf->max_depth
-                                      ? epv->mt->latest_solid_subtangle_milestone_index
-                                      : epv->mt->latest_solid_subtangle_milestone_index - epv->conf->max_depth;
+  uint32_t lowest_allowed_index = epv->mt->latest_solid_milestone_index < epv->conf->max_depth
+                                      ? epv->mt->latest_solid_milestone_index
+                                      : epv->mt->latest_solid_milestone_index - epv->conf->max_depth;
 
   uint64_t start_timestamp, end_timestamp;
   start_timestamp = current_timestamp_ms();
@@ -151,17 +151,25 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
   }
 
   if (tx_pack.num_loaded == 0) {
-    log_error(logger_id, "Validation failed, transaction is missing in db\n");
+    if (error_when_not_valid) {
+      log_error(logger_id, "Validation failed, transaction is missing in db\n");
+    }
     return RC_OK;
   }
 
   if (transaction_current_index(&tx) != 0) {
-    log_error(logger_id, "Validation failed, transaction is not a tail\n");
+    if (error_when_not_valid) {
+      log_error(logger_id, "Validation failed, transaction is not a tail\n");
+    }
+
     return RC_OK;
   }
 
   if (!transaction_solid(&tx)) {
-    log_error(logger_id, "Validation failed, transaction is not solid\n");
+    if (error_when_not_valid) {
+      log_error(logger_id, "Validation failed, transaction is not solid\n");
+    }
+
     return RC_OK;
   }
 
@@ -171,7 +179,10 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
   }
 
   if (below_max_depth) {
-    log_error(logger_id, "Validation failed, tail is below max depth\n");
+    if (error_when_not_valid) {
+      log_error(logger_id, "Validation failed, tail is below max depth\n");
+    }
+
     return RC_OK;
   }
 
@@ -181,7 +192,10 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_tran
   }
 
   if (!*is_valid) {
-    log_error(logger_id, "Validation failed, tail is inconsistent\n");
+    if (error_when_not_valid) {
+      log_error(logger_id, "Validation failed, tail is inconsistent\n");
+    }
+
     return RC_OK;
   }
 

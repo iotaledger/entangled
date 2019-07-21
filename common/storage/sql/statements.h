@@ -38,6 +38,7 @@ typedef struct tangle_statements_s {
   void* milestone_select_by_hash;
   void* milestone_select_last;
   void* milestone_select_by_index;
+  void* milestone_select_next;
   void* milestone_exist;
   void* milestone_exist_by_hash;
   void* state_delta_store;
@@ -100,6 +101,7 @@ extern char* iota_statement_milestone_insert;
 extern char* iota_statement_milestone_select_by_hash;
 extern char* iota_statement_milestone_select_last;
 extern char* iota_statement_milestone_select_by_index;
+extern char* iota_statement_milestone_select_next;
 extern char* iota_statement_milestone_exist;
 extern char* iota_statement_milestone_exist_by_hash;
 

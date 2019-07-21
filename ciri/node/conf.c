@@ -24,7 +24,6 @@ retcode_t iota_node_conf_init(iota_node_conf_t* const conf) {
   conf->recent_seen_bytes_cache_size = DEFAULT_RECENT_SEEN_BYTES_CACHE_SIZE;
   conf->requester_queue_size = DEFAULT_REQUESTER_QUEUE_SIZE;
   conf->tips_cache_size = DEFAULT_TIPS_CACHE_SIZE;
-  conf->tips_solidifier_enabled = DEFAULT_TIPS_SOLIDIFIER_ENABLED;
   flex_trits_from_trytes(coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
   flex_trits_to_bytes(conf->coordinator_address, HASH_LENGTH_TRIT, coordinator_address, HASH_LENGTH_TRIT,
