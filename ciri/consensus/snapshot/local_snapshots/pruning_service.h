@@ -88,8 +88,8 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
  *
  * @return void
  */
-void iota_local_snapshots_pruning_service_update_current_solid_entry_points(pruning_service_t *const ps,
-                                                                            snapshot_t *const snapshot);
+void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
+                                                                  snapshot_t *const snapshot);
 
 #ifdef __cplusplus
 }

@@ -132,7 +132,9 @@ static void *pruning_service_routine(void *arg) {
   }
 
   while (ps->running) {
+    printf("%s, Blocking on conditional", __FUNCTION__);
     cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
+    printf("%s was signaled", __FUNCTION__);
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
@@ -236,15 +238,20 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
       err, cleanup);
 
   if (!has_solid_entry_points) {
+    printf("%s has no solid entry points", __FUNCTION__);
     hash243_set_remove(&transactions_to_prune, milestone.hash);
+    printf("%s delete transactions", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
     hash243_set_free(&transactions_to_prune);
     // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle
     // transactions
     hash243_set_add(&transactions_to_prune, milestone.hash);
+    printf("%s delete milestone transaction", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
+    printf("%s delete milestone", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
     ps->last_pruned_snapshot_index++;
+    printf("%s pruned was successful", __FUNCTION__);
     hash243_set_free(&transactions_to_prune);
   } else {
     *should_wait_for_next_snapshot = true;
@@ -334,8 +341,8 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
   return ret;
 }
 
-void iota_local_snapshots_pruning_service_update_current_solid_entry_points(pruning_service_t *const ps,
-                                                                            snapshot_t *const snapshot) {
+void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
+                                                                  snapshot_t *const snapshot) {
   rw_lock_handle_wrlock(&ps->rw_lock);
   ps->last_snapshot_index_to_prune = snapshot->metadata.index;
   rw_lock_handle_unlock(&ps->rw_lock);
