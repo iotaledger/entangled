@@ -195,13 +195,13 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
   HASH_ITER(hh, ps->solid_entry_points, iter, tmp) {
     memcpy(to_remove, iter->hash, FLEX_TRIT_SIZE_243);
     to_remove[FLEX_TRIT_SIZE_243] = '\0';
-    printf("%s, Hash of SEP is: %s\n", to_remove);
+    printf("Hash of SEP is: %s\n", to_remove);
   }
 
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
     memcpy(to_remove, iter->hash, FLEX_TRIT_SIZE_243);
     to_remove[FLEX_TRIT_SIZE_243] = '\0';
-    printf("%s, Hash of tx to prune is: %s\n", to_remove);
+    printf("Hash of tx to prune is: %s\n", to_remove);
     if (hash243_set_contains(ps->solid_entry_points, iter->hash)) {
       printf("%s Found a SEP\n", __FUNCTION__);
       *has_solid_entry_points = true;
