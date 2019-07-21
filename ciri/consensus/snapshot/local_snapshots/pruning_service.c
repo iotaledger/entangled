@@ -129,15 +129,10 @@ static void *pruning_service_routine(void *arg) {
   if (milestone_pack.num_loaded > 0) {
     ps->last_pruned_snapshot_index =
         MIN(MAX(0LL, (int64_t)milestone.index - 1LL), (int64_t)ps->last_pruned_snapshot_index);
-    printf("%s, last_pruned_snapshot_index = %d\n", __FUNCTION__, ps->last_pruned_snapshot_index);
-  } else {
-    printf("%s, No milestone loaded, last_pruned_snapshot_index = %d\n", __FUNCTION__, ps->last_pruned_snapshot_index);
   }
 
   while (ps->running) {
-    printf("%s, Blocking on conditional\n", __FUNCTION__);
     cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
-    printf("%s was signaled\n", __FUNCTION__);
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
@@ -184,7 +179,6 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
   *has_solid_entry_points = false;
   hash243_set_entry_t *iter = NULL, *tmp = NULL;
   bool spent;
-  char to_remove[FLEX_TRIT_SIZE_243 + 1];
 
   params.current_snapshot_index = ps->last_pruned_snapshot_index + 1;
 
@@ -192,18 +186,10 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
                                              ps->conf->genesis_hash, transactions_to_prune, &params),
                 err, cleanup);
 
-  HASH_ITER(hh, ps->solid_entry_points, iter, tmp) {
-    memcpy(to_remove, iter->hash, FLEX_TRIT_SIZE_243);
-    to_remove[FLEX_TRIT_SIZE_243] = '\0';
-    printf("Hash of SEP is: %s\n", to_remove);
-  }
+  ERR_BIND_GOTO(hash243_set_remove(params.transactions_to_prune, ps->conf->genesis_hash), err, cleanup);
 
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
-    memcpy(to_remove, iter->hash, FLEX_TRIT_SIZE_243);
-    to_remove[FLEX_TRIT_SIZE_243] = '\0';
-    printf("Hash of tx to prune is: %s\n", to_remove);
     if (hash243_set_contains(ps->solid_entry_points, iter->hash)) {
-      printf("%s Found a SEP\n", __FUNCTION__);
       *has_solid_entry_points = true;
       break;
     }
@@ -244,30 +230,23 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
 
   *should_wait_for_next_snapshot = false;
 
-  printf("%s loading milestone\n", __FUNCTION__);
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index + 1, &milestone_pack), err,
                 cleanup);
 
-  printf("%s collecting for milestone %d\n", __FUNCTION__, ps->last_pruned_snapshot_index + 1);
   ERR_BIND_GOTO(
       collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune, &has_solid_entry_points),
       err, cleanup);
 
   if (!has_solid_entry_points) {
-    printf("%s has no solid entry points\n", __FUNCTION__);
     hash243_set_remove(&transactions_to_prune, milestone.hash);
-    printf("%s delete transactions\n", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
     hash243_set_free(&transactions_to_prune);
     // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle
     // transactions
     hash243_set_add(&transactions_to_prune, milestone.hash);
-    printf("%s delete milestone transaction\n", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
-    printf("%s delete milestone\n", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
     ps->last_pruned_snapshot_index++;
-    printf("%s pruned was successful\n", __FUNCTION__);
   } else {
     *should_wait_for_next_snapshot = true;
   }
@@ -365,8 +344,6 @@ void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_servic
 
   hash243_set_free(&ps->solid_entry_points);
   iota_snapshot_solid_entry_points_set(snapshot, &ps->solid_entry_points);
-  printf("%s, num of SEPs = %d\n", __FUNCTION__,
-         ps->solid_entry_points == NULL ? 0 : hash243_set_size(ps->solid_entry_points));
   cond_handle_signal(&ps->cond_pruning_service);
 }
 
