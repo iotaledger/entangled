@@ -230,30 +230,30 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
 
   *should_wait_for_next_snapshot = false;
 
-  printf("%s loading milestone", __FUNCTION__);
+  printf("%s loading milestone\n", __FUNCTION__);
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index + 1, &milestone_pack), err,
                 cleanup);
 
-  printf("%s collecting transactions", __FUNCTION__);
+  printf("%s collecting \n", __FUNCTION__);
   ERR_BIND_GOTO(
       collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune, &has_solid_entry_points),
       err, cleanup);
 
   if (!has_solid_entry_points) {
-    printf("%s has no solid entry points", __FUNCTION__);
+    printf("%s has no solid entry points\n", __FUNCTION__);
     hash243_set_remove(&transactions_to_prune, milestone.hash);
-    printf("%s delete transactions", __FUNCTION__);
+    printf("%s delete transactions\n", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
     hash243_set_free(&transactions_to_prune);
     // It's important to delete the milestone only after all it's past cone has been deleted to avoid dangle
     // transactions
     hash243_set_add(&transactions_to_prune, milestone.hash);
-    printf("%s delete milestone transaction", __FUNCTION__);
+    printf("%s delete milestone transaction\n", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_transactions_delete(tangle, transactions_to_prune), err, cleanup);
-    printf("%s delete milestone", __FUNCTION__);
+    printf("%s delete milestone\n", __FUNCTION__);
     ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
     ps->last_pruned_snapshot_index++;
-    printf("%s pruned was successful", __FUNCTION__);
+    printf("%s pruned was successful\n", __FUNCTION__);
     hash243_set_free(&transactions_to_prune);
   } else {
     *should_wait_for_next_snapshot = true;
