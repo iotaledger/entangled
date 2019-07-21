@@ -106,6 +106,11 @@ static retcode_t random_walker_select_approver_tail(ep_randomizer_t const *const
       hash243_set_remove(&approvers_entry->approvers, approver);
     }
   }
+
+  if (!has_approver_tail) {
+    log_info(logger_id, "Selected tip has no solid direct approvers\n");
+  }
+
   return ret;
 }
 
