@@ -9,8 +9,6 @@
 
 #include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
-#include "ciri/node/protocol/gossip.h"
-#include "ciri/node/protocol/type.h"
 #include "common/network/uri.h"
 #include "utils/handles/rand.h"
 
@@ -106,7 +104,7 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
     return RC_OOM;
   }
 
-  header.type = GOSSIP;
+  header.type = PROTOCOL_GOSSIP;
   header.length = htons(buffer_size);
 
   memcpy(buffer + offset, &header, HEADER_BYTES_LENGTH);

@@ -12,7 +12,7 @@
 #include "uv.h"
 
 #include "ciri/node/network/neighbor.h"
-#include "ciri/node/protocol/type.h"
+#include "ciri/node/protocol/protocol.h"
 #include "common/errors.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
@@ -163,7 +163,7 @@ retcode_t router_read(router_t *const router, neighbor_t *const neighbor, void c
  *
  * @return a status code
  */
-retcode_t router_write(uv_stream_t *const stream, packet_type_t const type, void *const buffer,
+retcode_t router_write(uv_stream_t *const stream, protocol_packet_type_t const type, void *const buffer,
                        uint16_t const buffer_size);
 
 /**
