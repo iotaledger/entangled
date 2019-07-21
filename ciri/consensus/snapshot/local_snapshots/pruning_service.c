@@ -152,6 +152,7 @@ static void *pruning_service_routine(void *arg) {
 
 cleanup:
 
+  log_info(logger_id, "Exiting %s\n", __FUNCTION__);
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
 
