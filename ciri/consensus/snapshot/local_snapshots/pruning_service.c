@@ -355,7 +355,8 @@ void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_servic
 
   hash243_set_free(&ps->solid_entry_points);
   iota_snapshot_solid_entry_points_set(snapshot, &ps->solid_entry_points);
-  printf("%s, num of SEPs = %d\n", ps->solid_entry_points == NULL ? 0 : hash243_set_size(ps->solid_entry_points));
+  printf("%s, num of SEPs = %d\n", __FUNCTION__,
+         ps->solid_entry_points == NULL ? 0 : hash243_set_size(ps->solid_entry_points));
   cond_handle_signal(&ps->cond_pruning_service);
 }
 

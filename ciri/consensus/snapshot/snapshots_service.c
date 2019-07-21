@@ -399,10 +399,10 @@ retcode_t iota_snapshots_service_update_solid_entry_points(snapshots_service_t *
       hash_to_uint64_t_map_add(&solid_entry_points, snapshots_service->conf->genesis_hash, target_milestone->index),
       ret, cleanup);
 
-  // ERR_BIND_GOTO(iota_snapshots_service_update_old_solid_entry_points(
-  //                snapshots_service, &snapshots_service->snapshots_provider->inital_snapshot, target_milestone,
-  //              tangle, &solid_entry_points),
-  //        ret, cleanup);
+  ERR_BIND_GOTO(iota_snapshots_service_update_old_solid_entry_points(
+                    snapshots_service, &snapshots_service->snapshots_provider->inital_snapshot, target_milestone,
+                    tangle, &solid_entry_points),
+                ret, cleanup);
   ERR_BIND_GOTO(iota_snapshots_service_collect_new_solid_entry_points(
                     snapshots_service, &snapshots_service->snapshots_provider->inital_snapshot, target_milestone,
                     tangle, &solid_entry_points),
