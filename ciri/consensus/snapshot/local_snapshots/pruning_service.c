@@ -97,7 +97,7 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
 static void *pruning_service_routine(void *arg) {
   pruning_service_t *ps = (pruning_service_t *)arg;
   tangle_t tangle;
-  uint64_t start_timestamp, end_timestamp, progress_start_timestamp;
+  uint64_t start_timestamp, end_timestamp;
   uint64_t start_index;
   spent_addresses_provider_t sap;
   bool should_wait_for_next_snapshot;
@@ -134,6 +134,7 @@ static void *pruning_service_routine(void *arg) {
   while (ps->running) {
     cond_handle_wait(&ps->cond_pruning_service, &lock_cond);
     start_index = ps->last_pruned_snapshot_index;
+    start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
       if (ps->last_pruned_snapshot_index > start_index && (ps->last_pruned_snapshot_index % 10) == 0) {
         log_info(logger_id, "Last pruned snapshot index % " PRIu64 "\n", ps->last_pruned_snapshot_index);
