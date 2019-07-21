@@ -152,6 +152,9 @@ retcode_t iota_consensus_random_walker_randomize(ep_randomizer_t const *const ex
     }
   } while (has_approver_tail);
 
+  if (memcmp(curr_tail_hash, ep, FLEX_TRIT_SIZE_243) == 0) {
+    log_error(logger_id, "Selected tip is the entry point of the random walk\n");
+  }
   memcpy(tip, curr_tail_hash, FLEX_TRIT_SIZE_243);
   log_debug(logger_id, "Number of tails traversed to find tip: %" PRIu64 "\n", num_traversed_tails);
 
