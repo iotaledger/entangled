@@ -300,7 +300,8 @@ static void* milestone_solidifier(void* arg) {
         log_warning(logger_id, "Updating latest solid milestone failed\n");
       }
       if (previous_solid_latest_milestone_index != mt->latest_solid_milestone_index) {
-        log_info(logger_id, "Latest solid milestone has changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining)\n",
+        log_info(logger_id,
+                 "Latest solid milestone has changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
                  previous_solid_latest_milestone_index, mt->latest_solid_milestone_index,
                  mt->latest_milestone_index - mt->latest_solid_milestone_index);
         continue;
