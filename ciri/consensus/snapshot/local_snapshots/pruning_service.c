@@ -136,6 +136,10 @@ static void *pruning_service_routine(void *arg) {
     start_index = ps->last_pruned_snapshot_index;
     start_timestamp = current_timestamp_ms();
     while ((ps->last_pruned_snapshot_index < get_last_snapshot_to_prune_index(ps)) && ps->running) {
+      if (ps->last_pruned_snapshot_index > start_index && (ps->last_pruned_snapshot_index % 10) == 0) {
+        log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
+                 ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
+      }
       if (prune_transactions(ps, &tangle, &sap, &should_wait_for_next_snapshot) != RC_OK) {
         goto cleanup;
       }
