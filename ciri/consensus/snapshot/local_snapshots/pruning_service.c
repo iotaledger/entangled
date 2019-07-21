@@ -193,7 +193,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
 
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
     if (hash243_set_contains(ps->solid_entry_points, iter->hash)) {
-      printf("%s Found a SEP\n");
+      printf("%s Found a SEP\n", __FUNCTION__);
       *has_solid_entry_points = true;
       break;
     }
