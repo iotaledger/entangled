@@ -193,6 +193,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
 
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
     if (hash243_set_contains(ps->solid_entry_points, iter->hash)) {
+      printf("%s Found a SEP\n");
       *has_solid_entry_points = true;
       break;
     }
@@ -354,6 +355,7 @@ void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_servic
 
   hash243_set_free(&ps->solid_entry_points);
   iota_snapshot_solid_entry_points_set(snapshot, &ps->solid_entry_points);
+  printf("%s, num of SEPs = %d\n", hash243_set_size(ps->solid_entry_points));
   cond_handle_signal(&ps->cond_pruning_service);
 }
 
