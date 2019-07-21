@@ -184,6 +184,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
   *has_solid_entry_points = false;
   hash243_set_entry_t *iter = NULL, *tmp = NULL;
   bool spent;
+  char to_remove[FLEX_TRIT_SIZE_243 + 1];
 
   params.current_snapshot_index = ps->last_pruned_snapshot_index + 1;
 
@@ -191,7 +192,16 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
                                              ps->conf->genesis_hash, transactions_to_prune, &params),
                 err, cleanup);
 
+  HASH_ITER(hh, ps->solid_entry_points, iter, tmp) {
+    memcpy(to_remove, iter->hash, FLEX_TRIT_SIZE_243);
+    to_remove[FLEX_TRIT_SIZE_243] = '\0';
+    printf("%s, Hash of SEP is: %s\n", to_remove);
+  }
+
   HASH_ITER(hh, *params.transactions_to_prune, iter, tmp) {
+    memcpy(to_remove, iter->hash, FLEX_TRIT_SIZE_243);
+    to_remove[FLEX_TRIT_SIZE_243] = '\0';
+    printf("%s, Hash of tx to prune is: %s\n", to_remove);
     if (hash243_set_contains(ps->solid_entry_points, iter->hash)) {
       printf("%s Found a SEP\n", __FUNCTION__);
       *has_solid_entry_points = true;
