@@ -102,7 +102,6 @@ Long option | Short option | Description | Example input
 `--reconnect-attempt-interval` | | The interval (in seconds) at which to reconnect to neighbors. | `--reconnect-attempt-interval 60`
 `--requester-queue-size` | | Size of the transaction requester queue. | `--requester-queue-size 10000`
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
-`--tips-solidifier-enabled` | | Scan the current tips and attempt to mark them as solid. | `--tips-solidifier-enabled true`
 `--http-port` | `-p` | HTTP API listen port. | `--http-port 14265`
 `--max-find-transactions` | | The maximal number of transactions that may be returned by the 'findTransactions' API call. If the number of transactions found exceeds this number an error will be returned | `--max-find-transactions 100000`
 `--max-get-trytes` | | Maximum number of transactions that will be returned by the 'getTrytes' API call. | `--max-get-trytes 10000`
