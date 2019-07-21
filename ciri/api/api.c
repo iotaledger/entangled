@@ -183,7 +183,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
            &walker_validator)) == RC_OK) {
     CDL_FOREACH(req->tails, iter) {
       if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(&walker_validator, tangle, iter->hash,
-                                                                         &res->state)) != RC_OK) {
+                                                                         &res->state, true)) != RC_OK) {
         break;
       }
       if (!res->state) {

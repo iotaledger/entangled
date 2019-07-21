@@ -67,7 +67,7 @@ static retcode_t find_tail_if_valid(tangle_t *const tangle, exit_prob_transactio
     return ret;
   }
   if (*has_valid_tail) {
-    ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv, tangle, tx_hash, has_valid_tail);
+    ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv, tangle, tx_hash, has_valid_tail, false);
     if (ret != RC_OK) {
       log_error(logger_id, "Tail transaction validation failed: %" PRIu64 "\n", ret);
       return ret;
@@ -132,7 +132,7 @@ retcode_t iota_consensus_random_walker_randomize(ep_randomizer_t const *const ex
   uint64_t start_timestamp, end_timestamp;
   start_timestamp = current_timestamp_ms();
 
-  if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(ep_validator, tangle, ep, &ep_is_valid)) !=
+  if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(ep_validator, tangle, ep, &ep_is_valid, true)) !=
       RC_OK) {
     log_error(logger_id, "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;

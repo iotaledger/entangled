@@ -30,7 +30,8 @@ extern "C" {
    (HANDSHAKE_MWM_BYTES_LENGTH) + (HANDSHAKE_SUPPORTED_VERSIONS_MAX_BYTES_LENGTH))
 
 #define HANDSHAKE_PROTOCOL_VERSION = 1
-static uint8_t handshake_supported_protocol_versions[] = {0b00000001};
+#define HANDSHAKE_SUPPORTED_VERSIONS \
+  { 0b00000001 }
 
 typedef enum protocol_handshake_state_e {
   HANDSHAKE_INIT,
@@ -72,15 +73,12 @@ void handshake_init(protocol_handshake_t* const handshake, uint16_t const port, 
  * Returns the highest supported protocol version by the neighbor or a negative number indicating the highest
  * protocol version the neighbor would have supported but which our node doesn't.
  *
- * @param[in] own_supported_versions        The versions our own node supports
- * @param[in] own_supported_versions_length The length of the versions our own node supports
  * @param[in] supported_versions            The versions the neighbor supports
  * @param[in] supported_versions_length     The length of the versions the neighbor supports
  *
  * @return the highest supported protocol version
  */
-int handshake_supported_version(uint8_t const* const own_supported_versions, size_t const own_supported_versions_length,
-                                uint8_t const* const supported_versions, size_t const supported_versions_length);
+int handshake_supported_version(uint8_t const* const supported_versions, size_t const supported_versions_length);
 
 #ifdef __cplusplus
 }

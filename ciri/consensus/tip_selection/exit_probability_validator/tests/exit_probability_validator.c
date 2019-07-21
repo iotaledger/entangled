@@ -83,7 +83,7 @@ void test_transaction_does_not_exist() {
   iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(test_tx),
-                                                                      &is_valid) == RC_OK);
+                                                                      &is_valid, true) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   destroy_epv(&epv);
@@ -110,8 +110,8 @@ void test_transaction_not_a_tail() {
 
   TEST_ASSERT(exist == true);
 
-  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(tx3),
-                                                                      &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(tx3), &is_valid,
+                                                                      true) == RC_OK);
   TEST_ASSERT(!is_valid);
   transaction_free(tx3);
   destroy_epv(&epv);
@@ -136,8 +136,8 @@ void test_transaction_invalid_delta() {
 
   TEST_ASSERT(exist == true);
 
-  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(tx1),
-                                                                      &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(tx1), &is_valid,
+                                                                      true) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   transaction_free(tx1);
@@ -165,7 +165,7 @@ void test_transaction_below_max_depth() {
   TEST_ASSERT(exist == true);
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(txs[0]),
-                                                                      &is_valid) == RC_OK);
+                                                                      &is_valid, true) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   transactions_free(txs, 2);
@@ -196,7 +196,7 @@ void test_transaction_exceed_max_transactions() {
   TEST_ASSERT(exist == true);
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(txs[0]),
-                                                                      &is_valid) == RC_OK);
+                                                                      &is_valid, true) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   transactions_free(txs, 2);
@@ -228,7 +228,7 @@ void test_transaction_valid() {
 
   epv.mt->latest_solid_milestone_index = max_depth;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(&epv, &tangle, transaction_hash(txs[0]),
-                                                                      &is_valid) == RC_OK);
+                                                                      &is_valid, true) == RC_OK);
   TEST_ASSERT(is_valid);
   epv.mt->latest_solid_milestone_index = 0;
   transactions_free(txs, 2);

@@ -128,8 +128,10 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
     txs[i].consensus.hash[i / 256] += (i + 1);
     if (topology == ONLY_DIRECT_APPROVERS) {
       transaction_set_branch(&txs[i], transaction_branch(&txs[i - 1]));
+      transaction_set_trunk(&txs[i], transaction_trunk(&txs[i - 1]));
     } else if (topology == BLOCKCHAIN) {
       transaction_set_branch(&txs[i], transaction_hash(&txs[i - 1]));
+      transaction_set_trunk(&txs[i], transaction_hash(&txs[i - 1]));
     }
   }
 
