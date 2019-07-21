@@ -24,7 +24,6 @@
 # reconnect-attempt-interval: 60
 # requester-queue-size: 10000
 # tips-cache-size: 5000
-# tips-solidifier-enabled: true
 
 # API configuration
 

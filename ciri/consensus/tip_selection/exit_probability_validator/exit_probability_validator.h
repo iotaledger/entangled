@@ -47,7 +47,8 @@ extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(exit_pro
 extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_transaction_validator_t *const epv,
                                                                          tangle_t *const tangle,
                                                                          flex_trit_t const *const tail_hash,
-                                                                         bool *const is_valid);
+                                                                         bool *const is_valid,
+                                                                         bool error_when_not_valid);
 
 #ifdef __cplusplus
 }

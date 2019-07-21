@@ -53,7 +53,7 @@ static void *local_snapshots_manager_routine(void *arg) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
         }
-        log_info(logger_id, "Local snapshot from % " PRId64 " to % " PRId64 " took % " PRId64 " milliseconds\n",
+        log_info(logger_id, "Local snapshot from %" PRId64 " to %" PRId64 " took %" PRId64 " milliseconds\n",
                  prev_initial_index, lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index,
                  end_timestamp - start_timestamp);
       } else {

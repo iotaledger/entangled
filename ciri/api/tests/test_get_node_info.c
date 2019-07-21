@@ -72,7 +72,7 @@ int main(void) {
   config.db_path = test_db_path;
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK);
   api.core->consensus.milestone_tracker.latest_milestone_index = LATEST_MILESTONE_INDEX;
-  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index = LATEST_SOLID_MILESTONE_INDEX;
+  api.core->consensus.milestone_tracker.latest_solid_milestone_index = LATEST_SOLID_MILESTONE_INDEX;
   api.core->consensus.milestone_tracker.milestone_start_index = MILESTONE_START_INDEX;
   flex_trit_t latest_milestone_trits[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(latest_milestone_trits, NUM_TRITS_HASH, LATEST_MILESTONE, HASH_LENGTH_TRYTE,
@@ -81,7 +81,7 @@ int main(void) {
   flex_trit_t latest_solid_milestone_trits[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(latest_solid_milestone_trits, NUM_TRITS_HASH, LATEST_SOLID_MILESTONE, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
-  memcpy(api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone, latest_solid_milestone_trits,
+  memcpy(api.core->consensus.milestone_tracker.latest_solid_milestone, latest_solid_milestone_trits,
          FLEX_TRIT_SIZE_243);
 
   flex_trit_t coordinator_trits[FLEX_TRIT_SIZE_243];

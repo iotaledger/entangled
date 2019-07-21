@@ -327,8 +327,6 @@ static retcode_t iota_snapshots_service_update_old_solid_entry_points(
   hash_to_uint64_t_map_t snapshot_solid_entry_points = NULL;
   DECLARE_PACK_SINGLE_TX(milestone_tx, milestone_tx_p, milestone_tx_pack);
 
-  log_info(logger_id, "Updating old solid entry points\n");
-
   iota_snapshot_read_lock(snapshot);
   hash_to_uint64_t_map_copy(&snapshot->metadata.solid_entry_points, &snapshot_solid_entry_points);
   iota_snapshot_unlock(snapshot);
@@ -364,8 +362,6 @@ static retcode_t iota_snapshots_service_collect_new_solid_entry_points(
   DECLARE_PACK_SINGLE_TX(target_milestone_tx, target_milestone_tx_p, target_milestone_tx_pack);
   prev_milestone = *target_milestone;
   uint64_t index = prev_milestone.index;
-
-  log_info(logger_id, "Collecting new solid entry points\n");
 
   ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, target_milestone->hash, &target_milestone_tx_pack);
   if (target_milestone_tx_pack.num_loaded == 0) {

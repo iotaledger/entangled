@@ -40,6 +40,17 @@ cc_library(
 )
 
 cc_library(
+    name = "protocol",
+    hdrs = ["protocol.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":gossip",
+        ":handshake",
+        ":header",
+    ],
+)
+
+cc_library(
     name = "transaction_request",
     srcs = ["transaction_request.c"],
     hdrs = ["transaction_request.h"],
@@ -48,16 +59,5 @@ cc_library(
         "//common:errors",
         "//common/trinary:flex_trit",
         "@com_github_uthash//:uthash",
-    ],
-)
-
-cc_library(
-    name = "type",
-    hdrs = ["type.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":gossip",
-        ":handshake",
-        ":header",
     ],
 )

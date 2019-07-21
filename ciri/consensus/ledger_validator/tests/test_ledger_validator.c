@@ -164,7 +164,7 @@ static void test_replay_several_milestones() {
     test_util_create_bundles(curr_hash, &milestone, num_milestones, &sk_index);
 
     mt.latest_milestone_index = milestone.index;
-    TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_subtangle_milestone(&mt, &tangle));
+    TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_milestone(&mt, &tangle));
     TEST_ASSERT_EQUAL_INT64(num_milestones * (i + 1), snapshots_provider.latest_snapshot.metadata.index);
     TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &tangle));
     TEST_ASSERT_EQUAL_INT64(snapshots_provider.inital_snapshot.metadata.index,

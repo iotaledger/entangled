@@ -30,7 +30,6 @@
 #define DEFAULT_RECONNECT_ATTEMPT_INTERVAL 60
 #define DEFAULT_REQUESTER_QUEUE_SIZE 10000
 #define DEFAULT_TIPS_CACHE_SIZE 5000
-#define DEFAULT_TIPS_SOLIDIFIER_ENABLED true
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,8 +62,6 @@ typedef struct iota_node_conf_s {
   size_t requester_queue_size;
   // Path of the tangle database file
   char tangle_db_path[FILE_PATH_SIZE];
-  // Scan the current tips and attempt to mark them as solid
-  bool tips_solidifier_enabled;
   // The address of the coordinator encoded in bytes
   byte_t coordinator_address[HASH_LENGTH_BYTE];
   // The address to bind the TCP server socket to

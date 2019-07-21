@@ -13,7 +13,7 @@
 #include <uv.h>
 #include "utlist.h"
 
-#include "ciri/node/protocol/type.h"
+#include "ciri/node/protocol/protocol.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/handles/rw_lock.h"

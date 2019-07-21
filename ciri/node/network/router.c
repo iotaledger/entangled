@@ -11,7 +11,6 @@
 
 #include "ciri/node/network/router.h"
 #include "ciri/node/node.h"
-#include "ciri/node/protocol/type.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 
@@ -210,7 +209,7 @@ static void router_on_new_connection(uv_stream_t *const server, int const status
 
     handshake_init(&handshake, router->node->conf.neighboring_port, router->node->conf.coordinator_address,
                    router->node->conf.mwm, &handshake_size);
-    if (router_write((uv_stream_t *)client, HANDSHAKE, &handshake, handshake_size) != RC_OK) {
+    if (router_write((uv_stream_t *)client, PROTOCOL_HANDSHAKE, &handshake, handshake_size) != RC_OK) {
       log_error(logger_id, "Sending handshake to new peer failed\n");
       uv_close((uv_handle_t *)client, router_on_close);
     }
@@ -243,7 +242,7 @@ void router_on_connect(uv_connect_t *const connection, int const status) {
 
   handshake_init(&handshake, router->node->conf.neighboring_port, router->node->conf.coordinator_address,
                  router->node->conf.mwm, &handshake_size);
-  if (router_write((uv_stream_t *)client, HANDSHAKE, &handshake, handshake_size) != RC_OK) {
+  if (router_write((uv_stream_t *)client, PROTOCOL_HANDSHAKE, &handshake, handshake_size) != RC_OK) {
     log_error(logger_id, "Sending handshake to new peer failed\n");
     uv_close((uv_handle_t *)client, router_on_close);
   }
@@ -520,7 +519,7 @@ retcode_t router_read_handshake(router_t *const router, char const *const ip, ui
   header = (protocol_header_t const *)buf;
 
   // Check if the packet is really a handshake
-  if (header->type != HANDSHAKE) {
+  if (header->type != PROTOCOL_HANDSHAKE) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because packet is not a handshake\n", ip, port);
     return RC_INVALID_PACKET_TYPE;
   }
@@ -551,9 +550,8 @@ retcode_t router_read_handshake(router_t *const router, char const *const ip, ui
   }
 
   // Check whether we support the supported protocol versions by the neighbor
-  if ((protocol_version = handshake_supported_version(
-           handshake_supported_protocol_versions, sizeof(handshake_supported_protocol_versions),
-           handshake->supported_versions, header_length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
+  if ((protocol_version = handshake_supported_version(handshake->supported_versions,
+                                                      header_length - HANDSHAKE_MIN_BYTES_LENGTH + 1)) < 0) {
     log_warning(logger_id, "Failed handshake with tcp://%s:%d because of protocol version %d mismatch\n", ip, port,
                 protocol_version);
     return RC_FAILED_HANDSHAKE;
@@ -613,9 +611,9 @@ retcode_t router_read(router_t *const router, neighbor_t *const neighbor, void c
 
   if (header->type < PACKET_TYPES_NUM) {
     switch (header->type) {
-      case HANDSHAKE:
+      case PROTOCOL_HANDSHAKE:
         break;
-      case GOSSIP: {
+      case PROTOCOL_GOSSIP: {
         protocol_gossip_t gossip;
         void const *ptr = neighbor->buffer + HEADER_BYTES_LENGTH;
         size_t offset = 0;
@@ -691,7 +689,7 @@ retcode_t router_reconnect_attempt(router_t *const router) {
   return RC_OK;
 }
 
-retcode_t router_write(uv_stream_t *const stream, packet_type_t const type, void *const buffer,
+retcode_t router_write(uv_stream_t *const stream, protocol_packet_type_t const type, void *const buffer,
                        uint16_t const buffer_size) {
   retcode_t ret = RC_OK;
   int err = 0;

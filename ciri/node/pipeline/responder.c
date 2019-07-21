@@ -146,6 +146,7 @@ static retcode_t respond_to_request(responder_stage_t const *const responder, ta
 static void *responder_stage_routine(responder_stage_t *const responder) {
   transaction_request_queue_entry_t *entry = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  lock_handle_t lock_cond;
   tangle_t tangle;
 
   if (responder == NULL) {
@@ -161,18 +162,16 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
   while (responder->running) {
-    cond_handle_wait(&responder->cond, &lock_cond);
-
     rw_lock_handle_wrlock(&responder->lock);
     entry = transaction_request_queue_pop(&responder->queue);
     rw_lock_handle_unlock(&responder->lock);
 
     if (entry == NULL) {
+      cond_handle_wait(&responder->cond, &lock_cond);
       continue;
     }
 

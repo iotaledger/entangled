@@ -13,6 +13,9 @@
 #include "utils/macros.h"
 #include "utils/time.h"
 
+static uint8_t own_supported_versions[] = HANDSHAKE_SUPPORTED_VERSIONS;
+static size_t own_supported_versions_length = sizeof(own_supported_versions);
+
 void handshake_init(protocol_handshake_t* const handshake, uint16_t const port, byte_t const* const coordinator_address,
                     uint8_t const mwm, uint16_t* const handshake_size) {
   uint64_t timestamp = current_timestamp_ms();
@@ -22,13 +25,11 @@ void handshake_init(protocol_handshake_t* const handshake, uint16_t const port, 
   handshake->timestamp = htonll(timestamp);
   memcpy(handshake->coordinator_address, coordinator_address, HANDSHAKE_COORDINATOR_ADDRESS_BYTES_LENGTH);
   handshake->mwm = mwm;
-  memcpy(handshake->supported_versions, handshake_supported_protocol_versions,
-         sizeof(handshake_supported_protocol_versions));
-  *handshake_size = HANDSHAKE_MIN_BYTES_LENGTH + sizeof(handshake_supported_protocol_versions) - 1;
+  memcpy(handshake->supported_versions, own_supported_versions, own_supported_versions_length);
+  *handshake_size = HANDSHAKE_MIN_BYTES_LENGTH + own_supported_versions_length - 1;
 }
 
-int handshake_supported_version(uint8_t const* const own_supported_versions, size_t const own_supported_versions_length,
-                                uint8_t const* const supported_versions, size_t const supported_versions_length) {
+int handshake_supported_version(uint8_t const* const supported_versions, size_t const supported_versions_length) {
   int highest_supported_version = 0;
 
   for (size_t i = 0; i < MIN(own_supported_versions_length, supported_versions_length); i++) {
