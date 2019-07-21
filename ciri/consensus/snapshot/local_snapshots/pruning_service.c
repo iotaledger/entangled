@@ -230,9 +230,11 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
 
   *should_wait_for_next_snapshot = false;
 
+  printf("%s loading milestone", __FUNCTION__);
   ERR_BIND_GOTO(iota_tangle_milestone_load_by_index(tangle, ps->last_pruned_snapshot_index + 1, &milestone_pack), err,
                 cleanup);
 
+  printf("%s collecting transactions", __FUNCTION__);
   ERR_BIND_GOTO(
       collect_transactions_to_prune(ps, tangle, sap, milestone.hash, &transactions_to_prune, &has_solid_entry_points),
       err, cleanup);
