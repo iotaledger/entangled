@@ -258,13 +258,13 @@ static retcode_t prune_transactions(pruning_service_t *const ps, tangle_t const 
     ERR_BIND_GOTO(iota_tangle_milestone_delete(tangle, milestone.hash), err, cleanup);
     ps->last_pruned_snapshot_index++;
     printf("%s pruned was successful\n", __FUNCTION__);
-    hash243_set_free(&transactions_to_prune);
   } else {
     *should_wait_for_next_snapshot = true;
   }
 
 cleanup:
 
+  hash243_set_free(&transactions_to_prune);
   if (err != RC_OK) {
     log_warning(logger_id, "Local snapshots pruning has failed with error code: %d\n", err);
   }
