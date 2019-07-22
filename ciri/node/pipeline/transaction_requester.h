@@ -128,15 +128,6 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
 retcode_t get_transaction_to_request(transaction_requester_t *const transaction_requester, tangle_t const *const tangle,
                                      flex_trit_t *const hash);
 
-/**
- * Tells whether the requester queue is empty or not
- *
- * @param requester The requester
- *
- * @return true if empty, false otherwise
- */
-static inline bool requester_is_empty(transaction_requester_t *const requester) { return requester->hashes == NULL; }
-
 #ifdef __cplusplus
 }
 #endif
