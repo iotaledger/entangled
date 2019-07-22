@@ -41,7 +41,7 @@ extern "C" {
  * @return #retcode_t
  */
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-                                    int const depth, int const mwm, flex_trit_t const* const reference,
+                                    uint32_t const depth, uint8_t const mwm, flex_trit_t const* const reference,
                                     bundle_transactions_t* const bundle);
 
 #ifdef __cplusplus

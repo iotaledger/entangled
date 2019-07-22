@@ -38,7 +38,7 @@ retcode_t iota_consensus_tip_selector_init(tip_selector_t *const tip_selector, i
 }
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t *const tip_selector,
-                                                                  tangle_t *const tangle, size_t const depth,
+                                                                  tangle_t *const tangle, uint32_t const depth,
                                                                   flex_trit_t const *const reference,
                                                                   tips_pair_t *const tips) {
   retcode_t ret = RC_OK;

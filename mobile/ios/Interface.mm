@@ -26,7 +26,7 @@
   return outputDigest;
 }
 
-+ (NSString*)iota_ios_pow_trytes:(NSString*)trytes mwm:(int)mwm {
++ (NSString*)iota_ios_pow_trytes:(NSString*)trytes mwm:(uint8_t)mwm {
   const char* ctrytes = [trytes cStringUsingEncoding:NSUTF8StringEncoding];
   char* foundNonce = NULL;
   if ((foundNonce = iota_pow_trytes(ctrytes, mwm)) == NULL) {
@@ -52,7 +52,7 @@
   return (int8_t*)signature;
 }
 
-+ (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes trunk:(NSString*)trunk branch:(NSString*)branch mwm:(int)mwm {
++ (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes trunk:(NSString*)trunk branch:(NSString*)branch mwm:(uint8_t)mwm {
   bundle_transactions_t* bundle = NULL;
   iota_transaction_t tx;
   iota_transaction_t* curTx = NULL;

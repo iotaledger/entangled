@@ -11,7 +11,7 @@
 #include "cclient/api/extended/send_transfer.h"
 
 retcode_t iota_client_promote_transaction(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-                                          uint8_t security, int const depth, int const mwm,
+                                          uint8_t security, uint32_t const depth, uint8_t const mwm,
                                           transfer_array_t* spam_transfers, bundle_transactions_t* out_bundle) {
   retcode_t ret_code = RC_ERROR;
   if (out_bundle == NULL) {
