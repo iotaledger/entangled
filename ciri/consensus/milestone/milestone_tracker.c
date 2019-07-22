@@ -252,15 +252,17 @@ retcode_t update_latest_solid_milestone(milestone_tracker_t* const mt, tangle_t*
       break;
     }
 
-    if ((ret = iota_consensus_ledger_validator_update_snapshot(mt->ledger_validator, tangle, &milestone,
-                                                               &has_snapshot)) != RC_OK) {
-      log_error(logger_id, "Updating snapshot failed\n");
-      return ret;
-    } else if (has_snapshot) {
-      mt->latest_solid_milestone_index = milestone.index;
-      memcpy(mt->latest_solid_milestone, milestone.hash, FLEX_TRIT_SIZE_243);
-    } else {
-      break;
+    if (milestone.index == mt->latest_solid_milestone_index + 1) {
+      if ((ret = iota_consensus_ledger_validator_update_snapshot(mt->ledger_validator, tangle, &milestone,
+                                                                 &has_snapshot)) != RC_OK) {
+        log_error(logger_id, "Updating snapshot failed\n");
+        return ret;
+      } else if (has_snapshot) {
+        mt->latest_solid_milestone_index = milestone.index;
+        memcpy(mt->latest_solid_milestone, milestone.hash, FLEX_TRIT_SIZE_243);
+      } else {
+        break;
+      }
     }
     pack.num_loaded = 0;
     if ((ret = iota_tangle_milestone_load_next(tangle, mt->latest_solid_milestone_index, &pack)) != RC_OK) {
