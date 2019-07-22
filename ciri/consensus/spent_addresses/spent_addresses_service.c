@@ -85,9 +85,7 @@ static retcode_t iota_spent_addresses_service_was_tx_spent_from(spent_addresses_
       bundle_transactions_free(&bundle);
       // TODO: What if the bundle is invalid but signature is still OK ?
       // TODO: What if incomplete bundle ?
-      if ((*spent = (status == BUNDLE_VALID))) {
-        return iota_spent_addresses_provider_store(sap, transaction_address(tx));
-      }
+      *spent = (status == BUNDLE_VALID);
     }
 
   } else {
