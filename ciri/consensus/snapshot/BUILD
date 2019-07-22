@@ -48,21 +48,15 @@ cc_library(
 
 cc_library(
     name = "snapshots_provider",
-    srcs = [
-        "snapshots_provider.c",
-    ],
+    srcs = ["snapshots_provider.c"],
     hdrs = ["snapshots_provider.h"],
     visibility = ["//visibility:public"],
-    deps = [
-        ":snapshot",
-    ],
+    deps = [":snapshot"],
 )
 
 cc_library(
     name = "snapshots_service",
-    srcs = [
-        "snapshots_service.c",
-    ],
+    srcs = ["snapshots_service.c"],
     hdrs = ["snapshots_service.h"],
     visibility = ["//visibility:public"],
     deps = [
@@ -78,9 +72,7 @@ cc_library(
 
 cc_library(
     name = "snapshot_metadata",
-    srcs = [
-        "snapshot_metadata.c",
-    ],
+    srcs = ["snapshot_metadata.c"],
     hdrs = ["snapshot_metadata.h"],
     visibility = ["//visibility:public"],
     deps = [

@@ -6,6 +6,8 @@
  */
 
 #include "ciri/node/pipeline/responder.h"
+#include "ciri/consensus/milestone/milestone_tracker.h"
+#include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
@@ -36,7 +38,7 @@ static logger_id_t logger_id;
  */
 static retcode_t get_transaction_for_request(responder_stage_t const *const responder, tangle_t *const tangle,
                                              neighbor_t *const neighbor, flex_trit_t const *const hash,
-                                             iota_stor_pack_t *const pack) {
+                                             iota_stor_pack_t *const pack, bool *const respond) {
   retcode_t ret = RC_OK;
 
   if (responder == NULL || neighbor == NULL || hash == NULL || pack == NULL) {
@@ -47,9 +49,11 @@ static retcode_t get_transaction_for_request(responder_stage_t const *const resp
   if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
     flex_trit_t tip[FLEX_TRIT_SIZE_243];
 
-    log_debug(logger_id, "Responding to random tip request\n");
-    if (!requester_is_empty(&responder->node->transaction_requester) ||
-        rand_handle_probability() < responder->node->conf.p_reply_random_tip) {
+    // Don't reply to random tip requests if we are synchronized with a max delta of one to the newest milestone
+    *respond = !(responder->snapshot_provider->latest_snapshot.metadata.index >=
+                 responder->milestone_tracker->latest_milestone_index - 1);
+    if (respond) {
+      log_debug(logger_id, "Responding to random tip request\n");
       neighbor->nbr_random_tx_reqs++;
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
@@ -59,7 +63,6 @@ static retcode_t get_transaction_for_request(responder_stage_t const *const resp
         return ret;
       }
     }
-    // Else no tx to request, so no random tip will be sent as a reply.
   }
   // If the hash is non-null, a transaction was requested
   else {
@@ -96,6 +99,8 @@ static retcode_t respond_to_request(responder_stage_t const *const responder, ta
   if (responder == NULL || neighbor == NULL || hash == NULL || pack == NULL) {
     return RC_NULL_PARAM;
   }
+
+  log_debug(logger_id, "Responding to request\n");
 
   // Send the requested transaction back to the neighbor
   if (pack->num_loaded != 0) {
@@ -148,6 +153,7 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   lock_handle_t lock_cond;
   tangle_t tangle;
+  bool respond = true;
 
   if (responder == NULL) {
     return NULL;
@@ -175,12 +181,16 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
       continue;
     }
 
-    log_debug(logger_id, "Responding to request\n");
     hash_pack_reset(&pack);
-    if (get_transaction_for_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack) != RC_OK) {
+    respond = true;
+    if (get_transaction_for_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack,
+                                    &respond) != RC_OK) {
       log_warning(logger_id, "Getting transaction for request failed\n");
-    } else if (respond_to_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack) != RC_OK) {
-      log_warning(logger_id, "Replying to request failed\n");
+    }
+    if (respond) {
+      if (respond_to_request(responder, &tangle, entry->request.neighbor, entry->request.hash, &pack) != RC_OK) {
+        log_warning(logger_id, "Replying to request failed\n");
+      }
     }
     free(entry);
   }
@@ -199,7 +209,9 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
  * Public functions
  */
 
-retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node) {
+retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node,
+                               snapshots_provider_t *const snapshot_provider,
+                               milestone_tracker_t *const milestone_tracker) {
   if (responder == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -211,6 +223,8 @@ retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const
   rw_lock_handle_init(&responder->lock);
   cond_handle_init(&responder->cond);
   responder->node = node;
+  responder->snapshot_provider = snapshot_provider;
+  responder->milestone_tracker = milestone_tracker;
 
   return RC_OK;
 }

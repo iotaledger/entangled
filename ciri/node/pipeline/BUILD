@@ -90,9 +90,10 @@ cc_library(
 cc_library(
     name = "responder",
     srcs = ["responder.c"],
-    hdrs = ["responder.h"],
     deps = [
         ":responder_shared",
+        "//ciri/consensus/milestone:milestone_tracker",
+        "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/tangle",
         "//ciri/node:node_shared",
         "//ciri/node/network:neighbor_shared",
