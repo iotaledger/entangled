@@ -48,7 +48,7 @@ class IotaJsonAPI : virtual public IotaAPI {
   std::vector<std::string> getTrytes(const std::vector<std::string>& hashes) override;
 
   nonstd::optional<GetTransactionsToApproveResponse> getTransactionsToApprove(
-      size_t depth, const nonstd::optional<std::string>& reference = {}) override;
+      uint32_t depth, const nonstd::optional<std::string>& reference = {}) override;
 
   std::vector<std::string> attachToTangle(const std::string& trunkTransaction, const std::string& branchTransaction,
                                           size_t minWeightMagnitude, const std::vector<std::string>& trytes) override;

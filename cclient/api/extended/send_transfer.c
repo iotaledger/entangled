@@ -11,7 +11,7 @@
 #include "cclient/api/extended/send_trytes.h"
 
 retcode_t iota_client_send_transfer(iota_client_service_t const* const serv, flex_trit_t const* const seed,
-                                    uint8_t security, int const depth, int const mwm, bool local_pow,
+                                    uint8_t security, uint32_t const depth, uint8_t const mwm, bool local_pow,
                                     transfer_array_t const* const transfers, flex_trit_t const* const remainder_address,
                                     flex_trit_t const* const reference, inputs_t const* const inputs,
                                     bundle_transactions_t* out_tx_objs) {

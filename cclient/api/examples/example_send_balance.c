@@ -13,8 +13,8 @@ static tryte_t const *const RECEIVER_ADDR =
 void example_send_balance(iota_client_service_t *s) {
   printf("\n [%s]\n", __FUNCTION__);
   retcode_t ret_code = RC_OK;
-  int depth = 6;
-  int mwm = 9;
+  uint32_t depth = 6;
+  uint8_t mwm = 9;
   uint8_t security = 2;
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);

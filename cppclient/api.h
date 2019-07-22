@@ -87,7 +87,7 @@ class IotaAPI {
                                                   const std::vector<std::string>& trytes) = 0;
 
   virtual nonstd::optional<GetTransactionsToApproveResponse> getTransactionsToApprove(
-      size_t depth, const nonstd::optional<std::string>& reference = {}) = 0;
+      uint32_t depth, const nonstd::optional<std::string>& reference = {}) = 0;
 
   virtual bool storeTransactions(const std::vector<std::string>& trytes) = 0;
 
