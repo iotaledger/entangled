@@ -100,8 +100,6 @@ static retcode_t respond_to_request(responder_stage_t const *const responder, ta
     return RC_NULL_PARAM;
   }
 
-  log_debug(logger_id, "Responding to request\n");
-
   // Send the requested transaction back to the neighbor
   if (pack->num_loaded != 0) {
     byte_t transaction_bytes[GOSSIP_TX_BYTES_LENGTH];
