@@ -67,7 +67,7 @@ retcode_t iota_api_destroy(iota_api_t *const api);
  * Added neighbors will be removed after restarting cIRI.
  * Add the neighbors to the config file or supply them in the -n command line option if you want them to be permanent.
  *
- * The URI (Unique Resource Identification) for adding neighbors is: {tcp,udp}://ip:port
+ * The URI (Unique Resource Identification) for adding neighbors is: tcp://ip:port
  *
  * @param[in]   api   The API
  * @param[in]   req   The request
@@ -301,7 +301,7 @@ retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, er
  * Remove the neighbors from the config file or make sure they aren't supplied in the -n command line option if you
  * don't want to keep them anymore.
  *
- * The URI (Unique Resource Identification) for removing neighbors is: {tcp,udp}://ip:port
+ * The URI (Unique Resource Identification) for removing neighbors is: tcp://ip:port
  *
  * @param[in]   api   The API
  * @param[in]   req   The request

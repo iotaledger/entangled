@@ -208,8 +208,7 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv, tan
   lv->conf = conf;
   lv->milestone_tracker = mt;
 
-  if ((ret = build_snapshot(lv, tangle, &mt->latest_solid_subtangle_milestone_index,
-                            mt->latest_solid_subtangle_milestone)) != RC_OK) {
+  if ((ret = build_snapshot(lv, tangle, &mt->latest_solid_milestone_index, mt->latest_solid_milestone)) != RC_OK) {
     log_critical(logger_id, "Building snapshot failed\n");
     return ret;
   }

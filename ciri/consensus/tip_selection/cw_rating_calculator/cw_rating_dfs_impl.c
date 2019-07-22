@@ -13,6 +13,7 @@
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "cw_rating_calculator"
 
@@ -27,44 +28,41 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
                                               int64_t subtangle_before_timestamp) {
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
   retcode_t ret = RC_OK;
-  iota_stor_pack_t pack;
+  iota_stor_pack_t approvers_pack;
   hash243_stack_t stack = NULL;
   flex_trit_t *curr_tx_hash = NULL;
 
+  uint64_t start_timestamp, end_timestamp;
+
   *subtangle_size = 0;
 
-  if ((ret = hash_pack_init(&pack, 10)) != RC_OK) {
-    goto done;
-  }
+  start_timestamp = current_timestamp_ms();
 
-  if ((ret = hash243_stack_push(&stack, entry_point)) != RC_OK) {
-    goto done;
-  }
+  ERR_BIND_GOTO(hash_pack_init(&approvers_pack, 10), ret, done);
+  ERR_BIND_GOTO(hash243_stack_push(&stack, entry_point), ret, done);
 
   while (!hash243_stack_empty(stack)) {
     curr_tx_hash = hash243_stack_peek(stack);
 
     if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
-      hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load_hashes_of_approvers(tangle, curr_tx_hash, &pack,
+      hash_pack_reset(&approvers_pack);
+      if ((ret = iota_tangle_transaction_load_hashes_of_approvers(tangle, curr_tx_hash, &approvers_pack,
                                                                   subtangle_before_timestamp)) != RC_OK) {
         log_error(logger_id, "Failed in loading approvers, error code is: %" PRIu64 "\n", ret);
         goto done;
       }
-      if ((ret = hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash, &curr_tx,
-                                                          (*subtangle_size)++)) != RC_OK) {
-        goto done;
-      }
+
+      ERR_BIND_GOTO(
+          hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash, &curr_tx, (*subtangle_size)++), ret,
+          done);
       hash243_stack_pop(&stack);
-      while (pack.num_loaded > 0) {
-        curr_tx_hash = ((flex_trit_t *)pack.models[--pack.num_loaded]);
-        // Add each found approver to the currently traversed tx
-        if ((ret = hash243_stack_push(&stack, curr_tx_hash)) != RC_OK) {
-          goto done;
-        }
-        if ((ret = hash243_set_add(&curr_tx->approvers, curr_tx_hash)) != RC_OK) {
-          goto done;
-        }
+      while (approvers_pack.num_loaded > 0) {
+        curr_tx_hash = ((flex_trit_t *)approvers_pack.models[--approvers_pack.num_loaded]);
+
+        ERR_BIND_GOTO(hash243_stack_push(&stack, curr_tx_hash), ret, done);
+
+        // Add each found approver which has both approvees to the currently traversed tx
+        ERR_BIND_GOTO(hash243_set_add(&curr_tx->approvers, curr_tx_hash), ret, done);
       }
       continue;
     }
@@ -72,8 +70,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(tangle_t *const tangle, flex_trit_
   }
 
 done:
-  hash_pack_free(&pack);
+  hash_pack_free(&approvers_pack);
   hash243_stack_free(&stack);
+
+  end_timestamp = current_timestamp_ms();
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }
@@ -137,6 +138,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   uint64_t sub_tangle_size = 0;
   uint64_t max_subtangle_size = 0;
   uint64_t bitset_size = 0;
+  uint64_t start_timestamp, end_timestamp;
   UNUSED(cw_calc);
 
   out->cw_ratings = NULL;
@@ -145,6 +147,8 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   if (!entry_point) {
     return RC_NULL_PARAM;
   }
+
+  start_timestamp = current_timestamp_ms();
 
   if ((ret = cw_rating_dfs_do_dfs_from_db(tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size, 0)) !=
       RC_OK) {
@@ -189,6 +193,9 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
       }
     }
   }
+
+  end_timestamp = current_timestamp_ms();
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }

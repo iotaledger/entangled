@@ -16,6 +16,10 @@ get_inclusion_states_res_t* get_inclusion_states_res_new() {
 }
 
 retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, int state) {
+  if (!res) {
+    return RC_NULL_PARAM;
+  }
+
   if (!res->states) {
     utarray_new(res->states, &ut_int_icd);
   }
@@ -27,6 +31,10 @@ retcode_t get_inclusion_states_res_states_add(get_inclusion_states_res_t* res, i
 }
 
 bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* in, size_t index) {
+  if (!in) {
+    return false;
+  }
+
   int* b = (int*)utarray_eltptr(in->states, index);
   if (b != NULL) {
     return (*b > 0) ? true : false;
@@ -34,14 +42,25 @@ bool get_inclusion_states_res_states_at(get_inclusion_states_res_t* in, size_t i
   return false;
 }
 
-size_t get_inclusion_states_res_states_count(get_inclusion_states_res_t* in) { return utarray_len(in->states); }
+size_t get_inclusion_states_res_states_count(get_inclusion_states_res_t* in) {
+  if (!in) {
+    return 0;
+  }
+
+  if (!in->states) {
+    return 0;
+  }
+
+  return utarray_len(in->states);
+}
 
 void get_inclusion_states_res_free(get_inclusion_states_res_t** res) {
-  if (*res) {
-    if ((*res)->states) {
-      utarray_free((*res)->states);
-    }
-    free(*res);
-    *res = NULL;
+  if (!res || !(*res)) {
+    return;
   }
+  if ((*res)->states) {
+    utarray_free((*res)->states);
+  }
+  free(*res);
+  *res = NULL;
 }

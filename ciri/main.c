@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 
   rand_handle_seed(time(NULL));
 
-  if (logger_helper_init() != RC_OK) {
+  if (logger_helper_init(LOGGER_WARNING) != RC_OK) {
     return EXIT_FAILURE;
   }
   logger_id = logger_helper_enable(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
@@ -187,8 +187,9 @@ int main(int argc, char* argv[]) {
       log_info(logger_id,
                "Transactions: to process %d, to broadcast %d, to request %d, "
                "to reply %d, count %d\n",
-               processor_size(&ciri_core.node.processor), broadcaster_size(&ciri_core.node.broadcaster),
-               requester_size(&ciri_core.node.transaction_requester), responder_size(&ciri_core.node.responder), count);
+               processor_stage_size(&ciri_core.node.processor), broadcaster_stage_size(&ciri_core.node.broadcaster),
+               requester_size(&ciri_core.node.transaction_requester), responder_stage_size(&ciri_core.node.responder),
+               count);
       sleep(STATS_LOG_INTERVAL_S);
     }
   }

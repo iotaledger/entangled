@@ -76,7 +76,7 @@ void test_find_transactions_serialize_request_no_parameters(void) {
   find_transactions_req_t* find_tran_1 = find_transactions_req_new();
   char_buffer_t* serializer_out_1 = char_buffer_new();
 
-  TEST_ASSERT_EQUAL_INT16(RC_CCLIENT_JSON_KEY,
+  TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM,
                           serializer.vtable.find_transactions_serialize_request(find_tran_1, serializer_out_1));
 
   char_buffer_free(serializer_out_1);
@@ -124,7 +124,7 @@ void test_find_transactions_deserialize_request_no_parameters(void) {
   char const* json_text = "{\"command\":\"findTransactions\"}";
 
   find_transactions_req_t* req = find_transactions_req_new();
-  TEST_ASSERT_EQUAL_INT16(RC_CCLIENT_JSON_KEY, serializer.vtable.find_transactions_deserialize_request(json_text, req));
+  TEST_ASSERT_EQUAL_INT16(RC_NULL_PARAM, serializer.vtable.find_transactions_deserialize_request(json_text, req));
 
   find_transactions_req_free(&req);
 }

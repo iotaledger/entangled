@@ -30,17 +30,25 @@ void get_transactions_to_approve_req_free(get_transactions_to_approve_req_t** co
 }
 
 void get_transactions_to_approve_req_set_depth(get_transactions_to_approve_req_t* const req, uint32_t const depth) {
-  req->depth = depth;
+  if (req) {
+    req->depth = depth;
+  }
 }
 
 retcode_t get_transactions_to_approve_req_set_reference(get_transactions_to_approve_req_t* const req,
                                                         flex_trit_t const* const reference) {
+  if (!req || !reference) {
+    return RC_NULL_PARAM;
+  }
+
   if (req->reference == NULL) {
     req->reference = (flex_trit_t*)malloc(FLEX_TRIT_SIZE_243);
   }
+
   if (req->reference == NULL) {
     return RC_OOM;
   }
+
   memcpy(req->reference, reference, FLEX_TRIT_SIZE_243);
   return RC_OK;
 }

@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "ciri/node/transaction_request.h"
+#include "ciri/node/protocol/transaction_request.h"
 
 size_t transaction_request_queue_count(transaction_request_queue_t const queue) {
   transaction_request_queue_entry_t *iter = NULL;

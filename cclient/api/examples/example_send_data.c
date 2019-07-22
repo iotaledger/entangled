@@ -42,9 +42,6 @@ void example_send_data(iota_client_service_t *s) {
 
   /* transfer setup */
   transfer_t tf = {};
-  // seed
-  flex_trit_t seed[NUM_FLEX_TRITS_ADDRESS];
-  flex_trits_from_trytes(seed, NUM_TRITS_ADDRESS, MY_SEED, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
 
   // receiver
   flex_trits_from_trytes(tf.address, NUM_TRITS_ADDRESS, RECEIVER_ADDR, NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
@@ -57,7 +54,9 @@ void example_send_data(iota_client_service_t *s) {
   transfer_message_set_string(&tf, message);
 
   transfer_array_add(transfers, &tf);
-  ret_code = iota_client_send_transfer(s, seed, security, depth, mwm, false, transfers, NULL, NULL, NULL, bundle);
+
+  // the seed can be NULL when sending zero tx.
+  ret_code = iota_client_send_transfer(s, NULL, security, depth, mwm, false, transfers, NULL, NULL, NULL, bundle);
 
   printf("send transfer %s\n", error_2_string(ret_code));
   if (ret_code == RC_OK) {

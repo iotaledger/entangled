@@ -11,13 +11,14 @@
 
 static retcode_t neighbor_info_utarray_to_json_array(UT_array const *const ut, cJSON *const json_root,
                                                      char const *const obj_name) {
-  cJSON *array_obj = cJSON_CreateArray();
   neighbor_info_t *nbr_info = NULL;
 
-  if (!ut) {
+  if (!ut || !json_root || !obj_name) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
     return RC_NULL_PARAM;
   }
 
+  cJSON *array_obj = cJSON_CreateArray();
   if (array_obj == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
@@ -46,13 +47,21 @@ static retcode_t neighbor_info_utarray_to_json_array(UT_array const *const ut, c
 retcode_t json_get_neighbors_serialize_request(char_buffer_t *out) {
   char const *req_text = "{\"command\":\"getNeighbors\"}";
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  if (!out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   return char_buffer_set(out, req_text);
 }
 
 retcode_t json_get_neighbors_serialize_response(get_neighbors_res_t const *const obj, char_buffer_t *out) {
   retcode_t ret = RC_ERROR;
-  char const *json_text = NULL;
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
 
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -65,7 +74,7 @@ retcode_t json_get_neighbors_serialize_response(get_neighbors_res_t const *const
     goto err;
   }
 
-  json_text = cJSON_PrintUnformatted(json_root);
+  char const *json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
@@ -78,16 +87,23 @@ err:
 
 retcode_t json_get_neighbors_deserialize_response(char const *const obj, get_neighbors_res_t *out) {
   retcode_t ret = RC_ERROR;
-  cJSON *json_obj = cJSON_Parse(obj);
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (!obj || !out) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, error_2_string(RC_NULL_PARAM));
+    return RC_NULL_PARAM;
+  }
+
   cJSON *json_item = NULL;
+  cJSON *json_obj = cJSON_Parse(obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
+
   char_buffer_t *addr = char_buffer_new();
   char_buffer_t *connection = char_buffer_new();
   if (!addr || !connection) {
-    return RC_OOM;
+    ret = RC_OOM;
+    goto end;
   }
-
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
-  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "neighbors");
   if (cJSON_IsArray(json_item)) {

@@ -13,6 +13,7 @@
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 #define RANDOM_WALKER_LOGGER_ID "random_walker"
 
@@ -66,7 +67,7 @@ static retcode_t find_tail_if_valid(tangle_t *const tangle, exit_prob_transactio
     return ret;
   }
   if (*has_valid_tail) {
-    ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv, tangle, tx_hash, has_valid_tail);
+    ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv, tangle, tx_hash, has_valid_tail, false);
     if (ret != RC_OK) {
       log_error(logger_id, "Tail transaction validation failed: %" PRIu64 "\n", ret);
       return ret;
@@ -128,7 +129,10 @@ retcode_t iota_consensus_random_walker_randomize(ep_randomizer_t const *const ex
   size_t num_traversed_tails = 1;
   flex_trit_t const *curr_tail_hash = ep;
   flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
-  if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(ep_validator, tangle, ep, &ep_is_valid)) !=
+  uint64_t start_timestamp, end_timestamp;
+  start_timestamp = current_timestamp_ms();
+
+  if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(ep_validator, tangle, ep, &ep_is_valid, true)) !=
       RC_OK) {
     log_error(logger_id, "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;
@@ -150,6 +154,9 @@ retcode_t iota_consensus_random_walker_randomize(ep_randomizer_t const *const ex
 
   memcpy(tip, curr_tail_hash, FLEX_TRIT_SIZE_243);
   log_debug(logger_id, "Number of tails traversed to find tip: %" PRIu64 "\n", num_traversed_tails);
+
+  end_timestamp = current_timestamp_ms();
+  log_debug(logger_id, "%s took %" PRId64 " milliseconds\n", __FUNCTION__, end_timestamp - start_timestamp);
 
   return ret;
 }

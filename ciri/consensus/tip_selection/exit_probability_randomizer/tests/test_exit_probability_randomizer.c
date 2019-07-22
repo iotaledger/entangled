@@ -86,7 +86,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 
   // We want to avoid unnecessary validation
   mt.snapshots_provider->latest_snapshot.metadata.index = 9999999;
-  mt.latest_solid_subtangle_milestone_index = max_depth;
+  mt.latest_solid_milestone_index = max_depth;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(&conf, &mt, &lv, epv) == RC_OK);
 }
@@ -128,8 +128,10 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
     txs[i].consensus.hash[i / 256] += (i + 1);
     if (topology == ONLY_DIRECT_APPROVERS) {
       transaction_set_branch(&txs[i], transaction_branch(&txs[i - 1]));
+      transaction_set_trunk(&txs[i], transaction_trunk(&txs[i - 1]));
     } else if (topology == BLOCKCHAIN) {
       transaction_set_branch(&txs[i], transaction_hash(&txs[i - 1]));
+      transaction_set_trunk(&txs[i], transaction_hash(&txs[i - 1]));
     }
   }
 

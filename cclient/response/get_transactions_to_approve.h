@@ -17,6 +17,7 @@
 #ifndef CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 #define CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 
+#include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
 #ifdef __cplusplus
@@ -51,10 +52,15 @@ void get_transactions_to_approve_res_free(get_transactions_to_approve_res_t** co
  *
  * @param[in] res The response object.
  * @param[in] branch A valid branch transaction hash.
+ * @return #retcode_t
  */
-static inline void get_transactions_to_approve_res_set_branch(get_transactions_to_approve_res_t* const res,
-                                                              flex_trit_t const* const branch) {
+static inline retcode_t get_transactions_to_approve_res_set_branch(get_transactions_to_approve_res_t* const res,
+                                                                   flex_trit_t const* const branch) {
+  if (!res || !branch) {
+    return RC_NULL_PARAM;
+  }
   memcpy(res->branch, branch, FLEX_TRIT_SIZE_243);
+  return RC_OK;
 }
 
 /**
@@ -65,6 +71,9 @@ static inline void get_transactions_to_approve_res_set_branch(get_transactions_t
  */
 static inline flex_trit_t const* get_transactions_to_approve_res_branch(
     get_transactions_to_approve_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
   return res->branch;
 }
 
@@ -73,10 +82,15 @@ static inline flex_trit_t const* get_transactions_to_approve_res_branch(
  *
  * @param[in] res The response object.
  * @param[in] trunk A valid trunk transaction hash.
+ * @return #retcode_t
  */
-static inline void get_transactions_to_approve_res_set_trunk(get_transactions_to_approve_res_t* const res,
-                                                             flex_trit_t const* const trunk) {
+static inline retcode_t get_transactions_to_approve_res_set_trunk(get_transactions_to_approve_res_t* const res,
+                                                                  flex_trit_t const* const trunk) {
+  if (!res || !trunk) {
+    return RC_NULL_PARAM;
+  }
   memcpy(res->trunk, trunk, FLEX_TRIT_SIZE_243);
+  return RC_OK;
 }
 
 /**
@@ -87,6 +101,9 @@ static inline void get_transactions_to_approve_res_set_trunk(get_transactions_to
  */
 static inline flex_trit_t const* get_transactions_to_approve_res_trunk(
     get_transactions_to_approve_res_t const* const res) {
+  if (!res) {
+    return NULL;
+  }
   return res->trunk;
 }
 

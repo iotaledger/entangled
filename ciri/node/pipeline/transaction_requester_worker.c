@@ -21,7 +21,7 @@ static logger_id_t logger_id;
  */
 
 static void *transaction_requester_routine(transaction_requester_t *const transaction_requester) {
-  neighbor_t *iter = NULL;
+  neighbor_t *neighbor = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
@@ -61,13 +61,15 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
         memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
       }
     }
-    rw_lock_handle_rdlock(&transaction_requester->node->neighbors_lock);
-    LL_FOREACH(transaction_requester->node->neighbors, iter) {
-      if (neighbor_send_trits(transaction_requester->node, &tangle, iter, transaction) != RC_OK) {
-        log_warning(logger_id, "Sending request failed\n");
+    rw_lock_handle_rdlock(&transaction_requester->node->router.neighbors_lock);
+    NEIGHBORS_FOREACH(transaction_requester->node->router.neighbors, neighbor) {
+      if (neighbor->endpoint.stream != NULL) {
+        if (neighbor_send_trits(transaction_requester->node, &tangle, neighbor, transaction) != RC_OK) {
+          log_warning(logger_id, "Sending request failed\n");
+        }
       }
     }
-    rw_lock_handle_unlock(&transaction_requester->node->neighbors_lock);
+    rw_lock_handle_unlock(&transaction_requester->node->router.neighbors_lock);
   sleep:
     cond_handle_timedwait(&transaction_requester->cond, &lock_cond, REQUESTER_INTERVAL_MS);
   }

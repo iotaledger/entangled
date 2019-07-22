@@ -21,8 +21,8 @@ struct _response_ctx {
   IOTA_REQUEST_STATUS status;
 };
 
-const char* khttp_ApplicationJson = "application/json";
-const char* khttp_ApplicationFormUrlencoded = "application/x-www-form-urlencoded";
+char const* khttp_ApplicationJson = "application/json";
+char const* khttp_ApplicationFormUrlencoded = "application/x-www-form-urlencoded";
 
 static char const* header_template =
     "POST %s HTTP/1.1\r\n"
@@ -35,7 +35,7 @@ static char const* header_template =
 
 // Callback declarations for parser
 static int request_parse_header_complete(struct _response_ctx* response);
-static int request_parse_data(struct _response_ctx* response, const unsigned char* at, size_t length);
+static int request_parse_data(struct _response_ctx* response, unsigned char const* at, size_t length);
 static int request_parse_message_complete(struct _response_ctx* response);
 
 // Callback implementation for parser
@@ -43,8 +43,8 @@ static int request_parse_header_complete_cb(http_parser* parser) {
   return request_parse_header_complete((struct _response_ctx*)parser->data);
 }
 
-static int request_parse_data_cb(http_parser* parser, const char* at, size_t length) {
-  return request_parse_data((struct _response_ctx*)parser->data, (const unsigned char*)at, length);
+static int request_parse_data_cb(http_parser* parser, char const* at, size_t length) {
+  return request_parse_data((struct _response_ctx*)parser->data, (unsigned char const*)at, length);
 }
 
 static int request_parse_message_complete_cb(http_parser* parser) {
@@ -53,8 +53,8 @@ static int request_parse_message_complete_cb(http_parser* parser) {
 
 // Callback implementation for context
 static int request_parse_header_complete(struct _response_ctx* response) {
-  size_t data_len = response->parser->content_length;
-  if (!data_len) {
+  uint64_t data_len = response->parser->content_length;
+  if (data_len == UINT64_MAX) {
     response->status = IOTA_REQUEST_STATUS_ERROR;
     return -1;
   }
@@ -189,12 +189,12 @@ static retcode_t https_response_read(mbedtls_ctx_t* ctx, char_buffer_t* response
   return RC_OK;
 }
 
-retcode_t iota_service_query(void const* const service_opaque, char_buffer_t const* const obj,
-                             char_buffer_t* const response) {
+static retcode_t cclient_socket_send(void const* const service_opaque, char_buffer_t const* const obj,
+                                     char_buffer_t* const response) {
   int sockfd = -1;
   retcode_t result = RC_ERROR;
-  const iota_client_service_t* const service = (const iota_client_service_t* const)service_opaque;
-  const http_info_t* http_settings = &service->http;
+  iota_client_service_t const* const service = (iota_client_service_t const* const)service_opaque;
+  http_info_t const* http_settings = &service->http;
 
   if (http_settings->ca_pem == NULL) {
     // HTTP
@@ -228,4 +228,22 @@ retcode_t iota_service_query(void const* const service_opaque, char_buffer_t con
     tls_socket_close(&tls_ctx);
   }
   return result;
+}
+
+retcode_t iota_service_query(void const* const service_opaque, char_buffer_t const* const obj,
+                             char_buffer_t* const response) {
+  if (!service_opaque || !obj || !response) {
+    return RC_NULL_PARAM;
+  }
+
+  retcode_t ret = cclient_socket_send(service_opaque, obj, response);
+  size_t retry = 0;
+  while (ret == RC_UTILS_SOCKET_RECV) {
+    if (retry > CCLIENT_SOCKET_RETRY) {
+      break;
+    }
+    ret = cclient_socket_send(service_opaque, obj, response);
+    retry++;
+  }
+  return ret;
 }

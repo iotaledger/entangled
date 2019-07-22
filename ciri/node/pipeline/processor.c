@@ -9,7 +9,7 @@
 
 #include "ciri/consensus/milestone/milestone_tracker.h"
 #include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
-#include "ciri/node/neighbor.h"
+#include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
 #include "ciri/node/pipeline/processor.h"
 #include "common/crypto/curl-p/ptrit.h"
@@ -17,7 +17,6 @@
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
-#define PROCESSOR_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 
@@ -38,15 +37,15 @@ static logger_id_t logger_id;
  *
  * @return a status code
  */
-static retcode_t process_transaction_bytes(processor_t const *const processor, tangle_t *const tangle,
-                                           neighbor_t *const neighbor, iota_packet_t const *const packet,
+static retcode_t process_transaction_bytes(processor_stage_t const *const processor, tangle_t *const tangle,
+                                           neighbor_t *const neighbor, protocol_gossip_t const *const packet,
                                            flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   bool exists = false;
   iota_transaction_t transaction;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
-  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+  if (processor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -99,7 +98,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
     // TODO Store transaction metadata
 
     // Broadcast the new transaction
-    if ((ret = broadcaster_add(&processor->node->broadcaster, packet)) != RC_OK) {
+    if ((ret = broadcaster_stage_add(&processor->node->broadcaster, packet)) != RC_OK) {
       log_warning(logger_id, "Propagating packet to broadcaster failed\n");
       goto failure;
     }
@@ -110,13 +109,18 @@ static retcode_t process_transaction_bytes(processor_t const *const processor, t
       ret = iota_milestone_tracker_add_candidate(processor->milestone_tracker, transaction_hash(&transaction));
     }
 
-    neighbor->nbr_new_txs++;
+    if (neighbor) {
+      neighbor->nbr_new_txs++;
+    }
   }
 
   return ret;
 
 failure:
-  neighbor->nbr_invalid_txs++;
+  if (neighbor) {
+    neighbor->nbr_invalid_txs++;
+  }
+
   return ret;
 }
 
@@ -131,20 +135,24 @@ failure:
  *
  * @return a status code
  */
-static retcode_t process_request_bytes(processor_t const *const processor, neighbor_t *const neighbor,
-                                       iota_packet_t const *const packet, flex_trit_t const *const hash) {
+static retcode_t process_request_bytes(processor_stage_t const *const processor, neighbor_t *const neighbor,
+                                       protocol_gossip_t const *const packet, flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
 
-  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+  if (neighbor == NULL) {
+    return RC_OK;
+  }
+
+  if (processor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
   // Retreives the request hash from the packet
-  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + PACKET_TX_SIZE,
-                            processor->node->conf.request_hash_size_trit,
-                            processor->node->conf.request_hash_size_trit) !=
-      processor->node->conf.request_hash_size_trit) {
+  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + GOSSIP_TX_BYTES_LENGTH,
+                            HASH_LENGTH_TRIT - processor->node->conf.mwm,
+                            HASH_LENGTH_TRIT - processor->node->conf.mwm) !=
+      HASH_LENGTH_TRIT - processor->node->conf.mwm) {
     log_warning(logger_id, "Invalid request bytes\n");
     return RC_PROCESSOR_INVALID_REQUEST;
   }
@@ -155,8 +163,8 @@ static retcode_t process_request_bytes(processor_t const *const processor, neigh
     memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  // Adds request to the responder queue
-  if ((ret = responder_on_next(&processor->node->responder, neighbor, request_hash)) != RC_OK) {
+  // Adds request to the responder stage queue
+  if ((ret = responder_stage_add(&processor->node->responder, neighbor, request_hash)) != RC_OK) {
     log_warning(logger_id, "Propagating request to responder failed\n");
     return ret;
   }
@@ -173,26 +181,28 @@ static retcode_t process_request_bytes(processor_t const *const processor, neigh
  *
  * @return a status code
  */
-static retcode_t process_packet(processor_t const *const processor, tangle_t *const tangle,
-                                iota_packet_t const *const packet, flex_trit_t const *const hash, bool const cached,
+static retcode_t process_packet(processor_stage_t const *const processor, tangle_t *const tangle,
+                                protocol_gossip_t const *const packet, flex_trit_t const *const hash, bool const cached,
                                 uint64_t const digest) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
-  char *protocol = NULL;
 
   if (processor == NULL || packet == NULL) {
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&processor->node->neighbors_lock);
+  rw_lock_handle_rdlock(&processor->node->router.neighbors_lock);
 
-  neighbor = neighbors_find_by_endpoint(processor->node->neighbors, &packet->source);
-  protocol = packet->source.protocol == PROTOCOL_TCP ? "tcp" : "udp";
+  neighbor = router_neighbor_find_by_endpoint(&processor->node->router, &packet->source);
 
-  if (neighbor) {
-    log_debug(logger_id, "Processing packet from tethered node %s://%s:%d\n", protocol, neighbor->endpoint.host,
-              neighbor->endpoint.port);
-    neighbor->nbr_all_txs++;
+  if (neighbor || (packet->source.ip[0] == 0 && packet->source.port == 0)) {
+    if (neighbor) {
+      log_debug(logger_id, "Processing packet from neighbor tcp://%s:%d\n", neighbor->endpoint.domain,
+                neighbor->endpoint.port);
+      neighbor->nbr_all_txs++;
+    } else {
+      log_debug(logger_id, "Processing packet from API\n");
+    }
 
     if (!cached) {
       log_debug(logger_id, "Processing transaction bytes\n");
@@ -203,24 +213,22 @@ static retcode_t process_packet(processor_t const *const processor, tangle_t *co
       recent_seen_bytes_cache_put(&processor->node->recent_seen_bytes, digest, hash);
     }
 
-    log_debug(logger_id, "Processing request bytes\n");
-    if ((ret = process_request_bytes(processor, neighbor, packet, hash)) != RC_OK) {
-      log_warning(logger_id, "Processing request bytes failed\n");
-      goto done;
+    if (neighbor) {
+      log_debug(logger_id, "Processing request bytes\n");
+      if ((ret = process_request_bytes(processor, neighbor, packet, hash)) != RC_OK) {
+        log_warning(logger_id, "Processing request bytes failed\n");
+        goto done;
+      }
     }
-  } else {
-    log_debug(logger_id, "Discarding packet from non-tethered node %s://%s:%d\n", protocol, packet->source.ip,
-              packet->source.port);
-    // TODO Testnet add non-tethered neighbor
   }
 
 done:
-  rw_lock_handle_unlock(&processor->node->neighbors_lock);
+  rw_lock_handle_unlock(&processor->node->router.neighbors_lock);
   return ret;
 }
 
 typedef struct packet_digest_s {
-  iota_packet_queue_entry_t *entry;
+  protocol_gossip_queue_entry_t *entry;
   uint64_t digest;
 } packet_digest_t;
 
@@ -229,7 +237,7 @@ typedef struct packet_digest_s {
  *
  * @param processor The processor state
  */
-static void *processor_routine(processor_t *const processor) {
+static void *processor_stage_routine(processor_stage_t *const processor) {
   tangle_t tangle;
   size_t j;
 
@@ -248,7 +256,7 @@ static void *processor_routine(processor_t *const processor) {
 
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
-  iota_packet_queue_entry_t *entry = NULL;
+  protocol_gossip_queue_entry_t *entry = NULL;
   packet_digest_t *packets = (packet_digest_t *)calloc(PACKET_MAX, sizeof(packet_digest_t));
 
   trit_t *tx = (trit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
@@ -271,7 +279,7 @@ static void *processor_routine(processor_t *const processor) {
     packet_cnt = 0;
     while (packet_cnt < PACKET_MAX) {
       rw_lock_handle_wrlock(&processor->lock);
-      entry = iota_packet_queue_pop(&processor->queue);
+      entry = protocol_gossip_queue_pop(&processor->queue);
       rw_lock_handle_unlock(&processor->lock);
       if (entry == NULL) {
         break;
@@ -291,7 +299,7 @@ static void *processor_routine(processor_t *const processor) {
     }
 
     if (packet_cnt == 0) {
-      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_MS);
+      cond_handle_wait(&processor->cond, &lock_cond);
       continue;
     }
 
@@ -300,7 +308,7 @@ static void *processor_routine(processor_t *const processor) {
     memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(packets[j].entry->packet.content, PACKET_TX_SIZE, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
+      bytes_to_trits(packets[j].entry->packet.content, GOSSIP_TX_BYTES_LENGTH, tx, NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
     }
 
@@ -338,10 +346,10 @@ static void *processor_routine(processor_t *const processor) {
  * Public functions
  */
 
-retcode_t processor_init(processor_t *const processor, node_t *const node,
-                         transaction_validator_t *const transaction_validator,
-                         transaction_solidifier_t *const transaction_solidifier,
-                         milestone_tracker_t *const milestone_tracker) {
+retcode_t processor_stage_init(processor_stage_t *const processor, node_t *const node,
+                               transaction_validator_t *const transaction_validator,
+                               transaction_solidifier_t *const transaction_solidifier,
+                               milestone_tracker_t *const milestone_tracker) {
   if (processor == NULL || node == NULL || transaction_validator == NULL || transaction_solidifier == NULL ||
       milestone_tracker == NULL) {
     return RC_NULL_PARAM;
@@ -361,47 +369,47 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   return RC_OK;
 }
 
-retcode_t processor_start(processor_t *const processor) {
+retcode_t processor_stage_start(processor_stage_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   }
 
-  log_info(logger_id, "Spawning processor thread\n");
+  log_info(logger_id, "Spawning processor stage thread\n");
   processor->running = true;
-  if (thread_handle_create(&processor->thread, (thread_routine_t)processor_routine, processor) != 0) {
-    log_critical(logger_id, "Spawning processor thread failed\n");
+  if (thread_handle_create(&processor->thread, (thread_routine_t)processor_stage_routine, processor) != 0) {
+    log_critical(logger_id, "Spawning processor stage thread failed\n");
     return RC_THREAD_CREATE;
   }
 
   return RC_OK;
 }
 
-retcode_t processor_stop(processor_t *const processor) {
+retcode_t processor_stage_stop(processor_stage_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   } else if (processor->running == false) {
     return RC_OK;
   }
 
-  log_info(logger_id, "Shutting down processor thread\n");
+  log_info(logger_id, "Shutting down processor stage thread\n");
   processor->running = false;
   cond_handle_signal(&processor->cond);
   if (thread_handle_join(processor->thread, NULL) != 0) {
-    log_error(logger_id, "Shutting down processor thread failed\n");
+    log_error(logger_id, "Shutting down processor stage thread failed\n");
     return RC_THREAD_JOIN;
   }
 
   return RC_OK;
 }
 
-retcode_t processor_destroy(processor_t *const processor) {
+retcode_t processor_stage_destroy(processor_stage_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   } else if (processor->running) {
     return RC_STILL_RUNNING;
   }
 
-  iota_packet_queue_free(&processor->queue);
+  protocol_gossip_queue_free(&processor->queue);
   rw_lock_handle_destroy(&processor->lock);
   cond_handle_destroy(&processor->cond);
   processor->node = NULL;
@@ -414,7 +422,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   return RC_OK;
 }
 
-retcode_t processor_on_next(processor_t *const processor, iota_packet_t const packet) {
+retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossip_t const *const packet) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL) {
@@ -422,11 +430,11 @@ retcode_t processor_on_next(processor_t *const processor, iota_packet_t const pa
   }
 
   rw_lock_handle_wrlock(&processor->lock);
-  ret = iota_packet_queue_push(&processor->queue, &packet);
+  ret = protocol_gossip_queue_push(&processor->queue, packet);
   rw_lock_handle_unlock(&processor->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id, "Pushing packet to processor queue failed\n");
+    log_warning(logger_id, "Pushing packet to processor stage queue failed\n");
     return ret;
   } else {
     cond_handle_signal(&processor->cond);
@@ -435,7 +443,7 @@ retcode_t processor_on_next(processor_t *const processor, iota_packet_t const pa
   return RC_OK;
 }
 
-size_t processor_size(processor_t *const processor) {
+size_t processor_stage_size(processor_stage_t *const processor) {
   size_t size = 0;
 
   if (processor == NULL) {
@@ -443,7 +451,7 @@ size_t processor_size(processor_t *const processor) {
   }
 
   rw_lock_handle_rdlock(&processor->lock);
-  size = iota_packet_queue_count(processor->queue);
+  size = protocol_gossip_queue_count(processor->queue);
   rw_lock_handle_unlock(&processor->lock);
 
   return size;

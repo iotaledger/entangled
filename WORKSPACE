@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "rules_iota",
-    commit = "be6081052283769b9b934d66b824f31695014c82",
+    commit = "73f598ad1ce3ba79ff22d747f723d6d5cbf351e1",
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 
@@ -33,7 +33,7 @@ android_ndk_repository(
 git_repository(
     name = "build_bazel_rules_apple",
     remote = "https://github.com/bazelbuild/rules_apple.git",
-    tag = "0.16.1",
+    tag = "0.17.2",
 )
 
 load(

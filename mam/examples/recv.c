@@ -37,7 +37,9 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle);
+  if (receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle) != RC_OK) {
+    return EXIT_FAILURE;
+  }
 
   mam_psk_t_set_add(&api.psks, &psk);
   if (ac == 5) {

@@ -68,6 +68,9 @@ void get_balances_req_free(get_balances_req_t** req);
  * @return #retcode_t
  */
 static inline retcode_t get_balances_req_address_add(get_balances_req_t* const req, flex_trit_t const* const hash) {
+  if (!req || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&req->addresses, hash);
 }
 
@@ -79,6 +82,9 @@ static inline retcode_t get_balances_req_address_add(get_balances_req_t* const r
  * @return A pointer to an address hash.
  */
 static inline flex_trit_t* get_balances_req_address_get(get_balances_req_t* const req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
   return hash243_queue_at(req->addresses, index);
 }
 
@@ -90,6 +96,9 @@ static inline flex_trit_t* get_balances_req_address_get(get_balances_req_t* cons
  * @return #retcode_t
  */
 static inline retcode_t get_balances_req_tip_add(get_balances_req_t* const req, flex_trit_t const* const hash) {
+  if (!req || !hash) {
+    return RC_NULL_PARAM;
+  }
   return hash243_queue_push(&req->tips, hash);
 }
 
@@ -101,6 +110,9 @@ static inline retcode_t get_balances_req_tip_add(get_balances_req_t* const req, 
  * @return A pointer to a tip transaction hash.
  */
 static inline flex_trit_t* get_balances_req_tip_get(get_balances_req_t* const req, size_t index) {
+  if (!req) {
+    return NULL;
+  }
   return hash243_queue_at(req->tips, index);
 }
 

@@ -20,7 +20,7 @@ cc_test(
 
 cc_test(
     name = "test_poly_no_mred_binary",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_poly.c"],
     deps = [
         "//mam/ntru:poly_no_mred_binary",

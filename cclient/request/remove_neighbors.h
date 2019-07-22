@@ -66,7 +66,7 @@ void remove_neighbors_req_free(remove_neighbors_req_t** req);
  * @param[in] idx The index of URI list.
  * @return A URI string. see \ref remove_neighbors_req_t.uris
  */
-const char* remove_neighbors_req_uris_at(remove_neighbors_req_t* req, size_t idx);
+char const* remove_neighbors_req_uris_at(remove_neighbors_req_t* req, size_t idx);
 
 /**
  * @brief Get the size of URI list.
