@@ -80,10 +80,8 @@ static retcode_t collect_transactions_for_pruning_do_func(flex_trit_t *hash, iot
 
   if (current_snapshot_index >= params->current_snapshot_index) {
     *should_branch = true;
-    ERR_BIND_RETURN(
-        tangle_traversal_dfs_to_future(params->tangle, collect_unconfirmed_future_transactions_for_pruning_do_func,
-                                       hash, params->transactions_to_prune, &params),
-        ret);
+    ret = tangle_traversal_dfs_to_future(params->tangle, collect_unconfirmed_future_transactions_for_pruning_do_func,
+                                         hash, params->transactions_to_prune, &params);
   }
 
   if (ret) {
