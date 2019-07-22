@@ -148,7 +148,7 @@ static void *pruning_service_routine(void *arg) {
     }
     end_timestamp = current_timestamp_ms();
     if (ps->last_pruned_snapshot_index > start_index) {
-      log_info(logger_id, "Pruning from % " PRIu64 " to % " PRIu64 " took % " PRIu64 " milliseconds\n", start_index,
+      log_info(logger_id, "Pruning from %" PRIu64 " to %" PRIu64 " took %" PRIu64 " milliseconds\n", start_index,
                ps->last_pruned_snapshot_index, end_timestamp - start_timestamp);
     }
   }
