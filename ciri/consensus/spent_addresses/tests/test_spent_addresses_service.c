@@ -113,9 +113,6 @@ static void test_valid_bundle() {
   TEST_ASSERT(iota_spent_addresses_service_was_address_spent_from(&sas, &sap, &tangle, transaction_address(txs[1]),
                                                                   &spent) == RC_OK);
   TEST_ASSERT_TRUE(spent);
-  TEST_ASSERT(iota_spent_addresses_provider_exist(&sap, transaction_address(txs[1]), &exist) == RC_OK);
-  TEST_ASSERT_TRUE(exist);
-
   transactions_free(txs, 4);
 }
 
