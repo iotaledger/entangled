@@ -205,7 +205,7 @@ static void* milestone_validator(void* arg) {
         iota_tangle_milestone_store(&tangle, &candidate);
         if (candidate.index > mt->latest_milestone_index) {
           log_info(logger_id,
-                   "Latest milestone has changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
+                   "Latest milestone was changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
                    mt->latest_milestone_index, candidate.index, hash243_queue_count(mt->candidates));
           mt->latest_milestone_index = candidate.index;
           memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
@@ -302,8 +302,10 @@ static void* milestone_solidifier(void* arg) {
         log_warning(logger_id, "Updating latest solid milestone failed\n");
       }
       if (previous_solid_latest_milestone_index != mt->latest_solid_milestone_index) {
-        log_info(logger_id, "Latest solid milestone has changed from #%" PRIu64 " to #%" PRIu64 "\n",
-                 previous_solid_latest_milestone_index, mt->latest_solid_milestone_index);
+        log_info(logger_id,
+                 "Latest solid milestone was changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
+                 previous_solid_latest_milestone_index, mt->latest_solid_milestone_index,
+                 mt->latest_milestone_index - mt->latest_solid_milestone_index);
         continue;
       }
     }
