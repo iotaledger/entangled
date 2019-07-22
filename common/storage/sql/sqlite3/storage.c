@@ -790,6 +790,42 @@ done:
   return ret;
 }
 
+retcode_t iota_stor_transactions_delete(storage_connection_t const* const connection, hash243_set_t const hashes) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  retcode_t ret_rollback;
+  bool should_rollback_if_failed = false;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_delete;
+
+  if ((ret = begin_transaction(sqlite3_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  should_rollback_if_failed = true;
+
+  {
+    bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement, .hash_index = 1};
+
+    if ((ret = hash243_set_for_each(hashes, (hash243_on_container_func)bind_execute_hash_do_func, &params)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  if (ret != RC_OK && should_rollback_if_failed) {
+    if ((ret_rollback = rollback_transaction(sqlite3_connection->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+  if ((ret = end_transaction(sqlite3_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
+}
+
 /*
  * Bundle operations
  */
@@ -921,6 +957,20 @@ done:
   return ret;
 }
 
+retcode_t iota_stor_milestone_load_first(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_first;
+
+  if ((ret = execute_statement_load_milestones(sqlite_statement, pack, 1)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
 retcode_t iota_stor_milestone_load_by_index(storage_connection_t const* const connection, uint64_t const index,
                                             iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
@@ -981,6 +1031,27 @@ retcode_t iota_stor_milestone_exist(storage_connection_t const* const connection
   }
 
   if ((ret = execute_statement_exist(sqlite_statement, exist)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_milestone_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+
+  sqlite_statement = sqlite3_connection->statements.milestone_delete_by_hash;
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
     goto done;
   }
 

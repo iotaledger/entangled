@@ -58,6 +58,11 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   offset += value_len;
   value_len = sprintf(str + offset, "%" PRIu64 "\n", snapshot_metadata->timestamp);
   offset += value_len;
+  value_len = sprintf(str + offset, "%" PRIu64 "\n", hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points));
+  offset += value_len;
+  // Dummy value for the sake of alignment with IRI's seen milestones
+  value_len = sprintf(str + offset, "%" PRIu64 "\n", 0UL);
+  offset += value_len;
 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
     if (flex_trits_to_trytes((tryte_t *)(str + offset), NUM_TRYTES_ADDRESS, iter->hash, NUM_TRITS_HASH,
@@ -77,36 +82,46 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
 }
 retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot_metadata_t *const snapshot_metadata) {
   retcode_t ret;
-  char c;
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
   uint64_t snapshot_index;
   int offset;
   char const *ptr = str;
   char *token;
+  size_t num_solid_entry_points;
+  size_t num_seen_entry_point;
 
   if (flex_trits_from_trytes(snapshot_metadata->hash, NUM_TRITS_HASH, (tryte_t *)ptr, NUM_TRYTES_HASH,
                              NUM_TRYTES_HASH) != NUM_TRYTES_HASH) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += NUM_TRYTES_HASH;
+  ptr += 1;  // Terminating character
 
-  c = ptr[0];
-  ptr += 1;
   if (sscanf(ptr, "%" PRIu64 "%n", &snapshot_metadata->index, &offset) != 1) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += offset;
-  c = ptr[0];
   ptr += 1;
   if (sscanf(ptr, "%" PRIu64 "%n", &snapshot_metadata->timestamp, &offset) != 1) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += offset;
-  c = ptr[0];
+  ptr += 1;
+
+  if (sscanf(ptr, "%" PRIu64 "%n", &num_solid_entry_points, &offset) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  ptr += offset;
+  ptr += 1;
+
+  if (sscanf(ptr, "%" PRIu64 "%n", &num_seen_entry_point, &offset) != 1) {
+    return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
+  }
+  ptr += offset;
   ptr += 1;
 
   token = strtok((char *)ptr, ";");
-  while (token != NULL) {
+  while (token != NULL && num_solid_entry_points-- > 0) {
     if (flex_trits_from_trytes(curr_hash, NUM_TRITS_ADDRESS, (tryte_t *)token, NUM_TRYTES_ADDRESS,
                                NUM_TRYTES_ADDRESS) != NUM_TRYTES_ADDRESS) {
       return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;

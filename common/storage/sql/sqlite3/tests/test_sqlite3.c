@@ -183,6 +183,19 @@ void test_stored_milestone(void) {
   }
 }
 
+void test_delete_milestone(void) {
+  DECLARE_PACK_SINGLE_MILESTONE(ms, ms_ptr, ms_pack);
+
+  iota_stor_milestone_load_last(&connection, &ms_pack);
+  TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
+  bool exist = false;
+  TEST_ASSERT(iota_stor_milestone_exist(&connection, ms.hash, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+  TEST_ASSERT(iota_stor_milestone_delete(&connection, ms.hash) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&connection, ms.hash, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
+
 void test_stored_load_hashes_by_address(void) {
   flex_trit_t *hashes[5];
   iota_stor_pack_t pack = {.models = (void **)hashes, .capacity = 5, .num_loaded = 0, .insufficient_capacity = false};
@@ -381,6 +394,50 @@ void test_transactions_arrival_time(void) {
   transaction_free(test_tx);
 }
 
+void test_transactions_delete_two_transactions(void) {
+  flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+  flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
+  iota_transaction_t second_test_transaction = *test_tx;
+  // Make them distinguishable
+  trit_t modified_trit = flex_trits_at(transaction_hash(test_tx), FLEX_TRIT_SIZE_243, 0);
+  if (abs(modified_trit) > 0) {
+    modified_trit = 0;
+  } else {
+    modified_trit = 1;
+  }
+  flex_trits_set_at(second_test_transaction.consensus.hash, FLEX_TRIT_SIZE_243, 0, modified_trit);
+
+  hash243_set_t transactions_to_delete = NULL;
+
+  bool exist = false;
+  TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &exist) ==
+              RC_OK);
+  TEST_ASSERT(exist == true);
+
+  TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH,
+                                          transaction_hash(&second_test_transaction), &exist) == RC_OK);
+  TEST_ASSERT(exist == true);
+
+  TEST_ASSERT(iota_stor_transactions_delete(&connection, transactions_to_delete) == RC_OK);
+
+  hash243_set_add(&transactions_to_delete, transaction_hash(test_tx));
+  hash243_set_add(&transactions_to_delete, transaction_hash(&second_test_transaction));
+
+  TEST_ASSERT(iota_stor_transactions_delete(&connection, transactions_to_delete) == RC_OK);
+
+  TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &exist) ==
+              RC_OK);
+  TEST_ASSERT(exist == false);
+  TEST_ASSERT(iota_stor_transaction_exist(&connection, TRANSACTION_FIELD_HASH,
+                                          transaction_hash(&second_test_transaction), &exist) == RC_OK);
+  TEST_ASSERT(exist == false);
+
+  hash243_set_free(&transactions_to_delete);
+  transaction_free(test_tx);
+}
+
 int main(void) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
@@ -395,11 +452,13 @@ int main(void) {
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
   RUN_TEST(test_milestone_state_delta);
+  RUN_TEST(test_delete_milestone);
   RUN_TEST(test_transaction_update_snapshot_index);
   RUN_TEST(test_transaction_update_solid_state);
   RUN_TEST(test_transactions_update_solid_states_one_transaction);
   RUN_TEST(test_transactions_update_solid_states_two_transaction);
   RUN_TEST(test_transactions_arrival_time);
+  RUN_TEST(test_transactions_delete_two_transactions);
   RUN_TEST(test_destroy_connection);
 
   TEST_ASSERT(storage_destroy() == RC_OK);

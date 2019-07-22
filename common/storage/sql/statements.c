@@ -105,6 +105,8 @@ char *iota_statement_transaction_metadata_clear =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=0," TRANSACTION_COL_SOLID
     "=0," TRANSACTION_COL_VALIDITY "=0";
 
+char *iota_transaction_delete = "DELETE FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+
 /*
  * Partial Transaction statements
  */
@@ -177,6 +179,10 @@ char *iota_statement_milestone_select_last =
     "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
     " DESC LIMIT 1";
 
+char *iota_statement_milestone_select_first =
+    "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    " ASC LIMIT 1";
+
 char *iota_statement_milestone_select_by_index = "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
                                                  " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=?";
 
@@ -191,6 +197,7 @@ char *iota_statement_milestone_exist_by_hash =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
 
+char *iota_statement_milestone_delete_by_hash = "DELETE FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
 /*
  * State delta statements
  */

@@ -31,8 +31,30 @@ cc_library(
     hdrs = ["local_snapshots_manager.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":pruning_service",
         ":shared_local_snapshots",
         "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/snapshot:snapshots_service",
+        "//ciri/consensus/spent_addresses:spent_addresses_service",
+        "//ciri/node:tips_cache",
+    ],
+)
+
+cc_library(
+    name = "pruning_service",
+    srcs = ["pruning_service.c"],
+    hdrs = ["pruning_service.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":conf",
+        "//ciri/consensus/snapshot:snapshots_provider",
+        "//ciri/consensus/spent_addresses:spent_addresses_service",
+        "//ciri/consensus/tangle",
+        "//ciri/consensus/tangle:traversal",
+        "//ciri/node:tips_cache",
+        "//common:errors",
+        "//utils/handles:cond",
+        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
     ],
 )

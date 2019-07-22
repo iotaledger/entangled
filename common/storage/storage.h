@@ -117,6 +117,9 @@ extern retcode_t iota_stor_transaction_find(storage_connection_t const* const co
 
 extern retcode_t iota_stor_transaction_metadata_clear(storage_connection_t const* const connection);
 
+extern retcode_t iota_stor_transactions_delete(storage_connection_t const* const connection,
+                                               hash243_set_t const hashes);
+
 /*
  * Bundle operations
  */
@@ -140,6 +143,9 @@ extern retcode_t iota_stor_milestone_load(storage_connection_t const* const conn
 extern retcode_t iota_stor_milestone_load_last(storage_connection_t const* const connection,
                                                iota_stor_pack_t* const pack);
 
+extern retcode_t iota_stor_milestone_load_first(storage_connection_t const* const connection,
+                                                iota_stor_pack_t* const pack);
+
 extern retcode_t iota_stor_milestone_load_by_index(storage_connection_t const* const connection, uint64_t const index,
                                                    iota_stor_pack_t* const pack);
 
@@ -148,6 +154,9 @@ extern retcode_t iota_stor_milestone_load_next(storage_connection_t const* const
 
 extern retcode_t iota_stor_milestone_exist(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                            bool* const exist);
+
+extern retcode_t iota_stor_milestone_delete(storage_connection_t const* const connection,
+                                            flex_trit_t const* const hash);
 
 /*
  * State delta operations

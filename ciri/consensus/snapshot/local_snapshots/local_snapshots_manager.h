@@ -13,9 +13,12 @@
 
 #include "ciri/consensus/conf.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
+#include "ciri/consensus/snapshot/local_snapshots/pruning_service.h"
 #include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/snapshot/snapshots_service.h"
+#include "ciri/consensus/spent_addresses/spent_addresses_service.h"
 #include "ciri/consensus/tangle/tangle.h"
+#include "ciri/node/tips_cache.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
@@ -31,6 +34,7 @@ typedef struct local_snapshots_manager_s {
   milestone_tracker_t const *mt;
   snapshots_service_t *snapshots_service;
   size_t last_snapshot_transactions_count;
+  pruning_service_t ps;
 } local_snapshots_manager_t;
 
 /**
@@ -45,7 +49,9 @@ typedef struct local_snapshots_manager_s {
  */
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
                                             snapshots_service_t *const snapshots_service,
-                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt);
+                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt,
+                                            spent_addresses_service_t *const spent_addresses_service,
+                                            tips_cache_t *const tips_cache);
 
 /**
  * Starts a local snapshots manager
