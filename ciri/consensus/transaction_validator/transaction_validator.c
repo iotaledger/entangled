@@ -41,8 +41,8 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
   bool is_requested = false;
   bool is_too_futuristic = timestamp_ms > (current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS);
   bool is_below_snapshot =
-      (timestamp_ms < tv->snapshots_provider->inital_snapshot.metadata.timestamp * 1000UL) &&
-      !iota_snapshot_has_solid_entry_point(&tv->snapshots_provider->inital_snapshot, transaction_hash(transaction));
+      (timestamp_ms < tv->snapshots_provider->initial_snapshot.metadata.timestamp * 1000UL) &&
+      !iota_snapshot_has_solid_entry_point(&tv->snapshots_provider->initial_snapshot, transaction_hash(transaction));
 
   requester_is_requested(tv->transaction_requester, transaction_hash(transaction), true, &is_requested);
 

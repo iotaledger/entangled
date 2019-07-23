@@ -339,7 +339,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   lock_handle_init(&mt->candidates_lock);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
-  mt->latest_solid_milestone_index = MAX(conf->last_milestone, snapshots_provider->inital_snapshot.metadata.index);
+  mt->latest_solid_milestone_index = MAX(conf->last_milestone, snapshots_provider->initial_snapshot.metadata.index);
   mt->snapshots_provider = snapshots_provider;
   cond_handle_init(&mt->cond_validator);
   cond_handle_init(&mt->cond_solidifier);
@@ -358,7 +358,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
     return RC_NULL_PARAM;
   }
 
-  iota_snapshot_solid_entry_points_set(&mt->snapshots_provider->inital_snapshot, &solid_entry_points);
+  iota_snapshot_solid_entry_points_set(&mt->snapshots_provider->initial_snapshot, &solid_entry_points);
 
   mt->running = true;
 

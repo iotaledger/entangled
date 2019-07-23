@@ -170,12 +170,12 @@ static void test_replay_several_milestones() {
     TEST_ASSERT_EQUAL_INT(RC_OK, update_latest_solid_milestone(&mt, &tangle));
     TEST_ASSERT_EQUAL_INT64(num_milestones * (i + 1), snapshots_provider.latest_snapshot.metadata.index);
     TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshots_service_take_snapshot(&snapshots_service, &ps, &tangle));
-    TEST_ASSERT_EQUAL_INT64(snapshots_provider.inital_snapshot.metadata.index,
+    TEST_ASSERT_EQUAL_INT64(snapshots_provider.initial_snapshot.metadata.index,
                             (num_milestones * (i + 1) - conf.local_snapshots.min_depth - 1));
     snapshot_t tmp;
     conf.local_snapshots.local_snapshots_is_enabled = true;
     TEST_ASSERT_EQUAL_INT(RC_OK, iota_snapshot_init(&tmp, &conf));
-    test_snapshots_equal(&snapshots_provider.inital_snapshot, &tmp);
+    test_snapshots_equal(&snapshots_provider.initial_snapshot, &tmp);
     iota_snapshot_destroy(&tmp);
   }
 
