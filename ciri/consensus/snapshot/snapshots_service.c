@@ -81,9 +81,6 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
   snapshot_t next_snapshot;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  log_debug(logger_id, "State delta size before taking a snapshot: %" PRId64 "\n ",
-            state_delta_size(snapshots_service->snapshots_provider->initial_snapshot.state));
-
   ERR_BIND_RETURN(iota_snapshots_service_determine_new_entry_point(snapshots_service, &pack, tangle), ret);
 
   ERR_BIND_GOTO(iota_snapshot_reset(&next_snapshot, snapshots_service->conf), ret, cleanup);
@@ -97,8 +94,6 @@ retcode_t iota_snapshots_service_take_snapshot(snapshots_service_t *const snapsh
       iota_local_snapshots_pruning_service_update_current_snapshot(ps, &next_snapshot);
     }
     ERR_BIND_GOTO(iota_snapshots_service_persist_snapshot(snapshots_service, &next_snapshot), ret, cleanup);
-    log_debug(logger_id, "State delta size after taking a snapshot: %" PRId64 "\n ",
-              state_delta_size(snapshots_service->snapshots_provider->initial_snapshot.state));
   }
 
 cleanup:
