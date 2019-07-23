@@ -373,6 +373,7 @@ void hasher_payload_queue_free(hasher_payload_queue_t *const queue) {
 
   CDL_FOREACH_SAFE(*queue, iter, tmp1, tmp2) {
     CDL_DELETE(*queue, iter);
+    free(iter->payload.gossip);
     free(iter);
   }
   *queue = NULL;
