@@ -57,7 +57,7 @@ static void *local_snapshots_manager_routine(void *arg) {
         }
         log_info(logger_id,
                  "Local snapshot from %" PRId64 " to %" PRId64 " took %" PRId64
-                 " milliseconds\nState delta size before snapshot was: % " PRId64 " and now is: %" PRId64 " \n",
+                 " milliseconds\nState delta size before snapshot was: %" PRId64 " and now is: %" PRId64 " \n",
                  prev_initial_index, lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index,
                  end_timestamp - start_timestamp, initial_delta_size,
                  state_delta_size(lsm->snapshots_service->snapshots_provider->initial_snapshot.state));
