@@ -202,6 +202,7 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
 
   for (size_t j = 0; j < HASHER_MAX; j++) {
     if (entries[j] != NULL) {
+      free(entries[j]->payload.gossip);
       free(entries[j]);
     }
   }
