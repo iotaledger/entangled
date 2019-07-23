@@ -78,7 +78,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   conf.snapshot_signature_skip_validation = true;
 
   // Avoid complete initialization with state file loading
-  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.inital_snapshot, &conf) == RC_OK);
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.initial_snapshot, &conf) == RC_OK);
   TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.latest_snapshot, &conf) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &conf, NULL, &snapshots_provider, NULL) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, &lv, &ts) == RC_OK);

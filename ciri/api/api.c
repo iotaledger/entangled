@@ -24,7 +24,7 @@ static logger_id_t logger_id;
 
 static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **const error) {
   bool invalid = api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.metadata.index ==
-                 api->core->consensus.milestone_tracker.snapshots_provider->inital_snapshot.metadata.index;
+                 api->core->consensus.milestone_tracker.snapshots_provider->initial_snapshot.metadata.index;
 
   if (invalid) {
     *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
