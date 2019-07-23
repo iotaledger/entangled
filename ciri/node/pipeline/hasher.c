@@ -134,7 +134,7 @@ static logger_id_t logger_id;
  */
 
 static void *hasher_stage_routine(hasher_stage_t *const hasher) {
-  hasher_payload_queue_entry_t *entry = NULL;
+  hasher_payload_queue_entry_t *entries[HASHER_MAX];
   lock_handle_t lock_cond;
   size_t packets_num = 0;
   trit_t tx[NUM_TRITS_SERIALIZED_TRANSACTION];
@@ -142,7 +142,6 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
   trit_t hash[HASH_LENGTH_TRIT];
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
   PCurl curl;
-  // packet_digest_t *packets = (packet_digest_t *)calloc(PACKET_MAX, sizeof(packet_digest_t));
 
   if (hasher == NULL) {
     return NULL;
@@ -156,14 +155,14 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
 
     while (hasher->running && packets_num < HASHER_MAX) {
       lock_handle_lock(&hasher->lock);
-      entry = hasher_payload_queue_pop(&hasher->queue);
+      entries[packets_num] = hasher_payload_queue_pop(&hasher->queue);
       lock_handle_unlock(&hasher->lock);
 
-      if (entry == NULL) {
+      if (entries[packets_num] == NULL) {
         break;
       }
 
-      bytes_to_trits(entry->payload.gossip->packet.content, GOSSIP_TX_BYTES_LENGTH, tx,
+      bytes_to_trits(entries[packets_num]->payload.gossip->packet.content, GOSSIP_TX_BYTES_LENGTH, tx,
                      NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, acc, packets_num, NUM_TRITS_SERIALIZED_TRANSACTION);
 
@@ -195,6 +194,8 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
       //   log_warning(logger_id, "Processing packet failed\n");
       // }
       // free(packets[j].entry);
+      free(entries[j]->payload.gossip);
+      free(entries[j]);
     }
   }
 
