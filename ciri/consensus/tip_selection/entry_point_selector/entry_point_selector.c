@@ -25,7 +25,7 @@ retcode_t iota_consensus_entry_point_selector_init(entry_point_selector_t *const
 }
 
 retcode_t iota_consensus_entry_point_selector_get_entry_point(entry_point_selector_t *const eps, tangle_t *const tangle,
-                                                              size_t const depth, flex_trit_t *const ep) {
+                                                              uint32_t const depth, flex_trit_t *const ep) {
   retcode_t ret = RC_OK;
   uint64_t milestone_index = MAX((int64_t)eps->mt->latest_solid_milestone_index - depth - 1, 0);
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);

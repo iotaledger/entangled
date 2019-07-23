@@ -45,7 +45,7 @@ static void *local_snapshots_manager_routine(void *arg) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
       prev_initial_index = lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
-      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &tangle);
+      err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &lsm->ps, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
         end_timestamp = current_timestamp_ms();
@@ -110,7 +110,10 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
 
 retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
                                             snapshots_service_t *const snapshots_service,
-                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt) {
+                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt,
+                                            spent_addresses_service_t *const spent_addresses_service,
+                                            tips_cache_t *const tips_cache) {
+  retcode_t ret = RC_OK;
   if (lsm == NULL || mt == NULL || snapshots_service == NULL) {
     return RC_NULL_PARAM;
   }
@@ -124,10 +127,17 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 
   cond_handle_init(&lsm->cond_local_snapshots);
 
-  return RC_OK;
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_init(&lsm->ps, lsm->snapshots_service->snapshots_provider,
+                                                              spent_addresses_service, tips_cache, conf),
+                    ret);
+  }
+
+  return ret;
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
+  retcode_t ret;
   if (lsm == NULL) {
     return RC_NULL_PARAM;
   }
@@ -138,6 +148,10 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
   if (thread_handle_create(&lsm->local_snapshots_thread, (thread_routine_t)local_snapshots_manager_routine, lsm) != 0) {
     log_critical(logger_id, "Spawning local snapshots manager thread failed\n");
     return RC_THREAD_CREATE;
+  }
+
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
+    ERR_BIND_RETURN(iota_local_snapshots_pruning_service_start(&lsm->ps), ret);
   }
 
   return RC_OK;
@@ -152,12 +166,19 @@ retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm
     return RC_OK;
   }
 
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
+    ret = iota_local_snapshots_pruning_service_stop(&lsm->ps);
+  }
+
   lsm->running = false;
   cond_handle_signal(&lsm->cond_local_snapshots);
   log_info(logger_id, "Shutting down local snapshots manager thread\n");
   if (thread_handle_join(lsm->local_snapshots_thread, NULL) != 0) {
     log_error(logger_id, "Shutting down local snapshots manager thread failed\n");
-    ret = RC_THREAD_JOIN;
+    // We want to return the first error
+    if (ret == RC_OK) {
+      ret = RC_THREAD_JOIN;
+    }
   }
 
   return ret;
@@ -170,6 +191,10 @@ retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const 
     return RC_NULL_PARAM;
   } else if (lsm->running) {
     return RC_STILL_RUNNING;
+  }
+
+  if (lsm->conf->local_snapshots.pruning_is_enabled) {
+    ret = iota_local_snapshots_pruning_service_destroy(&lsm->ps);
   }
 
   cond_handle_destroy(&lsm->cond_local_snapshots);

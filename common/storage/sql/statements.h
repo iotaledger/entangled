@@ -33,14 +33,17 @@ typedef struct tangle_statements_s {
   void* transaction_select_essence_and_consensus;
   void* transaction_select_metadata;
   void* transaction_metadata_clear;
+  void* transaction_delete;
   void* milestone_clear;
   void* milestone_insert;
   void* milestone_select_by_hash;
   void* milestone_select_last;
+  void* milestone_select_first;
   void* milestone_select_by_index;
   void* milestone_select_next;
   void* milestone_exist;
   void* milestone_exist_by_hash;
+  void* milestone_delete_by_hash;
   void* state_delta_store;
   void* state_delta_load;
 } tangle_statements_t;
@@ -75,6 +78,7 @@ extern char* iota_statement_transaction_approvers_count;
 extern char* iota_statement_transaction_count;
 extern char* iota_statement_transaction_find;
 extern char* iota_statement_transaction_metadata_clear;
+extern char* iota_transaction_delete;
 
 /*
  * Partial Transaction statements
@@ -100,10 +104,12 @@ extern char* iota_statement_milestone_clear;
 extern char* iota_statement_milestone_insert;
 extern char* iota_statement_milestone_select_by_hash;
 extern char* iota_statement_milestone_select_last;
+extern char* iota_statement_milestone_select_first;
 extern char* iota_statement_milestone_select_by_index;
 extern char* iota_statement_milestone_select_next;
 extern char* iota_statement_milestone_exist;
 extern char* iota_statement_milestone_exist_by_hash;
+extern char* iota_statement_milestone_delete_by_hash;
 
 /*
  * State delta statements

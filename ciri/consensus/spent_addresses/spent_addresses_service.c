@@ -57,10 +57,10 @@ done:
   return ret;
 }
 
-static retcode_t iota_spent_addresses_service_was_tx_spent_from(spent_addresses_provider_t const *const sap,
-                                                                tangle_t const *const tangle,
-                                                                iota_transaction_t const *const tx,
-                                                                flex_trit_t const *const hash, bool *const spent) {
+retcode_t iota_spent_addresses_service_was_tx_spent_from(spent_addresses_provider_t const *const sap,
+                                                         tangle_t const *const tangle,
+                                                         iota_transaction_t const *const tx,
+                                                         flex_trit_t const *const hash, bool *const spent) {
   retcode_t ret = RC_OK;
 
   if (transaction_value(tx) < 0) {

@@ -11,7 +11,7 @@
 #include "cclient/api/extended/send_trytes.h"
 
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-                                    int const depth, int const mwm, flex_trit_t const* const reference,
+                                    uint32_t const depth, uint8_t const mwm, flex_trit_t const* const reference,
                                     bundle_transactions_t* const bundle) {
   retcode_t ret_code = RC_ERROR;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;

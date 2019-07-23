@@ -368,7 +368,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(const std::vec
 }
 
 nonstd::optional<GetTransactionsToApproveResponse> IotaJsonAPI::getTransactionsToApprove(
-    size_t depth, const nonstd::optional<std::string>& reference) {
+    uint32_t depth, const nonstd::optional<std::string>& reference) {
   VLOG(3) << __FUNCTION__;
   json req;
 
