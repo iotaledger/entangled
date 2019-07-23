@@ -34,10 +34,14 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     return ret;
   }
 
+  log_info(logger_id, "Initializing hasher stage\n");
+  if ((ret = hasher_stage_init(&node->hasher)) != RC_OK) {
+    log_critical(logger_id, "Initializing hasher stage failed\n");
+    return ret;
+  }
+
   log_info(logger_id, "Initializing processor stage\n");
-  if ((ret = processor_stage_init(&node->processor, node, &core->consensus.transaction_validator,
-                                  &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) !=
-      RC_OK) {
+  if ((ret = processor_stage_init(&node->processor, node)) != RC_OK) {
     log_critical(logger_id, "Initializing processor stage failed\n");
     return ret;
   }
@@ -95,6 +99,12 @@ retcode_t node_start(node_t* const node) {
     return ret;
   }
 
+  log_info(logger_id, "Starting hasher stage\n");
+  if ((ret = hasher_stage_start(&node->hasher)) != RC_OK) {
+    log_critical(logger_id, "Starting hasher stage failed\n");
+    return ret;
+  }
+
   log_info(logger_id, "Starting processor stage\n");
   if ((ret = processor_stage_start(&node->processor)) != RC_OK) {
     log_critical(logger_id, "Starting processor stage failed\n");
@@ -144,6 +154,11 @@ retcode_t node_stop(node_t* const node) {
   log_info(logger_id, "Stopping broadcaster stage\n");
   if ((ret = broadcaster_stage_stop(&node->broadcaster)) != RC_OK) {
     log_error(logger_id, "Stopping broadcaster stage failed\n");
+  }
+
+  log_info(logger_id, "Stopping hasher stage\n");
+  if ((ret = hasher_stage_stop(&node->hasher)) != RC_OK) {
+    log_error(logger_id, "Stopping hasher stage failed\n");
   }
 
   log_info(logger_id, "Stopping processor stage\n");
@@ -201,6 +216,11 @@ retcode_t node_destroy(node_t* const node) {
   log_info(logger_id, "Destroying broadcaster stage\n");
   if ((ret = broadcaster_stage_destroy(&node->broadcaster)) != RC_OK) {
     log_error(logger_id, "Destroying broadcaster stage failed\n");
+  }
+
+  log_info(logger_id, "Destroying hasher stage\n");
+  if ((ret = hasher_stage_destroy(&node->hasher)) != RC_OK) {
+    log_error(logger_id, "Destroying hasher stage failed\n");
   }
 
   log_info(logger_id, "Destroying processor stage\n");

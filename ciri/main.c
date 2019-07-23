@@ -185,9 +185,10 @@ int main(int argc, char* argv[]) {
         break;
       }
       log_info(logger_id,
-               "Transactions: to process %d, to broadcast %d, to request %d, "
+               "Transactions: to process %d, to hash %d, to broadcast %d, to request %d, "
                "to reply %d, count %d\n",
-               processor_stage_size(&ciri_core.node.processor), broadcaster_stage_size(&ciri_core.node.broadcaster),
+               processor_stage_size(&ciri_core.node.processor), hasher_stage_size(&ciri_core.node.hasher),
+               broadcaster_stage_size(&ciri_core.node.broadcaster),
                requester_size(&ciri_core.node.transaction_requester), responder_stage_size(&ciri_core.node.responder),
                count);
       sleep(STATS_LOG_INTERVAL_S);
