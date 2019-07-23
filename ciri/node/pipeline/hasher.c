@@ -134,7 +134,7 @@ static logger_id_t logger_id;
  */
 
 static void *hasher_stage_routine(hasher_stage_t *const hasher) {
-  hasher_payload_queue_entry_t *entries[HASHER_MAX];
+  hasher_payload_queue_entry_t *entries[HASHER_MAX] = {NULL};
   lock_handle_t lock_cond;
   size_t packets_num = 0;
   trit_t tx[NUM_TRITS_SERIALIZED_TRANSACTION];
@@ -185,7 +185,7 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
     ptrit_curl_absorb(&curl, acc, NUM_TRITS_SERIALIZED_TRANSACTION);
     ptrit_curl_squeeze(&curl, acc, HASH_LENGTH_TRIT);
 
-    for (size_t j = 0; j < packets_num; j++) {
+    for (size_t j = 0; hasher->running && j < packets_num; j++) {
       ptrits_to_trits(acc, hash, j, HASH_LENGTH_TRIT);
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
@@ -193,8 +193,15 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
       // RC_OK) {
       //   log_warning(logger_id, "Processing packet failed\n");
       // }
-      // free(packets[j].entry);
+
       free(entries[j]->payload.gossip);
+      free(entries[j]);
+      entries[j] = NULL;
+    }
+  }
+
+  for (size_t j = 0; j < packets_num; j++) {
+    if (entries[j] != NULL) {
       free(entries[j]);
     }
   }
