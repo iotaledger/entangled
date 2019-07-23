@@ -13,7 +13,7 @@
 #include "ciri/node/protocol/gossip.h"
 #include "common/errors.h"
 #include "utils/handles/cond.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/handles/lock.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -30,7 +30,7 @@ typedef struct node_s node_t;
 typedef struct broadcaster_stage_s {
   // Metadata
   cond_handle_t cond;     /*!< Condition variable to wait/signal the broadcaster */
-  rw_lock_handle_t lock;  /*!< Lock for the broadcaster queue */
+  lock_handle_t lock;     /*!< Lock for the broadcaster queue */
   bool running;           /*!< State of the broadcaster */
   thread_handle_t thread; /*!< Handle for the broadcaster thread */
   // Data

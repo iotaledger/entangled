@@ -49,9 +49,9 @@ static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
   lock_handle_lock(&cond_lock);
 
   while (broadcaster->running) {
-    rw_lock_handle_wrlock(&broadcaster->lock);
+    lock_handle_lock(&broadcaster->lock);
     entry = protocol_gossip_queue_pop(&broadcaster->queue);
-    rw_lock_handle_unlock(&broadcaster->lock);
+    lock_handle_unlock(&broadcaster->lock);
 
     if (entry == NULL) {
       cond_handle_wait(&broadcaster->cond, &cond_lock);
@@ -98,7 +98,7 @@ retcode_t broadcaster_stage_init(broadcaster_stage_t *const broadcaster, node_t 
     log_critical(logger_id, "Initializing condition variable failed\n");
     return RC_COND_INIT;
   }
-  if (rw_lock_handle_init(&broadcaster->lock) != 0) {
+  if (lock_handle_init(&broadcaster->lock) != 0) {
     log_critical(logger_id, "Initializing lock failed\n");
     return RC_LOCK_INIT;
   }
@@ -165,7 +165,7 @@ retcode_t broadcaster_stage_destroy(broadcaster_stage_t *const broadcaster) {
     log_error(logger_id, "Destroying condition variable failed\n");
     ret = RC_COND_DESTROY;
   }
-  if (rw_lock_handle_destroy(&broadcaster->lock) != 0) {
+  if (lock_handle_destroy(&broadcaster->lock) != 0) {
     log_error(logger_id, "Destroying lock failed\n");
     ret = RC_LOCK_DESTROY;
   }
@@ -187,9 +187,9 @@ retcode_t broadcaster_stage_add(broadcaster_stage_t *const broadcaster, protocol
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&broadcaster->lock);
+  lock_handle_lock(&broadcaster->lock);
   ret = protocol_gossip_queue_push(&broadcaster->queue, packet);
-  rw_lock_handle_unlock(&broadcaster->lock);
+  lock_handle_unlock(&broadcaster->lock);
 
   if (ret != RC_OK) {
     log_warning(logger_id, "Pushing packet to broadcaster stage queue failed\n");
@@ -208,9 +208,9 @@ size_t broadcaster_stage_size(broadcaster_stage_t *const broadcaster) {
     return 0;
   }
 
-  rw_lock_handle_rdlock(&broadcaster->lock);
+  lock_handle_lock(&broadcaster->lock);
   size = protocol_gossip_queue_count(broadcaster->queue);
-  rw_lock_handle_unlock(&broadcaster->lock);
+  lock_handle_unlock(&broadcaster->lock);
 
   return size;
 }

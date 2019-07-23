@@ -100,6 +100,7 @@ static void *pruning_service_routine(void *arg) {
   spent_addresses_provider_t sap;
   bool should_wait_for_next_snapshot;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, milestone_pack);
+  lock_handle_t lock_cond;
 
   {
     connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
@@ -120,7 +121,6 @@ static void *pruning_service_routine(void *arg) {
 
   iota_tangle_milestone_load_first(&tangle, &milestone_pack);
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
@@ -277,7 +277,7 @@ retcode_t iota_local_snapshots_pruning_service_init(pruning_service_t *const ps,
   ps->last_snapshot_index_to_prune = ps->last_pruned_snapshot_index;
   ps->spent_addresses_service = spent_addresses_service;
   ps->tips_cache = tips_cache;
-  rw_lock_handle_init(&ps->rw_lock);
+  lock_handle_init(&ps->lock);
   cond_handle_init(&ps->cond_pruning_service);
 
   ps->solid_entry_points = NULL;
@@ -333,7 +333,7 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
   cond_handle_destroy(&ps->cond_pruning_service);
   memset(ps, 0, sizeof(pruning_service_t));
   logger_helper_release(logger_id);
-  rw_lock_handle_destroy(&ps->rw_lock);
+  lock_handle_destroy(&ps->lock);
 
   hash243_set_free(&ps->solid_entry_points);
 
@@ -342,9 +342,9 @@ retcode_t iota_local_snapshots_pruning_service_destroy(pruning_service_t *const 
 
 void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_service_t *const ps,
                                                                   snapshot_t *const snapshot) {
-  rw_lock_handle_wrlock(&ps->rw_lock);
+  lock_handle_lock(&ps->lock);
   ps->last_snapshot_index_to_prune = snapshot->metadata.index;
-  rw_lock_handle_unlock(&ps->rw_lock);
+  lock_handle_unlock(&ps->lock);
 
   hash243_set_free(&ps->solid_entry_points);
   iota_snapshot_solid_entry_points_set(snapshot, &ps->solid_entry_points);
@@ -353,8 +353,10 @@ void iota_local_snapshots_pruning_service_update_current_snapshot(pruning_servic
 
 static uint64_t get_last_snapshot_to_prune_index(pruning_service_t *const ps) {
   uint64_t index;
-  rw_lock_handle_rdlock(&ps->rw_lock);
+
+  lock_handle_lock(&ps->lock);
   index = ps->last_snapshot_index_to_prune;
-  rw_lock_handle_unlock(&ps->rw_lock);
+  lock_handle_unlock(&ps->lock);
+
   return index;
 }

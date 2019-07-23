@@ -181,9 +181,9 @@ static void* milestone_validator(void* arg) {
   lock_handle_lock(&lock_cond);
 
   while (mt->running) {
-    rw_lock_handle_wrlock(&mt->candidates_lock);
+    lock_handle_lock(&mt->candidates_lock);
     entry = hash243_queue_pop(&mt->candidates);
-    rw_lock_handle_unlock(&mt->candidates_lock);
+    lock_handle_unlock(&mt->candidates_lock);
 
     if (entry == NULL) {
       cond_handle_timedwait(&mt->cond_validator, &lock_cond, MILESTONE_VALIDATION_INTERVAL_MS);
@@ -336,7 +336,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->ledger_validator = lv;
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
-  rw_lock_handle_init(&mt->candidates_lock);
+  lock_handle_init(&mt->candidates_lock);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_milestone_index = MAX(conf->last_milestone, snapshots_provider->initial_snapshot.metadata.index);
@@ -443,7 +443,7 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
   }
 
   hash243_queue_free(&mt->candidates);
-  rw_lock_handle_destroy(&mt->candidates_lock);
+  lock_handle_destroy(&mt->candidates_lock);
   cond_handle_destroy(&mt->cond_validator);
   cond_handle_destroy(&mt->cond_solidifier);
   memset(mt, 0, sizeof(milestone_tracker_t));
@@ -459,9 +459,9 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, fl
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&mt->candidates_lock);
+  lock_handle_lock(&mt->candidates_lock);
   ret = hash243_queue_push(&mt->candidates, hash);
-  rw_lock_handle_unlock(&mt->candidates_lock);
+  lock_handle_unlock(&mt->candidates_lock);
 
   if (ret != RC_OK) {
     log_warning(logger_id, "Pushing candidate hash to candidates queue failed\n");
