@@ -16,7 +16,7 @@
 #include "ciri/node/protocol/protocol.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/handles/lock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +46,7 @@ typedef struct neighbor_s {
   size_t buffer_size;
   uv_async_t *writer;
   uv_buf_t_queue_t write_queue;
-  rw_lock_handle_t write_queue_lock;
+  lock_handle_t write_queue_lock;
   endpoint_t endpoint;
   neighbor_state_t state;
   uint8_t protocol_version;
