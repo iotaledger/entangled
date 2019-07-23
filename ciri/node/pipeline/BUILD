@@ -38,6 +38,11 @@ cc_library(
     srcs = ["hasher.c"],
     deps = [
         ":hasher_shared",
+        "//ciri/consensus/milestone:milestone_tracker",
+        "//ciri/consensus/tangle",
+        "//ciri/consensus/transaction_solidifier",
+        "//ciri/consensus/transaction_validator",
+        "//ciri/node:node_shared",
         "//common/crypto/curl-p:ptrit",
         "//common/model:transaction",
         "//common/trinary:flex_trit",

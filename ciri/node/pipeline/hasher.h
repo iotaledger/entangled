@@ -20,6 +20,12 @@
 extern "C" {
 #endif
 
+// Forward declarations
+typedef struct node_s node_t;
+typedef struct transaction_validator_s transaction_validator_t;
+typedef struct transaction_solidifier_s transaction_solidifier_t;
+typedef struct milestone_tracker_s milestone_tracker_t;
+
 typedef struct hasher_payload_s {
   protocol_gossip_queue_entry_t *gossip;
   uint64_t digest;
@@ -39,16 +45,27 @@ typedef struct hasher_stage_s {
   hasher_payload_queue_t queue;
   lock_handle_t lock;
   cond_handle_t cond;
+  node_t *node;
+  transaction_validator_t *transaction_validator;
+  transaction_solidifier_t *transaction_solidifier;
+  milestone_tracker_t *milestone_tracker;
 } hasher_stage_t;
 
 /**
  * Initializes a hasher stage
  *
  * @param[in, out]  hasher  The hasher stage
+ * @param node A node
+ * @param transaction_validator A transaction validator
+ * @param transaction_solidifier A transaction solidifier
+ * @param milestone_tracker A milestone tracker
  *
  * @return a status code
  */
-retcode_t hasher_stage_init(hasher_stage_t *const hasher);
+retcode_t hasher_stage_init(hasher_stage_t *const hasher, node_t *const node,
+                            transaction_validator_t *const transaction_validator,
+                            transaction_solidifier_t *const transaction_solidifier,
+                            milestone_tracker_t *const milestone_tracker);
 
 /**
  * Starts a hasher stage
