@@ -44,7 +44,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   while (lsm->running) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
-      prev_initial_index = lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
+      prev_initial_index = lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index;
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &lsm->ps, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
@@ -54,7 +54,7 @@ static void *local_snapshots_manager_routine(void *arg) {
           goto cleanup;
         }
         log_info(logger_id, "Local snapshot from %" PRId64 " to %" PRId64 " took %" PRId64 " milliseconds\n",
-                 prev_initial_index, lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index,
+                 prev_initial_index, lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index,
                  end_timestamp - start_timestamp);
       } else {
         exponential_delay_factor *= 2;
@@ -96,7 +96,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
   }
 
   uint64_t latest_to_initial_gap = lsm->snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
-                                   lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
+                                   lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index;
 
   if ((latest_to_initial_gap > SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC) ||
       (((new_transactions_count - lsm->last_snapshot_transactions_count) >=
