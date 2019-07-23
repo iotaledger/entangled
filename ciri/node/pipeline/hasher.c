@@ -245,6 +245,9 @@ retcode_t hasher_stage_init(hasher_stage_t *const hasher, node_t *const node,
   lock_handle_init(&hasher->lock);
   cond_handle_init(&hasher->cond);
   hasher->node = node;
+  hasher->transaction_validator = transaction_validator;
+  hasher->transaction_solidifier = transaction_solidifier;
+  hasher->milestone_tracker = milestone_tracker;
 
   return RC_OK;
 }
