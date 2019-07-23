@@ -40,3 +40,10 @@ cc_library(
         ":api_extended",
     ],
 )
+
+cc_binary(
+    name = "libcclient.so",
+    linkshared = True,
+    visibility = ["//visibility:public"],
+    deps = [":api"],
+)

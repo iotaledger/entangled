@@ -12,7 +12,7 @@ Component|Description
 [[Tanglescope]](https://github.com/iotaledger/entangled/tree/develop/tanglescope) | A monitoring tool for the Tangle
 [[MAM]](https://github.com/iotaledger/MAM) |A low level implementation for MAM
 [[CIRI]](https://github.com/iotaledger/entangled/tree/develop/ciri) (WIP) |A low level implementation of IOTA node largely inspired by [[IRI]](https://github.com/iotaledger/iri)
-[[CClient]](https://github.com/iotaledger/entangled/tree/develop/cclient) (WIP)| A low level IOTA client implementation
+[[CClient]](https://github.com/iotaledger/entangled/tree/develop/cclient) | A low level IOTA client implementation
 
 
 ## Building
