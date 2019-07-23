@@ -32,7 +32,7 @@ retcode_t neighbor_destroy(neighbor_t *const neighbor) {
   }
 
   neighbor_write_queue_free(neighbor);
-  rw_lock_handle_destroy(&neighbor->write_queue_lock);
+  lock_handle_destroy(&neighbor->write_queue_lock);
 
   return RC_OK;
 }
@@ -114,9 +114,9 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, p
   memcpy(buffer + offset, packet->content + GOSSIP_SIG_MAX_BYTES_LENGTH,
          GOSSIP_NON_SIG_BYTES_LENGTH + GOSSIP_REQUESTED_TX_HASH_BYTES_LENGTH);
 
-  rw_lock_handle_wrlock(&neighbor->write_queue_lock);
+  lock_handle_lock(&neighbor->write_queue_lock);
   neighbor_write_queue_push(neighbor, buffer, HEADER_BYTES_LENGTH + buffer_size);
-  rw_lock_handle_unlock(&neighbor->write_queue_lock);
+  lock_handle_unlock(&neighbor->write_queue_lock);
 
   // TODO not here
   neighbor->writer->data = neighbor;

@@ -15,7 +15,6 @@
 #include "common/trinary/flex_trit.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/lock.h"
-#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -29,7 +28,7 @@ typedef struct responder_stage_s {
   thread_handle_t thread;
   bool running;
   transaction_request_queue_t queue;
-  rw_lock_handle_t lock;
+  lock_handle_t lock;
   cond_handle_t cond;
   node_t *node;
 } responder_stage_t;

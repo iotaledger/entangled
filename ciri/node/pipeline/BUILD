@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
-        "//utils/handles:rw_lock",
+        "//utils/handles:lock",
         "//utils/handles:thread",
     ],
 )
@@ -30,7 +30,6 @@ cc_library(
         "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
         "//utils/handles:lock",
-        "//utils/handles:rw_lock",
         "//utils/handles:thread",
     ],
 )
@@ -104,7 +103,6 @@ cc_library(
         "//ciri/node/protocol:transaction_request",
         "//utils/handles:cond",
         "//utils/handles:lock",
-        "//utils/handles:rw_lock",
         "//utils/handles:thread",
     ],
 )

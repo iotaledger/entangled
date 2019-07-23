@@ -28,6 +28,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   tangle_t tangle;
   lock_handle_t lock_cond;
   uint64_t prev_initial_index;
+  uint64_t initial_delta_size;
 
   {
     connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
@@ -44,7 +45,8 @@ static void *local_snapshots_manager_routine(void *arg) {
   while (lsm->running) {
     if (skip_check || iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       start_timestamp = current_timestamp_ms();
-      prev_initial_index = lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
+      prev_initial_index = lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index;
+      initial_delta_size = state_delta_size(lsm->snapshots_service->snapshots_provider->initial_snapshot.state);
       err = iota_snapshots_service_take_snapshot(lsm->snapshots_service, &lsm->ps, &tangle);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
@@ -53,9 +55,12 @@ static void *local_snapshots_manager_routine(void *arg) {
           log_critical(logger_id, "Failed in querying db size\n");
           goto cleanup;
         }
-        log_info(logger_id, "Local snapshot from %" PRId64 " to %" PRId64 " took %" PRId64 " milliseconds\n",
-                 prev_initial_index, lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index,
-                 end_timestamp - start_timestamp);
+        log_info(logger_id,
+                 "Local snapshot from %" PRId64 " to %" PRId64 " took %" PRId64
+                 " milliseconds\nState delta size before snapshot was: %" PRId64 " and now is: %" PRId64 " \n",
+                 prev_initial_index, lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index,
+                 end_timestamp - start_timestamp, initial_delta_size,
+                 state_delta_size(lsm->snapshots_service->snapshots_provider->initial_snapshot.state));
       } else {
         exponential_delay_factor *= 2;
         log_warning(logger_id, "Local snapshot is delayed in %d ms, error code: %d\n",
@@ -64,7 +69,7 @@ static void *local_snapshots_manager_routine(void *arg) {
                               exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
       }
     }
-    if (!iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
+    if (lsm->running && !iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond, LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
       skip_check = false;
     } else {
@@ -96,7 +101,7 @@ bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t
   }
 
   uint64_t latest_to_initial_gap = lsm->snapshots_service->snapshots_provider->latest_snapshot.metadata.index -
-                                   lsm->snapshots_service->snapshots_provider->inital_snapshot.metadata.index;
+                                   lsm->snapshots_service->snapshots_provider->initial_snapshot.metadata.index;
 
   if ((latest_to_initial_gap > SNAPSHOT_SERVICE_MAX_NUM_MILESTONES_TO_CALC) ||
       (((new_transactions_count - lsm->last_snapshot_transactions_count) >=

@@ -89,7 +89,7 @@ int main(void) {
   api.core->consensus.conf.mwm = 1;
 
   // Avoid complete initialization with state file loading
-  iota_snapshot_reset(&api.core->consensus.snapshots_provider.inital_snapshot, &api.core->consensus.conf);
+  iota_snapshot_reset(&api.core->consensus.snapshots_provider.initial_snapshot, &api.core->consensus.conf);
   iota_snapshot_reset(&api.core->consensus.snapshots_provider.latest_snapshot, &api.core->consensus.conf);
 
   iota_consensus_transaction_validator_init(&api.core->consensus.transaction_validator,

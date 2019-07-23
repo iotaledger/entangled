@@ -14,7 +14,7 @@
 #include "ciri/node/uint64_t_to_flex_trit_t_map.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/handles/lock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ typedef struct recent_seen_bytes_cache_s {
   size_t capacity;
   uint64_t miss;
   uint64_t hit;
-  rw_lock_handle_t lock;
+  lock_handle_t lock;
 } recent_seen_bytes_cache_t;
 
 retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, size_t const capacity);
@@ -49,9 +49,9 @@ static inline retcode_t recent_seen_bytes_cache_hash(byte_t const *const bytes, 
 static inline size_t recent_seen_bytes_cache_size(recent_seen_bytes_cache_t *const cache) {
   size_t size = 0;
 
-  rw_lock_handle_rdlock(&cache->lock);
+  lock_handle_lock(&cache->lock);
   size = uint64_t_to_flex_trit_t_map_size(cache->map);
-  rw_lock_handle_unlock(&cache->lock);
+  lock_handle_unlock(&cache->lock);
 
   return size;
 }

@@ -18,7 +18,7 @@
 #include "common/model/transaction.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/handles/cond.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/handles/lock.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -54,8 +54,7 @@ typedef struct milestone_tracker_s {
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;
-  rw_lock_handle_t candidates_lock;
-  // bool accept_any_testnet_coo;
+  lock_handle_t candidates_lock;
 } milestone_tracker_t;
 
 /**

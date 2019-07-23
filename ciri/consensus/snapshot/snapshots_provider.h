@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 typedef struct snapshots_provider_s {
-  snapshot_t inital_snapshot;
+  snapshot_t initial_snapshot;
   // This snapshot is an entry point and it's always updated with the last snapshot after being persisted
   snapshot_t latest_snapshot;
 } snapshots_provider_t;

@@ -278,12 +278,14 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
   while (processor->running) {
     packet_cnt = 0;
     while (packet_cnt < PACKET_MAX) {
-      rw_lock_handle_wrlock(&processor->lock);
+      lock_handle_lock(&processor->lock);
       entry = protocol_gossip_queue_pop(&processor->queue);
-      rw_lock_handle_unlock(&processor->lock);
+      lock_handle_unlock(&processor->lock);
+
       if (entry == NULL) {
         break;
       }
+
       recent_seen_bytes_cache_hash(entry->packet.content, &digest);
       recent_seen_bytes_cache_get(&processor->node->recent_seen_bytes, digest, flex_hash, &digest_found);
       if (digest_found) {
@@ -359,7 +361,7 @@ retcode_t processor_stage_init(processor_stage_t *const processor, node_t *const
 
   processor->running = false;
   processor->queue = NULL;
-  rw_lock_handle_init(&processor->lock);
+  lock_handle_init(&processor->lock);
   cond_handle_init(&processor->cond);
   processor->node = node;
   processor->transaction_validator = transaction_validator;
@@ -410,7 +412,7 @@ retcode_t processor_stage_destroy(processor_stage_t *const processor) {
   }
 
   protocol_gossip_queue_free(&processor->queue);
-  rw_lock_handle_destroy(&processor->lock);
+  lock_handle_destroy(&processor->lock);
   cond_handle_destroy(&processor->cond);
   processor->node = NULL;
   processor->transaction_validator = NULL;
@@ -429,9 +431,9 @@ retcode_t processor_stage_add(processor_stage_t *const processor, protocol_gossi
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&processor->lock);
+  lock_handle_lock(&processor->lock);
   ret = protocol_gossip_queue_push(&processor->queue, packet);
-  rw_lock_handle_unlock(&processor->lock);
+  lock_handle_unlock(&processor->lock);
 
   if (ret != RC_OK) {
     log_warning(logger_id, "Pushing packet to processor stage queue failed\n");
@@ -450,9 +452,9 @@ size_t processor_stage_size(processor_stage_t *const processor) {
     return 0;
   }
 
-  rw_lock_handle_rdlock(&processor->lock);
+  lock_handle_lock(&processor->lock);
   size = protocol_gossip_queue_count(processor->queue);
-  rw_lock_handle_unlock(&processor->lock);
+  lock_handle_unlock(&processor->lock);
 
   return size;
 }

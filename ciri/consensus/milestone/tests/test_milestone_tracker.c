@@ -449,7 +449,7 @@ int main() {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
-  snapshots_provider.inital_snapshot.metadata.index = 0;
+  snapshots_provider.initial_snapshot.metadata.index = 0;
 
   RUN_TEST(milestone_validation_curl_p_27_sec_lvl_1);
   RUN_TEST(milestone_validation_kerl_sec_lvl_1);
