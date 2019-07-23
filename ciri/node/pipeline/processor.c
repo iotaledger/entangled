@@ -114,8 +114,8 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
         if (process_request_bytes(processor, neighbor, &entry->packet, hash) != RC_OK) {
           log_warning(logger_id, "Processing request bytes failed\n");
         }
-        free(entry);
       }
+      free(entry);
     } else {
       if (hasher_stage_add(&processor->node->hasher, entry, digest) != RC_OK) {
         log_warning(logger_id, "Sending payload to hasher stage failed\n");
