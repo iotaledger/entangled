@@ -43,7 +43,7 @@ cc_library(
         "//ciri/node/protocol:gossip",
         "//common:errors",
         "//common/trinary:flex_trit",
-        "//utils/handles:rw_lock",
+        "//utils/handles:lock",
         "@xxhash",
     ],
 )

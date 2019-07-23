@@ -166,9 +166,9 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
   lock_handle_lock(&lock_cond);
 
   while (responder->running) {
-    rw_lock_handle_wrlock(&responder->lock);
+    lock_handle_lock(&responder->lock);
     entry = transaction_request_queue_pop(&responder->queue);
-    rw_lock_handle_unlock(&responder->lock);
+    lock_handle_unlock(&responder->lock);
 
     if (entry == NULL) {
       cond_handle_wait(&responder->cond, &lock_cond);
@@ -208,7 +208,7 @@ retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const
 
   responder->running = false;
   responder->queue = NULL;
-  rw_lock_handle_init(&responder->lock);
+  lock_handle_init(&responder->lock);
   cond_handle_init(&responder->cond);
   responder->node = node;
 
@@ -260,7 +260,7 @@ retcode_t responder_stage_destroy(responder_stage_t *const responder) {
   }
 
   transaction_request_queue_free(&responder->queue);
-  rw_lock_handle_destroy(&responder->lock);
+  lock_handle_destroy(&responder->lock);
   cond_handle_destroy(&responder->cond);
   responder->node = NULL;
 
@@ -277,9 +277,9 @@ retcode_t responder_stage_add(responder_stage_t *const responder, neighbor_t *co
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&responder->lock);
+  lock_handle_lock(&responder->lock);
   ret = transaction_request_queue_push(&responder->queue, neighbor, hash);
-  rw_lock_handle_unlock(&responder->lock);
+  lock_handle_unlock(&responder->lock);
 
   if (ret != RC_OK) {
     log_warning(logger_id, "Pushing transaction_request to responder stage queue failed\n");
@@ -298,9 +298,9 @@ size_t responder_stage_size(responder_stage_t *const responder) {
     return 0;
   }
 
-  rw_lock_handle_rdlock(&responder->lock);
+  lock_handle_lock(&responder->lock);
   size = transaction_request_queue_count(responder->queue);
-  rw_lock_handle_unlock(&responder->lock);
+  lock_handle_unlock(&responder->lock);
 
   return size;
 }
