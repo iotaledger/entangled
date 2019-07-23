@@ -69,7 +69,7 @@ static void *local_snapshots_manager_routine(void *arg) {
                               exponential_delay_factor * LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
       }
     }
-    if (!iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
+    if (lsm->running && !iota_local_snapshots_manager_should_take_snapshot(lsm, &tangle)) {
       cond_handle_timedwait(&lsm->cond_local_snapshots, &lock_cond, LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS);
       skip_check = false;
     } else {
