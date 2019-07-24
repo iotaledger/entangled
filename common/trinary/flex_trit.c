@@ -14,7 +14,7 @@
 #include "utils/macros.h"
 
 #if defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
-static flex_trit_t flex_trit_set_residual(flex_trit_t flex_trit, size_t residual) {
+static uint8_t flex_trit_set_residual(uint8_t flex_trit, size_t residual) {
   // residual <= 4
   size_t shift = (4 - residual) << 1U;
   flex_trit <<= shift;
