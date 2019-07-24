@@ -21,6 +21,10 @@ retcode_t transfer_message_set_trytes(transfer_t* tf, tryte_t const* const tryte
 }
 
 retcode_t transfer_message_set_string(transfer_t* tf, char const* const str) {
+  if (strlen(str) == 0) {
+    return RC_NULL_PARAM;
+  }
+
   size_t trytes_len = strlen(str) * 2;
   tryte_t trytes_msg[trytes_len];
   ascii_to_trytes(str, trytes_msg);
