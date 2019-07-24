@@ -54,7 +54,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t const *const lv, t
   hash243_set_t analyzed_hashes = NULL;
 
   // TODO this could be removed if SEPs were in database instead of in a map
-  iota_snapshot_solid_entry_points_set(&lv->milestone_tracker->snapshots_provider->inital_snapshot, &analyzed_hashes);
+  iota_snapshot_solid_entry_points_set(&lv->milestone_tracker->snapshots_provider->initial_snapshot, &analyzed_hashes);
 
   if ((ret = tangle_traversal_dfs_to_past(tangle, update_snapshot_milestone_do_func, hash, lv->conf->genesis_hash,
                                           &analyzed_hashes, &hashes_to_update)) != RC_OK) {
@@ -77,7 +77,7 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv, tangle_t con
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
   if ((ret = iota_tangle_milestone_load_by_index(
-           tangle, lv->milestone_tracker->snapshots_provider->inital_snapshot.metadata.index + 1, &pack)) != RC_OK) {
+           tangle, lv->milestone_tracker->snapshots_provider->initial_snapshot.metadata.index + 1, &pack)) != RC_OK) {
     goto done;
   }
 
@@ -187,7 +187,7 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv, tangle_t *
                                               .tangle = tangle};
 
   // TODO this could be removed if SEPs were in database instead of in a map
-  iota_snapshot_solid_entry_points_set(&lv->milestone_tracker->snapshots_provider->inital_snapshot, analyzed_hashes);
+  iota_snapshot_solid_entry_points_set(&lv->milestone_tracker->snapshots_provider->initial_snapshot, analyzed_hashes);
 
   ret = tangle_traversal_dfs_to_past(tangle, get_latest_delta_do_func, tip, lv->conf->genesis_hash, analyzed_hashes,
                                      &params);

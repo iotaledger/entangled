@@ -32,7 +32,7 @@ void transaction_invalid_value() {
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
+  snapshots_provider.initial_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   transaction_set_value(tx1, -IOTA_SUPPLY - 1);
@@ -50,7 +50,7 @@ void transaction_invalid_hash() {
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
+  snapshots_provider.initial_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   tx1->consensus.hash[FLEX_TRIT_SIZE_243 - 1] = tx1->consensus.hash[0];
@@ -69,7 +69,7 @@ void transaction_invalid_attachment_timestamp_too_futuristic() {
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_set_attachment_timestamp(tx1, current_timestamp_ms() + 99 * 60 * 60 * 1000);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = 0;
+  snapshots_provider.initial_snapshot.metadata.timestamp = 0;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
@@ -86,7 +86,7 @@ void transaction_invalid_attachment_timestamp_too_old() {
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = current_timestamp_ms() / 1000;
+  snapshots_provider.initial_snapshot.metadata.timestamp = current_timestamp_ms() / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   tx1->consensus.hash[FLEX_TRIT_SIZE_243 - 1] = tx1->consensus.hash[0];
@@ -104,7 +104,7 @@ void transaction_invalid_value_tx_wrong_address() {
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
+  snapshots_provider.initial_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   transaction_address(tx1)[FLEX_TRIT_SIZE_243 - 1] = transaction_address(tx1)[4];
@@ -124,7 +124,7 @@ void transaction_invalid_timestamp_too_futuristic() {
   transaction_set_attachment_timestamp(tx1, 0);
   transaction_set_timestamp(tx1, current_timestamp_ms() + 99 * 60 * 60 * 1000);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = 0;
+  snapshots_provider.initial_snapshot.metadata.timestamp = 0;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
@@ -144,7 +144,7 @@ void transaction_invalid_timestamp_too_old() {
   uint64_t current_time = current_timestamp_ms();
   transaction_set_timestamp(tx1, current_time / 1000 - 1);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = current_time / 1000UL;
+  snapshots_provider.initial_snapshot.metadata.timestamp = current_time / 1000UL;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
@@ -161,7 +161,7 @@ void transaction_is_valid() {
 
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
-  snapshots_provider.inital_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
+  snapshots_provider.initial_snapshot.metadata.timestamp = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &snapshots_provider, &transaction_requester, &conf) ==
               RC_OK);
   TEST_ASSERT_TRUE(iota_consensus_transaction_validate(&tv, tx1));
@@ -176,9 +176,9 @@ int main() {
   iota_consensus_conf_init(&conf);
   conf.mwm = 14;
   conf.local_snapshots.local_snapshots_is_enabled = false;
-  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.inital_snapshot, &conf) == RC_OK);
+  TEST_ASSERT(iota_snapshot_reset(&snapshots_provider.initial_snapshot, &conf) == RC_OK);
   // Avoid complete initialization with state file loading
-  iota_snapshot_reset(&snapshots_provider.inital_snapshot, &conf);
+  iota_snapshot_reset(&snapshots_provider.initial_snapshot, &conf);
   iota_snapshot_reset(&snapshots_provider.latest_snapshot, &conf);
   TEST_ASSERT(requester_init(&transaction_requester, &node) == RC_OK);
 

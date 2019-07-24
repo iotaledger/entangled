@@ -243,7 +243,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
     return RC_OK;
   }
 
-  iota_snapshot_solid_entry_points_set(&ts->snapshots_provider->inital_snapshot, &analyzed_hashes);
+  iota_snapshot_solid_entry_points_set(&ts->snapshots_provider->initial_snapshot, &analyzed_hashes);
   hash243_set_append(&analyzed_hashes, &solid_entry_points_hashes);
   check_solidity_do_func_params_t params = {.ts = ts,
                                             .tangle = tangle,
@@ -284,7 +284,7 @@ static retcode_t check_transaction_and_update_solid_state(transaction_solidifier
 
   *is_new_solid = false;
 
-  if (iota_snapshot_has_solid_entry_point(&ts->snapshots_provider->inital_snapshot, hash)) {
+  if (iota_snapshot_has_solid_entry_point(&ts->snapshots_provider->initial_snapshot, hash)) {
     return RC_OK;
   }
 
@@ -323,7 +323,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts, 
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  if (iota_snapshot_has_solid_entry_point(&ts->snapshots_provider->inital_snapshot, approvee)) {
+  if (iota_snapshot_has_solid_entry_point(&ts->snapshots_provider->initial_snapshot, approvee)) {
     *solid = true;
     return RC_OK;
   }

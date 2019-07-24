@@ -170,9 +170,9 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
   lock_handle_lock(&lock_cond);
 
   while (responder->running) {
-    rw_lock_handle_wrlock(&responder->lock);
+    lock_handle_lock(&responder->lock);
     entry = transaction_request_queue_pop(&responder->queue);
-    rw_lock_handle_unlock(&responder->lock);
+    lock_handle_unlock(&responder->lock);
 
     if (entry == NULL) {
       cond_handle_wait(&responder->cond, &lock_cond);
@@ -218,7 +218,7 @@ retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const
 
   responder->running = false;
   responder->queue = NULL;
-  rw_lock_handle_init(&responder->lock);
+  lock_handle_init(&responder->lock);
   cond_handle_init(&responder->cond);
   responder->node = node;
   responder->snapshot_provider = snapshot_provider;
@@ -272,7 +272,7 @@ retcode_t responder_stage_destroy(responder_stage_t *const responder) {
   }
 
   transaction_request_queue_free(&responder->queue);
-  rw_lock_handle_destroy(&responder->lock);
+  lock_handle_destroy(&responder->lock);
   cond_handle_destroy(&responder->cond);
   responder->node = NULL;
 
@@ -289,9 +289,9 @@ retcode_t responder_stage_add(responder_stage_t *const responder, neighbor_t *co
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&responder->lock);
+  lock_handle_lock(&responder->lock);
   ret = transaction_request_queue_push(&responder->queue, neighbor, hash);
-  rw_lock_handle_unlock(&responder->lock);
+  lock_handle_unlock(&responder->lock);
 
   if (ret != RC_OK) {
     log_warning(logger_id, "Pushing transaction_request to responder stage queue failed\n");
@@ -310,9 +310,43 @@ size_t responder_stage_size(responder_stage_t *const responder) {
     return 0;
   }
 
-  rw_lock_handle_rdlock(&responder->lock);
+  lock_handle_lock(&responder->lock);
   size = transaction_request_queue_count(responder->queue);
-  rw_lock_handle_unlock(&responder->lock);
+  lock_handle_unlock(&responder->lock);
 
   return size;
+}
+
+retcode_t responder_process_request(responder_stage_t *const responder, neighbor_t *const neighbor,
+                                    protocol_gossip_t const *const packet, flex_trit_t const *const hash) {
+  retcode_t ret = RC_OK;
+  flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
+
+  if (responder == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+
+  // Retreives the request hash from the packet
+  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + GOSSIP_TX_BYTES_LENGTH,
+                            HASH_LENGTH_TRIT - responder->node->conf.mwm,
+                            HASH_LENGTH_TRIT - responder->node->conf.mwm) !=
+      HASH_LENGTH_TRIT - responder->node->conf.mwm) {
+    log_warning(logger_id, "Invalid request bytes\n");
+    return RC_PROCESSOR_INVALID_REQUEST;
+  }
+
+  // If requested hash is equal to transaction hash, sets the request hash to null to request a random tip
+  if (memcmp(request_hash, hash, FLEX_TRIT_SIZE_243) == 0) {
+    memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  }
+
+  // Adds request to the responder stage queue
+  if ((ret = responder_stage_add(responder, neighbor, request_hash)) != RC_OK) {
+    log_warning(logger_id, "Propagating request to responder failed\n");
+    return ret;
+  }
+
+  return RC_OK;
 }

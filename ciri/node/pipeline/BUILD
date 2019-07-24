@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
-        "//utils/handles:rw_lock",
+        "//utils/handles:lock",
         "//utils/handles:thread",
     ],
 )
@@ -23,14 +23,42 @@ cc_library(
 )
 
 cc_library(
-    name = "processor_shared",
-    hdrs = ["processor.h"],
+    name = "hasher_shared",
+    hdrs = ["hasher.h"],
     deps = [
-        "//ciri/consensus/transaction_validator",
         "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
         "//utils/handles:lock",
-        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "hasher",
+    srcs = ["hasher.c"],
+    deps = [
+        ":hasher_shared",
+        "//ciri/consensus/milestone:milestone_tracker",
+        "//ciri/consensus/tangle",
+        "//ciri/consensus/transaction_solidifier",
+        "//ciri/consensus/transaction_validator",
+        "//ciri/node:node_shared",
+        "//common/crypto/curl-p:ptrit",
+        "//common/model:transaction",
+        "//common/trinary:flex_trit",
+        "//common/trinary:trit_byte",
+        "//common/trinary:trit_ptrit",
+        "//utils:logger_helper",
+    ],
+)
+
+cc_library(
+    name = "processor_shared",
+    hdrs = ["processor.h"],
+    deps = [
+        "//ciri/node/protocol:gossip",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
         "//utils/handles:thread",
     ],
 )
@@ -39,13 +67,10 @@ cc_library(
     name = "processor",
     srcs = ["processor.c"],
     deps = [
+        ":hasher",
         ":processor_shared",
-        "//ciri/consensus/milestone:milestone_tracker",
-        "//ciri/consensus/transaction_solidifier",
         "//ciri/node:node_shared",
         "//ciri/node/network:neighbor",
-        "//common/crypto/curl-p:ptrit",
-        "//common/trinary:trit_ptrit",
     ],
 )
 
@@ -82,7 +107,6 @@ cc_library(
         "//ciri/node/protocol:transaction_request",
         "//utils/handles:cond",
         "//utils/handles:lock",
-        "//utils/handles:rw_lock",
         "//utils/handles:thread",
     ],
 )

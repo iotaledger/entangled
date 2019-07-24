@@ -15,7 +15,7 @@ retcode_t recent_seen_bytes_cache_init(recent_seen_bytes_cache_t *const cache, s
   cache->capacity = capacity;
   cache->miss = 0;
   cache->hit = 0;
-  rw_lock_handle_init(&cache->lock);
+  lock_handle_init(&cache->lock);
 
   return uint64_t_to_flex_trit_t_map_init(&cache->map, sizeof(uint64_t), FLEX_TRIT_SIZE_243);
 }
@@ -25,7 +25,7 @@ retcode_t recent_seen_bytes_cache_destroy(recent_seen_bytes_cache_t *const cache
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_destroy(&cache->lock);
+  lock_handle_destroy(&cache->lock);
 
   return uint64_t_to_flex_trit_t_map_free(&cache->map);
 }
@@ -39,7 +39,7 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&cache->lock);
+  lock_handle_lock(&cache->lock);
 
   if ((*found = uint64_t_to_flex_trit_t_map_find(cache->map, &digest, &entry))) {
     memcpy(hash, entry->value, FLEX_TRIT_SIZE_243);
@@ -48,7 +48,7 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
     cache->miss++;
   }
 
-  rw_lock_handle_unlock(&cache->lock);
+  lock_handle_unlock(&cache->lock);
 
   return ret;
 }
@@ -62,7 +62,7 @@ retcode_t recent_seen_bytes_cache_put(recent_seen_bytes_cache_t *const cache, ui
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&cache->lock);
+  lock_handle_lock(&cache->lock);
 
   if (!uint64_t_to_flex_trit_t_map_find(cache->map, &digest, &entry)) {
     if (uint64_t_to_flex_trit_t_map_size(cache->map) >= cache->capacity) {
@@ -74,7 +74,7 @@ retcode_t recent_seen_bytes_cache_put(recent_seen_bytes_cache_t *const cache, ui
   }
 
 done:
-  rw_lock_handle_unlock(&cache->lock);
+  lock_handle_unlock(&cache->lock);
 
   return ret;
 }
