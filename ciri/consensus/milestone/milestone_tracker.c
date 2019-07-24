@@ -19,7 +19,6 @@
 #include "utils/macros.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
-#define MILESTONE_VALIDATION_INTERVAL_MS 10ULL
 #define SOLID_MILESTONE_RESCAN_INTERVAL_MS 50ULL
 
 static logger_id_t logger_id;
@@ -187,7 +186,7 @@ static void* milestone_validator(void* arg) {
     lock_handle_unlock(&mt->candidates_lock);
 
     if (entry == NULL) {
-      cond_handle_timedwait(&mt->cond_validator, &lock_cond, MILESTONE_VALIDATION_INTERVAL_MS);
+      cond_handle_wait(&mt->cond_validator, &lock_cond);
       continue;
     }
 
@@ -474,6 +473,7 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, fl
     log_warning(logger_id, "Pushing candidate hash to candidates queue failed\n");
     return RC_OOM;
   }
+  cond_handle_signal(&mt->cond_validator);
 
   return RC_OK;
 }
