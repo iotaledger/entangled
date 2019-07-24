@@ -25,65 +25,101 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len, f
   // num_bytes == num_trits in a 1:1 scheme
   memcpy(to_flex_trits, flex_trits + start, num_bytes);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
-  trit_t trits[6] = {0};
-  size_t index = start / 3U;
-  size_t offset = start % 3U;
-  size_t i, j;
-  size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
-  for (i = index, j = 0; j < num_bytes; i++, j++) {
-    trytes_to_trits(&flex_trits[i], trits, 1);
-    if (offset && i < end_index) {
-      trytes_to_trits(&flex_trits[i + 1], trits + 3, 1);
+  if (0 == (start % NUM_TRITS_PER_FLEX_TRIT)) {
+    // Copy flex trits as bytes
+    memcpy(to_flex_trits, flex_trits + start / NUM_TRITS_PER_FLEX_TRIT, num_trits / NUM_TRITS_PER_FLEX_TRIT);
+    // Handle tail
+    if (0 != num_trits % NUM_TRITS_PER_FLEX_TRIT) {
+      trit_t trits[3] = {0};
+      trytes_to_trits(flex_trits + (start + num_trits) / NUM_TRITS_PER_FLEX_TRIT, trits, 1);
+      trits_to_trytes(trits, to_flex_trits + num_trits / NUM_TRITS_PER_FLEX_TRIT, num_trits % NUM_TRITS_PER_FLEX_TRIT);
     }
-    trits_to_trytes(trits + offset, to_flex_trits + j, 3);
-  }
-  // There is a risk of noise after the last trit so we need to clean up
-  uint8_t residual = num_trits % 3U;
-  if (residual) {
-    // size_t tlen = (num_trits - num_bytes * 3 + 3);
-    trits_to_trytes(trits + offset, to_flex_trits + num_bytes - 1, residual);
+  } else {
+    trit_t trits[6] = {0};
+    size_t index = start / 3U;
+    size_t offset = start % 3U;
+    size_t i, j;
+    size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
+    for (i = index, j = 0; j < num_bytes; i++, j++) {
+      trytes_to_trits(&flex_trits[i], trits, 1);
+      if (offset && i < end_index) {
+        trytes_to_trits(&flex_trits[i + 1], trits + 3, 1);
+      }
+      trits_to_trytes(trits + offset, to_flex_trits + j, 3);
+    }
+    // There is a risk of noise after the last trit so we need to clean up
+    uint8_t residual = num_trits % 3U;
+    if (residual) {
+      // size_t tlen = (num_trits - num_bytes * 3 + 3);
+      trits_to_trytes(trits + offset, to_flex_trits + num_bytes - 1, residual);
+    }
   }
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
-  uint8_t buffer = 0;
-  uint8_t tshift = (start & 3) << 1U;
-  uint8_t rshift = (8U - tshift) & 7;
-  size_t index = start >> 2U;
-  size_t i, j;
-  size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
-  // Calculate the number of bytes to copy over
-  for (i = index, j = 0; j < num_bytes; i++, j++) {
-    buffer = flex_trits[i];
-    buffer = buffer >> tshift;
-    if (rshift && i < end_index) {
-      buffer |= (flex_trits[i + 1] << rshift);
+  if (0 == (start % NUM_TRITS_PER_FLEX_TRIT)) {
+    // Copy flex trits as bytes
+    memcpy(to_flex_trits, flex_trits + start / NUM_TRITS_PER_FLEX_TRIT, num_trits / NUM_TRITS_PER_FLEX_TRIT);
+    // Handle tail
+    if (0 != num_trits % NUM_TRITS_PER_FLEX_TRIT) {
+      uint8_t buffer = 0;
+      uint8_t shift = (4 - num_trits % NUM_TRITS_PER_FLEX_TRIT) << 1U;
+      buffer = flex_trits[(start + num_trits) / NUM_TRITS_PER_FLEX_TRIT];
+      buffer <<= shift;
+      buffer >>= shift;
+      to_flex_trits[num_trits / NUM_TRITS_PER_FLEX_TRIT] = buffer;
     }
-    to_flex_trits[j] = buffer;
-  }
-  // There is a risk of noise after the last trit so we need to clean up
-  uint8_t residual = (num_trits & 3);
-  if (residual) {
-    uint8_t shift = (4 - residual) << 1U;
-    buffer <<= shift;
-    buffer >>= shift;
-    to_flex_trits[num_bytes - 1] = buffer;
+  } else {
+    uint8_t buffer = 0;
+    uint8_t tshift = (start & 3) << 1U;
+    uint8_t rshift = (8U - tshift) & 7;
+    size_t index = start >> 2U;
+    size_t i, j;
+    size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
+    // Calculate the number of bytes to copy over
+    for (i = index, j = 0; j < num_bytes; i++, j++) {
+      buffer = flex_trits[i];
+      buffer = buffer >> tshift;
+      if (rshift && i < end_index) {
+        buffer |= (flex_trits[i + 1] << rshift);
+      }
+      to_flex_trits[j] = buffer;
+    }
+    // There is a risk of noise after the last trit so we need to clean up
+    uint8_t residual = (num_trits & 3);
+    if (residual) {
+      uint8_t shift = (4 - residual) << 1U;
+      buffer <<= shift;
+      buffer >>= shift;
+      to_flex_trits[num_bytes - 1] = buffer;
+    }
   }
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
-  trit_t trits[10] = {0};
-  size_t index = start / 5U;
-  size_t offset = start % 5U;
-  size_t i, j;
-  size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
-  for (i = index, j = 0; j < num_bytes; i++, j++) {
-    bytes_to_trits(((byte_t *)flex_trits + i), 1, trits, 5);
-    if (offset && i < end_index) {
-      bytes_to_trits(((byte_t *)flex_trits + i + 1), 1, ((trit_t *)trits + 5), 5);
+  if (0 == (start % NUM_TRITS_PER_FLEX_TRIT)) {
+    // Copy flex trits as bytes
+    memcpy(to_flex_trits, flex_trits + start / NUM_TRITS_PER_FLEX_TRIT, num_trits / NUM_TRITS_PER_FLEX_TRIT);
+    // Handle tail
+    if (0 != num_trits % NUM_TRITS_PER_FLEX_TRIT) {
+      trit_t trits[5] = {0};
+      bytes_to_trits((byte_t *)(flex_trits + (start + num_trits) / NUM_TRITS_PER_FLEX_TRIT), 1, trits, 5);
+      to_flex_trits[num_trits / NUM_TRITS_PER_FLEX_TRIT] = trits_to_byte(trits, num_trits % NUM_TRITS_PER_FLEX_TRIT);
     }
-    to_flex_trits[j] = trits_to_byte(trits + offset, 5);
-  }
-  // There is a risk of noise after the last trit so we need to clean up
-  uint8_t residual = num_trits % 5U;
-  if (residual) {
-    to_flex_trits[num_bytes - 1] = trits_to_byte(trits + offset, residual);
+  } else {
+    trit_t trits[10] = {0};
+    size_t index = start / 5U;
+    size_t offset = start % 5U;
+    size_t i, j;
+    size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
+    for (i = index, j = 0; j < num_bytes; i++, j++) {
+      bytes_to_trits(((byte_t *)flex_trits + i), 1, trits, 5);
+      if (offset && i < end_index) {
+        bytes_to_trits(((byte_t *)flex_trits + i + 1), 1, ((trit_t *)trits + 5), 5);
+      }
+      to_flex_trits[j] = trits_to_byte(trits + offset, 5);
+    }
+    // There is a risk of noise after the last trit so we need to clean up
+    uint8_t residual = num_trits % 5U;
+    if (residual) {
+      to_flex_trits[num_bytes - 1] = trits_to_byte(trits + offset, residual);
+    }
   }
 #endif
   return num_bytes;
