@@ -161,7 +161,9 @@ static void* milestone_validator(void* arg) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   hash243_queue_entry_t* entry = NULL;
   milestone_status_t milestone_status;
+  lock_handle_t lock_cond;
   tangle_t tangle;
+  bool is_solid;
 
   if (mt == NULL) {
     return NULL;
@@ -176,7 +178,6 @@ static void* milestone_validator(void* arg) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
@@ -211,6 +212,11 @@ static void* milestone_validator(void* arg) {
           memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
         }
       } else if (milestone_status == MILESTONE_INCOMPLETE) {
+        if (iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, &tangle, candidate.hash,
+                                                                 MILESTONE_VALIDATION_TRANSACTIONS_LIMIT,
+                                                                 &is_solid) != RC_OK) {
+          log_warning(logger_id, "Quick fetching of milestone failed\n");
+        }
         iota_milestone_tracker_add_candidate(mt, candidate.hash);
       }
     }

@@ -49,10 +49,10 @@ retcode_t tangle_traversal_dfs_to_past(tangle_t const *const tangle, tangle_trav
       }
 
       if (should_branch) {
-        if ((ret = hash243_stack_push(&non_analyzed_hashes, transaction_trunk(&tx))) != RC_OK) {
+        if ((ret = hash243_stack_push(&non_analyzed_hashes, transaction_branch(&tx))) != RC_OK) {
           break;
         }
-        if ((ret = hash243_stack_push(&non_analyzed_hashes, transaction_branch(&tx))) != RC_OK) {
+        if ((ret = hash243_stack_push(&non_analyzed_hashes, transaction_trunk(&tx))) != RC_OK) {
           break;
         }
       }

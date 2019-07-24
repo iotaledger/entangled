@@ -212,6 +212,13 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
   transaction_solidifier_t *ts = params->ts;
   tangle_t *tangle = params->tangle;
 
+  if (params->max_analyzed == 0) {
+    *should_stop = true;
+    params->is_solid = false;
+    return RC_OK;
+  }
+  params->max_analyzed--;
+
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 && !((transaction_solid((iota_transaction_t *)pack->models[0])))) {
     *should_branch = true;
