@@ -103,6 +103,33 @@ void test_flex_trits_slice(void) {
   }
 }
 
+void test_flex_trits_insert() {
+  flex_trit_t const fsrc[] = {TRITS_IN};
+  flex_trit_t fdst[sizeof(fsrc)];
+  flex_trit_t ftmp[sizeof(fsrc)];
+  trit_t src[NUM_TRITS];
+  trit_t dst[NUM_TRITS];
+  for (size_t num_trits = 1; num_trits < 3 * NUM_TRITS_PER_FLEX_TRIT; ++num_trits) {
+    for (size_t fdst_off = 0; fdst_off < NUM_TRITS_PER_FLEX_TRIT; ++fdst_off) {
+      flex_trits_insert(fdst, NUM_TRITS, fsrc, NUM_TRITS, fdst_off, num_trits);
+      flex_trits_slice(ftmp, NUM_TRITS, fsrc, NUM_TRITS, 0, num_trits);
+      flex_trits_to_trits(src, NUM_TRITS, ftmp, NUM_TRITS, num_trits);
+      flex_trits_slice(ftmp, NUM_TRITS, fdst, NUM_TRITS, fdst_off, num_trits);
+      flex_trits_to_trits(dst, NUM_TRITS, ftmp, NUM_TRITS, num_trits);
+      TEST_ASSERT_EQUAL_MEMORY(src, dst, num_trits);
+
+      for (size_t fsrc_off = 0; fsrc_off < NUM_TRITS_PER_FLEX_TRIT; ++fsrc_off) {
+        flex_trits_insert_from_pos(fdst, NUM_TRITS, fsrc, NUM_TRITS, fsrc_off, fdst_off, num_trits);
+        flex_trits_slice(ftmp, NUM_TRITS, fsrc, NUM_TRITS, fsrc_off, num_trits);
+        flex_trits_to_trits(src, NUM_TRITS, ftmp, NUM_TRITS, num_trits);
+        flex_trits_slice(ftmp, NUM_TRITS, fdst, NUM_TRITS, fdst_off, num_trits);
+        flex_trits_to_trits(dst, NUM_TRITS, ftmp, NUM_TRITS, num_trits);
+        TEST_ASSERT_EQUAL_MEMORY(src, dst, num_trits);
+      }
+    }
+  }
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -113,6 +140,7 @@ int main(void) {
   RUN_TEST(test_flex_trits_to_bytes);
   RUN_TEST(test_flex_trits_from_bytes);
   RUN_TEST(test_flex_trits_slice);
+  RUN_TEST(test_flex_trits_insert);
 
   return UNITY_END();
 }
