@@ -8,6 +8,7 @@
 #include "ciri/node/pipeline/processor.h"
 #include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
+#include "ciri/node/pipeline/hasher.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
