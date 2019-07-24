@@ -158,6 +158,9 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
 
   while (hasher->running) {
     packets_num = 0;
+    ptrit_curl_init(&curl, CURL_P_81);
+    memset(acc, 0, NUM_TRITS_SERIALIZED_TRANSACTION * sizeof(ptrit_t));
+    memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     while (hasher->running && packets_num < HASHER_MAX) {
       lock_handle_lock(&hasher->lock);
@@ -183,10 +186,6 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
       cond_handle_wait(&hasher->cond, &lock_cond);
       continue;
     }
-
-    ptrit_curl_init(&curl, CURL_P_81);
-    memset(acc, 0, NUM_TRITS_SERIALIZED_TRANSACTION * sizeof(ptrit_t));
-    memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     ptrit_curl_absorb(&curl, acc, NUM_TRITS_SERIALIZED_TRANSACTION);
     ptrit_curl_squeeze(&curl, acc, HASH_LENGTH_TRIT);
