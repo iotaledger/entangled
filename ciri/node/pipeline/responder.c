@@ -304,3 +304,37 @@ size_t responder_stage_size(responder_stage_t *const responder) {
 
   return size;
 }
+
+retcode_t responder_process_request(responder_stage_t *const responder, neighbor_t *const neighbor,
+                                    protocol_gossip_t const *const packet, flex_trit_t const *const hash) {
+  retcode_t ret = RC_OK;
+  flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
+
+  if (responder == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+
+  // Retreives the request hash from the packet
+  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + GOSSIP_TX_BYTES_LENGTH,
+                            HASH_LENGTH_TRIT - responder->node->conf.mwm,
+                            HASH_LENGTH_TRIT - responder->node->conf.mwm) !=
+      HASH_LENGTH_TRIT - responder->node->conf.mwm) {
+    log_warning(logger_id, "Invalid request bytes\n");
+    return RC_PROCESSOR_INVALID_REQUEST;
+  }
+
+  // If requested hash is equal to transaction hash, sets the request hash to null to request a random tip
+  if (memcmp(request_hash, hash, FLEX_TRIT_SIZE_243) == 0) {
+    memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  }
+
+  // Adds request to the responder stage queue
+  if ((ret = responder_stage_add(responder, neighbor, request_hash)) != RC_OK) {
+    log_warning(logger_id, "Propagating request to responder failed\n");
+    return ret;
+  }
+
+  return RC_OK;
+}
