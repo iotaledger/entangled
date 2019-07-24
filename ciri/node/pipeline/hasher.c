@@ -198,8 +198,11 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
                                     flex_hash) != RC_OK) {
         log_warning(logger_id, "Processing packet failed\n");
       }
-      // TODO answer to request
       recent_seen_bytes_cache_put(&hasher->node->recent_seen_bytes, entries[j]->payload.digest, flex_hash);
+      if (responder_process_request(&hasher->node->responder, entries[j]->payload.neighbor,
+                                    &entries[j]->payload.gossip->packet, flex_hash) != RC_OK) {
+        log_warning(logger_id, "Processing request bytes failed\n");
+      }
 
       free(entries[j]->payload.gossip);
       free(entries[j]);

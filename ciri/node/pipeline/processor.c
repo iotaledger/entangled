@@ -19,49 +19,6 @@ static logger_id_t logger_id;
  */
 
 /**
- * Converts request bytes from a packet to a hash and adds it to the responder queue.
- *
- * @param processor The processor stage
- * @param neighbor The neighbor that sent the packet
- * @param packet The packet from which to process request bytes
- * @param hash Transaction hash
- *
- * @return a status code
- */
-static retcode_t process_request_bytes(processor_stage_t const *const processor, neighbor_t *const neighbor,
-                                       protocol_gossip_t const *const packet, flex_trit_t const *const hash) {
-  retcode_t ret = RC_OK;
-  // TODO memset ?
-  flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
-
-  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  // Retreives the request hash from the packet
-  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT, packet->content + GOSSIP_TX_BYTES_LENGTH,
-                            HASH_LENGTH_TRIT - processor->node->conf.mwm,
-                            HASH_LENGTH_TRIT - processor->node->conf.mwm) !=
-      HASH_LENGTH_TRIT - processor->node->conf.mwm) {
-    log_warning(logger_id, "Invalid request bytes\n");
-    return RC_PROCESSOR_INVALID_REQUEST;
-  }
-
-  // If requested hash is equal to transaction hash, sets the request hash to null to request a random tip
-  if (memcmp(request_hash, hash, FLEX_TRIT_SIZE_243) == 0) {
-    memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  }
-
-  // Adds request to the responder stage queue
-  if ((ret = responder_stage_add(&processor->node->responder, neighbor, request_hash)) != RC_OK) {
-    log_warning(logger_id, "Propagating request to responder failed\n");
-    return ret;
-  }
-
-  return RC_OK;
-}
-
-/**
  * Continuously looks for a packet from a processor packet queue and process it.
  *
  * @param processor The processor stage
@@ -92,9 +49,7 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
     }
 
     rw_lock_handle_rdlock(&processor->node->router.neighbors_lock);
-    // TODO can do without ?
     neighbor = router_neighbor_find_by_endpoint(&processor->node->router, &entry->packet.source);
-    // TODO ALL ?
     rw_lock_handle_unlock(&processor->node->router.neighbors_lock);
 
     if (neighbor) {
@@ -111,7 +66,7 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
     if (cached) {
       if (neighbor) {
         log_debug(logger_id, "Processing request bytes\n");
-        if (process_request_bytes(processor, neighbor, &entry->packet, hash) != RC_OK) {
+        if (responder_process_request(&processor->node->responder, neighbor, &entry->packet, hash) != RC_OK) {
           log_warning(logger_id, "Processing request bytes failed\n");
         }
       }

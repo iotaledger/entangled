@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include "ciri/node/protocol/gossip.h"
 #include "ciri/node/protocol/transaction_request.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
@@ -94,6 +95,19 @@ retcode_t responder_stage_add(responder_stage_t *const responder, neighbor_t *co
  * @return a status code
  */
 size_t responder_stage_size(responder_stage_t *const responder);
+
+/**
+ * Converts request bytes from a packet to a hash and adds it to the responder queue.
+ *
+ * @param responder The responder stage
+ * @param neighbor The neighbor that sent the packet
+ * @param packet The packet from which to process request bytes
+ * @param hash Transaction hash
+ *
+ * @return a status code
+ */
+retcode_t responder_process_request(responder_stage_t *const responder, neighbor_t *const neighbor,
+                                    protocol_gossip_t const *const packet, flex_trit_t const *const hash);
 
 #ifdef __cplusplus
 }
