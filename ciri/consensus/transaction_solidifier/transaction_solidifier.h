@@ -55,7 +55,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(transaction_solidifier_t
 
 retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solidifier_t *const ts,
                                                                tangle_t *const tangle, flex_trit_t *const hash,
-                                                               bool *const is_solid);
+                                                               int max_analyzed, bool *const is_solid);
 
 retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(transaction_solidifier_t *const ts,
                                                                              tangle_t *const tangle,

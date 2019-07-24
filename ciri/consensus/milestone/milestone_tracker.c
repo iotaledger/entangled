@@ -245,6 +245,7 @@ retcode_t update_latest_solid_milestone(milestone_tracker_t* const mt, tangle_t*
     is_solid = false;
 
     if ((ret = iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, tangle, milestone.hash,
+                                                                    MILESTONE_SOLIDIFICATION_TRANSACTIONS_LIMIT,
                                                                     &is_solid)) != RC_OK) {
       return ret;
     }
