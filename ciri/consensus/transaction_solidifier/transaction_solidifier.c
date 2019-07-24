@@ -39,6 +39,7 @@ typedef struct check_solidity_do_func_params_s {
   bool is_solid;
   hash243_set_t *solid_transactions_candidates;
   hash243_set_t *solid_entry_points;
+  int max_analyzed;
 } check_solidity_do_func_params_t;
 
 static retcode_t propagate_solid_transactions(transaction_solidifier_t *const ts, tangle_t *const tangle) {
@@ -211,6 +212,13 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
   transaction_solidifier_t *ts = params->ts;
   tangle_t *tangle = params->tangle;
 
+  if (params->max_analyzed == 0) {
+    *should_stop = true;
+    params->is_solid = false;
+    return RC_OK;
+  }
+  params->max_analyzed--;
+
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 && !((transaction_solid((iota_transaction_t *)pack->models[0])))) {
     *should_branch = true;
@@ -225,7 +233,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
 
 retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solidifier_t *const ts,
                                                                tangle_t *const tangle, flex_trit_t *const hash,
-                                                               bool *const is_solid) {
+                                                               int max_analyzed, bool *const is_solid) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
   hash243_set_t solid_transactions_candidates = NULL;
@@ -245,11 +253,15 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
 
   iota_snapshot_solid_entry_points_set(&ts->snapshots_provider->initial_snapshot, &analyzed_hashes);
   hash243_set_append(&analyzed_hashes, &solid_entry_points_hashes);
+
+  max_analyzed += hash243_set_size(solid_entry_points_hashes);
+
   check_solidity_do_func_params_t params = {.ts = ts,
                                             .tangle = tangle,
                                             .is_solid = true,
                                             .solid_transactions_candidates = &solid_transactions_candidates,
-                                            .solid_entry_points = &solid_entry_points_hashes};
+                                            .solid_entry_points = &solid_entry_points_hashes,
+                                            .max_analyzed = max_analyzed};
 
   if ((ret = tangle_traversal_dfs_to_past(tangle, check_solidity_do_func, hash, ts->conf->genesis_hash,
                                           &analyzed_hashes, &params)) != RC_OK) {

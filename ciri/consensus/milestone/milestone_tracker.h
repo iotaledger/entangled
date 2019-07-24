@@ -21,6 +21,9 @@
 #include "utils/handles/lock.h"
 #include "utils/handles/thread.h"
 
+#define MILESTONE_VALIDATION_TRANSACTIONS_LIMIT 10
+#define MILESTONE_SOLIDIFICATION_TRANSACTIONS_LIMIT 50000
+
 #ifdef __cplusplus
 extern "C" {
 #endif

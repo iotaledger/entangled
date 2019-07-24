@@ -19,7 +19,6 @@
 #include "utils/macros.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
-#define MILESTONE_VALIDATION_INTERVAL_MS 10ULL
 #define SOLID_MILESTONE_RESCAN_INTERVAL_MS 50ULL
 
 static logger_id_t logger_id;
@@ -161,7 +160,9 @@ static void* milestone_validator(void* arg) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   hash243_queue_entry_t* entry = NULL;
   milestone_status_t milestone_status;
+  lock_handle_t lock_cond;
   tangle_t tangle;
+  bool is_solid;
 
   if (mt == NULL) {
     return NULL;
@@ -176,7 +177,6 @@ static void* milestone_validator(void* arg) {
     }
   }
 
-  lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
@@ -186,7 +186,7 @@ static void* milestone_validator(void* arg) {
     lock_handle_unlock(&mt->candidates_lock);
 
     if (entry == NULL) {
-      cond_handle_timedwait(&mt->cond_validator, &lock_cond, MILESTONE_VALIDATION_INTERVAL_MS);
+      cond_handle_wait(&mt->cond_validator, &lock_cond);
       continue;
     }
 
@@ -211,6 +211,11 @@ static void* milestone_validator(void* arg) {
           memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
         }
       } else if (milestone_status == MILESTONE_INCOMPLETE) {
+        if (iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, &tangle, candidate.hash,
+                                                                 MILESTONE_VALIDATION_TRANSACTIONS_LIMIT,
+                                                                 &is_solid) != RC_OK) {
+          log_warning(logger_id, "Quick fetching of milestone failed\n");
+        }
         iota_milestone_tracker_add_candidate(mt, candidate.hash);
       }
     }
@@ -245,6 +250,7 @@ retcode_t update_latest_solid_milestone(milestone_tracker_t* const mt, tangle_t*
     is_solid = false;
 
     if ((ret = iota_consensus_transaction_solidifier_check_solidity(mt->transaction_solidifier, tangle, milestone.hash,
+                                                                    MILESTONE_SOLIDIFICATION_TRANSACTIONS_LIMIT,
                                                                     &is_solid)) != RC_OK) {
       return ret;
     }
@@ -467,6 +473,7 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, fl
     log_warning(logger_id, "Pushing candidate hash to candidates queue failed\n");
     return RC_OOM;
   }
+  cond_handle_signal(&mt->cond_validator);
 
   return RC_OK;
 }
