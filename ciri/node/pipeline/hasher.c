@@ -195,8 +195,8 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
       ptrits_to_trits(acc, hash, j, HASH_LENGTH_TRIT);
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
-      // TODO neighbor
-      if (process_transaction_bytes(hasher, &tangle, NULL, &entries[j]->payload.gossip->packet, flex_hash) != RC_OK) {
+      if (process_transaction_bytes(hasher, &tangle, entries[j]->payload.neighbor, &entries[j]->payload.gossip->packet,
+                                    flex_hash) != RC_OK) {
         log_warning(logger_id, "Processing packet failed\n");
       }
       // TODO answer to request
@@ -306,7 +306,7 @@ retcode_t hasher_stage_destroy(hasher_stage_t *const hasher) {
 }
 
 retcode_t hasher_stage_add(hasher_stage_t *const hasher, protocol_gossip_queue_entry_t *const gossip,
-                           uint64_t const digest) {
+                           uint64_t const digest, neighbor_t *const neighbor) {
   retcode_t ret = RC_OK;
 
   if (hasher == NULL) {
@@ -314,7 +314,7 @@ retcode_t hasher_stage_add(hasher_stage_t *const hasher, protocol_gossip_queue_e
   }
 
   lock_handle_lock(&hasher->lock);
-  ret = hasher_payload_queue_push(&hasher->queue, gossip, digest);
+  ret = hasher_payload_queue_push(&hasher->queue, gossip, digest, neighbor);
   lock_handle_unlock(&hasher->lock);
 
   if (ret != RC_OK) {
@@ -351,7 +351,7 @@ size_t hasher_payload_queue_count(hasher_payload_queue_t const queue) {
 }
 
 retcode_t hasher_payload_queue_push(hasher_payload_queue_t *const queue, protocol_gossip_queue_entry_t *const gossip,
-                                    uint64_t const digest) {
+                                    uint64_t const digest, neighbor_t *const neighbor) {
   hasher_payload_queue_entry_t *entry = NULL;
 
   if (queue == NULL || gossip == NULL) {
@@ -364,6 +364,7 @@ retcode_t hasher_payload_queue_push(hasher_payload_queue_t *const queue, protoco
 
   entry->payload.gossip = gossip;
   entry->payload.digest = digest;
+  entry->payload.neighbor = neighbor;
   CDL_APPEND(*queue, entry);
 
   return RC_OK;

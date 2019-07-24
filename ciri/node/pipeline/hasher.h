@@ -29,6 +29,7 @@ typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct hasher_payload_s {
   protocol_gossip_queue_entry_t *gossip;
   uint64_t digest;
+  neighbor_t *neighbor;
 } hasher_payload_t;
 
 typedef struct hasher_payload_queue_entry_s {
@@ -97,14 +98,15 @@ retcode_t hasher_stage_destroy(hasher_stage_t *const hasher);
 /**
  * Adds a payload to a hasher stage queue
  *
- * @param[in, out]  hasher  The hasher stage
- * @param[in]       gossip  A gossip packet
- * @param[in]       digest  The digest of the gossip transaction
+ * @param[in, out]  hasher    The hasher stage
+ * @param[in]       gossip    A gossip packet
+ * @param[in]       digest    The digest of the gossip transaction
+ * @param[in]       neighbor  The neighbor that sent the packet
  *
  * @return a status code
  */
 retcode_t hasher_stage_add(hasher_stage_t *const hasher, protocol_gossip_queue_entry_t *const gossip,
-                           uint64_t const digest);
+                           uint64_t const digest, neighbor_t *const neighbor);
 
 /**
  * Gets the size of the hasher stage queue
@@ -127,14 +129,15 @@ size_t hasher_payload_queue_count(hasher_payload_queue_t const queue);
 /**
  * Pushes a packet to a hasher payload queue
  *
- * @param[out]  queue   The hasher payload queue
- * @param[in]   gossip  A gossip packet
- * @param[in]   digest  The digest of the gossip transaction
+ * @param[out]  queue     The hasher payload queue
+ * @param[in]   gossip    A gossip packet
+ * @param[in]   digest    The digest of the gossip transaction
+ * @param[in]   neighbor  The neighbor that sent the packet
  *
  * @return a status code
  */
 retcode_t hasher_payload_queue_push(hasher_payload_queue_t *const queue, protocol_gossip_queue_entry_t *const gossip,
-                                    uint64_t const digest);
+                                    uint64_t const digest, neighbor_t *const neighbor);
 
 /**
  * Pops a packet from a hasher payload queue

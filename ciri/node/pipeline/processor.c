@@ -117,7 +117,7 @@ static void *processor_stage_routine(processor_stage_t *const processor) {
       }
       free(entry);
     } else {
-      if (hasher_stage_add(&processor->node->hasher, entry, digest) != RC_OK) {
+      if (hasher_stage_add(&processor->node->hasher, entry, digest, neighbor) != RC_OK) {
         log_warning(logger_id, "Sending payload to hasher stage failed\n");
       }
     }
