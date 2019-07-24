@@ -75,28 +75,6 @@ cc_library(
 )
 
 cc_library(
-    name = "transaction_requester_worker_shared",
-    hdrs = ["transaction_requester_worker.h"],
-    deps = [
-        ":transaction_requester_shared",
-        "//common:errors",
-    ],
-)
-
-cc_library(
-    name = "transaction_requester_worker",
-    srcs = ["transaction_requester_worker.c"],
-    deps = [
-        ":transaction_requester_worker_shared",
-        "//ciri/consensus/tangle",
-        "//ciri/node:node_shared",
-        "//ciri/node/network:neighbor",
-        "//utils:logger_helper",
-        "//utils:time",
-    ],
-)
-
-cc_library(
     name = "transaction_requester_shared",
     hdrs = ["transaction_requester.h"],
     deps = [
@@ -136,9 +114,10 @@ cc_library(
 cc_library(
     name = "responder",
     srcs = ["responder.c"],
-    hdrs = ["responder.h"],
     deps = [
         ":responder_shared",
+        "//ciri/consensus/milestone:milestone_tracker",
+        "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/tangle",
         "//ciri/node:node_shared",
         "//ciri/node/network:neighbor_shared",

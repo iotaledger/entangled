@@ -44,7 +44,7 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
       (timestamp_ms < tv->snapshots_provider->initial_snapshot.metadata.timestamp * 1000UL) &&
       !iota_snapshot_has_solid_entry_point(&tv->snapshots_provider->initial_snapshot, transaction_hash(transaction));
 
-  requester_is_requested(tv->transaction_requester, transaction_hash(transaction), true, &is_requested);
+  requester_is_requested(tv->transaction_requester, transaction_hash(transaction), &is_requested);
 
   if (is_requested) {
     return false;

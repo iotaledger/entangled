@@ -48,7 +48,8 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing responder stage\n");
-  if ((ret = responder_stage_init(&node->responder, node)) != RC_OK) {
+  if ((ret = responder_stage_init(&node->responder, node, &core->consensus.snapshots_provider,
+                                  &core->consensus.milestone_tracker)) != RC_OK) {
     log_critical(logger_id, "Initializing responder stage failed\n");
     return ret;
   }
@@ -124,12 +125,6 @@ retcode_t node_start(node_t* const node) {
     return ret;
   }
 
-  log_info(logger_id, "Starting transaction requester\n");
-  if ((ret = requester_start(&node->transaction_requester)) != RC_OK) {
-    log_critical(logger_id, "Starting transaction requester failed\n");
-    return ret;
-  }
-
   log_info(logger_id, "Starting router\n");
   if ((ret = router_start(&node->router)) != RC_OK) {
     log_critical(logger_id, "Starting router failed\n");
@@ -175,11 +170,6 @@ retcode_t node_stop(node_t* const node) {
   log_info(logger_id, "Stopping tips requester\n");
   if ((ret = tips_requester_stop(&node->tips_requester)) != RC_OK) {
     log_error(logger_id, "Stopping tips requester failed\n");
-  }
-
-  log_info(logger_id, "Stopping transaction requester\n");
-  if ((ret = requester_stop(&node->transaction_requester)) != RC_OK) {
-    log_error(logger_id, "Stopping transaction requester failed\n");
   }
 
   log_info(logger_id, "Stopping router\n");

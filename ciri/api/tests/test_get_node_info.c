@@ -115,9 +115,9 @@ int main(void) {
 
   // Adding requests
 
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[0], false) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[1], false) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[2], false) == RC_OK);
+  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[0]) == RC_OK);
+  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[1]) == RC_OK);
+  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[2]) == RC_OK);
   // Adding broadcasts
 
   protocol_gossip_t packet;

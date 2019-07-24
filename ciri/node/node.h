@@ -16,7 +16,6 @@
 #include "ciri/node/pipeline/responder.h"
 #include "ciri/node/pipeline/tips_requester.h"
 #include "ciri/node/pipeline/transaction_requester.h"
-#include "ciri/node/pipeline/transaction_requester_worker.h"
 #include "ciri/node/recent_seen_bytes_cache.h"
 #include "ciri/node/tips_cache.h"
 #include "common/errors.h"

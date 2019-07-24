@@ -31,56 +31,28 @@ void test_get_missing_transactions_empty(void) {
   error_res_free(&error);
 }
 
-void test_get_tips(void) {
+void test_get_missing_transactions(void) {
   get_missing_transactions_res_t *res = get_missing_transactions_res_new();
   error_res_t *error = NULL;
   flex_trit_t hashes[10][FLEX_TRIT_SIZE_243];
   tryte_t trytes[81] =
       "A99999999999999999999999999999999999999999999999999999999999999999999999"
       "999999999";
+  hash243_stack_entry_t *iter = NULL;
 
   for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trytes(hashes[i], HASH_LENGTH_TRIT, trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[i]) == RC_OK);
     trytes[0]++;
   }
-
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[0], true) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[1], false) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[2], true) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[3], false) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[4], true) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[5], false) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[6], true) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[7], false) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[8], true) == RC_OK);
-  TEST_ASSERT(request_transaction(&api.core->node.transaction_requester, &tangle, hashes[9], false) == RC_OK);
 
   TEST_ASSERT(iota_api_get_missing_transactions(&api, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(get_missing_transactions_res_hash_num(res), 10);
 
-  {
-    hash243_stack_entry_t *iter = res->hashes;
-
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[8], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[6], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[4], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[2], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[0], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[9], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[7], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[5], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[3], FLEX_TRIT_SIZE_243);
-    iter = iter->next;
-    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[1], FLEX_TRIT_SIZE_243);
+  iter = res->hashes;
+  for (int i = 9; i >= 0; i--) {
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[i], FLEX_TRIT_SIZE_243);
     iter = iter->next;
   }
 
@@ -99,7 +71,7 @@ int main(void) {
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
 
   RUN_TEST(test_get_missing_transactions_empty);
-  RUN_TEST(test_get_tips);
+  RUN_TEST(test_get_missing_transactions);
 
   TEST_ASSERT(requester_destroy(&api.core->node.transaction_requester) == RC_OK);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);

@@ -36,7 +36,6 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
 typedef struct check_solidity_do_func_params_s {
   transaction_solidifier_t *ts;
   tangle_t *tangle;
-  bool is_milestone;
   bool is_solid;
   hash243_set_t *solid_transactions_candidates;
   hash243_set_t *solid_entry_points;
@@ -218,7 +217,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
     return hash243_set_add(params->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0 && !hash243_set_contains(*params->solid_entry_points, hash)) {
     params->is_solid = false;
-    return request_transaction(ts->transaction_requester, tangle, hash, params->is_milestone);
+    return request_transaction(ts->transaction_requester, tangle, hash);
   }
 
   return RC_OK;
@@ -226,7 +225,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash, iota_stor_pack_t *pac
 
 retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solidifier_t *const ts,
                                                                tangle_t *const tangle, flex_trit_t *const hash,
-                                                               bool is_milestone, bool *const is_solid) {
+                                                               bool *const is_solid) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
   hash243_set_t solid_transactions_candidates = NULL;
@@ -248,7 +247,6 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
   hash243_set_append(&analyzed_hashes, &solid_entry_points_hashes);
   check_solidity_do_func_params_t params = {.ts = ts,
                                             .tangle = tangle,
-                                            .is_milestone = is_milestone,
                                             .is_solid = true,
                                             .solid_transactions_candidates = &solid_transactions_candidates,
                                             .solid_entry_points = &solid_entry_points_hashes};
@@ -340,9 +338,6 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts, 
 
   if (pack.num_loaded == 0) {
     *solid = false;
-    if ((ret = request_transaction(ts->transaction_requester, tangle, approvee, false)) != RC_OK) {
-      log_error(logger_id, "Requesting missing approvee failed\n");
-    }
     return ret;
   }
 
