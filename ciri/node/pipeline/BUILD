@@ -38,7 +38,6 @@ cc_library(
     srcs = ["hasher.c"],
     deps = [
         ":hasher_shared",
-        ":processor",
         "//ciri/consensus/milestone:milestone_tracker",
         "//ciri/consensus/tangle",
         "//ciri/consensus/transaction_solidifier",
@@ -68,6 +67,7 @@ cc_library(
     name = "processor",
     srcs = ["processor.c"],
     deps = [
+        ":hasher",
         ":processor_shared",
         "//ciri/node:node_shared",
         "//ciri/node/network:neighbor",
