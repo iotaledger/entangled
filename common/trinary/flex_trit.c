@@ -13,6 +13,16 @@
 #include "common/trinary/trit_byte.h"
 #include "utils/macros.h"
 
+#if defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+static flex_trit_t flex_trit_set_residual(flex_trit_t flex_trit, size_t residual) {
+  // residual <= 4
+  size_t shift = (4 - residual) << 1U;
+  flex_trit <<= shift;
+  flex_trit >>= shift;
+  return flex_trit;
+}
+#endif
+
 size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len, flex_trit_t const *const flex_trits,
                         size_t const len, size_t const start, size_t const num_trits) {
   // Bounds checking
@@ -60,12 +70,8 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len, f
     memcpy(to_flex_trits, flex_trits + start / NUM_TRITS_PER_FLEX_TRIT, num_trits / NUM_TRITS_PER_FLEX_TRIT);
     // Handle tail
     if (0 != num_trits % NUM_TRITS_PER_FLEX_TRIT) {
-      uint8_t buffer = 0;
-      uint8_t shift = (4 - num_trits % NUM_TRITS_PER_FLEX_TRIT) << 1U;
-      buffer = flex_trits[(start + num_trits) / NUM_TRITS_PER_FLEX_TRIT];
-      buffer <<= shift;
-      buffer >>= shift;
-      to_flex_trits[num_trits / NUM_TRITS_PER_FLEX_TRIT] = buffer;
+      to_flex_trits[num_trits / NUM_TRITS_PER_FLEX_TRIT] = flex_trit_set_residual(
+          flex_trits[(start + num_trits) / NUM_TRITS_PER_FLEX_TRIT], num_trits % NUM_TRITS_PER_FLEX_TRIT);
     }
   } else {
     uint8_t buffer = 0;
@@ -86,10 +92,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len, f
     // There is a risk of noise after the last trit so we need to clean up
     uint8_t residual = (num_trits & 3);
     if (residual) {
-      uint8_t shift = (4 - residual) << 1U;
-      buffer <<= shift;
-      buffer >>= shift;
-      to_flex_trits[num_bytes - 1] = buffer;
+      to_flex_trits[num_bytes - 1] = flex_trit_set_residual(buffer, residual);
     }
   }
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
