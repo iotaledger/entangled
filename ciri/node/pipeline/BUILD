@@ -148,6 +148,8 @@ cc_library(
     name = "validator_shared",
     hdrs = ["validator.h"],
     deps = [
+        "//ciri/node/network:neighbor_shared",
+        "//ciri/node/protocol:gossip",
         "//utils/handles:cond",
         "//utils/handles:lock",
         "//utils/handles:thread",

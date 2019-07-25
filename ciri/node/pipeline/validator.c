@@ -122,6 +122,7 @@ failure:
 }
 
 static void *validator_stage_routine(validator_stage_t *const validator) {
+  validator_payload_queue_entry_t *entry = NULL;
   lock_handle_t lock_cond;
   tangle_t tangle;
 
@@ -149,6 +150,17 @@ static void *validator_stage_routine(validator_stage_t *const validator) {
     // if (entry == NULL) {
     //   cond_handle_wait(&validator->cond, &lock_cond);
     //   continue;
+    // }
+
+    // if (process_transaction_bytes(hasher, &tangle, entries[j]->payload.neighbor,
+    // &entries[j]->payload.gossip->packet,
+    //                               flex_hash) != RC_OK) {
+    //   log_warning(logger_id, "Processing packet failed\n");
+    // }
+    // recent_seen_bytes_cache_put(&hasher->node->recent_seen_bytes, entries[j]->payload.digest, flex_hash);
+    // if (responder_process_request(&hasher->node->responder, entries[j]->payload.neighbor,
+    //                               &entries[j]->payload.gossip->packet, flex_hash) != RC_OK) {
+    //   log_warning(logger_id, "Processing request bytes failed\n");
     // }
 
     // free(entry);
@@ -180,7 +192,7 @@ retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const
   logger_id = logger_helper_enable(VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
 
   validator->running = false;
-  // validator->queue = NULL;
+  validator->queue = NULL;
   lock_handle_init(&validator->lock);
   cond_handle_init(&validator->cond);
   validator->node = node;
@@ -231,7 +243,7 @@ retcode_t validator_stage_destroy(validator_stage_t *const validator) {
     return RC_STILL_RUNNING;
   }
 
-  // protocol_gossip_queue_free(&validator->queue);
+  validator_payload_queue_free(&validator->queue);
   lock_handle_destroy(&validator->lock);
   cond_handle_destroy(&validator->cond);
   validator->node = NULL;
@@ -241,26 +253,27 @@ retcode_t validator_stage_destroy(validator_stage_t *const validator) {
   return RC_OK;
 }
 
-// retcode_t validator_stage_add(validator_stage_t *const validator, protocol_gossip_t const *const packet) {
-//   retcode_t ret = RC_OK;
-//
-//   if (validator == NULL) {
-//     return RC_NULL_PARAM;
-//   }
-//
-//   lock_handle_lock(&validator->lock);
-//   ret = protocol_gossip_queue_push(&validator->queue, packet);
-//   lock_handle_unlock(&validator->lock);
-//
-//   if (ret != RC_OK) {
-//     log_warning(logger_id, "Pushing packet to validator stage queue failed\n");
-//     return ret;
-//   } else {
-//     cond_handle_signal(&validator->cond);
-//   }
-//
-//   return RC_OK;
-// }
+retcode_t validator_stage_add(validator_stage_t *const validator, protocol_gossip_queue_entry_t *const gossip,
+                              uint64_t const digest, neighbor_t *const neighbor, flex_trit_t const *const hash) {
+  retcode_t ret = RC_OK;
+
+  if (validator == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  lock_handle_lock(&validator->lock);
+  ret = validator_payload_queue_push(&validator->queue, gossip, digest, neighbor, hash);
+  lock_handle_unlock(&validator->lock);
+
+  if (ret != RC_OK) {
+    log_warning(logger_id, "Pushing packet to validator stage queue failed\n");
+    return ret;
+  } else {
+    cond_handle_signal(&validator->cond);
+  }
+
+  return RC_OK;
+}
 
 size_t validator_stage_size(validator_stage_t *const validator) {
   size_t size = 0;
@@ -270,8 +283,69 @@ size_t validator_stage_size(validator_stage_t *const validator) {
   }
 
   lock_handle_lock(&validator->lock);
-  // size = protocol_gossip_queue_count(validator->queue);
+  size = validator_payload_queue_count(validator->queue);
   lock_handle_unlock(&validator->lock);
 
   return size;
+}
+
+size_t validator_payload_queue_count(validator_payload_queue_t const queue) {
+  validator_payload_queue_entry_t *iter = NULL;
+  size_t count = 0;
+
+  CDL_COUNT(queue, iter, count);
+
+  return count;
+}
+
+retcode_t validator_payload_queue_push(validator_payload_queue_t *const queue,
+                                       protocol_gossip_queue_entry_t *const gossip, uint64_t const digest,
+                                       neighbor_t *const neighbor, flex_trit_t const *const hash) {
+  validator_payload_queue_entry_t *entry = NULL;
+
+  if (queue == NULL || gossip == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((entry = (validator_payload_queue_entry_t *)malloc(sizeof(validator_payload_queue_entry_t))) == NULL) {
+    return RC_OOM;
+  }
+
+  entry->payload.gossip = gossip;
+  entry->payload.digest = digest;
+  entry->payload.neighbor = neighbor;
+  memcpy(entry->payload.hash, hash, FLEX_TRIT_SIZE_243);
+  CDL_APPEND(*queue, entry);
+
+  return RC_OK;
+}
+
+validator_payload_queue_entry_t *validator_payload_queue_pop(validator_payload_queue_t *const queue) {
+  validator_payload_queue_entry_t *front = NULL;
+
+  if (queue == NULL) {
+    return NULL;
+  }
+
+  front = *queue;
+  if (front != NULL) {
+    CDL_DELETE(*queue, front);
+  }
+
+  return front;
+}
+
+void validator_payload_queue_free(validator_payload_queue_t *const queue) {
+  validator_payload_queue_entry_t *iter = NULL, *tmp1 = NULL, *tmp2 = NULL;
+
+  if (queue == NULL) {
+    return;
+  }
+
+  CDL_FOREACH_SAFE(*queue, iter, tmp1, tmp2) {
+    CDL_DELETE(*queue, iter);
+    free(iter->payload.gossip);
+    free(iter);
+  }
+  *queue = NULL;
 }

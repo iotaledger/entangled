@@ -80,18 +80,11 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
       ptrits_to_trits(acc, hash, j, HASH_LENGTH_TRIT);
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
-      // if (process_transaction_bytes(hasher, &tangle, entries[j]->payload.neighbor,
-      // &entries[j]->payload.gossip->packet,
-      //                               flex_hash) != RC_OK) {
-      //   log_warning(logger_id, "Processing packet failed\n");
-      // }
-      // recent_seen_bytes_cache_put(&hasher->node->recent_seen_bytes, entries[j]->payload.digest, flex_hash);
-      // if (responder_process_request(&hasher->node->responder, entries[j]->payload.neighbor,
-      //                               &entries[j]->payload.gossip->packet, flex_hash) != RC_OK) {
-      //   log_warning(logger_id, "Processing request bytes failed\n");
-      // }
+      if (validator_stage_add(&hasher->node->validator, entries[j]->payload.gossip, entries[j]->payload.digest,
+                              entries[j]->payload.neighbor, flex_hash) != RC_OK) {
+        log_warning(logger_id, "Propagating request to responder failed\n");
+      }
 
-      free(entries[j]->payload.gossip);
       free(entries[j]);
       entries[j] = NULL;
     }
@@ -99,7 +92,6 @@ static void *hasher_stage_routine(hasher_stage_t *const hasher) {
 
   for (size_t j = 0; j < HASHER_MAX; j++) {
     if (entries[j] != NULL) {
-      free(entries[j]->payload.gossip);
       free(entries[j]);
     }
   }
@@ -272,7 +264,6 @@ void hasher_payload_queue_free(hasher_payload_queue_t *const queue) {
 
   CDL_FOREACH_SAFE(*queue, iter, tmp1, tmp2) {
     CDL_DELETE(*queue, iter);
-    free(iter->payload.gossip);
     free(iter);
   }
   *queue = NULL;
