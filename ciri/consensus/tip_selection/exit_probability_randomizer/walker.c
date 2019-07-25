@@ -67,6 +67,7 @@ static retcode_t find_tail_if_valid(tangle_t *const tangle, exit_prob_transactio
     return ret;
   }
   if (*has_valid_tail) {
+    *has_valid_tail = false;
     ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv, tangle, tx_hash, has_valid_tail, false);
     if (ret != RC_OK) {
       log_error(logger_id, "Tail transaction validation failed: %" PRIu64 "\n", ret);
