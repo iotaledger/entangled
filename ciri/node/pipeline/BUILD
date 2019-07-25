@@ -147,3 +147,22 @@ cc_library(
         "//utils:logger_helper",
     ],
 )
+
+cc_library(
+    name = "validator_shared",
+    hdrs = ["validator.h"],
+    deps = [
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "validator",
+    srcs = ["validator.c"],
+    deps = [
+        "//ciri/node:node_shared",
+        "//utils:logger_helper",
+    ],
+)
