@@ -13,7 +13,6 @@
 #include "common/errors.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash243_stack.h"
-#include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
@@ -25,9 +24,10 @@ typedef struct transaction_requester_s {
   thread_handle_t thread;
   bool running;
   hash243_set_t hashes;
+  rw_lock_handle_t hashes_lock;
+  hash243_set_t requested_hashes;
+  rw_lock_handle_t requested_hashes_lock;
   node_t *node;
-  rw_lock_handle_t lock;
-  cond_handle_t cond;
 } transaction_requester_t;
 
 #ifdef __cplusplus
@@ -54,7 +54,7 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester, n
 retcode_t requester_destroy(transaction_requester_t *const transaction_requester);
 
 /**
- * Gets all the requested transactions and milestones hashes from a transaction requester
+ * Gets all the requested transactions hashes from a transaction requester
  *
  * @param transaction_requester The transaction requester
  * @param hashes The stack of transactions to be filled
@@ -97,12 +97,12 @@ retcode_t requester_clear_request(transaction_requester_t *const transaction_req
  *
  * @param transaction_requester The transaction requester
  * @param hash The transaction to check for request
- * @param is_requested Will be set to true if requested, false otherwise
+ * @param was_requested Will be set to true if was requested, false otherwise
  *
  * @return a status code
  */
-retcode_t requester_is_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
-                                 bool *const is_requested);
+retcode_t requester_was_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
+                                  bool *const was_requested);
 
 /**
  * Adds a transaction to be requested by a transaction requester
