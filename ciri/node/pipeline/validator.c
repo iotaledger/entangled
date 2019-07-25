@@ -144,26 +144,26 @@ static void *validator_stage_routine(validator_stage_t *const validator) {
 
   while (validator->running) {
     lock_handle_lock(&validator->lock);
-    // entry = protocol_gossip_queue_pop(&validator->queue);
+    entry = validator_payload_queue_pop(&validator->queue);
     lock_handle_unlock(&validator->lock);
 
-    // if (entry == NULL) {
-    //   cond_handle_wait(&validator->cond, &lock_cond);
-    //   continue;
-    // }
+    if (entry == NULL) {
+      cond_handle_wait(&validator->cond, &lock_cond);
+      continue;
+    }
 
-    // if (process_transaction_bytes(hasher, &tangle, entries[j]->payload.neighbor,
-    // &entries[j]->payload.gossip->packet,
-    //                               flex_hash) != RC_OK) {
-    //   log_warning(logger_id, "Processing packet failed\n");
-    // }
-    // recent_seen_bytes_cache_put(&hasher->node->recent_seen_bytes, entries[j]->payload.digest, flex_hash);
-    // if (responder_process_request(&hasher->node->responder, entries[j]->payload.neighbor,
-    //                               &entries[j]->payload.gossip->packet, flex_hash) != RC_OK) {
-    //   log_warning(logger_id, "Processing request bytes failed\n");
-    // }
+    if (validate_transaction_bytes(validator, &tangle, entry->payload.neighbor, &entry->payload.gossip->packet,
+                                   entry->payload.hash) != RC_OK) {
+      log_warning(logger_id, "Processing packet failed\n");
+    }
+    recent_seen_bytes_cache_put(&validator->node->recent_seen_bytes, entry->payload.digest, entry->payload.hash);
+    if (responder_process_request(&validator->node->responder, entry->payload.neighbor, &entry->payload.gossip->packet,
+                                  entry->payload.hash) != RC_OK) {
+      log_warning(logger_id, "Processing request bytes failed\n");
+    }
 
-    // free(entry);
+    free(entry->payload.gossip);
+    free(entry);
   }
 
   lock_handle_unlock(&lock_cond);
