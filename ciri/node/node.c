@@ -35,14 +35,15 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing hasher stage\n");
-  if ((ret = hasher_stage_init(&node->hasher, node, &core->consensus.transaction_validator,
-                               &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) != RC_OK) {
+  if ((ret = hasher_stage_init(&node->hasher, node)) != RC_OK) {
     log_critical(logger_id, "Initializing hasher stage failed\n");
     return ret;
   }
 
   log_info(logger_id, "Initializing validator stage\n");
-  if ((ret = validator_stage_init(&node->validator, node)) != RC_OK) {
+  if ((ret = validator_stage_init(&node->validator, node, &core->consensus.transaction_validator,
+                                  &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) !=
+      RC_OK) {
     log_critical(logger_id, "Initializing validator stage failed\n");
     return ret;
   }

@@ -6,6 +6,10 @@
  */
 
 #include "ciri/node/pipeline/validator.h"
+#include "ciri/consensus/milestone/milestone_tracker.h"
+#include "ciri/consensus/tangle/tangle.h"
+#include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
+#include "ciri/consensus/transaction_validator/transaction_validator.h"
 #include "ciri/node/node.h"
 #include "utils/logger_helper.h"
 
@@ -17,11 +21,121 @@ static logger_id_t logger_id;
  * Private functions
  */
 
+/**
+ * Converts transaction bytes from a packet to a transaction, validates it and
+ * updates its status.
+ * If valid and new: stores and broadcasts it.
+ *
+ * @param validator The validator stage
+ * @param tangle A tangle
+ * @param neighbor The neighbor that sent the packet
+ * @param packet The packet from which to process transaction bytes
+ * @param hash The transaction hash
+ *
+ * @return a status code
+ */
+static retcode_t validate_transaction_bytes(validator_stage_t const *const validator, tangle_t *const tangle,
+                                            neighbor_t *const neighbor, protocol_gossip_t const *const gossip,
+                                            flex_trit_t const *const hash) {
+  retcode_t ret = RC_OK;
+  bool exists = false;
+  iota_transaction_t transaction;
+  flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+
+  if (validator == NULL || gossip == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  transaction_reset(&transaction);
+  // Retreives the transaction from the packet
+  if (flex_trits_from_bytes(transaction_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION, gossip->content,
+                            NUM_TRITS_SERIALIZED_TRANSACTION,
+                            NUM_TRITS_SERIALIZED_TRANSACTION) != NUM_TRITS_SERIALIZED_TRANSACTION) {
+    log_warning(logger_id, "Invalid transaction bytes\n");
+    ret = RC_PROCESSOR_INVALID_TRANSACTION;
+    goto failure;
+  }
+
+  // Deserializes the transaction
+  if (transaction_deserialize_from_trits(&transaction, transaction_flex_trits, false) !=
+      NUM_TRITS_SERIALIZED_TRANSACTION) {
+    log_warning(logger_id, "Deserializing transaction failed\n");
+    ret = RC_PROCESSOR_INVALID_TRANSACTION;
+    goto failure;
+  }
+  transaction_set_hash(&transaction, hash);
+
+  // Validates the transaction
+  if (!iota_consensus_transaction_validate(validator->transaction_validator, &transaction)) {
+    log_debug(logger_id, "Invalid transaction\n");
+    goto failure;
+  }
+
+  // Checks if the transaction is already persisted
+  if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, hash, &exists)) != RC_OK) {
+    log_warning(logger_id, "Checking if transaction exists failed\n");
+    goto failure;
+  }
+
+  if (!exists) {
+    // Stores the new transaction
+    log_debug(logger_id, "Storing new transaction\n");
+    if ((ret = iota_tangle_transaction_store(tangle, &transaction)) != RC_OK) {
+      log_warning(logger_id, "Storing new transaction failed\n");
+      goto failure;
+    }
+
+    // Updates transaction status
+    if ((ret = iota_consensus_transaction_solidifier_update_status(validator->transaction_solidifier, tangle,
+                                                                   &transaction)) != RC_OK) {
+      log_warning(logger_id, "Updating transaction status failed\n");
+      return ret;
+    }
+
+    // TODO Store transaction metadata
+
+    // Broadcast the new transaction
+    if ((ret = broadcaster_stage_add(&validator->node->broadcaster, gossip)) != RC_OK) {
+      log_warning(logger_id, "Propagating packet to broadcaster failed\n");
+      goto failure;
+    }
+
+    if (transaction_current_index(&transaction) == 0 &&
+        memcmp(transaction_address(&transaction), validator->milestone_tracker->conf->coordinator_address,
+               FLEX_TRIT_SIZE_243) == 0) {
+      ret = iota_milestone_tracker_add_candidate(validator->milestone_tracker, transaction_hash(&transaction));
+    }
+
+    if (neighbor) {
+      neighbor->nbr_new_txs++;
+    }
+  }
+
+  return ret;
+
+failure:
+  if (neighbor) {
+    neighbor->nbr_invalid_txs++;
+  }
+
+  return ret;
+}
+
 static void *validator_stage_routine(validator_stage_t *const validator) {
   lock_handle_t lock_cond;
+  tangle_t tangle;
 
   if (validator == NULL) {
     return NULL;
+  }
+
+  {
+    connection_config_t db_conf = {.db_path = validator->node->conf.tangle_db_path};
+
+    if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+      log_critical(logger_id, "Initializing tangle connection failed\n");
+      return NULL;
+    }
   }
 
   lock_handle_init(&lock_cond);
@@ -43,6 +157,10 @@ static void *validator_stage_routine(validator_stage_t *const validator) {
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
 
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(logger_id, "Destroying tangle connection failed\n");
+  }
+
   return NULL;
 }
 
@@ -50,8 +168,12 @@ static void *validator_stage_routine(validator_stage_t *const validator) {
  * Public functions
  */
 
-retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const node) {
-  if (validator == NULL || node == NULL) {
+retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const node,
+                               transaction_validator_t *const transaction_validator,
+                               transaction_solidifier_t *const transaction_solidifier,
+                               milestone_tracker_t *const milestone_tracker) {
+  if (validator == NULL || node == NULL || transaction_validator == NULL || transaction_solidifier == NULL ||
+      milestone_tracker == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -62,6 +184,9 @@ retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const
   lock_handle_init(&validator->lock);
   cond_handle_init(&validator->cond);
   validator->node = node;
+  validator->transaction_validator = transaction_validator;
+  validator->transaction_solidifier = transaction_solidifier;
+  validator->milestone_tracker = milestone_tracker;
 
   return RC_OK;
 }
