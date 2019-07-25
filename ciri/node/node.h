@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __NODE_NODE_H__
-#define __NODE_NODE_H__
+#ifndef __CIRI_NODE_NODE_H__
+#define __CIRI_NODE_NODE_H__
 
 #include "ciri/node/conf.h"
 #include "ciri/node/network/router.h"
@@ -16,6 +16,7 @@
 #include "ciri/node/pipeline/responder.h"
 #include "ciri/node/pipeline/tips_requester.h"
 #include "ciri/node/pipeline/transaction_requester.h"
+#include "ciri/node/pipeline/validator.h"
 #include "ciri/node/recent_seen_bytes_cache.h"
 #include "ciri/node/tips_cache.h"
 #include "common/errors.h"
@@ -37,6 +38,7 @@ typedef struct node_s {
   responder_stage_t responder;
   tips_requester_t tips_requester;
   transaction_requester_t transaction_requester;
+  validator_stage_t validator;
   router_t router;
   tips_cache_t tips;
   recent_seen_bytes_cache_t recent_seen_bytes;
@@ -84,4 +86,4 @@ retcode_t node_destroy(iota_node_t* const node);
 }
 #endif
 
-#endif  // __NODE_NODE_H__
+#endif  // __CIRI_NODE_NODE_H__

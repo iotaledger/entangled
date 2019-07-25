@@ -38,10 +38,6 @@ cc_library(
     srcs = ["hasher.c"],
     deps = [
         ":hasher_shared",
-        "//ciri/consensus/milestone:milestone_tracker",
-        "//ciri/consensus/tangle",
-        "//ciri/consensus/transaction_solidifier",
-        "//ciri/consensus/transaction_validator",
         "//ciri/node:node_shared",
         "//common/crypto/curl-p:ptrit",
         "//common/model:transaction",
@@ -144,6 +140,31 @@ cc_library(
         "//ciri/node:node_shared",
         "//ciri/node/protocol:gossip",
         "//common/model:milestone",
+        "//utils:logger_helper",
+    ],
+)
+
+cc_library(
+    name = "validator_shared",
+    hdrs = ["validator.h"],
+    deps = [
+        "//ciri/node/network:neighbor_shared",
+        "//ciri/node/protocol:gossip",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "validator",
+    srcs = ["validator.c"],
+    deps = [
+        "//ciri/consensus/milestone:milestone_tracker",
+        "//ciri/consensus/tangle",
+        "//ciri/consensus/transaction_solidifier",
+        "//ciri/consensus/transaction_validator",
+        "//ciri/node:node_shared",
         "//utils:logger_helper",
     ],
 )
