@@ -21,8 +21,6 @@
 // Forward declarations
 typedef struct neighbor_s neighbor_t;
 typedef struct node_s node_t;
-typedef struct snapshots_provider_s snapshots_provider_t;
-typedef struct milestone_tracker_s milestone_tracker_t;
 
 /**
  * A responder stage is responsible for responding to transaction requests sent by neighbors.
@@ -34,8 +32,6 @@ typedef struct responder_stage_s {
   lock_handle_t lock;
   cond_handle_t cond;
   node_t *node;
-  snapshots_provider_t *snapshot_provider;
-  milestone_tracker_t *milestone_tracker;
 } responder_stage_t;
 
 #ifdef __cplusplus
@@ -47,14 +43,10 @@ extern "C" {
  *
  * @param responder The responder stage
  * @param node A node
- * @param snapshot_provider A snapshot provider
- * @param milestone_tracker A milestone tracker
  *
  * @return a status code
  */
-retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node,
-                               snapshots_provider_t *const snapshot_provider,
-                               milestone_tracker_t *const milestone_tracker);
+retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node);
 
 /**
  * Starts a responder stage

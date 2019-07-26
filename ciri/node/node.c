@@ -55,8 +55,7 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
   }
 
   log_info(logger_id, "Initializing responder stage\n");
-  if ((ret = responder_stage_init(&node->responder, node, &core->consensus.snapshots_provider,
-                                  &core->consensus.milestone_tracker)) != RC_OK) {
+  if ((ret = responder_stage_init(&node->responder, node)) != RC_OK) {
     log_critical(logger_id, "Initializing responder stage failed\n");
     return ret;
   }
