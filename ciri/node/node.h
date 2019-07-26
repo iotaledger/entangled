@@ -82,6 +82,17 @@ retcode_t node_stop(iota_node_t* const node);
  */
 retcode_t node_destroy(iota_node_t* const node);
 
+/**
+ * Checks whether the node is synchronized by comparing the latest known milestone index against the current latest
+ * solid milestone index. We allow for max. one milestone delta as a headroom, as a milestone is only applied in a set
+ * interval to the current ledger state.
+ *
+ * @param node The node
+ *
+ * @return true if synced, false otherwise
+ */
+bool node_is_synced(node_t const* const node);
+
 #ifdef __cplusplus
 }
 #endif
