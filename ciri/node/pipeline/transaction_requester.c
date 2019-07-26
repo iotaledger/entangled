@@ -63,14 +63,22 @@ retcode_t requester_get_requested_transactions(transaction_requester_t *const tr
   }
 
   rw_lock_handle_rdlock(&transaction_requester->hashes_lock);
-
   HASH_SET_ITER(transaction_requester->hashes, iter, tmp) {
     if ((ret = hash243_stack_push(hashes, iter->hash)) != RC_OK) {
       break;
     }
   }
-
   rw_lock_handle_unlock(&transaction_requester->hashes_lock);
+
+  if (ret != RC_OK) {
+    rw_lock_handle_rdlock(&transaction_requester->requested_hashes_lock);
+    HASH_SET_ITER(transaction_requester->requested_hashes, iter, tmp) {
+      if ((ret = hash243_stack_push(hashes, iter->hash)) != RC_OK) {
+        break;
+      }
+    }
+    rw_lock_handle_unlock(&transaction_requester->requested_hashes_lock);
+  }
 
   return ret;
 }
