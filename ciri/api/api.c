@@ -19,21 +19,6 @@
 static logger_id_t logger_id;
 
 /*
- * Private functions
- */
-
-static bool invalid_subtangle_status(iota_api_t const *const api, error_res_t **const error) {
-  bool invalid = api->core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.metadata.index ==
-                 api->core->consensus.milestone_tracker.snapshots_provider->initial_snapshot.metadata.index;
-
-  if (invalid) {
-    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
-  }
-
-  return invalid;
-}
-
-/*
  * Public functions
  */
 
@@ -143,7 +128,8 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
 
   res->state = false;
 
-  if (invalid_subtangle_status(api, error)) {
+  if (!node_is_synced(&api->core->node)) {
+    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
@@ -354,7 +340,8 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
     return RC_NULL_PARAM;
   }
 
-  if (invalid_subtangle_status(api, error)) {
+  if (!node_is_synced(&api->core->node)) {
+    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
@@ -463,7 +450,8 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
     return RC_API_INVALID_DEPTH_INPUT;
   }
 
-  if (invalid_subtangle_status(api, error)) {
+  if (!node_is_synced(&api->core->node)) {
+    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 

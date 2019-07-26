@@ -45,20 +45,11 @@ void test_get_transactions_to_approve_invalid_subtangle_status(void) {
   get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
   error_res_t *error = NULL;
 
-  uint64_t latest_solid_milestone_index = api.core->consensus.milestone_tracker.latest_solid_milestone_index;
-  uint64_t milestone_start_index = api.core->consensus.milestone_tracker.milestone_start_index;
-
-  api.core->consensus.milestone_tracker.latest_solid_milestone_index = 42;
-  api.core->consensus.milestone_tracker.milestone_start_index = 42;
-
   get_transactions_to_approve_req_set_depth(req, 5);
 
   TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
   TEST_ASSERT(error != NULL);
   TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_SUBTANGLE);
-
-  api.core->consensus.milestone_tracker.latest_solid_milestone_index = latest_solid_milestone_index;
-  api.core->consensus.milestone_tracker.milestone_start_index = milestone_start_index;
 
   get_transactions_to_approve_req_free(&req);
   get_transactions_to_approve_res_free(&res);
@@ -73,6 +64,7 @@ int main(void) {
 
   config.db_path = test_db_path;
   api.core = &core;
+  core.node.core = &core;
 
   TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
@@ -88,8 +80,12 @@ int main(void) {
 
   tearDown();
 
-  RUN_TEST(test_get_transactions_to_approve_invalid_depth);
   RUN_TEST(test_get_transactions_to_approve_invalid_subtangle_status);
+
+  api.core->consensus.snapshots_provider.latest_snapshot.metadata.index = 42;
+  api.core->consensus.milestone_tracker.latest_milestone_index = 42;
+
+  RUN_TEST(test_get_transactions_to_approve_invalid_depth);
 
   TEST_ASSERT(iota_consensus_destroy(&api.core->consensus) == RC_OK);
 

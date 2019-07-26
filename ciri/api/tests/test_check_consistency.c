@@ -198,6 +198,7 @@ int main(void) {
 
   config.db_path = test_db_path;
   api.core = &core;
+  core.node.core = &core;
 
   TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
@@ -218,7 +219,8 @@ int main(void) {
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);
 
-  api.core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.metadata.index++;
+  api.core->consensus.snapshots_provider.latest_snapshot.metadata.index = 42;
+  api.core->consensus.milestone_tracker.latest_milestone_index = 42;
 
   RUN_TEST(test_check_consistency_missing_tail);
   RUN_TEST(test_check_consistency_not_tail);

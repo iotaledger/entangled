@@ -256,7 +256,7 @@ retcode_t node_destroy(node_t* const node) {
   return ret;
 }
 
-bool node_is_sync(node_t const* const node) {
+bool node_is_synced(node_t const* const node) {
   return (node->core->consensus.snapshots_provider.latest_snapshot.metadata.index !=
           node->core->consensus.snapshots_provider.initial_snapshot.metadata.index) &&
          (node->core->consensus.snapshots_provider.latest_snapshot.metadata.index >=
