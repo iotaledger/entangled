@@ -86,7 +86,7 @@ static void router_on_async(uv_async_t *const handle) {
 }
 
 static void router_on_write(uv_write_t *const req, int const status) {
-  if (status) {
+  if (status && status != UV_ECANCELED && status != UV_ECONNRESET) {
     log_warning(logger_id, "Writing data failed: %s\n", uv_strerror(status));
   }
   free(req->data);
