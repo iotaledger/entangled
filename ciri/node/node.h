@@ -47,9 +47,9 @@ typedef struct node_s {
 /**
  * Initializes a node
  *
- * @param node The node
- * @param core A core
- * @param tangle A tangle
+ * @param[in, out]  node    The node
+ * @param[in]       core    A core
+ * @param[in]       tangle  A tangle
  *
  * @return a status code
  */
@@ -58,7 +58,7 @@ retcode_t node_init(iota_node_t* const node, core_t* const core, tangle_t* const
 /**
  * Starts a node
  *
- * @param node The node
+ * @param[in, out] node The node
  *
  * @return a status code
  */
@@ -67,7 +67,7 @@ retcode_t node_start(iota_node_t* const node);
 /**
  * Stops a node
  *
- * @param node The node
+ * @param[in, out] node The node
  *
  * @return a status code
  */
@@ -76,11 +76,22 @@ retcode_t node_stop(iota_node_t* const node);
 /**
  * Destroys a node
  *
- * @param node The node
+ * @param[in, out] node The node
  *
  * @return a status code
  */
 retcode_t node_destroy(iota_node_t* const node);
+
+/**
+ * Checks whether the node is synchronized by comparing the latest known milestone index against the current latest
+ * solid milestone index. We allow for max. one milestone delta as a headroom, as a milestone is only applied in a set
+ * interval to the current ledger state.
+ *
+ * @param[in] node The node
+ *
+ * @return true if synced, false otherwise
+ */
+bool node_is_synced(node_t const* const node);
 
 #ifdef __cplusplus
 }

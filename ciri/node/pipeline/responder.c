@@ -6,8 +6,6 @@
  */
 
 #include "ciri/node/pipeline/responder.h"
-#include "ciri/consensus/milestone/milestone_tracker.h"
-#include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/node/network/neighbor.h"
 #include "ciri/node/node.h"
@@ -49,9 +47,8 @@ static retcode_t get_transaction_for_request(responder_stage_t const *const resp
   if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
     flex_trit_t tip[FLEX_TRIT_SIZE_243];
 
-    // Don't reply to random tip requests if we are synchronized with a max delta of one to the newest milestone
-    *respond = !(responder->snapshot_provider->latest_snapshot.metadata.index >=
-                 responder->milestone_tracker->latest_milestone_index - 1);
+    // Don't reply to random tip requests if the node is synchronized
+    *respond = !node_is_synced(responder->node);
     if (respond) {
       log_debug(logger_id, "Responding to random tip request\n");
       neighbor->nbr_random_tx_reqs++;
@@ -207,9 +204,7 @@ static void *responder_stage_routine(responder_stage_t *const responder) {
  * Public functions
  */
 
-retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node,
-                               snapshots_provider_t *const snapshot_provider,
-                               milestone_tracker_t *const milestone_tracker) {
+retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const node) {
   if (responder == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -221,8 +216,6 @@ retcode_t responder_stage_init(responder_stage_t *const responder, node_t *const
   lock_handle_init(&responder->lock);
   cond_handle_init(&responder->cond);
   responder->node = node;
-  responder->snapshot_provider = snapshot_provider;
-  responder->milestone_tracker = milestone_tracker;
 
   return RC_OK;
 }

@@ -25,7 +25,7 @@
 #include "ciri/core.h"
 #include "common/errors.h"
 
-#define API_ERROR_INVALID_SUBTANGLE "This operation cannot be executed: The subtangle has not been updated yet"
+#define API_ERROR_UNSYNCED_NODE "This operation cannot be executed: the node is unsynced"
 #define API_ERROR_INVALID_URI_SCHEME "Invalid URI scheme"
 #define API_ERROR_TAILS_BUNDLE_INVALID "Tails are not consistent (bundle is invalid)"
 #define API_ERROR_TAILS_NOT_CONSISTENT \
