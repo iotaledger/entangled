@@ -129,8 +129,8 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
   res->state = false;
 
   if (!node_is_synced(&api->core->node)) {
-    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
-    return RC_API_INVALID_SUBTANGLE_STATUS;
+    *error = error_res_new(API_ERROR_UNSYNCED_NODE);
+    return RC_API_UNSYNCED_NODE;
   }
 
   CDL_FOREACH(req->tails, iter) {
@@ -341,8 +341,8 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, tangle_t *c
   }
 
   if (!node_is_synced(&api->core->node)) {
-    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
-    return RC_API_INVALID_SUBTANGLE_STATUS;
+    *error = error_res_new(API_ERROR_UNSYNCED_NODE);
+    return RC_API_UNSYNCED_NODE;
   }
 
   {
@@ -451,8 +451,8 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
   }
 
   if (!node_is_synced(&api->core->node)) {
-    *error = error_res_new(API_ERROR_INVALID_SUBTANGLE);
-    return RC_API_INVALID_SUBTANGLE_STATUS;
+    *error = error_res_new(API_ERROR_UNSYNCED_NODE);
+    return RC_API_UNSYNCED_NODE;
   }
 
   if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(&api->core->consensus.tip_selector, tangle,

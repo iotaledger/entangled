@@ -47,9 +47,9 @@ void test_get_transactions_to_approve_invalid_subtangle_status(void) {
 
   get_transactions_to_approve_req_set_depth(req, 5);
 
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res, &error) == RC_API_UNSYNCED_NODE);
   TEST_ASSERT(error != NULL);
-  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_SUBTANGLE);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_UNSYNCED_NODE);
 
   get_transactions_to_approve_req_free(&req);
   get_transactions_to_approve_res_free(&res);
