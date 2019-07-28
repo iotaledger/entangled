@@ -29,9 +29,9 @@ void test_check_consistency_invalid_subtangle_status(void) {
   check_consistency_res_t *res = check_consistency_res_new();
   error_res_t *error = NULL;
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_UNSYNCED_NODE);
   TEST_ASSERT(error != NULL);
-  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_INVALID_SUBTANGLE);
+  TEST_ASSERT_EQUAL_STRING(error_res_get_message(error), API_ERROR_UNSYNCED_NODE);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
@@ -198,6 +198,7 @@ int main(void) {
 
   config.db_path = test_db_path;
   api.core = &core;
+  core.node.core = &core;
 
   TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
@@ -218,7 +219,8 @@ int main(void) {
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);
 
-  api.core->consensus.milestone_tracker.snapshots_provider->latest_snapshot.metadata.index++;
+  api.core->consensus.snapshots_provider.latest_snapshot.metadata.index = 42;
+  api.core->consensus.milestone_tracker.latest_milestone_index = 42;
 
   RUN_TEST(test_check_consistency_missing_tail);
   RUN_TEST(test_check_consistency_not_tail);
