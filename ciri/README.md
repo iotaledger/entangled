@@ -47,6 +47,7 @@ Build and run cIRI
 ```
 $ bazel run -c opt --define network=mainnet -- ciri # optional flags
 ```
+
 ### For a testnet node
 
 Create the databases, only the first time:
@@ -60,7 +61,25 @@ Build and run cIRI
 $ bazel run -c opt --define network=testnet -- ciri # optional flags
 ```
 
+### Docker
 
+To run cIRI on docker, you also have to create databases first (mainnet as example here):
+```
+$ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/spent-addresses-schema.sql
+```
+
+Build the docker image with:
+```
+$ bazel run -c opt --define network=mainnet -- ciri:ciri_image
+```
+
+And then run with:
+```
+docker run -d --net=host -v ciri/db:/app/ciri/ciri.runfiles/org_iota_entangled/ciri/db \
+           iotaledger/ciri:ciri_image # optional flags
+```
+Note that `ciri/db` should be absolute path or your custom path to the database folder. This is same if you wan to mount configuration file `conf.yml`.
 
 ## Configuration
 
