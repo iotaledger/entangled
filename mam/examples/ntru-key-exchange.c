@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 IOTA Stiftung
+ * Copyright (c) 2019 IOTA Stiftung
  * https:github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
@@ -16,6 +16,8 @@
 #define RECEIVERSEED "RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9999"
 #define KEYSEED "AAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCC"
 #define NONCE "ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"
+#define PL "PAYLOADTEST"
+
 int main() {
   //Generating a keypair for the receiver api
   mam_prng_t prng;
@@ -51,7 +53,7 @@ int main() {
   //prepare and write header and packet
   trit_t message_id[MAM_MSG_ID_SIZE];
   mam_api_bundle_write_header_on_endpoint(&sender_api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
-  mam_api_bundle_write_packet(&sender_api, message_id, (tryte_t *)"PAYLOADTEST", 11, MAM_MSG_CHECKSUM_SIG, true, bundle);
+  mam_api_bundle_write_packet(&sender_api, message_id, (tryte_t *)PL, 11, MAM_MSG_CHECKSUM_SIG, true, bundle);
   //Set created channel and endpoint as trusted in receiver API
   mam_api_add_trusted_channel_pk(&receiver_api, channel_id);
   mam_api_add_trusted_endpoint_pk(&receiver_api, endpoint_id);
