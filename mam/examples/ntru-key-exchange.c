@@ -19,6 +19,7 @@
 #define PL "PAYLOADTEST"
 
 int main() {
+  retcode_t ret = RC_OK;
   //Generating a keypair for the receiver api
   mam_prng_t prng;
   mam_ntru_sk_t ntru;
@@ -34,34 +35,34 @@ int main() {
   //Setting up two APIs
   mam_api_t sender_api;
   tryte_t *sender_seed = (tryte_t *)SENDERSEED;
-  mam_api_init(&sender_api, sender_seed);
+  ERR_BIND_RETURN(mam_api_init(&sender_api, sender_seed), ret);
   mam_api_t receiver_api;
   tryte_t *receiver_seed = (tryte_t *)RECEIVERSEED;
-  mam_api_init(&receiver_api, receiver_seed);
+  ERR_BIND_RETURN(mam_api_init(&receiver_api, receiver_seed), ret);
   //Setting the generated keypair to the receiver API
-  mam_api_add_ntru_sk(&receiver_api, &ntru);
+  ERR_BIND_RETURN(mam_api_add_ntru_sk(&receiver_api, &ntru), ret);
   //Adding the receiver APIs public key to the sender API public key list
-  mam_api_add_ntru_pk(&sender_api, &ntru.public_key);
+  ERR_BIND_RETURN(mam_api_add_ntru_pk(&sender_api, &ntru.public_key), ret);
   //Preparing channel and endpoint with sender API with randomly chosen height
   tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
-  mam_api_channel_create(&sender_api, 2, channel_id);
+  ERR_BIND_RETURN(mam_api_channel_create(&sender_api, 2, channel_id), ret);
   tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
-  mam_api_endpoint_create(&sender_api, 2, channel_id, endpoint_id);
+  ERR_BIND_RETURN(mam_api_endpoint_create(&sender_api, 2, channel_id, endpoint_id), ret);
   //prepare bundle for sender API to write to
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
   //prepare and write header and packet
   trit_t message_id[MAM_MSG_ID_SIZE];
-  mam_api_bundle_write_header_on_endpoint(&sender_api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
-  mam_api_bundle_write_packet(&sender_api, message_id, (tryte_t *)PL, 11, MAM_MSG_CHECKSUM_SIG, true, bundle);
+  ERR_BIND_RETURN(mam_api_bundle_write_header_on_endpoint(&sender_api, channel_id, endpoint_id, NULL, NULL, bundle, message_id), ret);
+  ERR_BIND_RETURN(mam_api_bundle_write_packet(&sender_api, message_id, (tryte_t *)PL, 11, MAM_MSG_CHECKSUM_SIG, true, bundle), ret);
   //Set created channel and endpoint as trusted in receiver API
-  mam_api_add_trusted_channel_pk(&receiver_api, channel_id);
-  mam_api_add_trusted_endpoint_pk(&receiver_api, endpoint_id);
+  ERR_BIND_RETURN(mam_api_add_trusted_channel_pk(&receiver_api, channel_id), ret);
+  ERR_BIND_RETURN(mam_api_add_trusted_endpoint_pk(&receiver_api, endpoint_id), ret);
   //read the bundle with the receiver API and print the decrypted payload
   tryte_t *payload = NULL;
   size_t payload_size = 0;
   bool is_last_packet = false;
-  mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet);
+  ERR_BIND_RETURN(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet), ret);
   fprintf(stderr, "Payload: ");
   for (size_t i = 0; i < payload_size; i++) {
     fprintf(stderr, "%c", payload[i]);
@@ -73,5 +74,5 @@ int main() {
   mam_api_destroy(&sender_api);
   mam_api_destroy(&receiver_api);
   //finished
-  return 0;
+  return ret;
 }
