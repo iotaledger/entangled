@@ -12,6 +12,10 @@
 #include "mam/api/api.h"
 #include "mam/ntru/ntru.h"
 
+#define SENDERSEED "SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED99999"
+#define RECEIVERSEED "RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9999"
+#define keyseed "AAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCC"
+
 int main() {
   //Generating a keypair for the receiver api
   mam_prng_t prng;
@@ -20,19 +24,16 @@ int main() {
   MAM_TRITS_DEF(key, MAM_PRNG_SECRET_KEY_SIZE);
   nonce = MAM_TRITS_INIT(nonce, 3 * 10);
   key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
-  trits_from_str(key,
-                 "AAABBBCCCAAABBBCCCAAABBBCCC"
-                 "AAABBBCCCAAABBBCCCAAABBBCCC"
-                 "AAABBBCCCAAABBBCCCAAABBBCCC");
+  trits_from_str(key,keyseed);
   mam_prng_init(&prng, key);
   ntru_sk_reset(&ntru);
   ntru_sk_gen(&ntru, &prng, nonce);
   //Setting up two APIs
   mam_api_t sender_api;
-  tryte_t *sender_seed = (tryte_t *)"SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED99999";
+  tryte_t *sender_seed = (tryte_t *)SENDERSEED;
   mam_api_init(&sender_api, sender_seed);
   mam_api_t receiver_api;
-  tryte_t *receiver_seed = (tryte_t *)"RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9999";
+  tryte_t *receiver_seed = (tryte_t *)RECEIVERSEED;
   mam_api_init(&receiver_api, receiver_seed);
   //Setting the generated keypair to the receiver API
   mam_api_add_ntru_sk(&receiver_api, &ntru);
