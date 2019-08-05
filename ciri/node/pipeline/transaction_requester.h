@@ -13,7 +13,6 @@
 #include "common/errors.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash243_stack.h"
-#include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
@@ -25,9 +24,10 @@ typedef struct transaction_requester_s {
   thread_handle_t thread;
   bool running;
   hash243_set_t hashes;
+  rw_lock_handle_t hashes_lock;
+  hash243_set_t requested_hashes;
+  rw_lock_handle_t requested_hashes_lock;
   node_t *node;
-  rw_lock_handle_t lock;
-  cond_handle_t cond;
 } transaction_requester_t;
 
 #ifdef __cplusplus
@@ -37,8 +37,8 @@ extern "C" {
 /**
  * Initializes a transaction requester
  *
- * @param transaction_requester The transaction requester
- * @param node A node
+ * @param[in, out]  transaction_requester The transaction requester
+ * @param[in]       node                  A node
  *
  * @return a status code
  */
@@ -47,17 +47,17 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester, n
 /**
  * Destroys a transaction requester
  *
- * @param transaction_requester The transaction requester
+ * @param[in, out]  transaction_requester The transaction requester
  *
  * @return a status code
  */
 retcode_t requester_destroy(transaction_requester_t *const transaction_requester);
 
 /**
- * Gets all the requested transactions and milestones hashes from a transaction requester
+ * Gets all the requested transactions hashes from a transaction requester
  *
- * @param transaction_requester The transaction requester
- * @param hashes The stack of transactions to be filled
+ * @param[in]   transaction_requester The transaction requester
+ * @param[out]  hashes                The stack of transactions to be filled
  *
  * @return a status code
  */
@@ -67,7 +67,7 @@ retcode_t requester_get_requested_transactions(transaction_requester_t *const tr
 /**
  * Gets the number of transactions to request from a transaction requester
  *
- * @param transaction_requester The transaction requester
+ * @param[in] transaction_requester The transaction requester
  *
  * @return The number of transactions to request
  */
@@ -76,7 +76,7 @@ size_t requester_size(transaction_requester_t *const transaction_requester);
 /**
  * Tells whether a transaction requester is full or not
  *
- * @param transaction_requester The transaction requester
+ * @param[in] transaction_requester The transaction requester
  *
  * @return true if full, false otherwise
  */
@@ -85,8 +85,8 @@ bool requester_is_full(transaction_requester_t *const transaction_requester);
 /**
  * Cancels a request for a transaction from a transaction requester
  *
- * @param transaction_requester The transaction requester
- * @param hash The transaction request to cancel
+ * @param[out]  transaction_requester The transaction requester
+ * @param[in]   hash                  The transaction request to cancel
  *
  * @return a status code
  */
@@ -95,21 +95,21 @@ retcode_t requester_clear_request(transaction_requester_t *const transaction_req
 /**
  * Checks if a transaction was requested
  *
- * @param transaction_requester The transaction requester
- * @param hash The transaction to check for request
- * @param is_requested Will be set to true if requested, false otherwise
+ * @param[in]   transaction_requester The transaction requester
+ * @param[in]   hash                  The transaction to check for request
+ * @param[out]  was_requested         Will be set to true if was requested, false otherwise
  *
  * @return a status code
  */
-retcode_t requester_is_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
-                                 bool *const is_requested);
+retcode_t requester_was_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
+                                  bool *const was_requested);
 
 /**
  * Adds a transaction to be requested by a transaction requester
  *
- * @param transaction_requester The transaction requester
- * @param tangle A tangle
- * @param hash The transaction to request
+ * @param[out]  transaction_requester The transaction requester
+ * @param[in]   tangle                A tangle
+ * @param[int]  hash                  The transaction to request
  *
  * @return a status code
  */
@@ -119,9 +119,9 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
 /**
  * Gets a transaction to request from a transaction requester
  *
- * @param transaction_requester The transaction requester
- * @param tangle A tangle
- * @param hash The transaction to be requested
+ * @param[in, out]  transaction_requester The transaction requester
+ * @param[in]       tangle                A tangle
+ * @param[out]      hash                  The transaction to be requested
  *
  * @return a status code
  */
