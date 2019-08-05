@@ -50,3 +50,11 @@ cc_library(
         "//mam/api",
     ],
 )
+
+cc_binary(
+    name = "ntru-key-exchange",
+    srcs = ["ntru-key-exchange.c"],
+    deps = [
+    	 "//mam/api",
+    ],
+)
