@@ -14,24 +14,11 @@
 
 #define SENDERSEED "SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED99999"
 #define RECEIVERSEED "RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9999"
-#define KEYSEED "AAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCCAAABBBCCC"
 #define NONCE "ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"
 #define PL "PAYLOADTEST"
 
 int main() {
   retcode_t ret = RC_OK;
-  //Generating a keypair for the receiver api
-  mam_prng_t prng;
-  mam_ntru_sk_t ntru;
-  MAM_TRITS_DEF(nonce, 3 * 10);
-  MAM_TRITS_DEF(key, MAM_PRNG_SECRET_KEY_SIZE);
-  nonce = MAM_TRITS_INIT(nonce, 3 * 10);
-  key = MAM_TRITS_INIT(key, MAM_PRNG_SECRET_KEY_SIZE);
-  trits_from_str(key,KEYSEED);
-  trits_from_str(nonce,NONCE);
-  mam_prng_init(&prng, key);
-  ntru_sk_reset(&ntru);
-  ntru_sk_gen(&ntru, &prng, nonce);
   //Setting up two APIs
   mam_api_t sender_api;
   tryte_t *sender_seed = (tryte_t *)SENDERSEED;
@@ -39,6 +26,13 @@ int main() {
   mam_api_t receiver_api;
   tryte_t *receiver_seed = (tryte_t *)RECEIVERSEED;
   ERR_BIND_RETURN(mam_api_init(&receiver_api, receiver_seed), ret);
+  //Generating a keypair for the receiver api
+  mam_ntru_sk_t ntru;
+  MAM_TRITS_DEF(nonce, 3 * 10);
+  nonce = MAM_TRITS_INIT(nonce, 3 * 10);
+  trits_from_str(nonce,NONCE);
+  ntru_sk_reset(&ntru);
+  ntru_sk_gen(&ntru, &receiver_api.prng, nonce);
   //Setting the generated keypair to the receiver API
   ERR_BIND_RETURN(mam_api_add_ntru_sk(&receiver_api, &ntru), ret);
   //Adding the receiver APIs public key to the sender API public key list
