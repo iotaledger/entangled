@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@io_bazel_rules_docker//cc:image.bzl", "cc_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image")
 load(":conf.bzl", "CIRI_MAINNET_VARIABLES")
 load(":conf.bzl", "CIRI_TESTNET_VARIABLES")
 
@@ -38,6 +40,20 @@ cc_binary(
         "//utils/handles:rand",
         "//utils/handles:signal",
     ],
+)
+
+cc_image(
+    name = "ciri_base_image",
+    binary = ":ciri",
+)
+
+container_image(
+    name = "ciri_image",
+    base = ":ciri_base_image",
+    mode = "755",
+    repository = "iotaledger",
+    stamp = True,
+    volumes = ["/app/ciri/ciri.runfiles/org_iota_entangled/ciri/db"],
 )
 
 cc_library(
