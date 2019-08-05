@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "rules_iota",
-    commit = "73f598ad1ce3ba79ff22d747f723d6d5cbf351e1",
+    commit = "896627184c7472b0065724a5807c12692e9d997c",
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 
@@ -42,6 +42,26 @@ load(
 )
 
 apple_rules_dependencies()
+
+git_repository(
+    name = "io_bazel_rules_docker",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+    tag = "v0.8.1",
+)
+
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
+
+container_repositories()
+
+load(
+    "@io_bazel_rules_docker//cc:image.bzl",
+    _cc_image_repos = "repositories",
+)
+
+_cc_image_repos()
 
 load("@rules_iota//:defs.bzl", "iota_deps")
 load("//tools:snapshot.bzl", "fetch_snapshot_files")
