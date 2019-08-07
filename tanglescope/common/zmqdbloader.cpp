@@ -24,10 +24,10 @@ bool ZmqDBLoader::parseConfiguration(const YAML::Node& conf) {
 
 void ZmqDBLoader::start() {
   VLOG(3) << __FUNCTION__;
-
-  _zmqObservable = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-      [&](auto s) { zmqPublisher(std::move(s), _zmqPublisherURL); });
-
+  if (urlToZmqObservables.find(_zmqPublisherURL) == urlToZmqObservables.end()) {
+    urlToZmqObservables[_zmqPublisherURL] = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+        [&](auto s) { zmqPublisher(std::move(s), _zmqPublisherURL); });
+  }
   cleanDBPeriodically();
   loadDB();
 }
@@ -44,8 +44,8 @@ void ZmqDBLoader::cleanDBPeriodically() {
 }
 
 void ZmqDBLoader::loadDB() {
-  auto zmqThread = rxcpp::schedulers::make_current_thread();
-  _zmqObservable.observe_on(rxcpp::synchronize_new_thread())
+  urlToZmqObservables[_zmqPublisherURL]
+      .observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
           [](std::shared_ptr<iri::IRIMessage> msg) {
             if (msg->type() != iri::IRIMessageType::TX) return;

@@ -39,7 +39,6 @@ class BlowballCollector : public PrometheusCollector {
   std::string _zmqPublisher;
   uint32_t _snapshotInterval;
   // Others
-  ZmqObservable _zmqObservable;
   PrometheusCollector::HistogramsMap histograms;
   // state
   cuckoohash_map<std::string, uint8_t> _txToRefCount;

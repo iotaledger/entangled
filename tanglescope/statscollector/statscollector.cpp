@@ -102,14 +102,16 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange, uint32
   auto stats = std::make_shared<FrameTXStats>(bundleConfirmationHistogramRange, bundleConfirmationBucketSize);
   auto analyzer = std::make_shared<TXAnalyzer>(_counters, _histograms, stats);
 
-  auto zmqThread = rxcpp::schedulers::make_new_thread();
-  auto zmqObservable = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-      [&](auto s) { zmqPublisher(std::move(s), _zmqURL); });
+  if (urlToZmqObservables.find(_zmqURL) == urlToZmqObservables.end()) {
+    urlToZmqObservables[_zmqURL] = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+        [&](auto s) { zmqPublisher(std::move(s), _zmqURL); });
+  }
 
   // Latest solid milestone index
   uint64_t lmsi = 0;
 
-  zmqObservable.observe_on(rxcpp::synchronize_new_thread())
+  urlToZmqObservables[_zmqURL]
+      .observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
           [weakAnalyzer = std::weak_ptr<TXAnalyzer>(analyzer), &gauges = _gauges, &counters = _counters,
