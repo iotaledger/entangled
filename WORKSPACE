@@ -16,7 +16,7 @@ git_repository(
 
 git_repository(
     name = "bazel_toolchains",
-    commit = "b6875a7bb09b4fa1db8ea347852c0dc9ccae74ab",
+    commit = "251dd5b25e04f7bf98f855f8d676cce3c1ddbfff",
     remote = "https://github.com/th0br0/bazel-toolchains.git",
 )
 
