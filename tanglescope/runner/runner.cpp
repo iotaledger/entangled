@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
   ::google::InitGoogleLogging("tanglescope");
 
   std::list<boost::future<void>> tasks;
-  printf("\tWorkdir: %s\n", getenv("PWD"));
+
   // need to parse yaml file and get arguments
   try {
     auto conf =
