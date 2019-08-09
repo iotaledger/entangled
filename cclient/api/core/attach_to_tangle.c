@@ -34,7 +34,7 @@ retcode_t iota_client_attach_to_tangle(iota_client_service_t const* const servic
   }
 
   if (service == NULL) {
-#if !defined(__XTENSA__)
+#ifdef __CCLIENT_LOCAL_POW__
     log_info(client_core_logger_id, "[%s:%d] local PoW\n", __func__, __LINE__);
     iota_transaction_t tx = {};
     flex_trit_t* array_elt = NULL;
@@ -68,7 +68,7 @@ retcode_t iota_client_attach_to_tangle(iota_client_service_t const* const servic
       }
     }
 #else
-    log_info(client_core_logger_id, "[%s:%d] Local PoW is not supported on ESP32.\n", __func__, __LINE__);
+    log_info(client_core_logger_id, "[%s:%d] Local PoW is not supported on this device.\n", __func__, __LINE__);
     return RC_CCLIENT_NO_LOCAL_POW;
 #endif
   } else {

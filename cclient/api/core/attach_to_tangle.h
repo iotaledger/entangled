@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+#define __CCLIENT_LOCAL_POW__
+
+#if defined(__XTENSA__)
+#undef __CCLIENT_LOCAL_POW__
+#endif
+
 /**
  * @brief Performs Proof-of-Work required to attach a transation to the Tangle.
  *
