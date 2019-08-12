@@ -29,39 +29,39 @@ retcode_t iota_tangle_destroy(tangle_t *const tangle) {
  */
 
 retcode_t iota_tangle_transaction_count(tangle_t const *const tangle, size_t *const count) {
-  return iota_stor_transaction_count(&tangle->connection, count);
+  return storage_transaction_count(&tangle->connection, count);
 }
 
 retcode_t iota_tangle_transaction_store(tangle_t const *const tangle, iota_transaction_t const *const tx) {
-  return iota_stor_transaction_store(&tangle->connection, tx);
+  return storage_transaction_store(&tangle->connection, tx);
 }
 
 retcode_t iota_tangle_transaction_load(tangle_t const *const tangle, transaction_field_t const field,
                                        flex_trit_t const *const key, iota_stor_pack_t *const tx) {
-  return iota_stor_transaction_load(&tangle->connection, field, key, tx);
+  return storage_transaction_load(&tangle->connection, field, key, tx);
 }
 
 retcode_t iota_tangle_transaction_update_solid_state(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                      bool const state) {
-  return iota_stor_transaction_update_solid_state(&tangle->connection, hash, state);
+  return storage_transaction_update_solid_state(&tangle->connection, hash, state);
 }
 
 retcode_t iota_tangle_transactions_update_solid_state(tangle_t const *const tangle, hash243_set_t const hashes,
                                                       bool const is_solid) {
-  return iota_stor_transactions_update_solid_state(&tangle->connection, hashes, is_solid);
+  return storage_transactions_update_solid_state(&tangle->connection, hashes, is_solid);
 }
 
 retcode_t iota_tangle_transaction_load_hashes_by_address(tangle_t const *const tangle, flex_trit_t const *const address,
                                                          iota_stor_pack_t *const pack) {
   retcode_t res = RC_OK;
 
-  res = iota_stor_transaction_load_hashes(&tangle->connection, TRANSACTION_FIELD_ADDRESS, address, pack);
+  res = storage_transaction_load_hashes(&tangle->connection, TRANSACTION_FIELD_ADDRESS, address, pack);
 
   while (res == RC_OK && pack->insufficient_capacity) {
     res = hash_pack_resize(pack, 2);
     if (res == RC_OK) {
       pack->num_loaded = 0;
-      res = iota_stor_transaction_load_hashes(&tangle->connection, TRANSACTION_FIELD_ADDRESS, address, pack);
+      res = storage_transaction_load_hashes(&tangle->connection, TRANSACTION_FIELD_ADDRESS, address, pack);
     }
   }
 
@@ -77,13 +77,13 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(tangle_t const *const
                                                            iota_stor_pack_t *const pack, int64_t before_timestamp) {
   retcode_t res = RC_OK;
 
-  res = iota_stor_transaction_load_hashes_of_approvers(&tangle->connection, approvee_hash, pack, before_timestamp);
+  res = storage_transaction_load_hashes_of_approvers(&tangle->connection, approvee_hash, pack, before_timestamp);
 
   while (res == RC_OK && pack->insufficient_capacity) {
     res = hash_pack_resize(pack, 2);
     if (res == RC_OK) {
       pack->num_loaded = 0;
-      res = iota_stor_transaction_load_hashes_of_approvers(&tangle->connection, approvee_hash, pack, before_timestamp);
+      res = storage_transaction_load_hashes_of_approvers(&tangle->connection, approvee_hash, pack, before_timestamp);
     }
   }
 
@@ -97,13 +97,13 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(tangle_t const *const
 retcode_t iota_tangle_transaction_load_partial(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                iota_stor_pack_t *const pack, partial_transaction_model_e models_mask) {
   if (models_mask == PARTIAL_TX_MODEL_METADATA) {
-    return iota_stor_transaction_load_metadata(&tangle->connection, hash, pack);
+    return storage_transaction_load_metadata(&tangle->connection, hash, pack);
   } else if (models_mask == PARTIAL_TX_MODEL_ESSENCE_METADATA) {
-    return iota_stor_transaction_load_essence_and_metadata(&tangle->connection, hash, pack);
+    return storage_transaction_load_essence_and_metadata(&tangle->connection, hash, pack);
   } else if (models_mask == PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA) {
-    return iota_stor_transaction_load_essence_attachment_and_metadata(&tangle->connection, hash, pack);
+    return storage_transaction_load_essence_attachment_and_metadata(&tangle->connection, hash, pack);
   } else if (models_mask == PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) {
-    return iota_stor_transaction_load_essence_and_consensus(&tangle->connection, hash, pack);
+    return storage_transaction_load_essence_and_consensus(&tangle->connection, hash, pack);
   } else {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }
@@ -114,12 +114,12 @@ retcode_t iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle_t c
                                                                       flex_trit_t const *const coordinator) {
   retcode_t res = RC_OK;
 
-  res = iota_stor_transaction_load_hashes_of_milestone_candidates(&tangle->connection, pack, coordinator);
+  res = storage_transaction_load_hashes_of_milestone_candidates(&tangle->connection, pack, coordinator);
 
   while (res == RC_OK && pack->insufficient_capacity) {
     if ((res = hash_pack_resize(pack, 2)) == RC_OK) {
       pack->num_loaded = 0;
-      res = iota_stor_transaction_load_hashes_of_milestone_candidates(&tangle->connection, pack, coordinator);
+      res = storage_transaction_load_hashes_of_milestone_candidates(&tangle->connection, pack, coordinator);
     }
   }
 
@@ -135,36 +135,36 @@ retcode_t iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle_t c
 
 retcode_t iota_tangle_transaction_update_snapshot_index(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                         uint64_t const snapshot_index) {
-  return iota_stor_transaction_update_snapshot_index(&tangle->connection, hash, snapshot_index);
+  return storage_transaction_update_snapshot_index(&tangle->connection, hash, snapshot_index);
 }
 
 retcode_t iota_tangle_transactions_update_snapshot_index(tangle_t const *const tangle, hash243_set_t const hashes,
                                                          uint64_t const snapshot_index) {
-  return iota_stor_transactions_update_snapshot_index(&tangle->connection, hashes, snapshot_index);
+  return storage_transactions_update_snapshot_index(&tangle->connection, hashes, snapshot_index);
 }
 
 retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle, transaction_field_t const field,
                                         flex_trit_t const *const key, bool *const exist) {
-  return iota_stor_transaction_exist(&tangle->connection, field, key, exist);
+  return storage_transaction_exist(&tangle->connection, field, key, exist);
 }
 
 retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                   size_t *const count) {
-  return iota_stor_transaction_approvers_count(&tangle->connection, hash, count);
+  return storage_transaction_approvers_count(&tangle->connection, hash, count);
 }
 
 retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_queue_t const bundles,
                                        hash243_queue_t const addresses, hash81_queue_t const tags,
                                        hash243_queue_t const approvees, iota_stor_pack_t *const pack) {
-  return iota_stor_transaction_find(&tangle->connection, bundles, addresses, tags, approvees, pack);
+  return storage_transaction_find(&tangle->connection, bundles, addresses, tags, approvees, pack);
 }
 
 retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle) {
-  return iota_stor_transaction_metadata_clear(&tangle->connection);
+  return storage_transaction_metadata_clear(&tangle->connection);
 }
 
 retcode_t iota_tangle_transactions_delete(tangle_t const *const tangle, hash243_set_t const hashes) {
-  return iota_stor_transactions_delete(&tangle->connection, hashes);
+  return storage_transactions_delete(&tangle->connection, hashes);
 }
 
 /*
@@ -173,7 +173,7 @@ retcode_t iota_tangle_transactions_delete(tangle_t const *const tangle, hash243_
 
 retcode_t iota_tangle_bundle_update_validity(tangle_t const *const tangle, bundle_transactions_t const *const bundle,
                                              bundle_status_t const status) {
-  return iota_stor_bundle_update_validity(&tangle->connection, bundle, status);
+  return storage_bundle_update_validity(&tangle->connection, bundle, status);
 }
 
 retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t const *const tail_hash,
@@ -219,42 +219,42 @@ retcode_t iota_tangle_bundle_load(tangle_t const *const tangle, flex_trit_t cons
  */
 
 retcode_t iota_tangle_milestone_clear(tangle_t const *const tangle) {
-  return iota_stor_milestone_clear(&tangle->connection);
+  return storage_milestone_clear(&tangle->connection);
 }
 
 retcode_t iota_tangle_milestone_store(tangle_t const *const tangle, iota_milestone_t const *const data_in) {
-  return iota_stor_milestone_store(&tangle->connection, data_in);
+  return storage_milestone_store(&tangle->connection, data_in);
 }
 
 retcode_t iota_tangle_milestone_load(tangle_t const *const tangle, flex_trit_t const *const hash,
                                      iota_stor_pack_t *const pack) {
-  return iota_stor_milestone_load(&tangle->connection, hash, pack);
+  return storage_milestone_load(&tangle->connection, hash, pack);
 }
 
 retcode_t iota_tangle_milestone_load_last(tangle_t const *const tangle, iota_stor_pack_t *const pack) {
-  return iota_stor_milestone_load_last(&tangle->connection, pack);
+  return storage_milestone_load_last(&tangle->connection, pack);
 }
 
 retcode_t iota_tangle_milestone_load_first(tangle_t const *const tangle, iota_stor_pack_t *const pack) {
-  return iota_stor_milestone_load_first(&tangle->connection, pack);
+  return storage_milestone_load_first(&tangle->connection, pack);
 }
 
 retcode_t iota_tangle_milestone_load_by_index(tangle_t const *const tangle, uint64_t const index,
                                               iota_stor_pack_t *const pack) {
-  return iota_stor_milestone_load_by_index(&tangle->connection, index, pack);
+  return storage_milestone_load_by_index(&tangle->connection, index, pack);
 }
 
 retcode_t iota_tangle_milestone_load_next(tangle_t const *const tangle, uint64_t const index,
                                           iota_stor_pack_t *const pack) {
-  return iota_stor_milestone_load_next(&tangle->connection, index, pack);
+  return storage_milestone_load_next(&tangle->connection, index, pack);
 }
 
 retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle, flex_trit_t const *const hash, bool *const exist) {
-  return iota_stor_milestone_exist(&tangle->connection, hash, exist);
+  return storage_milestone_exist(&tangle->connection, hash, exist);
 }
 
 retcode_t iota_tangle_milestone_delete(tangle_t const *const tangle, flex_trit_t const *const hash) {
-  return iota_stor_milestone_delete(&tangle->connection, hash);
+  return storage_milestone_delete(&tangle->connection, hash);
 }
 
 /*
@@ -324,9 +324,9 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle, flex_trit_t const 
 
 retcode_t iota_tangle_state_delta_store(tangle_t const *const tangle, uint64_t const index,
                                         state_delta_t const *const delta) {
-  return iota_stor_state_delta_store(&tangle->connection, index, delta);
+  return storage_state_delta_store(&tangle->connection, index, delta);
 }
 
 retcode_t iota_tangle_state_delta_load(tangle_t const *const tangle, uint64_t const index, state_delta_t *const delta) {
-  return iota_stor_state_delta_load(&tangle->connection, index, delta);
+  return storage_state_delta_load(&tangle->connection, index, delta);
 }
