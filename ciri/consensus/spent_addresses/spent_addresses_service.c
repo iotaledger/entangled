@@ -57,8 +57,7 @@ done:
   return ret;
 }
 
-retcode_t iota_spent_addresses_service_was_tx_spent_from(spent_addresses_provider_t const *const sap,
-                                                         tangle_t const *const tangle,
+retcode_t iota_spent_addresses_service_was_tx_spent_from(tangle_t const *const tangle,
                                                          iota_transaction_t const *const tx,
                                                          flex_trit_t const *const hash, bool *const spent) {
   retcode_t ret = RC_OK;
@@ -155,7 +154,7 @@ retcode_t iota_spent_addresses_service_was_address_spent_from(spent_addresses_se
                                                     PARTIAL_TX_MODEL_ESSENCE_METADATA)) != RC_OK) {
       goto done;
     }
-    if ((ret = iota_spent_addresses_service_was_tx_spent_from(sap, tangle, txp, ((flex_trit_t **)(pack.models))[i],
+    if ((ret = iota_spent_addresses_service_was_tx_spent_from(tangle, txp, ((flex_trit_t **)(pack.models))[i],
                                                               spent)) != RC_OK) {
       goto done;
     }
