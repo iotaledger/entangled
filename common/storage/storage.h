@@ -122,9 +122,9 @@ extern retcode_t storage_transactions_delete(storage_connection_t const* const c
  * Bundle operations
  */
 
-extern retcode_t iota_stor_bundle_update_validity(storage_connection_t const* const connection,
-                                                  bundle_transactions_t const* const bundle,
-                                                  bundle_status_t const status);
+extern retcode_t storage_bundle_update_validity(storage_connection_t const* const connection,
+                                                bundle_transactions_t const* const bundle,
+                                                bundle_status_t const status);
 
 /*
  * Milestone operations
