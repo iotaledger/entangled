@@ -23,74 +23,74 @@ static retcode_t prepare_tangle_statements(sqlite3_tangle_connection_t* const co
   retcode_t ret = RC_OK;
 
   ret = prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_insert),
-                          iota_statement_transaction_insert);
+                          storage_statement_transaction_insert);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_select_by_hash),
-                           iota_statement_transaction_select_by_hash);
+                           storage_statement_transaction_select_by_hash);
   ret |=
       prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_by_address),
-                        iota_statement_transaction_select_hashes_by_address);
+                        storage_statement_transaction_select_hashes_by_address);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_of_approvers),
-                           iota_statement_transaction_select_hashes_of_approvers);
+                           storage_statement_transaction_select_hashes_of_approvers);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_of_approvers_before_date),
-                           iota_statement_transaction_select_hashes_of_approvers_before_date);
+                           storage_statement_transaction_select_hashes_of_approvers_before_date);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_hashes_of_milestone_candidates),
-                           iota_statement_transaction_select_hashes_of_milestone_candidates);
+                           storage_statement_transaction_select_hashes_of_milestone_candidates);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_update_snapshot_index),
-                           iota_statement_transaction_update_snapshot_index);
+                           storage_statement_transaction_update_snapshot_index);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_update_solid_state),
-                           iota_statement_transaction_update_solid_state);
+                           storage_statement_transaction_update_solid_state);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_update_validity),
-                           iota_statement_transaction_update_validity);
+                           storage_statement_transaction_update_validity);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_exist),
-                           iota_statement_transaction_exist);
+                           storage_statement_transaction_exist);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_exist_by_hash),
-                           iota_statement_transaction_exist_by_hash);
+                           storage_statement_transaction_exist_by_hash);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_approvers_count),
-                           iota_statement_transaction_approvers_count);
+                           storage_statement_transaction_approvers_count);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_count),
-                           iota_statement_transaction_count);
+                           storage_statement_transaction_count);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_delete),
-                           iota_transaction_delete);
+                           storage_statement_transaction_delete);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_essence_and_metadata),
-                           iota_statement_transaction_select_essence_and_metadata);
+                           storage_statement_transaction_select_essence_and_metadata);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_essence_attachment_and_metadata),
-                           iota_statement_transaction_select_essence_attachment_and_metadata);
+                           storage_statement_transaction_select_essence_attachment_and_metadata);
   ret |= prepare_statement(connection->db,
                            (sqlite3_stmt**)(&connection->statements.transaction_select_essence_and_consensus),
-                           iota_statement_transaction_select_essence_and_consensus);
+                           storage_statement_transaction_select_essence_and_consensus);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_select_metadata),
-                           iota_statement_transaction_select_metadata);
+                           storage_statement_transaction_select_metadata);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.transaction_metadata_clear),
-                           iota_statement_transaction_metadata_clear);
+                           storage_statement_transaction_metadata_clear);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_clear),
-                           iota_statement_milestone_clear);
+                           storage_statement_milestone_clear);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_insert),
-                           iota_statement_milestone_insert);
+                           storage_statement_milestone_insert);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_by_hash),
-                           iota_statement_milestone_select_by_hash);
+                           storage_statement_milestone_select_by_hash);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_last),
-                           iota_statement_milestone_select_last);
+                           storage_statement_milestone_select_last);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_first),
-                           iota_statement_milestone_select_first);
+                           storage_statement_milestone_select_first);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_by_index),
-                           iota_statement_milestone_select_by_index);
+                           storage_statement_milestone_select_by_index);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_select_next),
-                           iota_statement_milestone_select_next);
+                           storage_statement_milestone_select_next);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_exist),
-                           iota_statement_milestone_exist);
+                           storage_statement_milestone_exist);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_exist_by_hash),
-                           iota_statement_milestone_exist_by_hash);
+                           storage_statement_milestone_exist_by_hash);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.milestone_delete_by_hash),
-                           iota_statement_milestone_delete_by_hash);
+                           storage_statement_milestone_delete_by_hash);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.state_delta_store),
-                           iota_statement_state_delta_store);
+                           storage_statement_state_delta_store);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.state_delta_load),
-                           iota_statement_state_delta_load);
+                           storage_statement_state_delta_load);
 
   if (ret != RC_OK) {
     log_error(logger_id, "Preparing tangle statements failed\n");
@@ -103,9 +103,9 @@ static retcode_t prepare_spent_addresses_statements(sqlite3_spent_addresses_conn
   retcode_t ret = RC_OK;
 
   ret = prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.spent_address_insert),
-                          iota_statement_spent_address_insert);
+                          storage_statement_spent_address_insert);
   ret |= prepare_statement(connection->db, (sqlite3_stmt**)(&connection->statements.spent_address_exist),
-                           iota_statement_spent_address_exist);
+                           storage_statement_spent_address_exist);
 
   if (ret != RC_OK) {
     log_error(logger_id, "Preparing spent addresses statements failed\n");
