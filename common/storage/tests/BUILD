@@ -1,14 +1,11 @@
-cc_test(
-    name = "test_storage",
-    timeout = "moderate",
-    srcs = [
-        "test_storage.c",
-    ],
-    data = [":db_file"],
-    visibility = ["//visibility:public"],
+cc_library(
+    name = "test_storage_common",
+    srcs = ["test_storage.c"],
+    visibility = ["//visibility:private"],
     deps = [
         "//common/helpers:digest",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//common/model:milestone",
+        "//common/storage",
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",
         "//utils:files",
@@ -18,9 +15,20 @@ cc_test(
 )
 
 genrule(
-    name = "db_file",
+    name = "db_file_sqlite3",
     srcs = ["//common/storage/sql:tangle-schema"],
     outs = ["ciri.db"],
     cmd = "$(location @sqlite3//:shell) $@ < $<",
     tools = ["@sqlite3//:shell"],
+)
+
+cc_test(
+    name = "test_storage_sqlite3",
+    timeout = "moderate",
+    data = [":db_file_sqlite3"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":test_storage_common",
+        "//common/storage/sql/sqlite3:sqlite3_storage",
+    ],
 )
