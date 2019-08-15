@@ -20,8 +20,6 @@
 
 static char *test_db_path = "common/storage/tests/test.db";
 static char *ciri_db_path = "common/storage/tests/ciri.db";
-// TODO Remove after "Common definitions #329" is merged
-#define HASH_LENGTH 243
 
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 const flex_trit_t HASH[] = {
@@ -253,13 +251,13 @@ void test_transaction_update_snapshot_index(void) {
 void test_milestone_state_delta(void) {
   state_delta_t state_delta1 = NULL, state_delta2 = NULL;
   state_delta_entry_t *iter = NULL, *tmp = NULL;
-  trit_t trits[HASH_LENGTH] = {1};
+  trit_t trits[HASH_LENGTH_TRIT] = {1};
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t *hashed_hash;
 
-  flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
+  flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   for (int64_t i = -1000; i <= 1000; i++) {
-    hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
+    hashed_hash = iota_flex_digest(hash, HASH_LENGTH_TRIT);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
     TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
@@ -274,10 +272,10 @@ void test_milestone_state_delta(void) {
   TEST_ASSERT(state_delta2 != NULL);
 
   int i = -1000;
-  flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
+  flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   iter = NULL;
   HASH_ITER(hh, state_delta2, iter, tmp) {
-    hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
+    hashed_hash = iota_flex_digest(hash, HASH_LENGTH_TRIT);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
     TEST_ASSERT_EQUAL_MEMORY(iter->hash, hash, FLEX_TRIT_SIZE_243);
