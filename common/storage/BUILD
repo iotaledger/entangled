@@ -1,9 +1,13 @@
 cc_library(
     name = "storage",
-    srcs = glob(["*.c"]),
-    hdrs = glob(["*.h"]),
+    hdrs = [
+        "connection.h",
+        "defs.h",
+        "storage.h",
+    ],
     visibility = ["//visibility:public"],
     deps = [
+        ":pack",
         "//ciri/consensus/snapshot:state_delta",
         "//common:errors",
         "//common/model:bundle",
