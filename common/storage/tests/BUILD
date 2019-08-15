@@ -1,8 +1,8 @@
 cc_test(
-    name = "test_sqlite3",
+    name = "test_storage",
     timeout = "moderate",
     srcs = [
-        "test_sqlite3.c",
+        "test_storage.c",
     ],
     data = [":db_file"],
     visibility = ["//visibility:public"],

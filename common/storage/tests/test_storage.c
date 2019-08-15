@@ -13,14 +13,13 @@
 #include "common/helpers/digest.h"
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
-#include "common/storage/sql/sqlite3/connection.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/files.h"
 
-static char *test_db_path = "common/storage/sql/sqlite3/tests/test.db";
-static char *ciri_db_path = "common/storage/sql/sqlite3/tests/ciri.db";
+static char *test_db_path = "common/storage/tests/test.db";
+static char *ciri_db_path = "common/storage/tests/ciri.db";
 // TODO Remove after "Common definitions #329" is merged
 #define HASH_LENGTH 243
 
