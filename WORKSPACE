@@ -10,14 +10,8 @@ git_repository(
 
 git_repository(
     name = "iota_toolchains",
-    commit = "0f93f76fdff9f091dd3a99aa3f19b5d3f4f7f7fc",
-    remote = "https://github.com/iotaledger/toolchains.git",
-)
-
-git_repository(
-    name = "bazel_toolchains",
     commit = "251dd5b25e04f7bf98f855f8d676cce3c1ddbfff",
-    remote = "https://github.com/th0br0/bazel-toolchains.git",
+    remote = "https://github.com/iotaledger/toolchains.git",
 )
 
 android_sdk_repository(
