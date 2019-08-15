@@ -204,8 +204,7 @@ static retcode_t collect_transactions_to_prune(pruning_service_t *const ps, tang
           cleanup);
       ERR_BIND_GOTO(tips_cache_remove(ps->tips_cache, iter->hash), err, cleanup);
       if (tx_pack.num_loaded > 0) {
-        ERR_BIND_GOTO(iota_spent_addresses_service_was_tx_spent_from(sap, tangle, &tx, iter->hash, &spent), err,
-                      cleanup);
+        ERR_BIND_GOTO(iota_spent_addresses_service_was_tx_spent_from(tangle, &tx, iter->hash, &spent), err, cleanup);
         if (spent) {
           ERR_BIND_GOTO(iota_spent_addresses_provider_store(sap, transaction_address(&tx)), err, cleanup);
         }
