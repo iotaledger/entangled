@@ -20,7 +20,7 @@ cc_test(
         "//ciri/consensus/test_utils",
         "//ciri/consensus/transaction_solidifier",
         "//common/helpers:digest",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//common/storage/sql/sqlite3:storage_sqlite3",
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",
         "//utils/containers/hash:hash_uint64_t_map",

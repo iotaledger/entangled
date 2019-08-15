@@ -1,5 +1,5 @@
 cc_library(
-    name = "sqlite3_storage",
+    name = "storage_sqlite3",
     srcs = [
         "connection.c",
         "storage.c",

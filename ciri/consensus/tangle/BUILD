@@ -8,7 +8,7 @@ cc_library(
         "//common:errors",
         "//common/model:bundle",
         "//common/model:transaction",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//common/storage/sql/sqlite3:storage_sqlite3",
         "//common/trinary:trit_array",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_queue",

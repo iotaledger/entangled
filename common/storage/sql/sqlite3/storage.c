@@ -704,7 +704,8 @@ retcode_t storage_transaction_find(storage_connection_t const* const connection,
   hash81_queue_entry_t* iter81 = NULL;
   size_t column = 1;
 
-  char* statement = iota_statement_transaction_find_build(bundles_count, addresses_count, tags_count, approvees_count);
+  char* statement =
+      storage_statement_transaction_find_build(bundles_count, addresses_count, tags_count, approvees_count);
 
   if ((ret = prepare_statement(sqlite3_connection->db, &sqlite_statement, statement)) != RC_OK) {
     goto done;

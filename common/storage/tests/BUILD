@@ -29,6 +29,17 @@ cc_test(
     visibility = ["//visibility:public"],
     deps = [
         ":test_storage_common",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//common/storage/sql/sqlite3:storage_sqlite3",
+    ],
+)
+
+cc_test(
+    name = "test_storage_mariadb",
+    timeout = "moderate",
+    # data = [":db_file_sqlite3"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":test_storage_common",
+        "//common/storage/sql/mariadb:storage_mariadb",
     ],
 )

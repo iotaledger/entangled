@@ -5,7 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//common/storage/sql/sqlite3:storage_sqlite3",
         "//utils:logger_helper",
     ],
 )

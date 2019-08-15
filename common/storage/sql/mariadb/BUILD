@@ -1,5 +1,5 @@
 cc_library(
-    name = "mariadb_storage",
+    name = "storage_mariadb",
     srcs = [
         "connection.c",
         "storage.c",
