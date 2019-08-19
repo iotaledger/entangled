@@ -28,6 +28,7 @@ class IotaJsonAPITest : public ::testing::Test {};
 
 class MockAPI : public IotaJsonAPI {
  public:
+  explicit MockAPI(bool useSsl) : IotaJsonAPI(useSsl) {}
   json request;
   nonstd::optional<json> response;
 
@@ -41,7 +42,7 @@ class MockAPI : public IotaJsonAPI {
 };
 
 TEST_F(IotaJsonAPITest, GetBalances) {
-  MockAPI api;
+  MockAPI api(false);
 
   std::string address(
       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -68,7 +69,7 @@ TEST_F(IotaJsonAPITest, GetBalances) {
 }
 
 TEST_F(IotaJsonAPITest, GetNodeInfo) {
-  MockAPI api;
+  MockAPI api(false);
 
   json req;
   req["command"] = "getNodeInfo";

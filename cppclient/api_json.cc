@@ -49,6 +49,10 @@ DEFINE_uint32(maxQuerySizeGetInclusionState, 1000,
 
 namespace cppclient {
 
+IotaJsonAPI::IotaJsonAPI(bool useSsl) : _useSsl(useSsl) {}
+
+bool IotaJsonAPI::isSsl() const { return _useSsl; }
+
 bool IotaJsonAPI::isNodeSolid() {
   VLOG(3) << __FUNCTION__;
   auto maybeNodeInfo = getNodeInfo();

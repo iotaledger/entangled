@@ -31,8 +31,8 @@ class MockBeast : public BeastIotaAPI {
 };
 
 TEST_F(BeastIotaAPITest, InvalidHostPort) {
-  MockBeast beast1("localhost", 1);
-  MockBeast beast2("unresolvable.sometld", 41414);
+  MockBeast beast1("localhost", 1, false);
+  MockBeast beast2("unresolvable.sometld", 41414, false);
   json req = R"({"command":"getNodeInfo"})"_json;
 
   auto res1 = beast1.post(req);
