@@ -25,12 +25,7 @@ namespace cppclient {
 /// Implementation of IotaAPI class with JSON responses
 class IotaJsonAPI : virtual public IotaAPI {
  public:
-  explicit IotaJsonAPI(bool useSSl);
   bool isNodeSolid() override;
-
-  bool isSsl() const;
-  void setSslPemPath(const std::string& sslPemPath);
-  const std::string& sslPemPath() const;
 
   nonstd::optional<std::unordered_map<std::string, uint64_t>> getBalances(
       const std::vector<std::string>& addresses) override;
@@ -72,8 +67,6 @@ class IotaJsonAPI : virtual public IotaAPI {
  private:
   template <typename T>
   static std::vector<T> nextBatch(const std::vector<T>& vec, uint32_t& numBatchedEntries, uint32_t batchSize);
-  bool _useSsl;
-  std::string _sslPemPath;
 };
 }  // namespace cppclient
 

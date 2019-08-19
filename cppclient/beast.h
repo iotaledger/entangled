@@ -25,8 +25,7 @@ namespace cppclient {
 class BeastIotaAPI : virtual public IotaAPI, public IotaJsonAPI {
  public:
   BeastIotaAPI() = delete;
-  BeastIotaAPI(std::string host, uint32_t port, bool useSsl)
-      : IotaJsonAPI(useSsl), _host(std::move(host)), _port(port) {}
+  BeastIotaAPI(std::string host, uint32_t port, bool useSsl) : IotaAPI(useSsl), _host(std::move(host)), _port(port) {}
   virtual ~BeastIotaAPI() {}
 
  protected:

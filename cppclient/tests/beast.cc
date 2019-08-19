@@ -28,6 +28,7 @@ class MockBeast : public BeastIotaAPI {
  public:
   using BeastIotaAPI::BeastIotaAPI;
   using BeastIotaAPI::post;
+  explicit MockBeast(std::string host, uint32_t port, bool useSsl) : IotaAPI(false), BeastIotaAPI(host, port, false) {}
 };
 
 TEST_F(BeastIotaAPITest, InvalidHostPort) {
