@@ -27,7 +27,7 @@ retcode_t json_array_to_uint64(cJSON const* const obj, char const* const obj_nam
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        value = strtol(current_obj->valuestring, &endptr, 10);
+        value = strtoll(current_obj->valuestring, &endptr, 10);
         utarray_push_back(ut, &value);
       }
     }
