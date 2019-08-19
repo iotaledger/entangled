@@ -41,7 +41,7 @@ bool BroadcastReceiveCollector::parseConfiguration(const YAML::Node& conf) {
 void BroadcastReceiveCollector::collect() {
   LOG(INFO) << __FUNCTION__;
 
-  _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
+  _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort, false);
 
   for (const auto& url : _zmqPublishers) {
     if (urlToZmqObservables.find(url) == urlToZmqObservables.end()) {
