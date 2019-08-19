@@ -181,7 +181,8 @@ enum retcode_t {
   RC_CCLIENT_INVALID_TAIL_HASH = 0x12 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,    /**< Invalid tail hash */
   RC_CCLIENT_INVALID_BUNDLE = 0x13 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,       /**< Invalid bundle object */
   RC_CCLIENT_CHECK_BALANCE = 0x14 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,        /**< Checking balance value failed */
-  RC_CCLIENT_NOT_PROMOTABLE = 0x15 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR, /**< Unable to promot this transaction */
+  RC_CCLIENT_NOT_PROMOTABLE = 0x15 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR, /**< Unable to promote this transaction */
+  RC_CCLIENT_NO_LOCAL_POW = 0x16 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,   /**< Local PoW is not supported */
 
   // Consensus Module
   RC_CONSENSUS_NOT_IMPLEMENTED = 0x01 | RC_MODULE_CONSENSUS | RC_SEVERITY_MAJOR,
