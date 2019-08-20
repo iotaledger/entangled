@@ -21,9 +21,6 @@ class ZmqDBLoader {
   constexpr static auto OLDEST_TX_AGE = "oldest_tx_age";
   constexpr static auto CLEANUP_INTERVAL = "cleanup_interval";
 
-  // typedef
-  using ZmqObservable = rxcpp::observable<std::shared_ptr<iri::IRIMessage>>;
-
  private:
   virtual void loadDB();
   void cleanDBPeriodically();
@@ -31,8 +28,6 @@ class ZmqDBLoader {
   std::string _zmqPublisherURL;
   uint32_t _oldestTXAge;
   uint32_t _cleanupInterval;
-
-  ZmqObservable _zmqObservable;
 };
 
 }  // namespace tanglescope

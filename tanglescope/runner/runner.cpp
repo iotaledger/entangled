@@ -48,32 +48,32 @@ int main(int argc, char** argv) {
 
     if (echoCatcher.parseConfiguration(conf["echocollector"])) {
       auto task = boost::async(boost::launch::async, [&echoCatcher]() { echoCatcher.collect(); });
-      tasks.push_back(std::move(task));
+      tasks.emplace_back(std::move(task));
     }
 
     if (statsCollector.parseConfiguration(conf["statscollector"])) {
       auto task = boost::async(boost::launch::async, [&statsCollector]() { statsCollector.collect(); });
-      tasks.push_back(std::move(task));
+      tasks.emplace_back(std::move(task));
     }
 
     if (blowballCollector.parseConfiguration(conf["blowballcollector"])) {
       auto task = boost::async(boost::launch::async, [&blowballCollector]() { blowballCollector.collect(); });
-      tasks.push_back(std::move(task));
+      tasks.emplace_back(std::move(task));
     }
 
     if (tipSelectionCollector.parseConfiguration(conf["tipselectioncollector"])) {
       auto task = boost::async(boost::launch::async, [&tipSelectionCollector]() { tipSelectionCollector.collect(); });
-      tasks.push_back(std::move(task));
+      tasks.emplace_back(std::move(task));
     }
 
     if (widthCollector.parseConfiguration(conf["tanglewidthcollector"])) {
       auto task = boost::async(boost::launch::async, [&widthCollector]() { widthCollector.collect(); });
-      tasks.push_back(std::move(task));
+      tasks.emplace_back(std::move(task));
     }
 
     if (crCollector.parseConfiguration(conf["confirmationratecollector"])) {
       auto task = boost::async(boost::launch::async, [&crCollector]() { crCollector.collect(); });
-      tasks.push_back(std::move(task));
+      tasks.emplace_back(std::move(task));
     }
 
     std::for_each(tasks.begin(), tasks.end(), [](auto& task) { task.wait(); });
