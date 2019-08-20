@@ -199,23 +199,23 @@ retcode_t storage_connection_init(storage_connection_t* const connection,
 
   if (config->db_path == NULL) {
     log_critical(logger_id, "No path for db specified\n");
-    return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
+    return RC_STORAGE_NO_PATH_FOR_DB_SPECIFIED;
   }
 
   if ((rc = sqlite3_open_v2(config->db_path, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX, NULL)) != SQLITE_OK) {
     log_critical(logger_id, "Failed to open db on path: %s\n", config->db_path);
-    return RC_SQLITE3_FAILED_OPEN_DB;
+    return RC_STORAGE_FAILED_OPEN_DB;
   }
 
   if ((rc = sqlite3_busy_timeout(*db, 10000)) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
+    return RC_STORAGE_FAILED_CONFIG;
   }
 
   sql = "PRAGMA journal_mode = WAL;PRAGMA foreign_keys = ON";
 
   if ((rc = sqlite3_exec(*db, sql, NULL, NULL, &err_msg)) != SQLITE_OK) {
     sqlite3_free(err_msg);
-    return RC_SQLITE3_FAILED_INSERT_DB;
+    return RC_STORAGE_FAILED_INSERT_DB;
   }
 
   if (type == STORAGE_CONNECTION_TANGLE) {

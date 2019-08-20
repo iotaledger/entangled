@@ -9,7 +9,7 @@
 
 retcode_t prepare_statement(sqlite3* const db, sqlite3_stmt** const sqlite_statement, char const* const statement) {
   if (sqlite3_prepare_v2(db, statement, -1, sqlite_statement, NULL) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+    return RC_STORAGE_FAILED_PREPARED_STATEMENT;
   }
 
   return RC_OK;
@@ -21,7 +21,7 @@ retcode_t finalize_statement(sqlite3_stmt* const sqlite_statement) {
   }
 
   if (sqlite3_finalize(sqlite_statement) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_FINALIZE;
+    return RC_STORAGE_FAILED_FINALIZE;
   }
 
   return RC_OK;
@@ -29,21 +29,21 @@ retcode_t finalize_statement(sqlite3_stmt* const sqlite_statement) {
 
 retcode_t begin_transaction(sqlite3* const db) {
   if ((sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, NULL)) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_BEGIN;
+    return RC_STORAGE_FAILED_BEGIN;
   }
   return RC_OK;
 }
 
 retcode_t end_transaction(sqlite3* const db) {
   if (sqlite3_exec(db, "END TRANSACTION;", NULL, NULL, NULL) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_END;
+    return RC_STORAGE_FAILED_END;
   }
   return RC_OK;
 }
 
 retcode_t rollback_transaction(sqlite3* const db) {
   if (sqlite3_exec(db, "ROLLBACK TRANSACTION;", NULL, NULL, NULL) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_ROLLBACK;
+    return RC_STORAGE_FAILED_ROLLBACK;
   }
   return RC_OK;
 }
@@ -56,7 +56,7 @@ retcode_t column_compress_bind(sqlite3_stmt* const statement, size_t const index
   for (; i >= 0 && flex_trits[i] == FLEX_TRIT_NULL_VALUE; --i)
     ;
   if ((rc = sqlite3_bind_blob(statement, index, flex_trits, i + 1, NULL)) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_BINDING;
+    return RC_STORAGE_FAILED_BINDING;
   }
   return RC_OK;
 }

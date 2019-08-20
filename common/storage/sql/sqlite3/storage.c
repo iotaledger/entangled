@@ -36,21 +36,21 @@ retcode_t storage_init() {
   logger_id = logger_helper_enable(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
 
   if (sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
+    return RC_STORAGE_FAILED_CONFIG;
   }
 
   // TODO - implement connections pool so no two threads
   // will access db through same connection simultaneously
   if (sqlite3_config(SQLITE_CONFIG_MULTITHREAD) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
+    return RC_STORAGE_FAILED_CONFIG;
   }
 
   if (sqlite3_config(SQLITE_CONFIG_MEMSTATUS, 0) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
+    return RC_STORAGE_FAILED_CONFIG;
   }
 
   if (sqlite3_initialize() != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_INITIALIZE;
+    return RC_STORAGE_FAILED_INITIALIZE;
   }
 
   return RC_OK;
@@ -60,7 +60,7 @@ retcode_t storage_destroy() {
   logger_helper_release(logger_id);
 
   if (sqlite3_shutdown() != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_SHUTDOWN;
+    return RC_STORAGE_FAILED_SHUTDOWN;
   }
 
   return RC_OK;
@@ -145,7 +145,7 @@ static retcode_t execute_statement_load_gen(sqlite3_stmt* const sqlite_statement
       select_transactions_populate_metadata(sqlite_statement, pack->models[pack->num_loaded], &index);
       pack->num_loaded++;
     } else {
-      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
     }
   }
 
@@ -159,7 +159,7 @@ static retcode_t execute_statement_load_hashes(sqlite3_stmt* const sqlite_statem
 static retcode_t execute_statement(sqlite3_stmt* const sqlite_statement) {
   int rc = sqlite3_step(sqlite_statement);
   if (rc != SQLITE_OK && rc != SQLITE_DONE) {
-    return RC_SQLITE3_FAILED_STEP;
+    return RC_STORAGE_FAILED_STEP;
   }
 
   return RC_OK;
@@ -172,7 +172,7 @@ static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement, b
   if (rc == SQLITE_ROW) {
     *exist = true;
   } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
-    return RC_SQLITE3_FAILED_STEP;
+    return RC_STORAGE_FAILED_STEP;
   }
 
   return RC_OK;
@@ -199,12 +199,12 @@ static retcode_t update_transactions(storage_connection_t const* const connectio
   if (type == BOOLEAN) {
     int value_int = *((bool*)value);
     if (sqlite3_bind_int(sqlite_statement, 1, value_int) != SQLITE_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   } else if (type == INT64) {
     if (sqlite3_bind_int64(sqlite_statement, 1, *((int64_t*)value)) != SQLITE_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   }
@@ -240,11 +240,11 @@ static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* const par
   int reset_ret = sqlite3_reset(params->sqlite_statement);
 
   if (reset_ret != SQLITE_DONE && reset_ret != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_BINDING;
+    return RC_STORAGE_FAILED_BINDING;
   }
 
   if (column_compress_bind(params->sqlite_statement, params->hash_index, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    return RC_SQLITE3_FAILED_BINDING;
+    return RC_STORAGE_FAILED_BINDING;
   }
 
   return execute_statement(params->sqlite_statement);
@@ -338,7 +338,7 @@ retcode_t storage_transaction_count(storage_connection_t const* const connection
   if (rc == SQLITE_ROW) {
     *count = sqlite3_column_int64(sqlite_statement, 0);
   } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
-    ret = RC_SQLITE3_FAILED_STEP;
+    ret = RC_STORAGE_FAILED_STEP;
     goto done;
   }
 
@@ -369,7 +369,7 @@ retcode_t storage_transaction_store(storage_connection_t const* const connection
       column_compress_bind(sqlite_statement, 15, tx->attachment.nonce, FLEX_TRIT_SIZE_81) != RC_OK ||
       column_compress_bind(sqlite_statement, 16, tx->consensus.hash, FLEX_TRIT_SIZE_243) != RC_OK ||
       sqlite3_bind_int64(sqlite_statement, 17, current_timestamp_ms()) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -395,11 +395,11 @@ retcode_t storage_transaction_load(storage_connection_t const* const connection,
       num_key_bytes = FLEX_TRIT_SIZE_243;
       break;
     default:
-      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
   }
 
   if (column_compress_bind(sqlite_statement, 1, key, num_key_bytes) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -419,7 +419,7 @@ retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t con
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_and_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -440,7 +440,7 @@ retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_conne
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_attachment_and_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -460,7 +460,7 @@ retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t co
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_and_consensus;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -480,7 +480,7 @@ retcode_t storage_transaction_load_metadata(storage_connection_t const* const co
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -506,11 +506,11 @@ retcode_t storage_transaction_load_hashes(storage_connection_t const* const conn
       num_bytes_key = FLEX_TRIT_SIZE_243;
       break;
     default:
-      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
   }
 
   if (column_compress_bind(sqlite_statement, 1, key, num_bytes_key) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -534,12 +534,12 @@ retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t cons
 
   if (column_compress_bind(sqlite_statement, 1, approvee_hash, FLEX_TRIT_SIZE_243) != RC_OK ||
       column_compress_bind(sqlite_statement, 2, approvee_hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
   if (before_timestamp != 0 && sqlite3_bind_int64(sqlite_statement, 3, before_timestamp) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -560,7 +560,7 @@ retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connec
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_milestone_candidates;
 
   if (column_compress_bind(sqlite_statement, 1, coordinator, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -581,7 +581,7 @@ retcode_t storage_transaction_update_solid_state(storage_connection_t const* con
 
   if (sqlite3_bind_int(sqlite_statement, 1, (int)is_solid) != SQLITE_OK ||
       column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -616,7 +616,7 @@ retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* 
 
   if (sqlite3_bind_int64(sqlite_statement, 1, snapshot_index) != SQLITE_OK ||
       column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -645,12 +645,12 @@ retcode_t storage_transaction_exist(storage_connection_t const* const connection
       num_bytes_key = FLEX_TRIT_SIZE_243;
       break;
     default:
-      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
   }
 
   if (field != TRANSACTION_FIELD_NONE && key) {
     if (column_compress_bind(sqlite_statement, 1, (void*)key, num_bytes_key) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   }
@@ -673,7 +673,7 @@ retcode_t storage_transaction_approvers_count(storage_connection_t const* const 
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK ||
       column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -681,7 +681,7 @@ retcode_t storage_transaction_approvers_count(storage_connection_t const* const 
   if (rc == SQLITE_ROW) {
     *count = sqlite3_column_int64(sqlite_statement, 0);
   } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
-    ret = RC_SQLITE3_FAILED_STEP;
+    ret = RC_STORAGE_FAILED_STEP;
     goto done;
   }
 
@@ -712,53 +712,53 @@ retcode_t storage_transaction_find(storage_connection_t const* const connection,
   }
 
   if (sqlite3_bind_int(sqlite_statement, column++, !bundles_count) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
   CDL_FOREACH(bundles, iter243) {
     if (column_compress_bind(sqlite_statement, column++, iter243->hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   }
 
   if (sqlite3_bind_int(sqlite_statement, column++, !addresses_count) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
   CDL_FOREACH(addresses, iter243) {
     if (column_compress_bind(sqlite_statement, column++, iter243->hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   }
 
   if (sqlite3_bind_int(sqlite_statement, column++, !tags_count) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
   CDL_FOREACH(tags, iter81) {
     if (column_compress_bind(sqlite_statement, column++, iter81->hash, FLEX_TRIT_SIZE_81) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   }
 
   if (sqlite3_bind_int(sqlite_statement, column++, !approvees_count) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
   CDL_FOREACH(approvees, iter243) {
     if (column_compress_bind(sqlite_statement, column, iter243->hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
     if (column_compress_bind(sqlite_statement, column + approvees_count, iter243->hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
     column++;
@@ -841,7 +841,7 @@ retcode_t storage_bundle_update_validity(storage_connection_t const* const conne
   }
 
   if (sqlite3_bind_int(sqlite_statement, 1, (int)status) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -908,7 +908,7 @@ retcode_t storage_milestone_store(storage_connection_t const* const connection,
 
   if (sqlite3_bind_int64(sqlite_statement, 1, milestone->index) != SQLITE_OK ||
       column_compress_bind(sqlite_statement, 2, (flex_trit_t*)milestone->hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -928,7 +928,7 @@ retcode_t storage_milestone_load(storage_connection_t const* const connection, f
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_by_hash;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -976,7 +976,7 @@ retcode_t storage_milestone_load_by_index(storage_connection_t const* const conn
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_by_index;
 
   if (sqlite3_bind_int(sqlite_statement, 1, index) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -996,7 +996,7 @@ retcode_t storage_milestone_load_next(storage_connection_t const* const connecti
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.milestone_select_next;
 
   if (sqlite3_bind_int(sqlite_statement, 1, index) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -1023,7 +1023,7 @@ retcode_t storage_milestone_exist(storage_connection_t const* const connection, 
 
   if (hash) {
     if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-      ret = RC_SQLITE3_FAILED_BINDING;
+      ret = RC_STORAGE_FAILED_BINDING;
       goto done;
     }
   }
@@ -1045,7 +1045,7 @@ retcode_t storage_milestone_delete(storage_connection_t const* const connection,
   sqlite_statement = sqlite3_connection->statements.milestone_delete_by_hash;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -1082,7 +1082,7 @@ retcode_t storage_state_delta_store(storage_connection_t const* const connection
 
   if (sqlite3_bind_blob(sqlite_statement, 1, bytes, size, NULL) != SQLITE_OK ||
       sqlite3_bind_int(sqlite_statement, 2, index) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -1110,7 +1110,7 @@ retcode_t storage_state_delta_load(storage_connection_t const* const connection,
   *delta = NULL;
 
   if (sqlite3_bind_int(sqlite_statement, 1, index) != SQLITE_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -1122,7 +1122,7 @@ retcode_t storage_state_delta_load(storage_connection_t const* const connection,
       goto done;
     }
   } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
-    ret = RC_SQLITE3_FAILED_STEP;
+    ret = RC_STORAGE_FAILED_STEP;
   }
 
 done:
@@ -1141,7 +1141,7 @@ retcode_t storage_spent_address_store(storage_connection_t const* const connecti
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.spent_address_insert;
 
   if (column_compress_bind(sqlite_statement, 1, address, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
@@ -1198,7 +1198,7 @@ retcode_t storage_spent_address_exist(storage_connection_t const* const connecti
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.spent_address_exist;
 
   if (column_compress_bind(sqlite_statement, 1, address, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = RC_SQLITE3_FAILED_BINDING;
+    ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
