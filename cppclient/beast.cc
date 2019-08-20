@@ -144,6 +144,6 @@ http::request<http::string_body> BeastIotaAPI::setupRequest(const nlohmann::json
   req.set("X-IOTA-API-Version", "1");
   req.body() = input.dump();
   req.content_length(req.body().size());
-  return std::move(req);
+  return req;
 }
 }  // namespace cppclient
