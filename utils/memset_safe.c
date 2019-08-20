@@ -24,7 +24,7 @@ int memset_safe(void *dest, size_t destsz, int ch, size_t count) {
     return EOVERFLOW;
   }
 
-  volatile unsigned char *ptr = dest;
+  volatile unsigned char *ptr = (volatile unsigned char *)dest;
   while (destsz-- && count--) {
     *ptr++ = ch;
   }

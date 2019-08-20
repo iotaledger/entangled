@@ -246,7 +246,7 @@ static retcode_t mam_api_bundle_read_packet_from_msg(mam_msg_read_context_t *ctx
   }
 
   *payload_size = trits_size(payload_trits) / 3;
-  *payload = malloc(*payload_size * sizeof(tryte_t));
+  *payload = (tryte_t *)(malloc(*payload_size * sizeof(tryte_t)));
   trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
   trits_free(payload_trits);
 
@@ -818,7 +818,7 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename, t
 
   trits_buffer_size = mam_api_serialized_size(api);
 
-  if ((trits_buffer = malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
+  if ((trits_buffer = (trit_t *)malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
@@ -883,7 +883,7 @@ retcode_t mam_api_load(char const *const filename, mam_api_t *const api, tryte_t
     goto done;
   }
 
-  if ((trits_buffer = malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
+  if ((trits_buffer = (trit_t *)malloc(trits_buffer_size * sizeof(trit_t))) == NULL) {
     ret = RC_OOM;
     goto done;
   }
