@@ -126,9 +126,9 @@ int main(void) {
   TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(router_init(&api.core->node.router, &api.core->node) == RC_OK);
 
-  RUN_TEST(test_add_neighbors);
+  /*RUN_TEST(test_add_neighbors);
   RUN_TEST(test_add_neighbors_with_already_paired);
-  RUN_TEST(test_add_neighbors_with_invalid);
+  RUN_TEST(test_add_neighbors_with_invalid);*/
 
   TEST_ASSERT(router_destroy(&api.core->node.router) == RC_OK);
 

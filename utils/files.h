@@ -14,6 +14,12 @@
 
 #define FILE_PATH_SIZE 128
 
+#ifdef _WIN32
+#define IOTA_UTILS_FILE_SEPARATOR "\\"
+#else
+#define IOTA_UTILS_FILE_SEPARATOR "/"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
