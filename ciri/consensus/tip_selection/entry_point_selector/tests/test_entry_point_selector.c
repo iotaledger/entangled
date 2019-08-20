@@ -23,7 +23,7 @@
 static entry_point_selector_t eps;
 static tangle_t tangle;
 static milestone_tracker_t mt;
-connection_config_t config;
+storage_connection_config_t config;
 
 static char* tangle_test_db_path = "ciri/consensus/tip_selection/entry_point_selector/tests/test.db";
 static char* tangle_db_path = "common/storage/tangle.db";

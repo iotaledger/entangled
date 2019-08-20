@@ -131,7 +131,7 @@ static void *validator_stage_routine(validator_stage_t *const validator) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = validator->node->conf.tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = validator->node->conf.tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");

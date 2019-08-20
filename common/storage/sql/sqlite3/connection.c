@@ -169,7 +169,8 @@ static retcode_t finalize_spent_addresses_statements(sqlite3_spent_addresses_con
   return ret;
 }
 
-retcode_t storage_connection_init(storage_connection_t* const connection, connection_config_t const* const config,
+retcode_t storage_connection_init(storage_connection_t* const connection,
+                                  storage_connection_config_t const* const config,
                                   storage_connection_type_t const type) {
   retcode_t ret = RC_OK;
   sqlite3** db = NULL;

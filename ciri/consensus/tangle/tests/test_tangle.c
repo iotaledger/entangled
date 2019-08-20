@@ -12,7 +12,7 @@
 
 static char *tangle_test_db_path = "ciri/consensus/tangle/tests/test.db";
 static char *tangle_db_path = "common/storage/tangle.db";
-static connection_config_t config;
+static storage_connection_config_t config;
 static tangle_t tangle;
 
 void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }

@@ -22,7 +22,7 @@
 #include "common/trinary/flex_trit.h"
 
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 
 static char *tangle_test_db_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/test.db";
 static char *tangle_db_path = "common/storage/tangle.db";

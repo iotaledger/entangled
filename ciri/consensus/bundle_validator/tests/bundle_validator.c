@@ -19,7 +19,7 @@
 #include "common/storage/tests/defs.h"
 
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 
 static char *tangle_test_db_path = "ciri/consensus/bundle_validator/tests/test.db";
 static char *tangle_db_path = "common/storage/tangle.db";

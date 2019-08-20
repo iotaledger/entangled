@@ -29,7 +29,7 @@
 
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 static iota_consensus_conf_t conf;
 
 static char *tangle_test_db_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/test.db";

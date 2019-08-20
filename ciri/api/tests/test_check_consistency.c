@@ -15,7 +15,7 @@
 
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
 static char *tangle_db_path = "common/storage/tangle.db";
-static connection_config_t config;
+static storage_connection_config_t config;
 static iota_api_t api;
 static core_t core;
 static tangle_t tangle;

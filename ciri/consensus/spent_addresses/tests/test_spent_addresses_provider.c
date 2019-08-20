@@ -12,7 +12,7 @@
 
 static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/tests/test.db";
 static char *spent_addresses_db_path = "common/storage/spent-addresses.db";
-static connection_config_t config;
+static storage_connection_config_t config;
 static spent_addresses_provider_t sap;
 
 void setUp(void) {

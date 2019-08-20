@@ -36,7 +36,7 @@
 #define TEST_NUM_SNAPSHOTS 2
 
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 static iota_consensus_conf_t conf;
 
 static char *tangle_test_db_path = "ciri/consensus/ledger_validator/tests/test.db";

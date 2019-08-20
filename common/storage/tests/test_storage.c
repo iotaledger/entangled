@@ -21,7 +21,7 @@
 static char *tangle_test_db_path = "common/storage/tests/test.db";
 static char *tangle_db_path = "common/storage/tangle.db";
 
-static connection_config_t config;
+static storage_connection_config_t config;
 static storage_connection_t connection;
 
 void setUp(void) {

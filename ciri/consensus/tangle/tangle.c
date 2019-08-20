@@ -14,7 +14,7 @@
 
 static logger_id_t logger_id;
 
-retcode_t iota_tangle_init(tangle_t *const tangle, connection_config_t const *const conf) {
+retcode_t iota_tangle_init(tangle_t *const tangle, storage_connection_config_t const *const conf) {
   logger_id = logger_helper_enable(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
   return storage_connection_init(&tangle->connection, conf, STORAGE_CONNECTION_TANGLE);
 }

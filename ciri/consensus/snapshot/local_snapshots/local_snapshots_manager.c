@@ -31,7 +31,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   uint64_t initial_delta_size;
 
   {
-    connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
 
     if ((err = iota_tangle_init(&tangle, &db_conf))) {
       log_critical(logger_id, "Failed in initializing db\n");

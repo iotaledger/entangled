@@ -16,8 +16,8 @@ static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/test
 static char *spent_addresses_db_path = "common/storage/spent-addresses.db";
 static char *tangle_test_db_path = "ciri/consensus/spent_addresses/tests/tangle-test.db";
 static char *tangle_db_path = "common/storage/tangle.db";
-static connection_config_t spent_addresses_config;
-static connection_config_t tangle_config;
+static storage_connection_config_t spent_addresses_config;
+static storage_connection_config_t tangle_config;
 static iota_consensus_conf_t consensus_conf;
 static spent_addresses_provider_t sap;
 static spent_addresses_service_t sas;

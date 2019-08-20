@@ -15,8 +15,8 @@ static char *spent_addresses_test_db_path = "ciri/api/tests/spent-addresses-test
 static char *spent_addresses_db_path = "common/storage/spent-addresses.db";
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
 static char *tangle_db_path = "common/storage/tangle.db";
-static connection_config_t spent_addresses_config;
-static connection_config_t tangle_config;
+static storage_connection_config_t spent_addresses_config;
+static storage_connection_config_t tangle_config;
 static iota_api_t api;
 static core_t core;
 static tangle_t tangle;
