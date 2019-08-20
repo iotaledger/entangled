@@ -3,9 +3,9 @@ cc_test(
     timeout = "moderate",
     srcs = ["test_exit_probability_randomizer.c"],
     data = [
-        ":db_file",
         ":snapshot.txt",
         "//ciri/consensus/snapshot/tests:snapshot_test_files",
+        "//common/storage:tangle_db",
     ],
     flaky = True,
     visibility = ["//visibility:public"],
@@ -18,12 +18,4 @@ cc_test(
         "//common/trinary:trit_ptrit",
         "@unity",
     ],
-)
-
-genrule(
-    name = "db_file",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["ciri.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
 )

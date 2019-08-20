@@ -18,8 +18,8 @@
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/files.h"
 
-static char *test_db_path = "common/storage/tests/test.db";
-static char *ciri_db_path = "common/storage/tests/ciri.db";
+static char *tangle_test_db_path = "common/storage/tests/test.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 const flex_trit_t HASH[] = {
@@ -54,7 +54,7 @@ static storage_connection_t connection;
 
 void test_init_connection(void) {
   connection_config_t config;
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
   TEST_ASSERT(storage_connection_init(&connection, &config, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
@@ -436,7 +436,7 @@ int main(void) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  iota_utils_copy_file(test_db_path, ciri_db_path);
+  iota_utils_copy_file(tangle_test_db_path, tangle_db_path);
 
   RUN_TEST(test_init_connection);
   RUN_TEST(test_initialized_db_empty_transaction);

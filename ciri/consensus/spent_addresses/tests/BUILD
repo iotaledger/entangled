@@ -4,28 +4,12 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-genrule(
-    name = "spent_addresses_db_file",
-    srcs = ["//common/storage/sql:spent-addresses-schema"],
-    outs = ["spent-addresses.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-)
-
-genrule(
-    name = "tangle_db_file",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["tangle.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-)
-
 cc_test(
     name = "test_spent_addresses_provider",
     srcs = ["test_spent_addresses_provider.c"],
     data = [
-        ":spent_addresses_db_file",
         ":spent_addresses_test_file",
+        "//common/storage:spent_addresses_db",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -39,8 +23,8 @@ cc_test(
     name = "test_spent_addresses_service",
     srcs = ["test_spent_addresses_service.c"],
     data = [
-        ":spent_addresses_db_file",
-        ":tangle_db_file",
+        "//common/storage:spent_addresses_db",
+        "//common/storage:tangle_db",
     ],
     visibility = ["//visibility:public"],
     deps = [

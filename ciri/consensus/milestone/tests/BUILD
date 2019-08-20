@@ -1,16 +1,8 @@
-genrule(
-    name = "db_file",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["ciri.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-)
-
 cc_test(
     name = "test_milestone_tracker",
     timeout = "moderate",
     srcs = ["test_milestone_tracker.c"],
-    data = [":db_file"],
+    data = ["//common/storage:tangle_db"],
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/milestone:milestone_tracker",

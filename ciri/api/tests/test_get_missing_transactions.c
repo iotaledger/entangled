@@ -11,8 +11,8 @@
 #include "ciri/consensus/test_utils/tangle.h"
 #include "ciri/node/node.h"
 
-static char *test_db_path = "ciri/api/tests/tangle-test.db";
-static char *ciri_db_path = "ciri/api/tests/tangle.db";
+static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 static iota_api_t api;
 static connection_config_t config;
 static tangle_t tangle;
@@ -65,8 +65,8 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   api.core = &core;
-  config.db_path = test_db_path;
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK);
+  config.db_path = tangle_test_db_path;
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
   TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
 
@@ -74,7 +74,7 @@ int main(void) {
   RUN_TEST(test_get_missing_transactions);
 
   TEST_ASSERT(requester_destroy(&api.core->node.transaction_requester) == RC_OK);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();

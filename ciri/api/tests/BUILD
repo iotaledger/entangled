@@ -6,22 +6,6 @@ cc_library(
     ],
 )
 
-genrule(
-    name = "spent_addresses_db_file",
-    srcs = ["//common/storage/sql:spent-addresses-schema"],
-    outs = ["spent-addresses.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-)
-
-genrule(
-    name = "tangle_db_file",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["tangle.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-)
-
 cc_test(
     name = "test_add_neighbors",
     timeout = "short",
@@ -47,7 +31,7 @@ cc_test(
     name = "test_broadcast_transactions",
     timeout = "moderate",
     srcs = ["test_broadcast_transactions.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -60,7 +44,7 @@ cc_test(
     name = "test_check_consistency",
     timeout = "moderate",
     srcs = ["test_check_consistency.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -72,7 +56,7 @@ cc_test(
     name = "test_find_transactions",
     timeout = "moderate",
     srcs = ["test_find_transactions.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -85,7 +69,7 @@ cc_test(
     name = "test_get_missing_transactions",
     timeout = "moderate",
     srcs = ["test_get_missing_transactions.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -107,7 +91,7 @@ cc_test(
     name = "test_get_node_info",
     timeout = "moderate",
     srcs = ["test_get_node_info.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -129,7 +113,7 @@ cc_test(
     name = "test_get_transactions_to_approve",
     timeout = "moderate",
     srcs = ["test_get_transactions_to_approve.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -141,7 +125,7 @@ cc_test(
     name = "test_get_trytes",
     timeout = "short",
     srcs = ["test_get_trytes.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -164,7 +148,7 @@ cc_test(
     name = "test_store_transactions",
     timeout = "moderate",
     srcs = ["test_store_transactions.c"],
-    data = [":tangle_db_file"],
+    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -179,8 +163,8 @@ cc_test(
     timeout = "moderate",
     srcs = ["test_were_addresses_spent_from.c"],
     data = [
-        ":spent_addresses_db_file",
-        ":tangle_db_file",
+        "//common/storage:spent_addresses_db",
+        "//common/storage:tangle_db",
     ],
     deps = [
         "//ciri/api",

@@ -13,16 +13,16 @@
 #include "ciri/node/node.h"
 #include "utils/files.h"
 
-static char *test_db_path = "ciri/api/tests/tangle-test.db";
-static char *ciri_db_path = "ciri/api/tests/tangle.db";
+static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 static connection_config_t config;
 static iota_api_t api;
 static core_t core;
 static tangle_t tangle;
 
-void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
 
-void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
+void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 
 void test_check_consistency_invalid_subtangle_status(void) {
   check_consistency_req_t *req = check_consistency_req_new();
@@ -196,7 +196,7 @@ int main(void) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
   api.core = &core;
   core.node.core = &core;
 

@@ -14,18 +14,10 @@ cc_library(
     ],
 )
 
-genrule(
-    name = "db_file_sqlite3",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["ciri.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-)
-
 cc_test(
     name = "test_storage_sqlite3",
     timeout = "moderate",
-    data = [":db_file_sqlite3"],
+    data = ["//common/storage:tangle_db"],
     visibility = ["//visibility:public"],
     deps = [
         ":test_storage_common",
@@ -36,7 +28,7 @@ cc_test(
 cc_test(
     name = "test_storage_mariadb",
     timeout = "moderate",
-    # data = [":db_file_sqlite3"],
+    data = ["//common/storage:tangle_db"],
     visibility = ["//visibility:public"],
     deps = [
         ":test_storage_common",

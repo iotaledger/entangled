@@ -12,8 +12,8 @@
 #include "ciri/node/node.h"
 #include "utils/time.h"
 
-static char *test_db_path = "ciri/api/tests/tangle-test.db";
-static char *ciri_db_path = "ciri/api/tests/tangle.db";
+static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 static iota_api_t api;
 static connection_config_t config;
 static tangle_t tangle;
@@ -69,8 +69,8 @@ int main(void) {
   api.core->node.conf.requester_queue_size = 100;
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(broadcaster_stage_init(&api.core->node.broadcaster, &api.core->node) == RC_OK);
-  config.db_path = test_db_path;
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK);
+  config.db_path = tangle_test_db_path;
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
   api.core->consensus.milestone_tracker.latest_milestone_index = LATEST_MILESTONE_INDEX;
   api.core->consensus.milestone_tracker.latest_solid_milestone_index = LATEST_SOLID_MILESTONE_INDEX;
   api.core->consensus.milestone_tracker.milestone_start_index = MILESTONE_START_INDEX;
@@ -130,7 +130,7 @@ int main(void) {
 
   TEST_ASSERT(router_destroy(&api.core->node.router) == RC_OK);
   TEST_ASSERT(requester_destroy(&api.core->node.transaction_requester) == RC_OK);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();

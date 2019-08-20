@@ -13,9 +13,9 @@
 #include "utils/files.h"
 
 static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/tests/spent-addresses-test.db";
-static char *spent_addresses_db_path = "ciri/consensus/spent_addresses/tests/spent-addresses.db";
+static char *spent_addresses_db_path = "common/storage/spent-addresses.db";
 static char *tangle_test_db_path = "ciri/consensus/spent_addresses/tests/tangle-test.db";
-static char *tangle_db_path = "ciri/consensus/spent_addresses/tests/tangle.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 static connection_config_t spent_addresses_config;
 static connection_config_t tangle_config;
 static iota_consensus_conf_t consensus_conf;

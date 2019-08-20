@@ -10,14 +10,14 @@
 #include "ciri/consensus/test_utils/bundle.h"
 #include "ciri/consensus/test_utils/tangle.h"
 
-static char *test_db_path = "ciri/consensus/tangle/tests/test.db";
-static char *tangle_db_path = "ciri/consensus/tangle/tests/tangle.db";
+static char *tangle_test_db_path = "ciri/consensus/tangle/tests/test.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 static connection_config_t config;
 static tangle_t tangle;
 
-void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, tangle_db_path) == RC_OK); }
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
 
-void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
+void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 
 void test_find_tail(void) {
   iota_transaction_t *txs[4];
@@ -165,7 +165,7 @@ int main(void) {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
 
   RUN_TEST(test_find_tail);
   RUN_TEST(test_find_tail_unknown_tx);

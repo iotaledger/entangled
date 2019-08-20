@@ -29,3 +29,21 @@ cc_library(
         "//common/trinary:trit_array",
     ],
 )
+
+genrule(
+    name = "tangle_db",
+    srcs = ["//common/storage/sql:tangle-schema"],
+    outs = ["tangle.db"],
+    cmd = "$(location @sqlite3//:shell) $@ < $<",
+    tools = ["@sqlite3//:shell"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "spent_addresses_db",
+    srcs = ["//common/storage/sql:spent-addresses-schema"],
+    outs = ["spent-addresses.db"],
+    cmd = "$(location @sqlite3//:shell) $@ < $<",
+    tools = ["@sqlite3//:shell"],
+    visibility = ["//visibility:public"],
+)

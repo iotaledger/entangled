@@ -21,16 +21,16 @@
 static tangle_t tangle;
 static connection_config_t config;
 
-static char *test_db_path = "ciri/consensus/bundle_validator/tests/test.db";
-static char *ciri_db_path = "ciri/consensus/bundle_validator/tests/ciri.db";
+static char *tangle_test_db_path = "ciri/consensus/bundle_validator/tests/test.db";
+static char *tangle_db_path = "common/storage/tangle.db";
 
 void setUp() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 }
 
 void tearDown() {
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
 }
 
@@ -316,7 +316,7 @@ int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
 
   RUN_TEST(test_iota_consensus_bundle_validator_validate_tail_not_found);
   RUN_TEST(test_bundle_size_1_value_with_wrong_address_invalid);
