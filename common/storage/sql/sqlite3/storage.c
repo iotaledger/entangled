@@ -50,7 +50,7 @@ retcode_t storage_init() {
   }
 
   if (sqlite3_initialize() != SQLITE_OK) {
-    return RC_STORAGE_FAILED_INITIALIZE;
+    return RC_STORAGE_FAILED_INIT;
   }
 
   return RC_OK;
