@@ -61,7 +61,12 @@ bool IotaJsonAPI::isNodeSolid() {
     return false;
   }
 
-  auto tx = getTransactions({ni.latestMilestone}, false)[0];
+  auto tx_vector = getTransactions({ni.latestMilestone}, false);
+
+  if (tx_vector.empty()) {
+    return false;
+  }
+  auto tx = tx_vector.front();
   auto now = std::chrono::system_clock::now();
 
   if ((now - tx.timestamp) > std::chrono::seconds(300)) {
