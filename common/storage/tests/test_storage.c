@@ -14,7 +14,7 @@
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
+#include "common/storage/tests/defs.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/files.h"
 
