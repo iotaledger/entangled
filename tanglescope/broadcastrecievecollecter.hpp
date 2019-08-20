@@ -69,7 +69,6 @@ class BroadcastReceiveCollector : public PrometheusCollector {
   uint32_t _broadcastInterval;
   // Others
   std::shared_ptr<cppclient::IotaAPI> _api;
-  std::map<std::string, ZmqObservable> _urlToZmqObservables;
   cuckoohash_map<std::string, BroadcastInfo> _hashToBroadcastTime;
 };
 

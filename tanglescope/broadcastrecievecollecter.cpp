@@ -44,9 +44,10 @@ void BroadcastReceiveCollector::collect() {
   _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
 
   for (const auto& url : _zmqPublishers) {
-    auto zmqObservable =
-        rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>([&](auto s) { zmqPublisher(std::move(s), url); });
-    _urlToZmqObservables.insert(std::pair(url, zmqObservable));
+    if (urlToZmqObservables.find(url) == urlToZmqObservables.end()) {
+      urlToZmqObservables[url] = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+          [&](auto s) { zmqPublisher(std::move(s), url); });
+    }
   }
 
   doPeriodically();
@@ -101,13 +102,12 @@ void BroadcastReceiveCollector::receivedTransactions() {
   Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();
   exposer.RegisterCollectable(registry);
-  auto zmqThread = rxcpp::schedulers::make_new_thread();
 
   auto& catcher = *this;
   std::vector<boost::future<void>> observableTasks;
-  for (auto& kv : _urlToZmqObservables) {
-    auto zmqURL = kv.first;
-    auto zmqObservable = kv.second;
+  for (const auto& url : _zmqPublishers) {
+    auto zmqURL = url;
+    auto zmqObservable = urlToZmqObservables[url];
     auto task = boost::async(boost::launch::async, [zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher]() {
       catcher.subscribeToTransactions(zmqURL, zmqObservable, registry);
     });
