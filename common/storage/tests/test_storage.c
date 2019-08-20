@@ -34,6 +34,10 @@ void tearDown(void) {
   TEST_ASSERT(iota_utils_remove_file(tangle_test_db_path) == RC_OK);
 }
 
+static void test_connection_init_destroy(void) {
+  // Empty because connection init/destroy are handled by setUp/tearDown
+}
+
 // void test_initialized_db_empty_transaction(void) {
 //   bool exist = false;
 //
@@ -413,6 +417,8 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = tangle_test_db_path;
+
+  RUN_TEST(test_connection_init_destroy);
 
   // RUN_TEST(test_initialized_db_empty_transaction);
   // RUN_TEST(test_initialized_db_empty_milestone);
