@@ -28,7 +28,7 @@
       iota_ios_pow_bundle:bundle
                     trunk:@"HYDAVPDGIIFDZVDYRRKGKFEOYOMGE9AQMKTN9XFYWOHGUWLAVFONTBAFFAXFMACGBSLDHPVKIC9WZ9999"
                    branch:@"RLACKHIZIJPGPK9JRXOGJNPGVIXHDJWQSDZDNMVPZVXKHAFVVWJRHHVMPKQHKSMNVQBNANTDOEBY99999"
-                      mwm:14];
+                      mwm:@14];
   NSLog(@"Attached bundle: %@", attachedBundle);
   NSDate* endBundlePoW = [NSDate date];
   NSTimeInterval durationBundlePoW = [endBundlePoW timeIntervalSinceDate:startBundlePoW] * 1000;
@@ -37,7 +37,7 @@
   // PoW
   NSLog(@"Starting PoW");
   NSDate* startPoW = [NSDate date];
-  NSString* nonce = [EntangledIOSBindings iota_ios_pow_trytes:TX_TRYTES mwm:14];
+  NSString* nonce = [EntangledIOSBindings iota_ios_pow_trytes:TX_TRYTES mwm:@14];
   NSLog(@"Received nonce: %@ ", nonce);
   NSDate* endPoW = [NSDate date];
   NSTimeInterval durationPoW = [endPoW timeIntervalSinceDate:startPoW] * 1000;
