@@ -62,10 +62,6 @@ class IotaAPI {
   explicit IotaAPI(bool useSsl) { _useSsl = useSsl; }
   bool isSsl() const { return _useSsl; }
 
-  void setSslPemPath(const std::string& sslPemPath) { _sslPemPath = sslPemPath; }
-
-  const std::string& sslPemPath() const { return _sslPemPath; }
-
   virtual bool isNodeSolid() = 0;
 
   virtual nonstd::optional<std::unordered_map<std::string, uint64_t>> getBalances(
