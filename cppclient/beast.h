@@ -30,8 +30,8 @@ class BeastIotaAPI : virtual public IotaAPI, public IotaJsonAPI {
 
  protected:
   nonstd::optional<nlohmann::json> post(const nlohmann::json& input) override;
-  nonstd::optional<nlohmann::json> post_ssl(const nlohmann::json& input);
-  nonstd::optional<nlohmann::json> post_plain(const nlohmann::json& input);
+  nonstd::optional<nlohmann::json> postSsl(const nlohmann::json& input);
+  nonstd::optional<nlohmann::json> postPlainText(const nlohmann::json& input);
 
  private:
   boost::beast::http::request<boost::beast::http::string_body> setupRequest(const nlohmann::json& input) const;

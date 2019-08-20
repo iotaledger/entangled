@@ -34,9 +34,9 @@ nonstd::optional<json> BeastIotaAPI::post(const json& input) {
 
   try {
     if (isSsl()) {
-      result = post_ssl(input);
+      result = postSsl(input);
     } else {
-      result = post_plain(input);
+      result = postPlainText(input);
     }
   } catch (const std::exception& ex) {
     LOG(ERROR) << ex.what();
@@ -46,7 +46,7 @@ nonstd::optional<json> BeastIotaAPI::post(const json& input) {
   return result;
 }
 
-nonstd::optional<json> BeastIotaAPI::post_plain(const json& input) {
+nonstd::optional<json> BeastIotaAPI::postPlainText(const json& input) {
   net::io_context ioc;
   boost::system::error_code ec;
   tcp::resolver resolver{ioc};
@@ -83,7 +83,7 @@ nonstd::optional<json> BeastIotaAPI::post_plain(const json& input) {
   return result;
 }
 
-nonstd::optional<json> BeastIotaAPI::post_ssl(const json& input) {
+nonstd::optional<json> BeastIotaAPI::postSsl(const json& input) {
   net::io_context ioc;
   boost::system::error_code ec;
   tcp::resolver resolver{ioc};
