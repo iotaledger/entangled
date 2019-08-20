@@ -18,7 +18,7 @@
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
+#include "common/storage/tests/defs.h"
 #include "common/trinary/flex_trit.h"
 
 static tangle_t tangle;

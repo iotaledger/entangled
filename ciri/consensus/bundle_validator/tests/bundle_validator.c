@@ -16,7 +16,7 @@
 #include "ciri/consensus/test_utils/bundle.h"
 #include "ciri/consensus/test_utils/tangle.h"
 #include "common/model/transaction.h"
-#include "common/storage/tests/helpers/defs.h"
+#include "common/storage/tests/defs.h"
 
 static tangle_t tangle;
 static connection_config_t config;

@@ -22,7 +22,7 @@
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
+#include "common/storage/tests/defs.h"
 #include "utils/containers/hash/hash_double_map.h"
 #include "utils/macros.h"
 #include "utils/time.h"

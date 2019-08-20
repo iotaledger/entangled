@@ -14,7 +14,7 @@ cc_test(
         "//ciri/consensus/tip_selection/cw_rating_calculator",
         "//ciri/consensus/tip_selection/exit_probability_randomizer",
         "//common/storage/sql/sqlite3:storage_sqlite3",
-        "//common/storage/tests/helpers",
+        "//common/storage/tests:defs",
         "//common/trinary:trit_ptrit",
         "@unity",
     ],

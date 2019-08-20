@@ -11,11 +11,6 @@
 
 #include "math.h"
 
-#include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
-
 #include "ciri/consensus/ledger_validator/ledger_validator.h"
 #include "ciri/consensus/milestone/milestone_service.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
@@ -26,6 +21,10 @@
 #include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
 #include "common/helpers/digest.h"
 #include "common/model/milestone.h"
+#include "common/model/transaction.h"
+#include "common/storage/connection.h"
+#include "common/storage/storage.h"
+#include "common/storage/tests/defs.h"
 #include "utarray.h"
 #include "utils/containers/hash/hash_uint64_t_map.h"
 #include "utils/macros.h"
