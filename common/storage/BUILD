@@ -1,3 +1,13 @@
+config_setting(
+    name = "sqlite3",
+    values = {"define": "storage=sqlite3"},
+)
+
+config_setting(
+    name = "mariadb",
+    values = {"define": "storage=mariadb"},
+)
+
 cc_library(
     name = "storage",
     hdrs = [
@@ -32,7 +42,12 @@ cc_library(
 
 genrule(
     name = "tangle_db",
-    srcs = ["//common/storage/sql:tangle-schema"],
+    srcs =
+        select({
+            ":sqlite3": ["//common/storage/sql/sqlite3:tangle-schema"],
+            ":mariadb": ["//common/storage/sql/mariadb:tangle-schema"],
+            "//conditions:default": ["//common/storage/sql/sqlite3:tangle-schema"],
+        }),
     outs = ["tangle.db"],
     cmd = "$(location @sqlite3//:shell) $@ < $<",
     tools = ["@sqlite3//:shell"],
@@ -41,7 +56,12 @@ genrule(
 
 genrule(
     name = "spent_addresses_db",
-    srcs = ["//common/storage/sql:spent-addresses-schema"],
+    srcs =
+        select({
+            ":sqlite3": ["//common/storage/sql/sqlite3:spent-addresses-schema"],
+            ":mariadb": ["//common/storage/sql/mariadb:spent-addresses-schema"],
+            "//conditions:default": ["//common/storage/sql/sqlite3:spent-addresses-schema"],
+        }),
     outs = ["spent-addresses.db"],
     cmd = "$(location @sqlite3//:shell) $@ < $<",
     tools = ["@sqlite3//:shell"],
