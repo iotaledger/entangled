@@ -23,7 +23,6 @@ cc_test(
     name = "test_storage_sqlite3",
     timeout = "moderate",
     srcs = ["test_storage.c"],
-    data = ["//common/storage:tangle_db"],
     visibility = ["//visibility:public"],
     deps = [
         ":test_storage_common",
@@ -36,7 +35,6 @@ cc_test(
     name = "test_storage_mariadb",
     timeout = "moderate",
     srcs = ["test_storage.c"],
-    data = ["//common/storage:tangle_db"],
     visibility = ["//visibility:public"],
     deps = [
         ":test_storage_common",

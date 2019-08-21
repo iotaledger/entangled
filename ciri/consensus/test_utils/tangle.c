@@ -11,11 +11,10 @@
 #include "ciri/consensus/test_utils/tangle.h"
 #include "utils/files.h"
 
-retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path,
-                       char *ciri_db_path) {
+retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path) {
   retcode_t ret = RC_OK;
 
-  if ((ret = iota_utils_copy_file(test_db_path, ciri_db_path))) {
+  if ((ret = iota_utils_copy_file(test_db_path, "common/storage/sql/sqlite3/tangle.db"))) {
     return ret;
   }
   if ((ret = iota_tangle_init(tangle, config))) {

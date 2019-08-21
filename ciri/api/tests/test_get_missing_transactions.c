@@ -12,7 +12,6 @@
 #include "ciri/node/node.h"
 
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static iota_api_t api;
 static storage_connection_config_t config;
 static tangle_t tangle;
@@ -66,7 +65,7 @@ int main(void) {
 
   api.core = &core;
   config.db_path = tangle_test_db_path;
-  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK);
   TEST_ASSERT(iota_node_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
 

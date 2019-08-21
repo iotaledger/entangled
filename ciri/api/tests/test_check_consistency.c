@@ -14,13 +14,12 @@
 #include "utils/files.h"
 
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static storage_connection_config_t config;
 static iota_api_t api;
 static core_t core;
 static tangle_t tangle;
 
-void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
 void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 

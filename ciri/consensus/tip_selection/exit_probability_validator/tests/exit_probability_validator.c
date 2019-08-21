@@ -25,7 +25,6 @@ static tangle_t tangle;
 static storage_connection_config_t config;
 
 static char *tangle_test_db_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static char *snapshot_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/snapshot.txt";
 static char *snapshot_conf_path = "ciri/consensus/snapshot/tests/snapshot_conf.json";
 
@@ -39,7 +38,7 @@ static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 static iota_consensus_conf_t consensus_conf;
 
-void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
+void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
 void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 

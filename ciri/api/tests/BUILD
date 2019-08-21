@@ -31,7 +31,6 @@ cc_test(
     name = "test_broadcast_transactions",
     timeout = "moderate",
     srcs = ["test_broadcast_transactions.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -44,7 +43,6 @@ cc_test(
     name = "test_check_consistency",
     timeout = "moderate",
     srcs = ["test_check_consistency.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -56,7 +54,6 @@ cc_test(
     name = "test_find_transactions",
     timeout = "moderate",
     srcs = ["test_find_transactions.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -69,7 +66,6 @@ cc_test(
     name = "test_get_missing_transactions",
     timeout = "moderate",
     srcs = ["test_get_missing_transactions.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -91,7 +87,6 @@ cc_test(
     name = "test_get_node_info",
     timeout = "moderate",
     srcs = ["test_get_node_info.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -113,7 +108,6 @@ cc_test(
     name = "test_get_transactions_to_approve",
     timeout = "moderate",
     srcs = ["test_get_transactions_to_approve.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         "//ciri/api",
         "//ciri/consensus/test_utils",
@@ -125,7 +119,6 @@ cc_test(
     name = "test_get_trytes",
     timeout = "short",
     srcs = ["test_get_trytes.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -148,7 +141,6 @@ cc_test(
     name = "test_store_transactions",
     timeout = "moderate",
     srcs = ["test_store_transactions.c"],
-    data = ["//common/storage:tangle_db"],
     deps = [
         ":defs",
         "//ciri/api",
@@ -162,10 +154,6 @@ cc_test(
     name = "test_were_addresses_spent_from",
     timeout = "moderate",
     srcs = ["test_were_addresses_spent_from.c"],
-    data = [
-        "//common/storage:spent_addresses_db",
-        "//common/storage:tangle_db",
-    ],
     deps = [
         "//ciri/api",
         "//ciri/consensus:conf",

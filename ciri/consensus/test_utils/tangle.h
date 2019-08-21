@@ -16,8 +16,7 @@
 extern "C" {
 #endif
 
-retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path,
-                       char *ciri_db_path);
+retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path);
 
 retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path);
 

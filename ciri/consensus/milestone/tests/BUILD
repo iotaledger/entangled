@@ -2,7 +2,6 @@ cc_test(
     name = "test_milestone_tracker",
     timeout = "moderate",
     srcs = ["test_milestone_tracker.c"],
-    data = ["//common/storage:tangle_db"],
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/milestone:milestone_tracker",

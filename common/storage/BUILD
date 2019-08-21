@@ -49,31 +49,3 @@ cc_library(
         "//common/trinary:trit_array",
     ],
 )
-
-genrule(
-    name = "tangle_db",
-    srcs =
-        select({
-            ":sqlite3": ["//common/storage/sql/sqlite3:tangle-schema"],
-            ":mariadb": ["//common/storage/sql/mariadb:tangle-schema"],
-            "//conditions:default": ["//common/storage/sql/sqlite3:tangle-schema"],
-        }),
-    outs = ["tangle.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-    visibility = ["//visibility:public"],
-)
-
-genrule(
-    name = "spent_addresses_db",
-    srcs =
-        select({
-            ":sqlite3": ["//common/storage/sql/sqlite3:spent-addresses-schema"],
-            ":mariadb": ["//common/storage/sql/mariadb:spent-addresses-schema"],
-            "//conditions:default": ["//common/storage/sql/sqlite3:spent-addresses-schema"],
-        }),
-    outs = ["spent-addresses.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
-    visibility = ["//visibility:public"],
-)

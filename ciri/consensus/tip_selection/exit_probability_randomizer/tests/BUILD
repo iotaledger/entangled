@@ -5,7 +5,6 @@ cc_test(
     data = [
         ":snapshot.txt",
         "//ciri/consensus/snapshot/tests:snapshot_test_files",
-        "//common/storage:tangle_db",
     ],
     flaky = True,
     visibility = ["//visibility:public"],

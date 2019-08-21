@@ -40,7 +40,6 @@ static storage_connection_config_t config;
 static iota_consensus_conf_t conf;
 
 static char *tangle_test_db_path = "ciri/consensus/ledger_validator/tests/test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static char *snapshot_path = "ciri/consensus/ledger_validator/tests/snapshot.txt";
 static char *local_snapshot_path_base = "ciri/consensus/ledger_validator/tests/local_snapshot";
 static char *snapshot_conf_path = "ciri/consensus/ledger_validator/tests/snapshot_conf.json";
@@ -62,7 +61,7 @@ static pruning_service_t ps;
 static tips_cache_t tips;
 static flex_trit_t g_seed[FLEX_TRIT_SIZE_243];
 
-void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
+void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
 void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 

@@ -13,7 +13,6 @@
 #include "utils/time.h"
 
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static iota_api_t api;
 static storage_connection_config_t config;
 static tangle_t tangle;
@@ -70,7 +69,7 @@ int main(void) {
   TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
   TEST_ASSERT(broadcaster_stage_init(&api.core->node.broadcaster, &api.core->node) == RC_OK);
   config.db_path = tangle_test_db_path;
-  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK);
   api.core->consensus.milestone_tracker.latest_milestone_index = LATEST_MILESTONE_INDEX;
   api.core->consensus.milestone_tracker.latest_solid_milestone_index = LATEST_SOLID_MILESTONE_INDEX;
   api.core->consensus.milestone_tracker.milestone_start_index = MILESTONE_START_INDEX;

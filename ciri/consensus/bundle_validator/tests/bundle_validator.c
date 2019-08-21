@@ -22,10 +22,9 @@ static tangle_t tangle;
 static storage_connection_config_t config;
 
 static char *tangle_test_db_path = "ciri/consensus/bundle_validator/tests/test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 
 void setUp() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 }
 

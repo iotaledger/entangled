@@ -9,13 +9,12 @@
 
 #include "ciri/consensus/spent_addresses/spent_addresses_service.h"
 #include "ciri/consensus/test_utils/bundle.h"
+#include "ciri/consensus/test_utils/spent_addresses.h"
 #include "ciri/consensus/test_utils/tangle.h"
 #include "utils/files.h"
 
 static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/tests/spent-addresses-test.db";
-static char *spent_addresses_db_path = "common/storage/spent-addresses.db";
 static char *tangle_test_db_path = "ciri/consensus/spent_addresses/tests/tangle-test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static storage_connection_config_t spent_addresses_config;
 static storage_connection_config_t tangle_config;
 static iota_consensus_conf_t consensus_conf;
@@ -24,14 +23,12 @@ static spent_addresses_service_t sas;
 static tangle_t tangle;
 
 void setUp(void) {
-  TEST_ASSERT(iota_utils_copy_file(spent_addresses_test_db_path, spent_addresses_db_path) == RC_OK);
-  TEST_ASSERT(iota_spent_addresses_provider_init(&sap, &spent_addresses_config) == RC_OK);
-  TEST_ASSERT(tangle_setup(&tangle, &tangle_config, tangle_test_db_path, tangle_db_path) == RC_OK);
+  TEST_ASSERT(spent_addresses_setup(&sap, &spent_addresses_config, spent_addresses_test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &tangle_config, tangle_test_db_path) == RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(iota_spent_addresses_provider_destroy(&sap) == RC_OK);
-  TEST_ASSERT(iota_utils_remove_file(spent_addresses_test_db_path) == RC_OK);
+  TEST_ASSERT(spent_addresses_cleanup(&sap, spent_addresses_test_db_path) == RC_OK);
   TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK);
 }
 

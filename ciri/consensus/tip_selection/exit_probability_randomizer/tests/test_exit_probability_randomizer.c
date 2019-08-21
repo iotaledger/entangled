@@ -33,7 +33,6 @@ static storage_connection_config_t config;
 static iota_consensus_conf_t conf;
 
 static char *tangle_test_db_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static char *snapshot_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/snapshot.txt";
 static char *snapshot_conf_path = "ciri/consensus/snapshot/tests/snapshot_conf.json";
 
@@ -65,7 +64,7 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
                                                 ep_randomizer_t *const ep_randomizer);
 void test_single_tx_tangle_base(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *const ep_randomizer);
 
-void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
+void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
 void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 

@@ -19,13 +19,12 @@
 #include "utils/files.h"
 
 static char *tangle_test_db_path = "common/storage/tests/test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 
 static storage_connection_config_t config;
 static storage_connection_t connection;
 
 void setUp(void) {
-  TEST_ASSERT(iota_utils_copy_file(tangle_test_db_path, tangle_db_path) == RC_OK);
+  TEST_ASSERT(iota_utils_copy_file(tangle_test_db_path, "common/storage/sql/sqlite3/tangle.db") == RC_OK);
   TEST_ASSERT(storage_connection_init(&connection, &config, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 

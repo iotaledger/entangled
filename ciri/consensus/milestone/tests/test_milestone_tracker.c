@@ -13,14 +13,13 @@
 #include "common/model/milestone.h"
 
 static char *tangle_test_db_path = "ciri/consensus/milestone/tests/test.db";
-static char *tangle_db_path = "common/storage/tangle.db";
 static storage_connection_config_t config;
 static tangle_t tangle;
 static milestone_tracker_t mt;
 static iota_consensus_conf_t conf;
 static snapshots_provider_t snapshots_provider;
 
-void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK); }
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
 void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 

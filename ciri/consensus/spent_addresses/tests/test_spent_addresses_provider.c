@@ -8,22 +8,16 @@
 #include <unity/unity.h>
 
 #include "ciri/consensus/spent_addresses/spent_addresses_provider.h"
+#include "ciri/consensus/test_utils/spent_addresses.h"
 #include "utils/files.h"
 
 static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/tests/test.db";
-static char *spent_addresses_db_path = "common/storage/spent-addresses.db";
 static storage_connection_config_t config;
 static spent_addresses_provider_t sap;
 
-void setUp(void) {
-  TEST_ASSERT(iota_utils_copy_file(spent_addresses_test_db_path, spent_addresses_db_path) == RC_OK);
-  TEST_ASSERT(iota_spent_addresses_provider_init(&sap, &config) == RC_OK);
-}
+void setUp(void) { TEST_ASSERT(spent_addresses_setup(&sap, &config, spent_addresses_test_db_path) == RC_OK); }
 
-void tearDown(void) {
-  TEST_ASSERT(iota_spent_addresses_provider_destroy(&sap) == RC_OK);
-  TEST_ASSERT(iota_utils_remove_file(spent_addresses_test_db_path) == RC_OK);
-}
+void tearDown(void) { TEST_ASSERT(spent_addresses_cleanup(&sap, spent_addresses_test_db_path) == RC_OK); }
 
 static void test_spent_addresses_provider_store() {
   bool exist = true;

@@ -26,13 +26,12 @@ static milestone_tracker_t mt;
 storage_connection_config_t config;
 
 static char* tangle_test_db_path = "ciri/consensus/tip_selection/entry_point_selector/tests/test.db";
-static char* tangle_db_path = "common/storage/tangle.db";
 
 void test_entry_point() {
   iota_milestone_t milestone = {START_MILESTONE, {0}};
   DECLARE_PACK_SINGLE_MILESTONE(ep_milestone, ep_milestone_ptr, pack);
 
-  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path, tangle_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt) == RC_OK);
 
   mt.latest_solid_milestone_index = LATEST_SOLID_MILESTONE;

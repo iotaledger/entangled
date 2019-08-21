@@ -9,6 +9,10 @@ cc_library(
         "connection.h",
         "wrappers.h",
     ],
+    data = [
+        ":spent_addresses_db",
+        ":tangle_db",
+    ],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
     deps = [
@@ -30,5 +34,23 @@ filegroup(
 filegroup(
     name = "spent-addresses-schema",
     srcs = ["spent-addresses-schema.sql"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "tangle_db",
+    srcs = ["//common/storage/sql/sqlite3:tangle-schema"],
+    outs = ["tangle.db"],
+    cmd = "$(location @sqlite3//:shell) $@ < $<",
+    tools = ["@sqlite3//:shell"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "spent_addresses_db",
+    srcs = ["//common/storage/sql/sqlite3:spent-addresses-schema"],
+    outs = ["spent-addresses.db"],
+    cmd = "$(location @sqlite3//:shell) $@ < $<",
+    tools = ["@sqlite3//:shell"],
     visibility = ["//visibility:public"],
 )
