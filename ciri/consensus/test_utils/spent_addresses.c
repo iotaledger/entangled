@@ -14,9 +14,11 @@ retcode_t spent_addresses_setup(spent_addresses_provider_t *const sap, storage_c
                                 char *test_db_path) {
   retcode_t ret = RC_OK;
 
+#ifdef STORAGE_SQLITE3
   if ((ret = iota_utils_copy_file(test_db_path, "common/storage/sql/sqlite3/spent-addresses.db"))) {
     return ret;
   }
+#endif
   if ((ret = iota_spent_addresses_provider_init(sap, config))) {
     return ret;
   }
@@ -29,8 +31,10 @@ retcode_t spent_addresses_cleanup(spent_addresses_provider_t *const sap, char *t
   if ((ret = iota_spent_addresses_provider_destroy(sap))) {
     return ret;
   }
+#ifdef STORAGE_SQLITE3
   if ((ret = iota_utils_remove_file(test_db_path))) {
     return ret;
   }
+#endif
   return ret;
 }

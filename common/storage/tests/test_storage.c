@@ -24,13 +24,17 @@ static storage_connection_config_t config;
 static storage_connection_t connection;
 
 void setUp(void) {
+#ifdef STORAGE_SQLITE3
   TEST_ASSERT(iota_utils_copy_file(tangle_test_db_path, "common/storage/sql/sqlite3/tangle.db") == RC_OK);
+#endif
   TEST_ASSERT(storage_connection_init(&connection, &config, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
 void tearDown(void) {
   TEST_ASSERT(storage_connection_destroy(&connection) == RC_OK);
+#ifdef STORAGE_SQLITE3
   TEST_ASSERT(iota_utils_remove_file(tangle_test_db_path) == RC_OK);
+#endif
 }
 
 static void test_connection_init_destroy(void) {
