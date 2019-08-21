@@ -12,7 +12,7 @@ cc_library(
         ":defs",
         "//common/helpers:digest",
         "//common/model:milestone",
-        "//common/storage",
+        "//common/storage:storage_common",
         "//common/trinary:trit_ptrit",
         "//utils:files",
         "//utils/containers/hash:hash243_set",

@@ -15,7 +15,7 @@ cc_library(
     deps = [
         "//ciri/consensus/tangle",
         "//common:errors",
-        "//common/storage/sql/sqlite3:storage_sqlite3",
+        "//common/storage",
         "//utils:files",
     ],
 )

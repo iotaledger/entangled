@@ -3,5 +3,5 @@ cc_library(
     srcs = ["statements.c"],
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
-    deps = ["//common/storage"],
+    deps = ["//common/storage:storage_common"],
 )

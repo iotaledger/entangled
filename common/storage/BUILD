@@ -9,7 +9,7 @@ config_setting(
 )
 
 cc_library(
-    name = "storage",
+    name = "storage_common",
     hdrs = [
         "connection.h",
         "defs.h",
@@ -27,6 +27,16 @@ cc_library(
         "//utils/containers/hash:hash243_queue",
         "//utils/containers/hash:hash81_queue",
     ],
+)
+
+cc_library(
+    name = "storage",
+    visibility = ["//visibility:public"],
+    deps = select({
+        ":sqlite3": ["//common/storage/sql/sqlite3:storage_sqlite3"],
+        ":mariadb": ["//common/storage/sql/mariadb:storage_mariadb"],
+        "//conditions:default": ["//common/storage/sql/sqlite3:storage_sqlite3"],
+    }),
 )
 
 cc_library(
