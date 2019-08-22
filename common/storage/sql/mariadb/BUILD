@@ -9,7 +9,6 @@ cc_library(
         "connection.h",
         "wrappers.h",
     ],
-    defines = ["STORAGE_MARIADB"],
     visibility = ["//visibility:public"],
     deps = [
         "//common/model:milestone",

@@ -13,7 +13,6 @@ cc_library(
         ":spent_addresses_db",
         ":tangle_db",
     ],
-    defines = ["STORAGE_SQLITE3"],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
     deps = [
