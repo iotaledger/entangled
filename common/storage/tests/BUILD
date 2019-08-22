@@ -13,8 +13,8 @@ cc_library(
         "//common/helpers:digest",
         "//common/model:milestone",
         "//common/storage:storage_common",
+        "//common/storage:test_utils",
         "//common/trinary:trit_ptrit",
-        "//utils:files",
         "//utils/containers/hash:hash243_set",
     ],
 )
