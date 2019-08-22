@@ -60,7 +60,51 @@ static void test_transaction_store_duplicate(void) {
   TEST_ASSERT(storage_transaction_store(&connection, &transaction) != RC_OK);
 }
 
-static void test_transaction_load(void) {}
+static void test_transaction_load_not_found(void) {
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
+
+  TEST_ASSERT(storage_transaction_load(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 0);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+}
+
+static void test_transaction_load_found(void) {
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
+  iota_transaction_t transaction;
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
+
+  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+
+  TEST_ASSERT(storage_transaction_load(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_MEMORY(transaction_address(ptr), transaction_address(&transaction), NUM_FLEX_TRITS_ADDRESS);
+  TEST_ASSERT_EQUAL_INT(transaction_value(ptr), transaction_value(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_obsolete_tag(ptr), transaction_obsolete_tag(&transaction),
+                           NUM_FLEX_TRITS_OBSOLETE_TAG);
+  TEST_ASSERT_EQUAL_INT(transaction_timestamp(ptr), transaction_timestamp(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_current_index(ptr), transaction_current_index(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_last_index(ptr), transaction_last_index(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_bundle(ptr), transaction_bundle(&transaction), NUM_FLEX_TRITS_BUNDLE);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_trunk(ptr), transaction_trunk(&transaction), NUM_FLEX_TRITS_TRUNK);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_branch(ptr), transaction_branch(&transaction), NUM_FLEX_TRITS_BRANCH);
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp(ptr), transaction_attachment_timestamp(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_lower(ptr),
+                        transaction_attachment_timestamp_lower(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_upper(ptr),
+                        transaction_attachment_timestamp_upper(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_nonce(ptr), transaction_nonce(&transaction), NUM_FLEX_TRITS_NONCE);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_tag(ptr), transaction_tag(&transaction), NUM_FLEX_TRITS_TAG);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_hash(ptr), transaction_hash(&transaction), NUM_FLEX_TRITS_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_signature(ptr), transaction_signature(&transaction), NUM_FLEX_TRITS_SIGNATURE);
+
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.metadata & MASK_METADATA_ALL, 0);
+}
 
 static void test_transaction_load_essence_and_metadata(void) {}
 
@@ -133,81 +177,6 @@ static void test_transactions_delete(void) {}
 //   TRANSACTION_FIELD_HASH, hash, &exist) == RC_OK); TEST_ASSERT(exist
 //   == false);
 // }
-//
-// void test_stored_transaction(void) {
-//   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
-//   flex_trits_from_trytes(tx_test_trits,
-//   NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-//                          NUM_TRITS_SERIALIZED_TRANSACTION,
-//                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-//   iota_transaction_t *test_tx =
-//   transaction_deserialize(tx_test_trits, true);
-//
-//   TEST_ASSERT(storage_transaction_store(&connection, test_tx) ==
-//   RC_OK);
-//   // Test primary key constraint violation
-//   TEST_ASSERT(storage_transaction_store(&connection, test_tx) ==
-//   RC_SQLITE3_FAILED_STEP); bool exist = false;
-//
-//   TEST_ASSERT(storage_transaction_exist(&connection,
-//   TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK); TEST_ASSERT(exist
-//   == true); TEST_ASSERT(storage_transaction_exist(&connection,
-//   TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &exist) ==
-//               RC_OK);
-//   TEST_ASSERT(exist == true);
-//
-//   TEST_ASSERT(storage_transaction_exist(&connection,
-//   TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK); TEST_ASSERT(exist
-//   == true);
-//
-//   iota_transaction_t *txs[5];
-//   iota_stor_pack_t pack = {.models = (void **)txs, .capacity = 5,
-//   .num_loaded = 0, .insufficient_capacity = false};
-//
-//   for (int i = 0; i < 5; ++i) {
-//     pack.models[i] = transaction_new();
-//   }
-//
-//   TEST_ASSERT(storage_transaction_load(&connection,
-//   TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &pack) ==
-//   RC_OK); TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_nonce(txs[0]),
-//   transaction_nonce(test_tx), FLEX_TRIT_SIZE_81);
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_signature(txs[0]),
-//   transaction_signature(test_tx), FLEX_TRIT_SIZE_6561);
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_address(txs[0]),
-//   transaction_address(test_tx), FLEX_TRIT_SIZE_243);
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_branch(txs[0]),
-//   transaction_branch(test_tx), FLEX_TRIT_SIZE_243);
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_trunk(txs[0]),
-//   transaction_trunk(test_tx), FLEX_TRIT_SIZE_243);
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_bundle(txs[0]),
-//   transaction_bundle(test_tx), FLEX_TRIT_SIZE_243);
-//   TEST_ASSERT_EQUAL_INT(transaction_value(txs[0]),
-//   transaction_value(test_tx));
-//   TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_lower(txs[0]),
-//   transaction_attachment_timestamp(test_tx));
-//   TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_upper(txs[0]),
-//                         transaction_attachment_timestamp_upper(test_tx));
-//   TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_lower(txs[0]),
-//                         transaction_attachment_timestamp_lower(test_tx));
-//   TEST_ASSERT_EQUAL_INT(transaction_timestamp(txs[0]),
-//   transaction_timestamp(test_tx));
-//   TEST_ASSERT_EQUAL_INT(transaction_current_index(txs[0]),
-//   transaction_current_index(test_tx));
-//   TEST_ASSERT_EQUAL_INT(transaction_last_index(txs[0]),
-//   transaction_last_index(test_tx));
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_hash(txs[0]),
-//   transaction_hash(test_tx), FLEX_TRIT_SIZE_243);
-//
-//   for (int i = 0; i < 5; ++i) {
-//     transaction_free(pack.models[i]);
-//   }
-//
-//   transaction_free(test_tx);
-// }
-//
 // void test_stored_milestone(void) {
 //   iota_milestone_t milestone;
 //   milestone.index = 42;
@@ -583,7 +552,8 @@ int main(void) {
   RUN_TEST(test_transaction_count);
   RUN_TEST(test_transaction_store);
   RUN_TEST(test_transaction_store_duplicate);
-  RUN_TEST(test_transaction_load);
+  RUN_TEST(test_transaction_load_not_found);
+  RUN_TEST(test_transaction_load_found);
   RUN_TEST(test_transaction_load_essence_and_metadata);
   RUN_TEST(test_transaction_load_essence_attachment_and_metadata);
   RUN_TEST(test_transaction_load_essence_and_consensus);

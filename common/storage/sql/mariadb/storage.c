@@ -42,6 +42,165 @@ static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bo
   return RC_OK;
 }
 
+static void storage_transaction_load_bind_essence(MYSQL_BIND* const bind, iota_transaction_t* const transaction,
+                                                  size_t* const index) {
+  bind[*index].buffer = (char*)transaction->essence.address;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_243;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->essence.value;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_VALUE;
+  (*index)++;
+
+  bind[*index].buffer = (char*)transaction->essence.obsolete_tag;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_81;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->essence.timestamp;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_TIMESTAMP;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->essence.current_index;
+  bind[*index].buffer_type = MYSQL_TYPE_SHORT;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_CURRENT_INDEX;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->essence.last_index;
+  bind[*index].buffer_type = MYSQL_TYPE_SHORT;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_LAST_INDEX;
+  (*index)++;
+
+  bind[*index].buffer = (char*)transaction->essence.bundle;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_243;
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
+  (*index)++;
+}
+
+static void storage_transaction_load_bind_attachment(MYSQL_BIND* const bind, iota_transaction_t* const transaction,
+                                                     size_t* const index) {
+  bind[*index].buffer = (char*)transaction->attachment.trunk;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_243;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TRUNK;
+  (*index)++;
+
+  bind[*index].buffer = (char*)transaction->attachment.branch;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_243;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_BRANCH;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->attachment.attachment_timestamp;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TIMESTAMP;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->attachment.attachment_timestamp_lower;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TIMESTAMP_LOWER;
+  (*index)++;
+
+  bind[*index].buffer = (char*)&transaction->attachment.attachment_timestamp_upper;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TIMESTAMP_UPPER;
+  (*index)++;
+
+  bind[*index].buffer = (char*)transaction->attachment.nonce;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_81;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_NONCE;
+  (*index)++;
+
+  bind[*index].buffer = (char*)transaction->attachment.tag;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_81;
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
+  (*index)++;
+}
+
+static void storage_transaction_load_bind_consensus(MYSQL_BIND* const bind, iota_transaction_t* const transaction,
+                                                    size_t* const index) {
+  bind[*index].buffer = (char*)transaction->consensus.hash;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_243;
+  transaction->loaded_columns_mask.consensus |= MASK_CONSENSUS_HASH;
+  (*index)++;
+}
+
+static void storage_transaction_load_bind_data(MYSQL_BIND* const bind, iota_transaction_t* const transaction,
+                                               size_t* const index) {
+  bind[*index].buffer = (char*)transaction->data.signature_or_message;
+  bind[*index].buffer_type = MYSQL_TYPE_BLOB;
+  bind[*index].buffer_length = FLEX_TRIT_SIZE_6561;
+  transaction->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
+  (*index)++;
+}
+
+static retcode_t storage_transaction_load_generic(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind,
+                                                  storage_load_model_t const model, iota_stor_pack_t* const pack) {
+  size_t index = 0;
+  iota_transaction_t* transaction = *((iota_transaction_t**)pack->models);
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  transaction_reset(transaction);
+
+  if (model == MODEL_TRANSACTION) {
+    storage_transaction_load_bind_essence(bind, transaction, &index);
+    storage_transaction_load_bind_attachment(bind, transaction, &index);
+    storage_transaction_load_bind_consensus(bind, transaction, &index);
+    storage_transaction_load_bind_data(bind, transaction, &index);
+  } else if (model == MODEL_TRANSACTION_ESSENCE_METADATA) {
+    storage_transaction_load_bind_essence(bind, transaction, &index);
+    storage_transaction_load_bind_metadata(bind, transaction, &index);
+  } else if (model == MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA) {
+    storage_transaction_load_bind_essence(bind, transaction, &index);
+    storage_transaction_load_bind_attachment(bind, transaction, &index);
+    storage_transaction_load_bind_metadata(bind, transaction, &index);
+  } else if (model == MODEL_TRANSACTION_ESSENCE_CONSENSUS) {
+    storage_transaction_load_bind_essence(bind, transaction, &index);
+    storage_transaction_load_bind_consensus(bind, transaction, &index);
+  } else if (model == MODEL_TRANSACTION_METADATA) {
+    storage_transaction_load_bind_metadata(bind, transaction, &index);
+  } else {
+    return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
+  }
+
+  if (mysql_stmt_bind_result(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_store_result(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  pack->num_loaded = mysql_stmt_num_rows(mariadb_statement);
+  pack->insufficient_capacity = pack->num_loaded > pack->capacity;
+
+  if (pack->num_loaded == 0 || pack->insufficient_capacity == true) {
+    return RC_OK;
+  }
+
+  if (mysql_stmt_fetch(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  return RC_OK;
+}
+
 /**
  * Public functions
  */
@@ -115,9 +274,31 @@ retcode_t storage_transaction_load(storage_connection_t const* const connection,
                                    storage_transaction_field_t const field, flex_trit_t const* const key,
                                    iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_by_hash;
+  MYSQL_STMT* mariadb_statement = NULL;
+  size_t num_key_bytes;
+  MYSQL_BIND bind_in[1];
+  MYSQL_BIND bind_out[16];
 
-  return RC_OK;
+  switch (field) {
+    case TRANSACTION_FIELD_HASH:
+      mariadb_statement = mariadb_connection->statements.transaction_select_by_hash;
+      num_key_bytes = FLEX_TRIT_SIZE_243;
+      break;
+    default:
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
+  }
+
+  memset(bind_in, 0, sizeof(bind_in));
+  memset(bind_out, 0, sizeof(bind_out));
+
+  column_compress_bind(bind_in, 0, key, MYSQL_TYPE_BLOB, num_key_bytes);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION, pack);
 }
 
 retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
