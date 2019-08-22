@@ -75,7 +75,7 @@ retcode_t storage_transaction_store(storage_connection_t const* const connection
 
   if (mysql_stmt_execute(mariadb_statement) != 0) {
     log_statement_error(mariadb_statement);
-    return RC_STORAGE_FAILED_BINDING;
+    return RC_STORAGE_FAILED_EXECUTE;
   }
 
   // TODO reset ?
