@@ -39,7 +39,12 @@ retcode_t storage_destroy() {
   return RC_OK;
 }
 
-retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count) { return RC_OK; }
+retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_count;
+
+  return RC_OK;
+}
 
 retcode_t storage_transaction_store(storage_connection_t const* const connection,
                                     iota_transaction_t const* const transaction) {
@@ -85,85 +90,134 @@ retcode_t storage_transaction_store(storage_connection_t const* const connection
 
 retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
                                    flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_by_hash;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
                                                         flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_and_metadata;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
                                                                    flex_trit_t const* const hash,
                                                                    iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_attachment_and_metadata;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
                                                          flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_and_consensus;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_metadata(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                             iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_metadata;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_exist(storage_connection_t const* const connection, transaction_field_t const field,
                                     flex_trit_t const* const key, bool* const exist) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_exist;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* const connection,
                                                     flex_trit_t const* const hash, uint64_t const snapshot_index) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_snapshot_index;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
                                                  flex_trit_t const* const hash, bool const is_solid) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_solid_state;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection, transaction_field_t const field,
                                           flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_by_address;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
                                                        flex_trit_t const* const approvee_hash,
                                                        iota_stor_pack_t* const pack, int64_t before_timestamp) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_of_approvers;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
                                                                   iota_stor_pack_t* const pack,
                                                                   flex_trit_t const* const coordinator) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_of_milestone_candidates;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
                                               flex_trit_t const* const hash, size_t* const count) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_approvers_count;
+
   return RC_OK;
 }
 
 retcode_t storage_transaction_find(storage_connection_t const* const connection, hash243_queue_t const bundles,
                                    hash243_queue_t const addresses, hash81_queue_t const tags,
                                    hash243_queue_t const approvees, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+
   return RC_OK;
 }
 
-retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection) { return RC_OK; }
+retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_metadata_clear;
+  return RC_OK;
+}
 
 retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
                                                      hash243_set_t const hashes, uint64_t const snapshot_index) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+
   return RC_OK;
 }
 
 retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
                                                   hash243_set_t const hashes, bool const is_solid) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+
   return RC_OK;
 }
 
 retcode_t storage_transactions_delete(storage_connection_t const* const connection, hash243_set_t const hashes) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_delete;
+
   return RC_OK;
 }
