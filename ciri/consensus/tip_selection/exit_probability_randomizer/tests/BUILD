@@ -1,6 +1,6 @@
 cc_test(
     name = "test_exit_probability_randomizer",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["test_exit_probability_randomizer.c"],
     data = [
         ":db_file",
