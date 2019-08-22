@@ -34,3 +34,17 @@ retcode_t finalize_statement(MYSQL_STMT* const mariadb_statement) {
 
   return RC_OK;
 }
+
+void column_compress_bind(MYSQL_BIND* const bind, size_t const index, void const* const data,
+                          enum enum_field_types const type, size_t const num_bytes) {
+  ssize_t i = num_bytes - 1;
+
+  bind[index].buffer = (void*)data;
+  bind[index].buffer_type = type;
+  if (type == MYSQL_TYPE_BLOB) {
+    for (; i >= 0 && ((flex_trit_t*)data)[i] == FLEX_TRIT_NULL_VALUE; --i) {
+    }
+    bind[index].buffer_length = i + 1;
+  }
+  bind[index].is_null = 0;
+}
