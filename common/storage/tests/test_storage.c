@@ -24,13 +24,11 @@ static storage_connection_config_t config;
 static storage_connection_t connection;
 
 void setUp(void) {
-  TEST_ASSERT(storage_test_setup(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
-  TEST_ASSERT(storage_connection_init(&connection, &config, STORAGE_CONNECTION_TANGLE) == RC_OK);
+  TEST_ASSERT(storage_test_setup(&connection, &config, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
 void tearDown(void) {
   TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
-  TEST_ASSERT(storage_connection_destroy(&connection) == RC_OK);
 }
 
 static void test_connection_init_destroy(void) {
