@@ -58,7 +58,7 @@ typedef enum transaction_field_e {
 extern retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count);
 
 extern retcode_t storage_transaction_store(storage_connection_t const* const connection,
-                                           iota_transaction_t const* const data_in);
+                                           iota_transaction_t const* const transaction);
 
 extern retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
                                           flex_trit_t const* const key, iota_stor_pack_t* const pack);
@@ -133,7 +133,7 @@ extern retcode_t storage_bundle_update_validity(storage_connection_t const* cons
 extern retcode_t storage_milestone_clear(storage_connection_t const* const connection);
 
 extern retcode_t storage_milestone_store(storage_connection_t const* const connection,
-                                         iota_milestone_t const* const data_in);
+                                         iota_milestone_t const* const milestone);
 
 extern retcode_t storage_milestone_load(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                         iota_stor_pack_t* const pack);

@@ -7,12 +7,19 @@
 
 #include <mysql.h>
 
+#include "common/storage/sql/mariadb/connection.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define MARIADB_LOGGER_ID "mariadb"
 
 static logger_id_t logger_id;
+
+static void log_statement_error(MYSQL_STMT const* const stmt) {
+  log_error(logger_id, "Statement error(%d) state(%s): \"%s\"\n", mysql_stmt_errno(stmt), mysql_stmt_sqlstate(stmt),
+            mysql_stmt_error(stmt));
+}
 
 retcode_t storage_init() {
   logger_id = logger_helper_enable(MARIADB_LOGGER_ID, LOGGER_DEBUG, true);
@@ -29,5 +36,134 @@ retcode_t storage_destroy() {
 
   mysql_library_end();
 
+  return RC_OK;
+}
+
+retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count) { return RC_OK; }
+
+retcode_t storage_transaction_store(storage_connection_t const* const connection,
+                                    iota_transaction_t const* const transaction) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_insert;
+  MYSQL_BIND bind[17];
+  uint64_t ts = current_timestamp_ms();
+
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, transaction->data.signature_or_message, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_6561);
+  column_compress_bind(bind, 1, transaction->essence.address, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 2, &transaction->essence.value, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 3, transaction->essence.obsolete_tag, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_81);
+  column_compress_bind(bind, 4, &transaction->essence.timestamp, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 5, &transaction->essence.current_index, MYSQL_TYPE_SHORT, -1);
+  column_compress_bind(bind, 6, &transaction->essence.last_index, MYSQL_TYPE_SHORT, -1);
+  column_compress_bind(bind, 7, transaction->essence.bundle, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 8, transaction->attachment.trunk, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 9, transaction->attachment.branch, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 10, transaction->attachment.tag, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_81);
+  column_compress_bind(bind, 11, &transaction->attachment.attachment_timestamp, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 12, &transaction->attachment.attachment_timestamp_upper, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 13, &transaction->attachment.attachment_timestamp_lower, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 14, transaction->attachment.nonce, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_81);
+  column_compress_bind(bind, 15, transaction->consensus.hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 16, &ts, MYSQL_TYPE_LONGLONG, -1);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  // TODO reset ?
+
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
+                                   flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
+                                                        flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
+                                                                   flex_trit_t const* const hash,
+                                                                   iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
+                                                         flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_metadata(storage_connection_t const* const connection, flex_trit_t const* const hash,
+                                            iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_exist(storage_connection_t const* const connection, transaction_field_t const field,
+                                    flex_trit_t const* const key, bool* const exist) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* const connection,
+                                                    flex_trit_t const* const hash, uint64_t const snapshot_index) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
+                                                 flex_trit_t const* const hash, bool const is_solid) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection, transaction_field_t const field,
+                                          flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
+                                                       flex_trit_t const* const approvee_hash,
+                                                       iota_stor_pack_t* const pack, int64_t before_timestamp) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
+                                                                  iota_stor_pack_t* const pack,
+                                                                  flex_trit_t const* const coordinator) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
+                                              flex_trit_t const* const hash, size_t* const count) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_find(storage_connection_t const* const connection, hash243_queue_t const bundles,
+                                   hash243_queue_t const addresses, hash81_queue_t const tags,
+                                   hash243_queue_t const approvees, iota_stor_pack_t* const pack) {
+  return RC_OK;
+}
+
+retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection) { return RC_OK; }
+
+retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
+                                                     hash243_set_t const hashes, uint64_t const snapshot_index) {
+  return RC_OK;
+}
+
+retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
+                                                  hash243_set_t const hashes, bool const is_solid) {
+  return RC_OK;
+}
+
+retcode_t storage_transactions_delete(storage_connection_t const* const connection, hash243_set_t const hashes) {
   return RC_OK;
 }
