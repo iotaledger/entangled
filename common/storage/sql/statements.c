@@ -76,13 +76,10 @@ char *storage_statement_transaction_update_solid_state =
 char *storage_statement_transaction_update_validity =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_VALIDITY "=? WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_exist =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " TRANSACTION_TABLE_NAME ")";
+char *storage_statement_transaction_exist = "SELECT 1 WHERE EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME ")";
 
 char *storage_statement_transaction_exist_by_hash =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
+    "SELECT 1 WHERE EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
 char *storage_statement_transaction_approvers_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";

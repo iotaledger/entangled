@@ -8,6 +8,7 @@
 #include <mysql.h>
 
 #include "common/storage/sql/mariadb/connection.h"
+#include "common/storage/sql/mariadb/wrappers.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
@@ -16,10 +17,34 @@
 
 static logger_id_t logger_id;
 
+/**
+ * Private functions
+ */
+
 static void log_statement_error(MYSQL_STMT* const stmt) {
-  log_error(logger_id, "Statement error(%d) state(%s): \"%s\"\n", mysql_stmt_errno(stmt), mysql_stmt_sqlstate(stmt),
-            mysql_stmt_error(stmt));
+  log_error(logger_id, "Statement error with code: %d, state: %s and message: \"%s\"\n", mysql_stmt_errno(stmt),
+            mysql_stmt_sqlstate(stmt), mysql_stmt_error(stmt));
 }
+
+static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bool* const exist) {
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  if (mysql_stmt_store_result(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  *exist = mysql_stmt_num_rows(mariadb_statement) != 0;
+
+  return RC_OK;
+}
+
+/**
+ * Public functions
+ */
 
 retcode_t storage_init() {
   logger_id = logger_helper_enable(MARIADB_LOGGER_ID, LOGGER_DEBUG, true);
@@ -83,8 +108,6 @@ retcode_t storage_transaction_store(storage_connection_t const* const connection
     return RC_STORAGE_FAILED_EXECUTE;
   }
 
-  // TODO reset ?
-
   return RC_OK;
 }
 
@@ -132,9 +155,33 @@ retcode_t storage_transaction_load_metadata(storage_connection_t const* const co
 retcode_t storage_transaction_exist(storage_connection_t const* const connection, transaction_field_t const field,
                                     flex_trit_t const* const key, bool* const exist) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_exist;
+  MYSQL_STMT* mariadb_statement = NULL;
+  MYSQL_BIND bind[1];
+  retcode_t ret = RC_OK;
+  size_t num_bytes_key;
 
-  return RC_OK;
+  switch (field) {
+    case TRANSACTION_FIELD_NONE:
+      mariadb_statement = mariadb_connection->statements.transaction_exist;
+      break;
+    case TRANSACTION_FIELD_HASH:
+      mariadb_statement = mariadb_connection->statements.transaction_exist_by_hash;
+      num_bytes_key = FLEX_TRIT_SIZE_243;
+      break;
+    default:
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
+  }
+
+  if (field != TRANSACTION_FIELD_NONE && key) {
+    memset(bind, 0, sizeof(bind));
+    column_compress_bind(bind, 0, key, MYSQL_TYPE_BLOB, num_bytes_key);
+    if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+      log_statement_error(mariadb_statement);
+      return RC_STORAGE_FAILED_BINDING;
+    }
+  }
+
+  return execute_statement_exist(mariadb_statement, exist);
 }
 
 retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* const connection,
