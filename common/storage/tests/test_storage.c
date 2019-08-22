@@ -14,9 +14,9 @@
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/storage.h"
+#include "common/storage/test_utils.h"
 #include "common/storage/tests/defs.h"
 #include "utils/containers/hash/hash243_set.h"
-#include "utils/files.h"
 
 static char* tangle_test_db_path = "common/storage/tests/test.db";
 
@@ -24,17 +24,13 @@ static storage_connection_config_t config;
 static storage_connection_t connection;
 
 void setUp(void) {
-#ifdef STORAGE_SQLITE3
-  TEST_ASSERT(iota_utils_copy_file(tangle_test_db_path, "common/storage/sql/sqlite3/tangle.db") == RC_OK);
-#endif
+  TEST_ASSERT(storage_test_setup(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
   TEST_ASSERT(storage_connection_init(&connection, &config, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
 void tearDown(void) {
+  TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
   TEST_ASSERT(storage_connection_destroy(&connection) == RC_OK);
-#ifdef STORAGE_SQLITE3
-  TEST_ASSERT(iota_utils_remove_file(tangle_test_db_path) == RC_OK);
-#endif
 }
 
 static void test_connection_init_destroy(void) {

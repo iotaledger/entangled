@@ -9,33 +9,34 @@
 
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/consensus/test_utils/tangle.h"
+#include "common/storage/test_utils.h"
 #include "utils/files.h"
 
 retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path) {
   retcode_t ret = RC_OK;
 
-#ifdef STORAGE_SQLITE3
-  if ((ret = iota_utils_copy_file(test_db_path, "common/storage/sql/sqlite3/tangle.db"))) {
+  if ((ret = storage_test_setup(&tangle->connection, test_db_path, STORAGE_CONNECTION_TANGLE)) != RC_OK) {
     return ret;
   }
-#endif
-  if ((ret = iota_tangle_init(tangle, config))) {
+
+  if ((ret = iota_tangle_init(tangle, config)) != RC_OK) {
     return ret;
   }
+
   return ret;
 }
 
 retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
   retcode_t ret = RC_OK;
 
-  if ((ret = iota_tangle_destroy(tangle))) {
+  if ((ret = iota_tangle_destroy(tangle)) != RC_OK) {
     return ret;
   }
-#ifdef STORAGE_SQLITE3
-  if ((ret = iota_utils_remove_file(test_db_path))) {
+
+  if ((ret = storage_test_teardown(&tangle->connection, test_db_path, STORAGE_CONNECTION_TANGLE)) != RC_OK) {
     return ret;
   }
-#endif
+
   return ret;
 }
 

@@ -8,33 +8,34 @@
 #include <string.h>
 
 #include "ciri/consensus/test_utils/spent_addresses.h"
+#include "common/storage/test_utils.h"
 #include "utils/files.h"
 
 retcode_t spent_addresses_setup(spent_addresses_provider_t *const sap, storage_connection_config_t *const config,
                                 char *test_db_path) {
   retcode_t ret = RC_OK;
 
-#ifdef STORAGE_SQLITE3
-  if ((ret = iota_utils_copy_file(test_db_path, "common/storage/sql/sqlite3/spent-addresses.db"))) {
+  if ((ret = storage_test_setup(&sap->connection, test_db_path, STORAGE_CONNECTION_SPENT_ADDRESSES)) != RC_OK) {
     return ret;
   }
-#endif
-  if ((ret = iota_spent_addresses_provider_init(sap, config))) {
+
+  if ((ret = iota_spent_addresses_provider_init(sap, config)) != RC_OK) {
     return ret;
   }
+
   return ret;
 }
 
 retcode_t spent_addresses_cleanup(spent_addresses_provider_t *const sap, char *test_db_path) {
   retcode_t ret = RC_OK;
 
-  if ((ret = iota_spent_addresses_provider_destroy(sap))) {
+  if ((ret = iota_spent_addresses_provider_destroy(sap)) != RC_OK) {
     return ret;
   }
-#ifdef STORAGE_SQLITE3
-  if ((ret = iota_utils_remove_file(test_db_path))) {
+
+  if ((ret = storage_test_teardown(&sap->connection, test_db_path, STORAGE_CONNECTION_SPENT_ADDRESSES)) != RC_OK) {
     return ret;
   }
-#endif
+
   return ret;
 }
