@@ -16,7 +16,7 @@
 
 static logger_id_t logger_id;
 
-static void log_statement_error(MYSQL_STMT const* const stmt) {
+static void log_statement_error(MYSQL_STMT* const stmt) {
   log_error(logger_id, "Statement error(%d) state(%s): \"%s\"\n", mysql_stmt_errno(stmt), mysql_stmt_sqlstate(stmt),
             mysql_stmt_error(stmt));
 }
