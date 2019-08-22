@@ -111,8 +111,9 @@ retcode_t storage_transaction_store(storage_connection_t const* const connection
   return RC_OK;
 }
 
-retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
-                                   flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load(storage_connection_t const* const connection,
+                                   storage_transaction_field_t const field, flex_trit_t const* const key,
+                                   iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_by_hash;
 
@@ -152,8 +153,9 @@ retcode_t storage_transaction_load_metadata(storage_connection_t const* const co
   return RC_OK;
 }
 
-retcode_t storage_transaction_exist(storage_connection_t const* const connection, transaction_field_t const field,
-                                    flex_trit_t const* const key, bool* const exist) {
+retcode_t storage_transaction_exist(storage_connection_t const* const connection,
+                                    storage_transaction_field_t const field, flex_trit_t const* const key,
+                                    bool* const exist) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = NULL;
   MYSQL_BIND bind[1];
@@ -200,8 +202,9 @@ retcode_t storage_transaction_update_solid_state(storage_connection_t const* con
   return RC_OK;
 }
 
-retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection, transaction_field_t const field,
-                                          flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection,
+                                          storage_transaction_field_t const field, flex_trit_t const* const key,
+                                          iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_by_address;
 

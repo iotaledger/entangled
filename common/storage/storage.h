@@ -49,19 +49,35 @@ extern retcode_t storage_destroy();
  * Transaction operations
  */
 
-typedef enum transaction_field_e {
+typedef enum storage_transaction_field_e {
   TRANSACTION_FIELD_NONE,
   TRANSACTION_FIELD_HASH,
   TRANSACTION_FIELD_ADDRESS
-} transaction_field_t;
+} storage_transaction_field_t;
+
+typedef enum storage_load_model_e {
+  MODEL_HASH,
+  MODEL_MILESTONE,
+  MODEL_TRANSACTION,
+  MODEL_TRANSACTION_ESSENCE_METADATA,
+  MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
+  MODEL_TRANSACTION_ESSENCE_CONSENSUS,
+  MODEL_TRANSACTION_METADATA,
+} storage_load_model_t;
+
+typedef enum storage_value_type_e {
+  BOOLEAN,
+  INT64,
+} storage_value_type_t;
 
 extern retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count);
 
 extern retcode_t storage_transaction_store(storage_connection_t const* const connection,
                                            iota_transaction_t const* const transaction);
 
-extern retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
-                                          flex_trit_t const* const key, iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load(storage_connection_t const* const connection,
+                                          storage_transaction_field_t const field, flex_trit_t const* const key,
+                                          iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
                                                                flex_trit_t const* const hash,
@@ -79,7 +95,7 @@ extern retcode_t storage_transaction_load_metadata(storage_connection_t const* c
                                                    flex_trit_t const* const hash, iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_exist(storage_connection_t const* const connection,
-                                           transaction_field_t const field, flex_trit_t const* const key,
+                                           storage_transaction_field_t const field, flex_trit_t const* const key,
                                            bool* const exist);
 
 extern retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* const connection,
@@ -90,7 +106,7 @@ extern retcode_t storage_transaction_update_solid_state(storage_connection_t con
                                                         flex_trit_t const* const hash, bool const is_solid);
 
 extern retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection,
-                                                 transaction_field_t const field, flex_trit_t const* const key,
+                                                 storage_transaction_field_t const field, flex_trit_t const* const key,
                                                  iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
