@@ -48,6 +48,18 @@ static void test_transaction_store(void) {
   TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
 }
 
+static void test_transaction_store_duplicate(void) {
+  iota_transaction_t transaction;
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
+
+  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+  TEST_ASSERT(storage_transaction_store(&connection, &transaction) != RC_OK);
+}
+
 static void test_transaction_load(void) {}
 
 static void test_transaction_load_essence_and_metadata(void) {}
@@ -547,6 +559,7 @@ int main(void) {
 
   RUN_TEST(test_transaction_count);
   RUN_TEST(test_transaction_store);
+  RUN_TEST(test_transaction_store_duplicate);
   RUN_TEST(test_transaction_load);
   RUN_TEST(test_transaction_load_essence_and_metadata);
   RUN_TEST(test_transaction_load_essence_attachment_and_metadata);
