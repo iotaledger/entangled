@@ -70,7 +70,37 @@ static void test_transaction_load_essence_and_consensus(void) {}
 
 static void test_transaction_load_metadata(void) {}
 
-static void test_transaction_exist(void) {}
+static void test_transaction_exist_false(void) {
+  bool exist;
+
+  exist = true;
+  TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+
+  exist = true;
+  TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
+
+static void test_transaction_exist_true(void) {
+  iota_transaction_t transaction;
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+  bool exist;
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
+
+  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+
+  exist = false;
+  TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+
+  exist = false;
+  TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+}
 
 static void test_transaction_update_snapshot_index(void) {}
 
@@ -94,13 +124,6 @@ static void test_transactions_update_solid_state(void) {}
 
 static void test_transactions_delete(void) {}
 
-// void test_initialized_db_empty_transaction(void) {
-//   bool exist = false;
-//
-//   TEST_ASSERT(storage_milestone_exist(&connection, HASH, &exist) ==
-//   RC_OK); TEST_ASSERT(exist == false);
-// }
-//
 // void test_initialized_db_empty_milestone(void) {
 //   bool exist = false;
 //
@@ -565,7 +588,8 @@ int main(void) {
   RUN_TEST(test_transaction_load_essence_attachment_and_metadata);
   RUN_TEST(test_transaction_load_essence_and_consensus);
   RUN_TEST(test_transaction_load_metadata);
-  RUN_TEST(test_transaction_exist);
+  RUN_TEST(test_transaction_exist_false);
+  RUN_TEST(test_transaction_exist_true);
   RUN_TEST(test_transaction_update_snapshot_index);
   RUN_TEST(test_transaction_update_solid_state);
   RUN_TEST(test_transaction_load_hashes);
