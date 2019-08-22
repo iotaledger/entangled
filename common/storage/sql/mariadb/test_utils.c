@@ -10,16 +10,14 @@
 #include "common/storage/sql/mariadb/connection.h"
 #include "utils/macros.h"
 
-retcode_t storage_test_setup(storage_connection_t const* const connection, char const* const test_db_path,
-                             storage_connection_type_t const type) {
-  UNUSED(connection);
+retcode_t storage_test_setup(storage_connection_t* const connection, storage_connection_config_t const* const config,
+                             char const* const test_db_path, storage_connection_type_t const type) {
   UNUSED(test_db_path);
-  UNUSED(type);
 
-  return RC_OK;
+  return storage_connection_init(connection, config, type);
 }
 
-retcode_t storage_test_teardown(storage_connection_t const* const connection, char const* const test_db_path,
+retcode_t storage_test_teardown(storage_connection_t* const connection, char const* const test_db_path,
                                 storage_connection_type_t const type) {
   retcode_t ret = RC_OK;
   UNUSED(test_db_path);
@@ -38,5 +36,9 @@ retcode_t storage_test_teardown(storage_connection_t const* const connection, ch
     }
   }
 
-  return ret;
+  if (ret != RC_OK) {
+    return ret;
+  }
+
+  return storage_connection_destroy(connection);
 }

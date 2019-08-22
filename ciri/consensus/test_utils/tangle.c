@@ -13,31 +13,11 @@
 #include "utils/files.h"
 
 retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path) {
-  retcode_t ret = RC_OK;
-
-  if ((ret = storage_test_setup(&tangle->connection, test_db_path, STORAGE_CONNECTION_TANGLE)) != RC_OK) {
-    return ret;
-  }
-
-  if ((ret = iota_tangle_init(tangle, config)) != RC_OK) {
-    return ret;
-  }
-
-  return ret;
+  return storage_test_setup(&tangle->connection, config, test_db_path, STORAGE_CONNECTION_TANGLE);
 }
 
 retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
-  retcode_t ret = RC_OK;
-
-  if ((ret = iota_tangle_destroy(tangle)) != RC_OK) {
-    return ret;
-  }
-
-  if ((ret = storage_test_teardown(&tangle->connection, test_db_path, STORAGE_CONNECTION_TANGLE)) != RC_OK) {
-    return ret;
-  }
-
-  return ret;
+  return storage_test_teardown(&tangle->connection, test_db_path, STORAGE_CONNECTION_TANGLE);
 }
 
 void transactions_deserialize(tryte_t const *const *const transactions_trytes, iota_transaction_t **txs,
