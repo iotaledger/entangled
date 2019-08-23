@@ -236,6 +236,23 @@ static retcode_t storage_transaction_load_generic(MYSQL_STMT* const mariadb_stat
   return RC_OK;
 }
 
+static retcode_t storage_transaction_update_generic(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind,
+                                                    flex_trit_t const* const hash) {
+  column_compress_bind(bind, 1, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  return RC_OK;
+}
+
 /**
  * Public functions
  */
@@ -401,16 +418,39 @@ retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* 
                                                     flex_trit_t const* const hash, uint64_t const snapshot_index) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_snapshot_index;
+  MYSQL_BIND bind[2];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, &snapshot_index, MYSQL_TYPE_LONGLONG, -1);
+
+  return storage_transaction_update_generic(mariadb_statement, bind, hash);
 }
 
 retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
                                                  flex_trit_t const* const hash, bool const is_solid) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_solid_state;
+  MYSQL_BIND bind[2];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, &is_solid, MYSQL_TYPE_TINY, -1);
+
+  return storage_transaction_update_generic(mariadb_statement, bind, hash);
+}
+
+retcode_t storage_transaction_update_validity(storage_connection_t const* const connection,
+                                              flex_trit_t const* const hash, bundle_status_t const validity) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_validity;
+  MYSQL_BIND bind[2];
+
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, &validity, MYSQL_TYPE_TINY, -1);
+
+  return storage_transaction_update_generic(mariadb_statement, bind, hash);
 }
 
 retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection,
