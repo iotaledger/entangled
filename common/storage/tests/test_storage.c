@@ -32,7 +32,7 @@ void tearDown(void) {
   TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
-static void store_test_tx(iota_transaction_t* const transaction) {
+static void store_test_transaction(iota_transaction_t* const transaction) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
@@ -40,6 +40,13 @@ static void store_test_tx(iota_transaction_t* const transaction) {
   transaction_deserialize_from_trits(transaction, transaction_trits, true);
 
   TEST_ASSERT(storage_transaction_store(&connection, transaction) == RC_OK);
+}
+
+static void store_test_milestone(iota_milestone_t* const milestone) {
+  milestone->index = TEST_MS_INDEX;
+  flex_trits_from_trytes(milestone->hash, NUM_TRITS_HASH, TEST_TX_HASH, NUM_TRITS_HASH, NUM_TRYTES_HASH);
+
+  TEST_ASSERT(storage_milestone_store(&connection, milestone) == RC_OK);
 }
 
 static void test_connection_init_destroy(void) {
@@ -51,13 +58,13 @@ static void test_transaction_count(void) {}
 static void test_transaction_store(void) {
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 }
 
 static void test_transaction_store_duplicate(void) {
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
   TEST_ASSERT(storage_transaction_store(&connection, &transaction) != RC_OK);
 }
 
@@ -73,7 +80,7 @@ static void test_transaction_load_found(void) {
   iota_transaction_t transaction;
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_load(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
@@ -106,7 +113,7 @@ static void test_transaction_load_essence_metadata(void) {
   iota_transaction_t transaction;
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
   TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
@@ -138,7 +145,7 @@ static void test_transaction_load_essence_attachment_metadata(void) {
   iota_transaction_t transaction;
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
   TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
@@ -178,7 +185,7 @@ static void test_transaction_load_essence_consensus(void) {
   iota_transaction_t transaction;
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_load_essence_consensus(&connection, TEST_TX_HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
@@ -203,7 +210,7 @@ static void test_transaction_load_metadata(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
   TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
@@ -240,7 +247,7 @@ static void test_transaction_exist_true(void) {
   iota_transaction_t transaction;
   bool exist;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   exist = false;
   TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
@@ -255,7 +262,7 @@ static void test_transaction_update_snapshot_index(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
   TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
@@ -270,7 +277,7 @@ static void test_transaction_update_solidity(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
   TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
@@ -285,7 +292,7 @@ static void test_transaction_update_validity(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
   TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
@@ -310,7 +317,7 @@ static void test_transactions_metadata_clear(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
 
-  store_test_tx(&transaction);
+  store_test_transaction(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
   TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
@@ -335,7 +342,11 @@ static void test_bundle_update_validity(void) {}
 
 static void test_milestone_clear(void) {}
 
-static void test_milestone_store(void) {}
+static void test_milestone_store(void) {
+  iota_milestone_t milestone;
+
+  store_test_milestone(&milestone);
+}
 
 static void test_milestone_load(void) {}
 
