@@ -7,6 +7,8 @@
 
 #include <mysql.h>
 
+#include "common/model/milestone.h"
+#include "common/model/transaction.h"
 #include "common/storage/sql/mariadb/connection.h"
 #include "common/storage/sql/mariadb/wrappers.h"
 #include "common/storage/storage.h"
@@ -546,6 +548,22 @@ retcode_t storage_milestone_store(storage_connection_t const* const connection,
                                   iota_milestone_t const* const milestone) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_insert;
+  MYSQL_BIND bind[2];
+
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, &milestone->index, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 1, milestone->hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
 
   return RC_OK;
 }
