@@ -348,7 +348,27 @@ static void test_milestone_store(void) {
   store_test_milestone(&milestone);
 }
 
-static void test_milestone_load(void) {}
+static void test_milestone_load_not_found(void) {
+  DECLARE_PACK_SINGLE_MILESTONE(loaded_milestone, ptr, pack);
+
+  TEST_ASSERT(storage_milestone_load(&connection, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 0);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+}
+
+static void test_milestone_load_found(void) {
+  iota_milestone_t milestone;
+  DECLARE_PACK_SINGLE_MILESTONE(loaded_milestone, ptr, pack);
+
+  store_test_milestone(&milestone);
+
+  TEST_ASSERT(storage_milestone_load(&connection, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_INT(ptr->index, milestone.index);
+  TEST_ASSERT_EQUAL_MEMORY(ptr->hash, milestone.hash, NUM_FLEX_TRITS_HASH);
+}
 
 static void test_milestone_load_last(void) {}
 
@@ -781,7 +801,8 @@ int main(void) {
 
   RUN_TEST(test_milestone_clear);
   RUN_TEST(test_milestone_store);
-  RUN_TEST(test_milestone_load);
+  RUN_TEST(test_milestone_load_not_found);
+  RUN_TEST(test_milestone_load_found);
   RUN_TEST(test_milestone_load_last);
   RUN_TEST(test_milestone_load_first);
   RUN_TEST(test_milestone_load_by_index);

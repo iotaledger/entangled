@@ -238,6 +238,49 @@ static retcode_t storage_transaction_load_generic(MYSQL_STMT* const mariadb_stat
   return RC_OK;
 }
 
+static retcode_t storage_milestone_load_generic(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind_out,
+                                                iota_stor_pack_t* const pack) {
+  iota_milestone_t* milestone = *((iota_milestone_t**)pack->models);
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  milestone_reset(milestone);
+
+  bind_out[0].buffer = (char*)&milestone->index;
+  bind_out[0].buffer_type = MYSQL_TYPE_LONGLONG;
+
+  bind_out[1].buffer = (char*)milestone->hash;
+  bind_out[1].buffer_type = MYSQL_TYPE_BLOB;
+  bind_out[1].buffer_length = FLEX_TRIT_SIZE_243;
+
+  if (mysql_stmt_bind_result(mariadb_statement, bind_out) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_store_result(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  pack->num_loaded = mysql_stmt_num_rows(mariadb_statement);
+  pack->insufficient_capacity = pack->num_loaded > pack->capacity;
+
+  if (pack->num_loaded == 0 || pack->insufficient_capacity == true) {
+    return RC_OK;
+  }
+
+  if (mysql_stmt_fetch(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  return RC_OK;
+}
+
 static retcode_t storage_transaction_update_generic(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind,
                                                     flex_trit_t const* const hash) {
   column_compress_bind(bind, 1, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
@@ -572,38 +615,80 @@ retcode_t storage_milestone_load(storage_connection_t const* const connection, f
                                  iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_by_hash;
+  MYSQL_BIND bind_in[1];
+  MYSQL_BIND bind_out[2];
 
-  return RC_OK;
+  memset(bind_in, 0, sizeof(bind_in));
+  memset(bind_out, 0, sizeof(bind_out));
+
+  column_compress_bind(bind_in, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return storage_milestone_load_generic(mariadb_statement, bind_out, pack);
 }
 
 retcode_t storage_milestone_load_last(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_last;
+  MYSQL_BIND bind_out[2];
 
-  return RC_OK;
+  memset(bind_out, 0, sizeof(bind_out));
+
+  return storage_milestone_load_generic(mariadb_statement, bind_out, pack);
 }
 
 retcode_t storage_milestone_load_first(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_first;
+  MYSQL_BIND bind_out[2];
 
-  return RC_OK;
+  memset(bind_out, 0, sizeof(bind_out));
+
+  return storage_milestone_load_generic(mariadb_statement, bind_out, pack);
 }
 
 retcode_t storage_milestone_load_by_index(storage_connection_t const* const connection, uint64_t const index,
                                           iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_by_index;
+  MYSQL_BIND bind_in[1];
+  MYSQL_BIND bind_out[2];
 
-  return RC_OK;
+  memset(bind_in, 0, sizeof(bind_in));
+  memset(bind_out, 0, sizeof(bind_out));
+
+  column_compress_bind(bind_in, 0, &index, MYSQL_TYPE_LONGLONG, -1);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return storage_milestone_load_generic(mariadb_statement, bind_out, pack);
 }
 
 retcode_t storage_milestone_load_next(storage_connection_t const* const connection, uint64_t const index,
                                       iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_next;
+  MYSQL_BIND bind_in[1];
+  MYSQL_BIND bind_out[2];
 
-  return RC_OK;
+  memset(bind_in, 0, sizeof(bind_in));
+  memset(bind_out, 0, sizeof(bind_out));
+
+  column_compress_bind(bind_in, 0, &index, MYSQL_TYPE_LONGLONG, -1);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return storage_milestone_load_generic(mariadb_statement, bind_out, pack);
 }
 
 retcode_t storage_milestone_exist(storage_connection_t const* const connection, flex_trit_t const* const hash,
