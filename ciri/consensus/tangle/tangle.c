@@ -159,8 +159,8 @@ retcode_t iota_tangle_transaction_find(tangle_t const *const tangle, hash243_que
   return storage_transaction_find(&tangle->connection, bundles, addresses, tags, approvees, pack);
 }
 
-retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle) {
-  return storage_transaction_metadata_clear(&tangle->connection);
+retcode_t iota_tangle_transactions_metadata_clear(tangle_t const *const tangle) {
+  return storage_transactions_metadata_clear(&tangle->connection);
 }
 
 retcode_t iota_tangle_transactions_delete(tangle_t const *const tangle, hash243_set_t const hashes) {

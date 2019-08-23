@@ -105,7 +105,7 @@ retcode_t iota_tangle_transactions_update_solidity(tangle_t const *const tangle,
 retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                   size_t *const count);
 
-retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle);
+retcode_t iota_tangle_transactions_metadata_clear(tangle_t const *const tangle);
 
 retcode_t iota_tangle_transactions_delete(tangle_t const *const tangle, hash243_set_t const hashes);
 

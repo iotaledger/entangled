@@ -495,9 +495,15 @@ retcode_t storage_transaction_find(storage_connection_t const* const connection,
   return RC_OK;
 }
 
-retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection) {
+retcode_t storage_transactions_metadata_clear(storage_connection_t const* const connection) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_metadata_clear;
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
   return RC_OK;
 }
 
