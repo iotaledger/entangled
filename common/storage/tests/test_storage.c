@@ -306,7 +306,24 @@ static void test_transaction_approvers_count(void) {}
 
 static void test_transaction_find(void) {}
 
-static void test_transaction_metadata_clear(void) {}
+static void test_transactions_metadata_clear(void) {
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
+  iota_transaction_t transaction;
+
+  store_test_tx(&transaction);
+
+  TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
+
+  TEST_ASSERT(storage_transactions_metadata_clear(&connection) == RC_OK);
+  TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
+
+  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 0);
+  TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), 0);
+  TEST_ASSERT_EQUAL_INT(transaction_validity(ptr), 0);
+  TEST_ASSERT_TRUE(transaction_arrival_timestamp(ptr) <= current_timestamp_ms());
+}
 
 static void test_transactions_update_snapshot_index(void) {}
 
@@ -744,7 +761,7 @@ int main(void) {
   RUN_TEST(test_transaction_load_hashes_of_milestone_candidates);
   RUN_TEST(test_transaction_approvers_count);
   RUN_TEST(test_transaction_find);
-  RUN_TEST(test_transaction_metadata_clear);
+  RUN_TEST(test_transactions_metadata_clear);
   RUN_TEST(test_transactions_update_snapshot_index);
   RUN_TEST(test_transactions_update_solidity);
   RUN_TEST(test_transactions_delete);

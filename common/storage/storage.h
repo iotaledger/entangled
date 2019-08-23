@@ -126,7 +126,7 @@ extern retcode_t storage_transaction_find(storage_connection_t const* const conn
                                           hash243_queue_t const addresses, hash81_queue_t const tags,
                                           hash243_queue_t const approvees, iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection);
+extern retcode_t storage_transactions_metadata_clear(storage_connection_t const* const connection);
 
 extern retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
                                                             hash243_set_t const hashes, uint64_t const snapshot_index);

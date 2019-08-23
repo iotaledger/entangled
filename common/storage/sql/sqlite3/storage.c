@@ -762,7 +762,7 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection) {
+retcode_t storage_transactions_metadata_clear(storage_connection_t const* const connection) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_metadata_clear;
