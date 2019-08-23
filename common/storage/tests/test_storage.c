@@ -32,6 +32,16 @@ void tearDown(void) {
   TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
 }
 
+static void store_test_tx(iota_transaction_t* const transaction) {
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(transaction, transaction_trits, true);
+
+  TEST_ASSERT(storage_transaction_store(&connection, transaction) == RC_OK);
+}
+
 static void test_connection_init_destroy(void) {
   // Empty because connection init/destroy are handled by setUp/tearDown
 }
@@ -40,24 +50,14 @@ static void test_transaction_count(void) {}
 
 static void test_transaction_store(void) {
   iota_transaction_t transaction;
-  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
-
-  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+  store_test_tx(&transaction);
 }
 
 static void test_transaction_store_duplicate(void) {
   iota_transaction_t transaction;
-  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
-
-  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+  store_test_tx(&transaction);
   TEST_ASSERT(storage_transaction_store(&connection, &transaction) != RC_OK);
 }
 
@@ -70,15 +70,10 @@ static void test_transaction_load_not_found(void) {
 }
 
 static void test_transaction_load_found(void) {
-  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
-  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
 
-  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
-
-  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+  store_test_tx(&transaction);
 
   TEST_ASSERT(storage_transaction_load(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
@@ -116,13 +111,8 @@ static void test_transaction_load_essence_and_consensus(void) {}
 static void test_transaction_load_metadata(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
-  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
-
-  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+  store_test_tx(&transaction);
 
   // TODO update snapshot_index
   // TODO update solid
@@ -160,14 +150,9 @@ static void test_transaction_exist_false(void) {
 
 static void test_transaction_exist_true(void) {
   iota_transaction_t transaction;
-  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
   bool exist;
 
-  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
-
-  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+  store_test_tx(&transaction);
 
   exist = false;
   TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
