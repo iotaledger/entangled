@@ -28,9 +28,9 @@ typedef struct tangle_statements_s {
   void* transaction_exist_by_hash;
   void* transaction_approvers_count;
   void* transaction_count;
-  void* transaction_select_essence_and_metadata;
-  void* transaction_select_essence_attachment_and_metadata;
-  void* transaction_select_essence_and_consensus;
+  void* transaction_select_essence_metadata;
+  void* transaction_select_essence_attachment_metadata;
+  void* transaction_select_essence_consensus;
   void* transaction_select_metadata;
   void* transaction_metadata_clear;
   void* transaction_delete;
@@ -84,9 +84,9 @@ extern char* storage_statement_transaction_delete;
  * Partial Transaction statements
  */
 
-extern char* storage_statement_transaction_select_essence_and_metadata;
-extern char* storage_statement_transaction_select_essence_attachment_and_metadata;
-extern char* storage_statement_transaction_select_essence_and_consensus;
+extern char* storage_statement_transaction_select_essence_metadata;
+extern char* storage_statement_transaction_select_essence_attachment_metadata;
+extern char* storage_statement_transaction_select_essence_consensus;
 extern char* storage_statement_transaction_select_metadata;
 
 /*

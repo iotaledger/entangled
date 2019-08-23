@@ -244,19 +244,19 @@ static retcode_t execute_statement_load_transactions(sqlite3_stmt* const sqlite_
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_TRANSACTION);
 }
 
-static retcode_t execute_statement_load_transaction_for_essence_and_metadata(sqlite3_stmt* const sqlite_statement,
-                                                                             iota_stor_pack_t* const pack) {
+static retcode_t execute_statement_load_transaction_for_essence_metadata(sqlite3_stmt* const sqlite_statement,
+                                                                         iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_TRANSACTION_ESSENCE_METADATA);
 }
 
-static retcode_t execute_statement_load_transaction_for_essence_attachment_and_metadata(
+static retcode_t execute_statement_load_transaction_for_essence_attachment_metadata(
     sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
                                     MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA);
 }
 
-static retcode_t execute_statement_load_transaction_essence_and_consensus(sqlite3_stmt* const sqlite_statement,
-                                                                          iota_stor_pack_t* const pack) {
+static retcode_t execute_statement_load_transaction_essence_consensus(sqlite3_stmt* const sqlite_statement,
+                                                                      iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_TRANSACTION_ESSENCE_CONSENSUS);
 }
 
@@ -398,18 +398,18 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
-                                                        flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_metadata(storage_connection_t const* const connection,
+                                                    flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_and_metadata;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
-  if ((ret = execute_statement_load_transaction_for_essence_and_metadata(sqlite_statement, pack)) != RC_OK) {
+  if ((ret = execute_statement_load_transaction_for_essence_metadata(sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 
@@ -418,19 +418,19 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
-                                                                   flex_trit_t const* const hash,
-                                                                   iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_attachment_metadata(storage_connection_t const* const connection,
+                                                               flex_trit_t const* const hash,
+                                                               iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_attachment_and_metadata;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_attachment_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
-  if ((ret = execute_statement_load_transaction_for_essence_attachment_and_metadata(sqlite_statement, pack)) != RC_OK) {
+  if ((ret = execute_statement_load_transaction_for_essence_attachment_metadata(sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 
@@ -439,18 +439,18 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
-                                                         flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_consensus(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_and_consensus;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_consensus;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
-  if ((ret = execute_statement_load_transaction_essence_and_consensus(sqlite_statement, pack)) != RC_OK) {
+  if ((ret = execute_statement_load_transaction_essence_consensus(sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 

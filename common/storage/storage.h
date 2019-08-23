@@ -79,17 +79,16 @@ extern retcode_t storage_transaction_load(storage_connection_t const* const conn
                                           storage_transaction_field_t const field, flex_trit_t const* const key,
                                           iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
-                                                               flex_trit_t const* const hash,
-                                                               iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load_essence_metadata(storage_connection_t const* const connection,
+                                                           flex_trit_t const* const hash, iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
-                                                                          flex_trit_t const* const hash,
-                                                                          iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load_essence_attachment_metadata(storage_connection_t const* const connection,
+                                                                      flex_trit_t const* const hash,
+                                                                      iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
-                                                                flex_trit_t const* const hash,
-                                                                iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load_essence_consensus(storage_connection_t const* const connection,
+                                                            flex_trit_t const* const hash,
+                                                            iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_load_metadata(storage_connection_t const* const connection,
                                                    flex_trit_t const* const hash, iota_stor_pack_t* const pack);
