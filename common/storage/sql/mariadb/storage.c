@@ -521,3 +521,118 @@ retcode_t storage_transactions_delete(storage_connection_t const* const connecti
 
   return RC_OK;
 }
+
+retcode_t storage_bundle_update_validity(storage_connection_t const* const connection,
+                                         bundle_transactions_t const* const bundle, bundle_status_t const status) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_clear(storage_connection_t const* const connection) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_clear;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_store(storage_connection_t const* const connection,
+                                  iota_milestone_t const* const milestone) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_insert;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_load(storage_connection_t const* const connection, flex_trit_t const* const hash,
+                                 iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_by_hash;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_load_last(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_last;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_load_first(storage_connection_t const* const connection, iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_first;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_load_by_index(storage_connection_t const* const connection, uint64_t const index,
+                                          iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_by_index;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_load_next(storage_connection_t const* const connection, uint64_t const index,
+                                      iota_stor_pack_t* const pack) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_select_next;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_exist(storage_connection_t const* const connection, flex_trit_t const* const hash,
+                                  bool* const exist) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_exist;
+
+  return RC_OK;
+}
+
+retcode_t storage_milestone_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_delete_by_hash;
+
+  return RC_OK;
+}
+
+retcode_t storage_state_delta_store(storage_connection_t const* const connection, uint64_t const index,
+                                    state_delta_t const* const delta) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.state_delta_store;
+
+  return RC_OK;
+}
+
+retcode_t storage_state_delta_load(storage_connection_t const* const connection, uint64_t const index,
+                                   state_delta_t* const delta) {
+  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.state_delta_load;
+
+  return RC_OK;
+}
+
+retcode_t storage_spent_address_store(storage_connection_t const* const connection, flex_trit_t const* const address) {
+  mariadb_spent_addresses_connection_t const* mariadb_connection =
+      (mariadb_spent_addresses_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.spent_address_insert;
+
+  return RC_OK;
+}
+
+retcode_t storage_spent_address_exist(storage_connection_t const* const connection, flex_trit_t const* const address,
+                                      bool* const exist) {
+  mariadb_spent_addresses_connection_t const* mariadb_connection =
+      (mariadb_spent_addresses_connection_t*)connection->actual;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.spent_address_exist;
+
+  return RC_OK;
+}
+
+retcode_t storage_spent_addresses_store(storage_connection_t const* const connection, hash243_set_t const addresses) {
+  mariadb_spent_addresses_connection_t const* mariadb_connection =
+      (mariadb_spent_addresses_connection_t*)connection->actual;
+
+  return RC_OK;
+}
