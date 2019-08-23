@@ -17,6 +17,7 @@
 #include "common/storage/test_utils.h"
 #include "common/storage/tests/defs.h"
 #include "utils/containers/hash/hash243_set.h"
+#include "utils/time.h"
 
 static char* tangle_test_db_path = "common/storage/tests/test.db";
 
@@ -112,7 +113,38 @@ static void test_transaction_load_essence_attachment_and_metadata(void) {}
 
 static void test_transaction_load_essence_and_consensus(void) {}
 
-static void test_transaction_load_metadata(void) {}
+static void test_transaction_load_metadata(void) {
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
+  iota_transaction_t transaction;
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
+
+  TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+
+  // TODO update snapshot_index
+  // TODO update solid
+  // TODO update validity
+
+  TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  // TODO compare updated value
+  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 0);
+  // TODO compare updated value
+  TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), 0);
+  // TODO compare updated value
+  TEST_ASSERT_EQUAL_INT(transaction_validity(ptr), 0);
+  TEST_ASSERT_TRUE(transaction_arrival_timestamp(ptr) <= current_timestamp_ms());
+
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.essence & MASK_ESSENCE_ALL, 0);
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.attachment & MASK_ATTACHMENT_ALL, 0);
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.consensus & MASK_CONSENSUS_ALL, 0);
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.data & MASK_DATA_ALL, 0);
+}
 
 static void test_transaction_exist_false(void) {
   bool exist;
