@@ -11,6 +11,7 @@
 #include "common/storage/sql/mariadb/wrappers.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 #include "utils/time.h"
 
 #define MARIADB_LOGGER_ID "mariadb"
@@ -166,10 +167,21 @@ static void storage_transaction_load_bind_metadata(MYSQL_BIND* const bind, iota_
   (*index)++;
 }
 
-static retcode_t storage_transaction_load_generic(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind,
-                                                  storage_load_model_t const model, iota_stor_pack_t* const pack) {
+static retcode_t storage_transaction_load_generic(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind_out,
+                                                  storage_load_model_t const model, flex_trit_t const* const hash,
+                                                  iota_stor_pack_t* const pack) {
   size_t index = 0;
   iota_transaction_t* transaction = *((iota_transaction_t**)pack->models);
+  MYSQL_BIND bind_in[1];
+
+  memset(bind_in, 0, sizeof(bind_in));
+
+  column_compress_bind(bind_in, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
 
   if (mysql_stmt_execute(mariadb_statement) != 0) {
     log_statement_error(mariadb_statement);
@@ -179,27 +191,27 @@ static retcode_t storage_transaction_load_generic(MYSQL_STMT* const mariadb_stat
   transaction_reset(transaction);
 
   if (model == MODEL_TRANSACTION) {
-    storage_transaction_load_bind_essence(bind, transaction, &index);
-    storage_transaction_load_bind_attachment(bind, transaction, &index);
-    storage_transaction_load_bind_consensus(bind, transaction, &index);
-    storage_transaction_load_bind_data(bind, transaction, &index);
+    storage_transaction_load_bind_essence(bind_out, transaction, &index);
+    storage_transaction_load_bind_attachment(bind_out, transaction, &index);
+    storage_transaction_load_bind_consensus(bind_out, transaction, &index);
+    storage_transaction_load_bind_data(bind_out, transaction, &index);
   } else if (model == MODEL_TRANSACTION_ESSENCE_METADATA) {
-    storage_transaction_load_bind_essence(bind, transaction, &index);
-    storage_transaction_load_bind_metadata(bind, transaction, &index);
+    storage_transaction_load_bind_essence(bind_out, transaction, &index);
+    storage_transaction_load_bind_metadata(bind_out, transaction, &index);
   } else if (model == MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA) {
-    storage_transaction_load_bind_essence(bind, transaction, &index);
-    storage_transaction_load_bind_attachment(bind, transaction, &index);
-    storage_transaction_load_bind_metadata(bind, transaction, &index);
+    storage_transaction_load_bind_essence(bind_out, transaction, &index);
+    storage_transaction_load_bind_attachment(bind_out, transaction, &index);
+    storage_transaction_load_bind_metadata(bind_out, transaction, &index);
   } else if (model == MODEL_TRANSACTION_ESSENCE_CONSENSUS) {
-    storage_transaction_load_bind_essence(bind, transaction, &index);
-    storage_transaction_load_bind_consensus(bind, transaction, &index);
+    storage_transaction_load_bind_essence(bind_out, transaction, &index);
+    storage_transaction_load_bind_consensus(bind_out, transaction, &index);
   } else if (model == MODEL_TRANSACTION_METADATA) {
-    storage_transaction_load_bind_metadata(bind, transaction, &index);
+    storage_transaction_load_bind_metadata(bind_out, transaction, &index);
   } else {
     return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
   }
 
-  if (mysql_stmt_bind_result(mariadb_statement, bind) != 0) {
+  if (mysql_stmt_bind_result(mariadb_statement, bind_out) != 0) {
     log_statement_error(mariadb_statement);
     return RC_STORAGE_FAILED_BINDING;
   }
@@ -297,39 +309,24 @@ retcode_t storage_transaction_load(storage_connection_t const* const connection,
                                    storage_transaction_field_t const field, flex_trit_t const* const key,
                                    iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = NULL;
-  size_t num_key_bytes;
-  MYSQL_BIND bind_in[1];
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_by_hash;
   MYSQL_BIND bind_out[16];
+  UNUSED(field);
 
-  switch (field) {
-    case TRANSACTION_FIELD_HASH:
-      mariadb_statement = mariadb_connection->statements.transaction_select_by_hash;
-      num_key_bytes = FLEX_TRIT_SIZE_243;
-      break;
-    default:
-      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
-  }
-
-  memset(bind_in, 0, sizeof(bind_in));
   memset(bind_out, 0, sizeof(bind_out));
 
-  column_compress_bind(bind_in, 0, key, MYSQL_TYPE_BLOB, num_key_bytes);
-
-  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
-    log_statement_error(mariadb_statement);
-    return RC_STORAGE_FAILED_BINDING;
-  }
-
-  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION, pack);
+  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION, key, pack);
 }
 
 retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
                                                         flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_and_metadata;
+  MYSQL_BIND bind_out[11];
 
-  return RC_OK;
+  memset(bind_out, 0, sizeof(bind_out));
+
+  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION_ESSENCE_METADATA, hash, pack);
 }
 
 retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
@@ -337,36 +334,34 @@ retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_conne
                                                                    iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_attachment_and_metadata;
+  MYSQL_BIND bind_out[18];
 
-  return RC_OK;
+  memset(bind_out, 0, sizeof(bind_out));
+
+  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
+                                          hash, pack);
 }
 
 retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
                                                          flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_and_consensus;
+  MYSQL_BIND bind_out[8];
 
-  return RC_OK;
+  memset(bind_out, 0, sizeof(bind_out));
+
+  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION_ESSENCE_CONSENSUS, hash, pack);
 }
 
 retcode_t storage_transaction_load_metadata(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                             iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_metadata;
-  MYSQL_BIND bind_in[1];
   MYSQL_BIND bind_out[4];
 
-  memset(bind_in, 0, sizeof(bind_in));
   memset(bind_out, 0, sizeof(bind_out));
 
-  column_compress_bind(bind_in, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
-
-  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
-    log_statement_error(mariadb_statement);
-    return RC_STORAGE_FAILED_BINDING;
-  }
-
-  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION_METADATA, pack);
+  return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION_METADATA, hash, pack);
 }
 
 retcode_t storage_transaction_exist(storage_connection_t const* const connection,
