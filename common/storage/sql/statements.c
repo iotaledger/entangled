@@ -108,13 +108,13 @@ char *storage_statement_transaction_delete = "DELETE FROM " TRANSACTION_TABLE_NA
  * Partial Transaction statements
  */
 
-char *storage_statement_transaction_select_essence_and_metadata =
+char *storage_statement_transaction_select_essence_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
     "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_select_essence_attachment_and_metadata =
+char *storage_statement_transaction_select_essence_attachment_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_TRUNK "," TRANSACTION_COL_BRANCH
@@ -123,7 +123,7 @@ char *storage_statement_transaction_select_essence_attachment_and_metadata =
     "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
     "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_select_essence_and_consensus =
+char *storage_statement_transaction_select_essence_consensus =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH

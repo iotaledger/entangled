@@ -318,10 +318,10 @@ retcode_t storage_transaction_load(storage_connection_t const* const connection,
   return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION, key, pack);
 }
 
-retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
-                                                        flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_metadata(storage_connection_t const* const connection,
+                                                    flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_and_metadata;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_metadata;
   MYSQL_BIND bind_out[11];
 
   memset(bind_out, 0, sizeof(bind_out));
@@ -329,11 +329,11 @@ retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t con
   return storage_transaction_load_generic(mariadb_statement, bind_out, MODEL_TRANSACTION_ESSENCE_METADATA, hash, pack);
 }
 
-retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
-                                                                   flex_trit_t const* const hash,
-                                                                   iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_attachment_metadata(storage_connection_t const* const connection,
+                                                               flex_trit_t const* const hash,
+                                                               iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_attachment_and_metadata;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_attachment_metadata;
   MYSQL_BIND bind_out[18];
 
   memset(bind_out, 0, sizeof(bind_out));
@@ -342,10 +342,10 @@ retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_conne
                                           hash, pack);
 }
 
-retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
-                                                         flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_consensus(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_and_consensus;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_essence_consensus;
   MYSQL_BIND bind_out[8];
 
   memset(bind_out, 0, sizeof(bind_out));

@@ -51,15 +51,14 @@ static retcode_t prepare_tangle_statements(mariadb_tangle_connection_t* const co
                            storage_statement_transaction_count);
   ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_delete),
                            storage_statement_transaction_delete);
+  ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_select_essence_metadata),
+                           storage_statement_transaction_select_essence_metadata);
   ret |= prepare_statement(&connection->db,
-                           (MYSQL_STMT**)(&connection->statements.transaction_select_essence_and_metadata),
-                           storage_statement_transaction_select_essence_and_metadata);
-  ret |= prepare_statement(&connection->db,
-                           (MYSQL_STMT**)(&connection->statements.transaction_select_essence_attachment_and_metadata),
-                           storage_statement_transaction_select_essence_attachment_and_metadata);
-  ret |= prepare_statement(&connection->db,
-                           (MYSQL_STMT**)(&connection->statements.transaction_select_essence_and_consensus),
-                           storage_statement_transaction_select_essence_and_consensus);
+                           (MYSQL_STMT**)(&connection->statements.transaction_select_essence_attachment_metadata),
+                           storage_statement_transaction_select_essence_attachment_metadata);
+  ret |=
+      prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_select_essence_consensus),
+                        storage_statement_transaction_select_essence_consensus);
   ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_select_metadata),
                            storage_statement_transaction_select_metadata);
   ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_metadata_clear),
@@ -127,9 +126,9 @@ static retcode_t finalize_tangle_statements(mariadb_tangle_connection_t* const c
   ret |= finalize_statement(connection->statements.transaction_exist_by_hash);
   ret |= finalize_statement(connection->statements.transaction_approvers_count);
   ret |= finalize_statement(connection->statements.transaction_count);
-  ret |= finalize_statement(connection->statements.transaction_select_essence_and_metadata);
-  ret |= finalize_statement(connection->statements.transaction_select_essence_attachment_and_metadata);
-  ret |= finalize_statement(connection->statements.transaction_select_essence_and_consensus);
+  ret |= finalize_statement(connection->statements.transaction_select_essence_metadata);
+  ret |= finalize_statement(connection->statements.transaction_select_essence_attachment_metadata);
+  ret |= finalize_statement(connection->statements.transaction_select_essence_consensus);
   ret |= finalize_statement(connection->statements.transaction_select_metadata);
   ret |= finalize_statement(connection->statements.transaction_metadata_clear);
   ret |= finalize_statement(connection->statements.transaction_delete);
