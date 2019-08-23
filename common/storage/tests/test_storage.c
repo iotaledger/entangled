@@ -109,7 +109,7 @@ static void test_transaction_load_essence_metadata(void) {
   store_test_tx(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
-  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
   TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
 
   TEST_ASSERT(storage_transaction_load_essence_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
@@ -141,7 +141,7 @@ static void test_transaction_load_essence_attachment_metadata(void) {
   store_test_tx(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
-  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
   TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
 
   TEST_ASSERT(storage_transaction_load_essence_attachment_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
@@ -206,7 +206,7 @@ static void test_transaction_load_metadata(void) {
   store_test_tx(&transaction);
 
   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
-  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
   TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
 
   TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
@@ -266,13 +266,13 @@ static void test_transaction_update_snapshot_index(void) {
   TEST_ASSERT_TRUE(transaction_arrival_timestamp(ptr) <= current_timestamp_ms());
 }
 
-static void test_transaction_update_solid_state(void) {
+static void test_transaction_update_solidity(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
 
   store_test_tx(&transaction);
 
-  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solidity(&connection, TEST_TX_HASH, 1) == RC_OK);
   TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 0);
@@ -310,7 +310,7 @@ static void test_transaction_metadata_clear(void) {}
 
 static void test_transactions_update_snapshot_index(void) {}
 
-static void test_transactions_update_solid_state(void) {}
+static void test_transactions_update_solidity(void) {}
 
 static void test_transactions_delete(void) {}
 
@@ -517,7 +517,7 @@ static void test_transactions_delete(void) {}
 //   TEST_ASSERT(storage_transaction_load(&connection,
 //   TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &pack) ==
 //   RC_OK); TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT(storage_transaction_update_solid_state(&connection,
+//   TEST_ASSERT(storage_transaction_update_solidity(&connection,
 //   transaction_hash(test_tx), true) == RC_OK);
 //   hash_pack_reset(&pack);
 //   TEST_ASSERT(storage_transaction_load_metadata(&connection,
@@ -707,7 +707,7 @@ int main(void) {
   RUN_TEST(test_transaction_exist_false);
   RUN_TEST(test_transaction_exist_true);
   RUN_TEST(test_transaction_update_snapshot_index);
-  RUN_TEST(test_transaction_update_solid_state);
+  RUN_TEST(test_transaction_update_solidity);
   RUN_TEST(test_transaction_update_validity);
   RUN_TEST(test_transaction_load_hashes);
   RUN_TEST(test_transaction_load_hashes_of_approvers);
@@ -716,7 +716,7 @@ int main(void) {
   RUN_TEST(test_transaction_find);
   RUN_TEST(test_transaction_metadata_clear);
   RUN_TEST(test_transactions_update_snapshot_index);
-  RUN_TEST(test_transactions_update_solid_state);
+  RUN_TEST(test_transactions_update_solidity);
   RUN_TEST(test_transactions_delete);
 
   TEST_ASSERT(storage_destroy() == RC_OK);

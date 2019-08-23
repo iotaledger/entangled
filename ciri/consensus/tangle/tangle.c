@@ -41,14 +41,14 @@ retcode_t iota_tangle_transaction_load(tangle_t const *const tangle, storage_tra
   return storage_transaction_load(&tangle->connection, field, key, tx);
 }
 
-retcode_t iota_tangle_transaction_update_solid_state(tangle_t const *const tangle, flex_trit_t const *const hash,
-                                                     bool const state) {
-  return storage_transaction_update_solid_state(&tangle->connection, hash, state);
+retcode_t iota_tangle_transaction_update_solidity(tangle_t const *const tangle, flex_trit_t const *const hash,
+                                                  bool const state) {
+  return storage_transaction_update_solidity(&tangle->connection, hash, state);
 }
 
-retcode_t iota_tangle_transactions_update_solid_state(tangle_t const *const tangle, hash243_set_t const hashes,
-                                                      bool const is_solid) {
-  return storage_transactions_update_solid_state(&tangle->connection, hashes, is_solid);
+retcode_t iota_tangle_transactions_update_solidity(tangle_t const *const tangle, hash243_set_t const hashes,
+                                                   bool const is_solid) {
+  return storage_transactions_update_solidity(&tangle->connection, hashes, is_solid);
 }
 
 retcode_t iota_tangle_transaction_load_hashes_by_address(tangle_t const *const tangle, flex_trit_t const *const address,

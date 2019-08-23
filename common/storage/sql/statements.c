@@ -70,7 +70,7 @@ char *storage_statement_transaction_select_hashes_of_milestone_candidates =
 char *storage_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=? WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_update_solid_state =
+char *storage_statement_transaction_update_solidity =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID "=? WHERE " TRANSACTION_COL_HASH "=?";
 
 char *storage_statement_transaction_update_validity =

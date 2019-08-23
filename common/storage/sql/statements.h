@@ -22,7 +22,7 @@ typedef struct tangle_statements_s {
   void* transaction_select_hashes_of_approvers_before_date;
   void* transaction_select_hashes_of_milestone_candidates;
   void* transaction_update_snapshot_index;
-  void* transaction_update_solid_state;
+  void* transaction_update_solidity;
   void* transaction_update_validity;
   void* transaction_exist;
   void* transaction_exist_by_hash;
@@ -70,7 +70,7 @@ extern char* storage_statement_transaction_select_hashes_of_approvers;
 extern char* storage_statement_transaction_select_hashes_of_approvers_before_date;
 extern char* storage_statement_transaction_select_hashes_of_milestone_candidates;
 extern char* storage_statement_transaction_update_snapshot_index;
-extern char* storage_statement_transaction_update_solid_state;
+extern char* storage_statement_transaction_update_solidity;
 extern char* storage_statement_transaction_update_validity;
 extern char* storage_statement_transaction_exist;
 extern char* storage_statement_transaction_exist_by_hash;

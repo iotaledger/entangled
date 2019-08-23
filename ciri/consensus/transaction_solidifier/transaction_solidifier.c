@@ -273,7 +273,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
     *is_solid = true;
     log_debug(logger_id, "In %s, updating solid state\n", __FUNCTION__);
 
-    ret = iota_tangle_transactions_update_solid_state(tangle, solid_transactions_candidates, true);
+    ret = iota_tangle_transactions_update_solidity(tangle, solid_transactions_candidates, true);
 
     lock_handle_lock(&ts->lock);
     hash243_set_append(&solid_transactions_candidates, &ts->newly_set_solid_transactions);
@@ -320,7 +320,7 @@ static retcode_t check_transaction_and_update_solid_state(transaction_solidifier
     }
 
     if ((*is_new_solid = is_trunk_solid && is_branch_solid)) {
-      if ((ret = iota_tangle_transaction_update_solid_state(tangle, hash, true)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_update_solidity(tangle, hash, true)) != RC_OK) {
         log_error(logger_id, "Updating solid state failed\n");
         return ret;
       }

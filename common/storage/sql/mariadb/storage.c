@@ -426,10 +426,10 @@ retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* 
   return storage_transaction_update_generic(mariadb_statement, bind, hash);
 }
 
-retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
-                                                 flex_trit_t const* const hash, bool const is_solid) {
+retcode_t storage_transaction_update_solidity(storage_connection_t const* const connection,
+                                              flex_trit_t const* const hash, bool const is_solid) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_solid_state;
+  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_update_solidity;
   MYSQL_BIND bind[2];
 
   memset(bind, 0, sizeof(bind));
@@ -508,8 +508,8 @@ retcode_t storage_transactions_update_snapshot_index(storage_connection_t const*
   return RC_OK;
 }
 
-retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
-                                                  hash243_set_t const hashes, bool const is_solid) {
+retcode_t storage_transactions_update_solidity(storage_connection_t const* const connection, hash243_set_t const hashes,
+                                               bool const is_solid) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
 
   return RC_OK;
