@@ -387,7 +387,6 @@ retcode_t storage_transaction_exist(storage_connection_t const* const connection
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = NULL;
   MYSQL_BIND bind[1];
-  retcode_t ret = RC_OK;
   size_t num_bytes_key;
 
   switch (field) {

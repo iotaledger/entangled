@@ -102,9 +102,77 @@ static void test_transaction_load_found(void) {
   TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.metadata & MASK_METADATA_ALL, 0);
 }
 
-static void test_transaction_load_essence_metadata(void) {}
+static void test_transaction_load_essence_metadata(void) {
+  iota_transaction_t transaction;
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
 
-static void test_transaction_load_essence_attachment_metadata(void) {}
+  store_test_tx(&transaction);
+
+  TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
+
+  TEST_ASSERT(storage_transaction_load_essence_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_MEMORY(transaction_address(ptr), transaction_address(&transaction), NUM_FLEX_TRITS_ADDRESS);
+  TEST_ASSERT_EQUAL_INT(transaction_value(ptr), transaction_value(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_obsolete_tag(ptr), transaction_obsolete_tag(&transaction),
+                           NUM_FLEX_TRITS_OBSOLETE_TAG);
+  TEST_ASSERT_EQUAL_INT(transaction_timestamp(ptr), transaction_timestamp(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_current_index(ptr), transaction_current_index(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_last_index(ptr), transaction_last_index(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_bundle(ptr), transaction_bundle(&transaction), NUM_FLEX_TRITS_BUNDLE);
+  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 42);
+  TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), 1);
+  TEST_ASSERT_EQUAL_INT(transaction_validity(ptr), 5);
+  TEST_ASSERT_TRUE(transaction_arrival_timestamp(ptr) <= current_timestamp_ms());
+
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.attachment & MASK_ATTACHMENT_ALL, 0);
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.consensus & MASK_CONSENSUS_ALL, 0);
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.data & MASK_DATA_ALL, 0);
+}
+
+static void test_transaction_load_essence_attachment_metadata(void) {
+  iota_transaction_t transaction;
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
+
+  store_test_tx(&transaction);
+
+  TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
+
+  TEST_ASSERT(storage_transaction_load_essence_attachment_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_MEMORY(transaction_address(ptr), transaction_address(&transaction), NUM_FLEX_TRITS_ADDRESS);
+  TEST_ASSERT_EQUAL_INT(transaction_value(ptr), transaction_value(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_obsolete_tag(ptr), transaction_obsolete_tag(&transaction),
+                           NUM_FLEX_TRITS_OBSOLETE_TAG);
+  TEST_ASSERT_EQUAL_INT(transaction_timestamp(ptr), transaction_timestamp(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_current_index(ptr), transaction_current_index(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_last_index(ptr), transaction_last_index(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_bundle(ptr), transaction_bundle(&transaction), NUM_FLEX_TRITS_BUNDLE);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_trunk(ptr), transaction_trunk(&transaction), NUM_FLEX_TRITS_TRUNK);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_branch(ptr), transaction_branch(&transaction), NUM_FLEX_TRITS_BRANCH);
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp(ptr), transaction_attachment_timestamp(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_lower(ptr),
+                        transaction_attachment_timestamp_lower(&transaction));
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_upper(ptr),
+                        transaction_attachment_timestamp_upper(&transaction));
+  TEST_ASSERT_EQUAL_MEMORY(transaction_nonce(ptr), transaction_nonce(&transaction), NUM_FLEX_TRITS_NONCE);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_tag(ptr), transaction_tag(&transaction), NUM_FLEX_TRITS_TAG);
+  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 42);
+  TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), 1);
+  TEST_ASSERT_EQUAL_INT(transaction_validity(ptr), 5);
+  TEST_ASSERT_TRUE(transaction_arrival_timestamp(ptr) <= current_timestamp_ms());
+
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.consensus & MASK_CONSENSUS_ALL, 0);
+  TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.data & MASK_DATA_ALL, 0);
+}
 
 static void test_transaction_load_essence_consensus(void) {
   iota_transaction_t transaction;
@@ -137,20 +205,17 @@ static void test_transaction_load_metadata(void) {
 
   store_test_tx(&transaction);
 
-  // TODO update snapshot_index
-  // TODO update solid
-  // TODO update validity
+  TEST_ASSERT(storage_transaction_update_snapshot_index(&connection, TEST_TX_HASH, 42) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_solid_state(&connection, TEST_TX_HASH, 1) == RC_OK);
+  TEST_ASSERT(storage_transaction_update_validity(&connection, TEST_TX_HASH, 5) == RC_OK);
 
   TEST_ASSERT(storage_transaction_load_metadata(&connection, TEST_TX_HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-  // TODO compare updated value
-  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 0);
-  // TODO compare updated value
-  TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), 0);
-  // TODO compare updated value
-  TEST_ASSERT_EQUAL_INT(transaction_validity(ptr), 0);
+  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 42);
+  TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), 1);
+  TEST_ASSERT_EQUAL_INT(transaction_validity(ptr), 5);
   TEST_ASSERT_TRUE(transaction_arrival_timestamp(ptr) <= current_timestamp_ms());
 
   TEST_ASSERT_EQUAL_INT(ptr->loaded_columns_mask.essence & MASK_ESSENCE_ALL, 0);
