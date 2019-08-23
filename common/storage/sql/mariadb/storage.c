@@ -712,6 +712,21 @@ retcode_t storage_milestone_exist(storage_connection_t const* const connection, 
 retcode_t storage_milestone_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_delete_by_hash;
+  MYSQL_BIND bind[1];
+
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
 
   return RC_OK;
 }

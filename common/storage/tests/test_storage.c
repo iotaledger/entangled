@@ -395,7 +395,20 @@ static void test_milestone_exist_true(void) {
   TEST_ASSERT_TRUE(exist);
 }
 
-static void test_milestone_delete(void) {}
+static void test_milestone_delete(void) {
+  iota_milestone_t milestone;
+  bool exist = false;
+
+  store_test_milestone(&milestone);
+
+  TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+
+  TEST_ASSERT(storage_milestone_delete(&connection, TEST_TX_HASH) == RC_OK);
+
+  TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
 
 static void test_state_delta_store(void) {}
 
@@ -407,82 +420,6 @@ static void test_spent_address_exist(void) {}
 
 static void test_spent_addresses_store(void) {}
 
-// void test_initialized_db_empty_milestone(void) {
-//   bool exist = false;
-//
-//   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-//   memcpy(hash, HASH, FLEX_TRIT_SIZE_243);
-//   TEST_ASSERT(storage_transaction_exist(&connection,
-//   TRANSACTION_FIELD_HASH, hash, &exist) == RC_OK); TEST_ASSERT(exist
-//   == false);
-// }
-// void test_stored_milestone(void) {
-//   iota_milestone_t milestone;
-//   milestone.index = 42;
-//   memcpy(milestone.hash, HASH, FLEX_TRIT_SIZE_243);
-//
-//   TEST_ASSERT(storage_milestone_store(&connection, &milestone) ==
-//   RC_OK);
-//   // Test id primary key constraint violation
-//   TEST_ASSERT(storage_milestone_store(&connection, &milestone) ==
-//   RC_SQLITE3_FAILED_STEP);
-//   // Test hash unique constraint violation
-//   milestone.index++;
-//   TEST_ASSERT(storage_milestone_store(&connection, &milestone) ==
-//   RC_SQLITE3_FAILED_STEP);
-//
-//   // Test get last
-//   milestone.hash[0]++;
-//   TEST_ASSERT(storage_milestone_store(&connection, &milestone) ==
-//   RC_OK);
-//
-//   DECLARE_PACK_SINGLE_MILESTONE(ms, ms_ptr, ms_pack);
-//
-//   storage_milestone_load_last(&connection, &ms_pack);
-//   TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
-//   TEST_ASSERT_EQUAL_INT(ms.index, milestone.index);
-//   TEST_ASSERT_EQUAL_MEMORY(ms.hash, milestone.hash,
-//   FLEX_TRIT_SIZE_243); milestone.hash[0]--; milestone.index--;
-//
-//   bool exist = false;
-//   TEST_ASSERT(storage_milestone_exist(&connection, NULL, &exist) ==
-//   RC_OK); TEST_ASSERT(exist == true);
-//   TEST_ASSERT(storage_milestone_exist(&connection, HASH, &exist) ==
-//   RC_OK); TEST_ASSERT(exist == true);
-//   TEST_ASSERT(storage_milestone_exist(&connection, NULL, &exist) ==
-//   RC_OK); TEST_ASSERT(exist == true);
-//
-//   iota_milestone_t *milestones[5];
-//   iota_stor_pack_t pack = {
-//       .models = (void **)milestones, .num_loaded = 0, .capacity = 5,
-//       .insufficient_capacity = false};
-//
-//   for (int i = 0; i < 5; ++i) {
-//     pack.models[i] = (iota_milestone_t
-//     *)malloc(sizeof(iota_milestone_t));
-//   }
-//   TEST_ASSERT(storage_milestone_load(&connection, HASH, &pack) ==
-//   RC_OK); TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT_EQUAL_INT(milestones[0]->index, 42);
-//   TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, HASH,
-//   FLEX_TRIT_SIZE_243); for (int i = 0; i < 5; ++i) {
-//     free(pack.models[i]);
-//   }
-// }
-//
-// void test_delete_milestone(void) {
-//   DECLARE_PACK_SINGLE_MILESTONE(ms, ms_ptr, ms_pack);
-//
-//   storage_milestone_load_last(&connection, &ms_pack);
-//   TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
-//   bool exist = false;
-//   TEST_ASSERT(storage_milestone_exist(&connection, ms.hash, &exist)
-//   == RC_OK); TEST_ASSERT_TRUE(exist);
-//   TEST_ASSERT(storage_milestone_delete(&connection, ms.hash) ==
-//   RC_OK); TEST_ASSERT(storage_milestone_exist(&connection, ms.hash,
-//   &exist) == RC_OK); TEST_ASSERT_FALSE(exist);
-// }
-//
 // void test_stored_load_hashes_by_address(void) {
 //   flex_trit_t *hashes[5];
 //   iota_stor_pack_t pack = {.models = (void **)hashes, .capacity = 5,
@@ -533,29 +470,7 @@ static void test_spent_addresses_store(void) {}
 //   transaction_free(test_tx);
 // }
 //
-// void test_transaction_update_snapshot_index(void) {
-//   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
-//   flex_trits_from_trytes(tx_test_trits,
-//   NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-//                          NUM_TRITS_SERIALIZED_TRANSACTION,
-//                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-//   iota_transaction_t *test_tx =
-//   transaction_deserialize(tx_test_trits, true);
-//   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-//
-//   TEST_ASSERT(storage_transaction_load(&connection,
-//   TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &pack) ==
-//   RC_OK); TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT(storage_transaction_update_snapshot_index(&connection,
-//   transaction_hash(test_tx), 123456) == RC_OK);
-//   hash_pack_reset(&pack);
-//   TEST_ASSERT(storage_transaction_load_metadata(&connection,
-//   transaction_hash(test_tx), &pack) == RC_OK);
-//   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT_EQUAL_INT(tx.metadata.snapshot_index, 123456);
-//   transaction_free(test_tx);
-// }
-//
+
 // void test_milestone_state_delta(void) {
 //   state_delta_t state_delta1 = NULL, state_delta2 = NULL;
 //   state_delta_entry_t *iter = NULL, *tmp = NULL;
@@ -597,29 +512,7 @@ static void test_spent_addresses_store(void) {}
 //   state_delta_destroy(&state_delta2);
 // }
 //
-// void test_transaction_update_solid_state(void) {
-//   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
-//   flex_trits_from_trytes(tx_test_trits,
-//   NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-//                          NUM_TRITS_SERIALIZED_TRANSACTION,
-//                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-//   iota_transaction_t *test_tx =
-//   transaction_deserialize(tx_test_trits, true);
-//   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-//
-//   TEST_ASSERT(storage_transaction_load(&connection,
-//   TRANSACTION_FIELD_HASH, transaction_hash(test_tx), &pack) ==
-//   RC_OK); TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT(storage_transaction_update_solidity(&connection,
-//   transaction_hash(test_tx), true) == RC_OK);
-//   hash_pack_reset(&pack);
-//   TEST_ASSERT(storage_transaction_load_metadata(&connection,
-//   transaction_hash(test_tx), &pack) == RC_OK);
-//   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT(tx.metadata.solid == true);
-//   transaction_free(test_tx);
-// }
-//
+
 // void test_transactions_update_solid_states_one_transaction(void) {
 //   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
 //   flex_trits_from_trytes(tx_test_trits,
