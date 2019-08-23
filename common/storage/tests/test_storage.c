@@ -378,7 +378,22 @@ static void test_milestone_load_by_index(void) {}
 
 static void test_milestone_load_next(void) {}
 
-static void test_milestone_exist(void) {}
+static void test_milestone_exist_false(void) {
+  bool exist = true;
+
+  TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
+
+static void test_milestone_exist_true(void) {
+  iota_milestone_t milestone;
+  bool exist = false;
+
+  store_test_milestone(&milestone);
+
+  TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+}
 
 static void test_milestone_delete(void) {}
 
@@ -807,7 +822,8 @@ int main(void) {
   RUN_TEST(test_milestone_load_first);
   RUN_TEST(test_milestone_load_by_index);
   RUN_TEST(test_milestone_load_next);
-  RUN_TEST(test_milestone_exist);
+  RUN_TEST(test_milestone_exist_false);
+  RUN_TEST(test_milestone_exist_true);
   RUN_TEST(test_milestone_delete);
 
   RUN_TEST(test_state_delta_store);
