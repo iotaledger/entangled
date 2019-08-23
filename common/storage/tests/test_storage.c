@@ -314,6 +314,36 @@ static void test_transactions_update_solidity(void) {}
 
 static void test_transactions_delete(void) {}
 
+static void test_bundle_update_validity(void) {}
+
+static void test_milestone_clear(void) {}
+
+static void test_milestone_store(void) {}
+
+static void test_milestone_load(void) {}
+
+static void test_milestone_load_last(void) {}
+
+static void test_milestone_load_first(void) {}
+
+static void test_milestone_load_by_index(void) {}
+
+static void test_milestone_load_next(void) {}
+
+static void test_milestone_exist(void) {}
+
+static void test_milestone_delete(void) {}
+
+static void test_state_delta_store(void) {}
+
+static void test_state_delta_load(void) {}
+
+static void test_spent_address_store(void) {}
+
+static void test_spent_address_exist(void) {}
+
+static void test_spent_addresses_store(void) {}
+
 // void test_initialized_db_empty_milestone(void) {
 //   bool exist = false;
 //
@@ -718,6 +748,25 @@ int main(void) {
   RUN_TEST(test_transactions_update_snapshot_index);
   RUN_TEST(test_transactions_update_solidity);
   RUN_TEST(test_transactions_delete);
+
+  RUN_TEST(test_bundle_update_validity);
+
+  RUN_TEST(test_milestone_clear);
+  RUN_TEST(test_milestone_store);
+  RUN_TEST(test_milestone_load);
+  RUN_TEST(test_milestone_load_last);
+  RUN_TEST(test_milestone_load_first);
+  RUN_TEST(test_milestone_load_by_index);
+  RUN_TEST(test_milestone_load_next);
+  RUN_TEST(test_milestone_exist);
+  RUN_TEST(test_milestone_delete);
+
+  RUN_TEST(test_state_delta_store);
+  RUN_TEST(test_state_delta_load);
+
+  RUN_TEST(test_spent_address_store);
+  RUN_TEST(test_spent_address_exist);
+  RUN_TEST(test_spent_addresses_store);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
