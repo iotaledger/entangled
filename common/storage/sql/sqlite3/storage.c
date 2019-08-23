@@ -560,11 +560,11 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
-                                                 flex_trit_t const* const hash, bool const is_solid) {
+retcode_t storage_transaction_update_solidity(storage_connection_t const* const connection,
+                                              flex_trit_t const* const hash, bool const is_solid) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_update_solid_state;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_update_solidity;
 
   if (sqlite3_bind_int(sqlite_statement, 1, (int)is_solid) != SQLITE_OK ||
       column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
@@ -581,11 +581,11 @@ done:
   return ret;
 }
 
-retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
-                                                  hash243_set_t const hashes, bool const is_solid) {
+retcode_t storage_transactions_update_solidity(storage_connection_t const* const connection, hash243_set_t const hashes,
+                                               bool const is_solid) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
-  return update_transactions(connection, hashes, &is_solid,
-                             sqlite3_connection->statements.transaction_update_solid_state, BOOLEAN);
+  return update_transactions(connection, hashes, &is_solid, sqlite3_connection->statements.transaction_update_solidity,
+                             BOOLEAN);
 }
 
 retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,

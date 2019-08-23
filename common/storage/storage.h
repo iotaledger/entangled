@@ -101,8 +101,8 @@ extern retcode_t storage_transaction_update_snapshot_index(storage_connection_t 
                                                            flex_trit_t const* const hash,
                                                            uint64_t const snapshot_index);
 
-extern retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
-                                                        flex_trit_t const* const hash, bool const is_solid);
+extern retcode_t storage_transaction_update_solidity(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, bool const is_solid);
 
 extern retcode_t storage_transaction_update_validity(storage_connection_t const* const connection,
                                                      flex_trit_t const* const hash, bundle_status_t const validity);
@@ -131,8 +131,8 @@ extern retcode_t storage_transaction_metadata_clear(storage_connection_t const* 
 extern retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
                                                             hash243_set_t const hashes, uint64_t const snapshot_index);
 
-extern retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
-                                                         hash243_set_t const hashes, bool const is_solid);
+extern retcode_t storage_transactions_update_solidity(storage_connection_t const* const connection,
+                                                      hash243_set_t const hashes, bool const is_solid);
 
 extern retcode_t storage_transactions_delete(storage_connection_t const* const connection, hash243_set_t const hashes);
 

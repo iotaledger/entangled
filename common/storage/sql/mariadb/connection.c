@@ -37,8 +37,8 @@ static retcode_t prepare_tangle_statements(mariadb_tangle_connection_t* const co
                            storage_statement_transaction_select_hashes_of_milestone_candidates);
   ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_update_snapshot_index),
                            storage_statement_transaction_update_snapshot_index);
-  ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_update_solid_state),
-                           storage_statement_transaction_update_solid_state);
+  ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_update_solidity),
+                           storage_statement_transaction_update_solidity);
   ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_update_validity),
                            storage_statement_transaction_update_validity);
   ret |= prepare_statement(&connection->db, (MYSQL_STMT**)(&connection->statements.transaction_exist),
@@ -120,7 +120,7 @@ static retcode_t finalize_tangle_statements(mariadb_tangle_connection_t* const c
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_approvers_before_date);
   ret |= finalize_statement(connection->statements.transaction_select_hashes_of_milestone_candidates);
   ret |= finalize_statement(connection->statements.transaction_update_snapshot_index);
-  ret |= finalize_statement(connection->statements.transaction_update_solid_state);
+  ret |= finalize_statement(connection->statements.transaction_update_solidity);
   ret |= finalize_statement(connection->statements.transaction_update_validity);
   ret |= finalize_statement(connection->statements.transaction_exist);
   ret |= finalize_statement(connection->statements.transaction_exist_by_hash);
