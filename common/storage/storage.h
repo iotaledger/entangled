@@ -104,6 +104,9 @@ extern retcode_t storage_transaction_update_snapshot_index(storage_connection_t 
 extern retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
                                                         flex_trit_t const* const hash, bool const is_solid);
 
+extern retcode_t storage_transaction_update_validity(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, bundle_status_t const validity);
+
 extern retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection,
                                                  storage_transaction_field_t const field, flex_trit_t const* const key,
                                                  iota_stor_pack_t* const pack);
