@@ -735,16 +735,138 @@ retcode_t storage_state_delta_store(storage_connection_t const* const connection
                                     state_delta_t const* const delta) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.state_delta_store;
+  MYSQL_BIND bind[2];
+  size_t size = 0;
+  byte_t* bytes = NULL;
+  retcode_t ret = RC_OK;
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  size = state_delta_serialized_size(delta);
+
+  if ((bytes = (byte_t*)calloc(size, sizeof(byte_t))) == NULL) {
+    ret = RC_OOM;
+    goto done;
+  }
+
+  if ((ret = state_delta_serialize(delta, bytes)) != RC_OK) {
+    goto done;
+  }
+
+  bind[0].buffer = (void*)bytes;
+  bind[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind[0].buffer_length = size;
+  bind[0].is_null = 0;
+
+  bind[1].buffer = (void*)&index;
+  bind[1].buffer_type = MYSQL_TYPE_LONGLONG;
+  bind[1].is_null = 0;
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_BINDING;
+    goto done;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_EXECUTE;
+    goto done;
+  }
+
+done:
+  if (bytes) {
+    free(bytes);
+  }
+
+  return ret;
 }
 
 retcode_t storage_state_delta_load(storage_connection_t const* const connection, uint64_t const index,
                                    state_delta_t* const delta) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.state_delta_load;
+  MYSQL_BIND bind_in[1];
+  MYSQL_BIND bind_out[1];
+  byte_t* bytes = NULL;
+  size_t size = 0;
+  retcode_t ret = RC_OK;
+  MYSQL_RES* metadata = NULL;
+  my_bool set = 1;
 
-  return RC_OK;
+  *delta = NULL;
+
+  memset(bind_in, 0, sizeof(bind));
+  memset(bind_out, 0, sizeof(bind));
+
+  column_compress_bind(bind_in, 0, &index, MYSQL_TYPE_LONGLONG, -1);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind_in) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_BINDING;
+    goto done;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_EXECUTE;
+    goto done;
+  }
+
+  if ((metadata = mysql_stmt_result_metadata(mariadb_statement)) == NULL) {
+    ret = RC_STORAGE_FAILED_GET_RESULT;
+    goto done;
+  }
+
+  if (mysql_stmt_attr_set(mariadb_statement, STMT_ATTR_UPDATE_MAX_LENGTH, &set) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_SET_ATTR;
+    goto done;
+  }
+
+  if (mysql_stmt_store_result(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_STORE_RESULT;
+    goto done;
+  }
+
+  if (mysql_stmt_num_rows(mariadb_statement) == 0) {
+    goto done;
+  }
+
+  size = metadata->fields[0].max_length;
+
+  if ((bytes = (byte_t*)calloc(size, sizeof(byte_t))) == NULL) {
+    ret = RC_OOM;
+    goto done;
+  }
+
+  bind_out[0].buffer = (char*)bytes;
+  bind_out[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind_out[0].buffer_length = size;
+
+  if (mysql_stmt_bind_result(mariadb_statement, bind_out) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_BINDING;
+    goto done;
+  }
+
+  if (mysql_stmt_fetch(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    ret = RC_STORAGE_FAILED_STORE_RESULT;
+    goto done;
+  }
+
+  if ((ret = state_delta_deserialize(bytes, size, delta)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  if (bytes) {
+    free(bytes);
+  }
+
+  return ret;
 }
 
 retcode_t storage_spent_address_store(storage_connection_t const* const connection, flex_trit_t const* const address) {
