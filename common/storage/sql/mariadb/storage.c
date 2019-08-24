@@ -584,6 +584,11 @@ retcode_t storage_milestone_clear(storage_connection_t const* const connection) 
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_clear;
 
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
   return RC_OK;
 }
 

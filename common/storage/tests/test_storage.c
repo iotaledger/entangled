@@ -341,7 +341,20 @@ static void test_transactions_delete(void) {}
 
 static void test_bundle_update_validity(void) {}
 
-static void test_milestone_clear(void) {}
+static void test_milestone_clear(void) {
+  iota_milestone_t milestone;
+  bool exist = false;
+
+  store_test_milestone(&milestone);
+
+  TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+
+  TEST_ASSERT(storage_milestone_clear(&connection) == RC_OK);
+
+  TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
 
 static void test_milestone_store(void) {
   iota_milestone_t milestone;
