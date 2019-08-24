@@ -14,6 +14,7 @@ cc_library(
         "//common/model:milestone",
         "//common/storage:storage_common",
         "//common/storage:test_utils_hdr",
+        "//common/trinary:add",
         "//common/trinary:trit_ptrit",
         "//utils/containers/hash:hash243_set",
     ],

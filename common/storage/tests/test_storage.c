@@ -16,6 +16,7 @@
 #include "common/storage/storage.h"
 #include "common/storage/test_utils.h"
 #include "common/storage/tests/defs.h"
+#include "common/trinary/add.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/time.h"
 
@@ -410,9 +411,60 @@ static void test_milestone_delete(void) {
   TEST_ASSERT_FALSE(exist);
 }
 
-static void test_state_delta_store(void) {}
+static void test_state_delta_store(void) {
+  iota_milestone_t milestone;
+  state_delta_t state_delta = NULL;
 
-static void test_state_delta_load(void) {}
+  store_test_milestone(&milestone);
+
+  TEST_ASSERT(state_delta_add(&state_delta, TEST_TX_HASH, 4242) == RC_OK);
+  TEST_ASSERT(storage_state_delta_store(&connection, milestone.index, &state_delta) == RC_OK);
+
+  state_delta_destroy(&state_delta);
+}
+
+static void test_state_delta_load_not_found(void) {
+  state_delta_t state_delta = NULL;
+
+  TEST_ASSERT(storage_state_delta_load(&connection, 42, &state_delta) == RC_OK);
+  TEST_ASSERT_NULL(state_delta);
+}
+
+static void test_state_delta_load_found(void) {
+  iota_milestone_t milestone;
+  state_delta_t state_delta1 = NULL, state_delta2 = NULL;
+  state_delta_entry_t *iter = NULL, *tmp = NULL;
+  trit_t trits[HASH_LENGTH_TRIT] = {0};
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+
+  store_test_milestone(&milestone);
+
+  flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  for (int64_t i = -100; i <= 100; i++) {
+    flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
+    add_assign(trits, HASH_LENGTH_TRIT, 1);
+  }
+
+  TEST_ASSERT(storage_state_delta_store(&connection, milestone.index, &state_delta1) == RC_OK);
+
+  TEST_ASSERT(storage_state_delta_load(&connection, milestone.index, &state_delta2) == RC_OK);
+  TEST_ASSERT(state_delta2 != NULL);
+
+  int i = -100;
+  iter = NULL;
+  memset(trits, 0, sizeof(trits));
+  HASH_ITER(hh, state_delta2, iter, tmp) {
+    flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hash, FLEX_TRIT_SIZE_243);
+    TEST_ASSERT_EQUAL_INT64(iter->value, i);
+    add_assign(trits, HASH_LENGTH_TRIT, 1);
+    i++;
+  }
+
+  state_delta_destroy(&state_delta1);
+  state_delta_destroy(&state_delta2);
+}
 
 static void test_spent_address_store(void) {}
 
@@ -468,48 +520,6 @@ static void test_spent_addresses_store(void) {}
 //   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 //
 //   transaction_free(test_tx);
-// }
-//
-
-// void test_milestone_state_delta(void) {
-//   state_delta_t state_delta1 = NULL, state_delta2 = NULL;
-//   state_delta_entry_t *iter = NULL, *tmp = NULL;
-//   trit_t trits[HASH_LENGTH_TRIT] = {1};
-//   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-//   flex_trit_t *hashed_hash;
-//
-//   flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits,
-//   HASH_LENGTH_TRIT, HASH_LENGTH_TRIT); for (int64_t i = -1000; i <=
-//   1000; i++) {
-//     hashed_hash = iota_flex_digest(hash, HASH_LENGTH_TRIT);
-//     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
-//     free(hashed_hash);
-//     TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
-//   }
-//
-//   TEST_ASSERT(storage_state_delta_store(&connection, 42,
-//   &state_delta1) == RC_OK);
-//
-//   TEST_ASSERT(storage_state_delta_load(&connection, 43,
-//   &state_delta2) == RC_OK); TEST_ASSERT(state_delta2 == NULL);
-//
-//   TEST_ASSERT(storage_state_delta_load(&connection, 42,
-//   &state_delta2) == RC_OK); TEST_ASSERT(state_delta2 != NULL);
-//
-//   int i = -1000;
-//   flex_trits_from_trits(hash, HASH_LENGTH_TRIT, trits,
-//   HASH_LENGTH_TRIT, HASH_LENGTH_TRIT); iter = NULL; HASH_ITER(hh,
-//   state_delta2, iter, tmp) {
-//     hashed_hash = iota_flex_digest(hash, HASH_LENGTH_TRIT);
-//     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
-//     free(hashed_hash);
-//     TEST_ASSERT_EQUAL_MEMORY(iter->hash, hash, FLEX_TRIT_SIZE_243);
-//     TEST_ASSERT_EQUAL_INT64(iter->value, i);
-//     i++;
-//   }
-//
-//   state_delta_destroy(&state_delta1);
-//   state_delta_destroy(&state_delta2);
 // }
 //
 
@@ -720,7 +730,8 @@ int main(void) {
   RUN_TEST(test_milestone_delete);
 
   RUN_TEST(test_state_delta_store);
-  RUN_TEST(test_state_delta_load);
+  RUN_TEST(test_state_delta_load_not_found);
+  RUN_TEST(test_state_delta_load_found);
 
   RUN_TEST(test_spent_address_store);
   RUN_TEST(test_spent_address_exist);
