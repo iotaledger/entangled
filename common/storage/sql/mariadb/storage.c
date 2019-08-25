@@ -46,6 +46,37 @@ static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bo
   return RC_OK;
 }
 
+static retcode_t execute_statement_count(MYSQL_STMT* const mariadb_statement, uint64_t* const count) {
+  MYSQL_BIND bind[1];
+
+  memset(bind, 0, sizeof(bind));
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  bind[0].buffer = (char*)count;
+  bind[0].buffer_type = MYSQL_TYPE_LONGLONG;
+
+  if (mysql_stmt_bind_result(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_store_result(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  if (mysql_stmt_fetch(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  return RC_OK;
+}
+
 static void storage_transaction_load_bind_essence(MYSQL_BIND* const bind, iota_transaction_t* const transaction,
                                                   size_t* const index) {
   bind[*index].buffer = (char*)transaction->essence.address;
@@ -321,11 +352,11 @@ retcode_t storage_destroy() {
   return RC_OK;
 }
 
-retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count) {
+retcode_t storage_transaction_count(storage_connection_t const* const connection, uint64_t* const count) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_count;
 
-  return RC_OK;
+  return execute_statement_count(mariadb_statement, count);
 }
 
 retcode_t storage_transaction_store(storage_connection_t const* const connection,
