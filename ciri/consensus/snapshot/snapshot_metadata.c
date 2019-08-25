@@ -58,10 +58,10 @@ retcode_t iota_snapshot_metadata_serialize_str(snapshot_metadata_t const *const 
   offset += value_len;
   value_len = sprintf(str + offset, "%" PRIu64 "\n", snapshot_metadata->timestamp);
   offset += value_len;
-  value_len = sprintf(str + offset, "%" PRIu64 "\n", hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points));
+  value_len = sprintf(str + offset, "%zu\n", hash_to_uint64_t_map_size(snapshot_metadata->solid_entry_points));
   offset += value_len;
   // Dummy value for the sake of alignment with IRI's seen milestones
-  value_len = sprintf(str + offset, "%" PRIu64 "\n", 0UL);
+  value_len = sprintf(str + offset, "0\n");
   offset += value_len;
 
   HASH_ITER(hh, snapshot_metadata->solid_entry_points, iter, tmp) {
@@ -108,13 +108,13 @@ retcode_t iota_snapshot_metadata_deserialize_str(char const *const str, snapshot
   ptr += offset;
   ptr += 1;
 
-  if (sscanf(ptr, "%" PRIu64 "%n", &num_solid_entry_points, &offset) != 1) {
+  if (sscanf(ptr, "%zu%n", &num_solid_entry_points, &offset) != 1) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += offset;
   ptr += 1;
 
-  if (sscanf(ptr, "%" PRIu64 "%n", &num_seen_entry_point, &offset) != 1) {
+  if (sscanf(ptr, "%zu%n", &num_seen_entry_point, &offset) != 1) {
     return RC_SNAPSHOT_METADATA_FAILED_DESERIALIZING;
   }
   ptr += offset;
