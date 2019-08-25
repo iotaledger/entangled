@@ -47,7 +47,7 @@ int main() {
   bundle_transactions_new(&bundle);
   //prepare and write header and packet
   trit_t message_id[MAM_MSG_ID_SIZE];
-  ERR_BIND_RETURN(mam_api_bundle_write_header_on_endpoint(&sender_api, channel_id, endpoint_id, NULL, NULL, bundle, message_id), ret);
+  ERR_BIND_RETURN(mam_api_bundle_write_header_on_endpoint(&sender_api, channel_id, endpoint_id, NULL, sender_api.ntru_pks, bundle, message_id), ret);
   ERR_BIND_RETURN(mam_api_bundle_write_packet(&sender_api, message_id, (tryte_t *)PL, 11, MAM_MSG_CHECKSUM_SIG, true, bundle), ret);
   //Set created channel and endpoint as trusted in receiver API
   ERR_BIND_RETURN(mam_api_add_trusted_channel_pk(&receiver_api, channel_id), ret);
