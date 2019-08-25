@@ -384,13 +384,98 @@ static void test_milestone_load_found(void) {
   TEST_ASSERT_EQUAL_MEMORY(ptr->hash, milestone.hash, NUM_FLEX_TRITS_HASH);
 }
 
-static void test_milestone_load_last(void) {}
+static void test_milestone_load_last(void) {
+  iota_milestone_t milestone;
+  trit_t hash[HASH_LENGTH_TRIT];
+  DECLARE_PACK_SINGLE_MILESTONE(loaded_milestone, ptr, pack);
 
-static void test_milestone_load_first(void) {}
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  for (size_t i = 0; i < 10; i++) {
+    milestone.index = TEST_MS_INDEX + i;
+    flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_milestone_store(&connection, &milestone) == RC_OK);
+    add_assign(hash, HASH_LENGTH_TRIT, 1);
+  }
 
-static void test_milestone_load_by_index(void) {}
+  TEST_ASSERT(storage_milestone_load_last(&connection, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-static void test_milestone_load_next(void) {}
+  TEST_ASSERT_EQUAL_INT(ptr->index, TEST_MS_INDEX + 10 - 1);
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  add_assign(hash, HASH_LENGTH_TRIT, 10 - 1);
+  flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  TEST_ASSERT_EQUAL_MEMORY(ptr->hash, milestone.hash, NUM_FLEX_TRITS_HASH);
+}
+
+static void test_milestone_load_first(void) {
+  iota_milestone_t milestone;
+  trit_t hash[HASH_LENGTH_TRIT];
+  DECLARE_PACK_SINGLE_MILESTONE(loaded_milestone, ptr, pack);
+
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  for (size_t i = 0; i < 10; i++) {
+    milestone.index = TEST_MS_INDEX + i;
+    flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_milestone_store(&connection, &milestone) == RC_OK);
+    add_assign(hash, HASH_LENGTH_TRIT, 1);
+  }
+
+  TEST_ASSERT(storage_milestone_load_first(&connection, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_INT(ptr->index, TEST_MS_INDEX);
+  TEST_ASSERT_EQUAL_MEMORY(ptr->hash, TEST_TX_HASH, NUM_FLEX_TRITS_HASH);
+}
+
+static void test_milestone_load_by_index(void) {
+  iota_milestone_t milestone;
+  trit_t hash[HASH_LENGTH_TRIT];
+  DECLARE_PACK_SINGLE_MILESTONE(loaded_milestone, ptr, pack);
+
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  for (size_t i = 0; i < 10; i++) {
+    milestone.index = TEST_MS_INDEX + i;
+    flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_milestone_store(&connection, &milestone) == RC_OK);
+    add_assign(hash, HASH_LENGTH_TRIT, 1);
+  }
+
+  TEST_ASSERT(storage_milestone_load_by_index(&connection, TEST_MS_INDEX + 5, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_INT(ptr->index, TEST_MS_INDEX + 5);
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  add_assign(hash, HASH_LENGTH_TRIT, 5);
+  flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  TEST_ASSERT_EQUAL_MEMORY(ptr->hash, milestone.hash, NUM_FLEX_TRITS_HASH);
+}
+
+static void test_milestone_load_next(void) {
+  iota_milestone_t milestone;
+  trit_t hash[HASH_LENGTH_TRIT];
+  DECLARE_PACK_SINGLE_MILESTONE(loaded_milestone, ptr, pack);
+
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  for (size_t i = 0; i < 10; i += 2) {
+    milestone.index = TEST_MS_INDEX + i;
+    flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_milestone_store(&connection, &milestone) == RC_OK);
+    add_assign(hash, HASH_LENGTH_TRIT, 2);
+  }
+
+  TEST_ASSERT(storage_milestone_load_next(&connection, TEST_MS_INDEX + 2, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 1);
+  TEST_ASSERT_FALSE(pack.insufficient_capacity);
+
+  TEST_ASSERT_EQUAL_INT(ptr->index, TEST_MS_INDEX + 4);
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  add_assign(hash, HASH_LENGTH_TRIT, 4);
+  flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  TEST_ASSERT_EQUAL_MEMORY(ptr->hash, milestone.hash, NUM_FLEX_TRITS_HASH);
+}
 
 static void test_milestone_exist_false(void) {
   bool exist = true;
