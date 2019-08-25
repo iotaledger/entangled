@@ -557,11 +557,22 @@ retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connec
 }
 
 retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
-                                              flex_trit_t const* const hash, size_t* const count) {
+                                              flex_trit_t const* const hash, uint64_t* const count) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_approvers_count;
+  MYSQL_BIND bind[2];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 1, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return execute_statement_count(mariadb_statement, count);
 }
 
 retcode_t storage_transaction_find(storage_connection_t const* const connection, hash243_queue_t const bundles,

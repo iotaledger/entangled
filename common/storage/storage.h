@@ -120,7 +120,7 @@ extern retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage
                                                                          flex_trit_t const* const coordinator);
 
 extern retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
-                                                     flex_trit_t const* const hash, size_t* const count);
+                                                     flex_trit_t const* const hash, uint64_t* const count);
 
 extern retcode_t storage_transaction_find(storage_connection_t const* const connection, hash243_queue_t const bundles,
                                           hash243_queue_t const addresses, hash81_queue_t const tags,

@@ -681,7 +681,7 @@ done:
 }
 
 retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
-                                              flex_trit_t const* const hash, size_t* const count) {
+                                              flex_trit_t const* const hash, uint64_t* const count) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   int rc = 0;
   retcode_t ret = RC_OK;
