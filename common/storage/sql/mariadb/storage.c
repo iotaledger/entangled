@@ -24,9 +24,10 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static void log_statement_error(MYSQL_STMT* const stmt) {
-  log_error(logger_id, "Statement error with code: %d, state: %s and message: \"%s\"\n", mysql_stmt_errno(stmt),
-            mysql_stmt_sqlstate(stmt), mysql_stmt_error(stmt));
+static void log_statement_error(MYSQL_STMT* const mariadb_statement) {
+  log_error(logger_id, "Statement error with code: %d, state: %s and message: \"%s\"\n",
+            mysql_stmt_errno(mariadb_statement), mysql_stmt_sqlstate(mariadb_statement),
+            mysql_stmt_error(mariadb_statement));
 }
 
 static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bool* const exist) {
@@ -878,6 +879,24 @@ retcode_t storage_spent_address_store(storage_connection_t const* const connecti
   mariadb_spent_addresses_connection_t const* mariadb_connection =
       (mariadb_spent_addresses_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.spent_address_insert;
+  MYSQL_BIND bind[1];
+
+  memset(bind, 0, sizeof(bind));
+
+  bind[0].buffer = (void*)address;
+  bind[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind[0].buffer_length = FLEX_TRIT_SIZE_243;
+  bind[0].is_null = 0;
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
 
   return RC_OK;
 }
@@ -887,8 +906,21 @@ retcode_t storage_spent_address_exist(storage_connection_t const* const connecti
   mariadb_spent_addresses_connection_t const* mariadb_connection =
       (mariadb_spent_addresses_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = mariadb_connection->statements.spent_address_exist;
+  MYSQL_BIND bind[1];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  bind[0].buffer = (void*)address;
+  bind[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind[0].buffer_length = FLEX_TRIT_SIZE_243;
+  bind[0].is_null = 0;
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return execute_statement_exist(mariadb_statement, exist);
 }
 
 retcode_t storage_spent_addresses_store(storage_connection_t const* const connection, hash243_set_t const addresses) {
