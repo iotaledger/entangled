@@ -55,6 +55,7 @@ extern "C" {
 #define SRT_CCLIENT_INVALID_BUNDLE "Invalid bundle"
 #define SRT_CCLIENT_CHECK_BALANCE "Checking balance failed"
 #define SRT_CCLIENT_NOT_PROMOTABLE "Unable to promote this transaction"
+#define SRT_CCLIENT_NO_LOCAL_POW "Local PoW is not supported on this platform"
 
 #define SRT_COMMON_BUNDLE_SIGN "Signing a bundle failed"
 /** @} */

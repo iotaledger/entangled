@@ -60,7 +60,7 @@ void TipSelectionCollector::collect() {
   auto registry = std::make_shared<Registry>();
   exposer.RegisterCollectable(registry);
 
-  _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
+  _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort, false);
 
   _histograms = buildHistogramsMap(registry, "tipselection", {}, nameToDescHistogram);
 

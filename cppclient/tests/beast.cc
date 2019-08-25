@@ -28,11 +28,12 @@ class MockBeast : public BeastIotaAPI {
  public:
   using BeastIotaAPI::BeastIotaAPI;
   using BeastIotaAPI::post;
+  explicit MockBeast(std::string host, uint32_t port, bool useSsl) : IotaAPI(false), BeastIotaAPI(host, port, false) {}
 };
 
 TEST_F(BeastIotaAPITest, InvalidHostPort) {
-  MockBeast beast1("localhost", 1);
-  MockBeast beast2("unresolvable.sometld", 41414);
+  MockBeast beast1("localhost", 1, false);
+  MockBeast beast2("unresolvable.sometld", 41414, false);
   json req = R"({"command":"getNodeInfo"})"_json;
 
   auto res1 = beast1.post(req);

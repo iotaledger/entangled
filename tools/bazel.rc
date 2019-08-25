@@ -1,8 +1,8 @@
+build --cxxopt='-std=c++1z'
+
 build --copt -W
 build --copt -Wall
 build --copt -Wextra
-
-build --cxxopt='-std=c++1z'
 
 build --fat_apk_cpu='armeabi-v7a,arm64-v8a,x86,x86_64'
 build --output_filter='^//((?!external:).)*$'
