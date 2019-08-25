@@ -14,7 +14,7 @@
 
 #define SENDERSEED "SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED9SENDERSEED99999"
 #define RECEIVERSEED "RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9RECEIVERSEED9999"
-#define NONCE "ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"
+#define NONCE "ABCDEFGHI"
 #define PL "PAYLOADTEST"
 
 int main() {
@@ -28,8 +28,8 @@ int main() {
   ERR_BIND_RETURN(mam_api_init(&receiver_api, receiver_seed), ret);
   //Generating a keypair for the receiver api
   mam_ntru_sk_t ntru;
-  MAM_TRITS_DEF(nonce, 3 * 10);
-  nonce = MAM_TRITS_INIT(nonce, 3 * 10);
+  MAM_TRITS_DEF(nonce, 3*9);
+  nonce = MAM_TRITS_INIT(nonce, 3*9);
   trits_from_str(nonce,NONCE);
   ntru_sk_reset(&ntru);
   ntru_sk_gen(&ntru, &receiver_api.prng, nonce);
