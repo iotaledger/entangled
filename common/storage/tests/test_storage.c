@@ -24,14 +24,13 @@ static char* tangle_test_db_path = "common/storage/tests/test.db";
 
 static storage_connection_config_t config;
 static storage_connection_t connection;
+static storage_connection_type_t connection_type;
 
 void setUp(void) {
-  TEST_ASSERT(storage_test_setup(&connection, &config, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
+  TEST_ASSERT(storage_test_setup(&connection, &config, tangle_test_db_path, connection_type) == RC_OK);
 }
 
-void tearDown(void) {
-  TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, STORAGE_CONNECTION_TANGLE) == RC_OK);
-}
+void tearDown(void) { TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, connection_type) == RC_OK); }
 
 static void store_test_transaction(iota_transaction_t* const transaction) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
@@ -564,9 +563,25 @@ static void test_state_delta_load_found(void) {
   state_delta_destroy(&state_delta2);
 }
 
-static void test_spent_address_store(void) {}
+static void test_spent_address_store(void) {
+  TEST_ASSERT(storage_spent_address_store(&connection, TEST_TX_HASH) == RC_OK);
+}
 
-static void test_spent_address_exist(void) {}
+static void test_spent_address_exist_false(void) {
+  bool exist = true;
+
+  TEST_ASSERT(storage_spent_address_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
+
+static void test_spent_address_exist_true(void) {
+  bool exist = false;
+
+  TEST_ASSERT(storage_spent_address_store(&connection, TEST_TX_HASH) == RC_OK);
+
+  TEST_ASSERT(storage_spent_address_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+}
 
 static void test_spent_addresses_store(void) {}
 
@@ -787,7 +802,9 @@ int main(void) {
 
   config.db_path = tangle_test_db_path;
 
-  // RUN_TEST(test_connection_init_destroy);
+  connection_type = STORAGE_CONNECTION_TANGLE;
+
+  RUN_TEST(test_connection_init_destroy);
 
   RUN_TEST(test_transaction_count);
   RUN_TEST(test_transaction_store);
@@ -831,8 +848,13 @@ int main(void) {
   RUN_TEST(test_state_delta_load_not_found);
   RUN_TEST(test_state_delta_load_found);
 
+  connection_type = STORAGE_CONNECTION_SPENT_ADDRESSES;
+
+  RUN_TEST(test_connection_init_destroy);
+
   RUN_TEST(test_spent_address_store);
-  RUN_TEST(test_spent_address_exist);
+  RUN_TEST(test_spent_address_exist_false);
+  RUN_TEST(test_spent_address_exist_true);
   RUN_TEST(test_spent_addresses_store);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
