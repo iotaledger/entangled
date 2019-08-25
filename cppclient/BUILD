@@ -1,6 +1,8 @@
 cc_library(
     name = "beast",
-    srcs = ["beast.cc"],
+    srcs = [
+        "beast.cc",
+    ],
     hdrs = ["beast.h"],
     visibility = ["//visibility:public"],
     deps = [

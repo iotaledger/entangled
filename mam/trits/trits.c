@@ -504,7 +504,7 @@ bool trits_inc(trits_t x) {
 }
 
 trits_t trits_alloc(size_t n) {
-  trit_t *p = malloc(n);
+  trit_t *p = (trit_t *)malloc(n);
   return trits_from_rep(n, p);
 }
 

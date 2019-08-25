@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include <boost/beast/http.hpp>
 #include <nlohmann/json_fwd.hpp>
 
 #include "cppclient/api.h"
@@ -24,13 +25,16 @@ namespace cppclient {
 class BeastIotaAPI : virtual public IotaAPI, public IotaJsonAPI {
  public:
   BeastIotaAPI() = delete;
-  BeastIotaAPI(std::string host, uint32_t port) : _host(std::move(host)), _port(port) {}
+  BeastIotaAPI(std::string host, uint32_t port, bool useSsl) : IotaAPI(useSsl), _host(std::move(host)), _port(port) {}
   virtual ~BeastIotaAPI() {}
 
  protected:
   nonstd::optional<nlohmann::json> post(const nlohmann::json& input) override;
+  nonstd::optional<nlohmann::json> postSsl(const nlohmann::json& input);
+  nonstd::optional<nlohmann::json> postPlainText(const nlohmann::json& input);
 
  private:
+  boost::beast::http::request<boost::beast::http::string_body> setupRequest(const nlohmann::json& input) const;
   const std::string _host;
   const uint32_t _port;
 };

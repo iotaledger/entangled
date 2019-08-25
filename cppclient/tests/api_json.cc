@@ -28,6 +28,7 @@ class IotaJsonAPITest : public ::testing::Test {};
 
 class MockAPI : public IotaJsonAPI {
  public:
+  MockAPI() : IotaAPI(false) {}
   json request;
   nonstd::optional<json> response;
 

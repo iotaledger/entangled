@@ -368,18 +368,18 @@ retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
   memset(mss, 0, sizeof(mam_mss_t));
   ERR_GUARD_RETURN(height <= MAM_MSS_MAX_D, RC_MAM_INVALID_ARGUMENT);
 
-  mss->auth_path = malloc(sizeof(trit_t) * MAM_MSS_MT_AUTH_WORDS(height));
+  mss->auth_path = (trit_t *)malloc(sizeof(trit_t) * MAM_MSS_MT_AUTH_WORDS(height));
   ERR_GUARD_RETURN(mss->auth_path, RC_OOM);
 
   /* add 1 extra hash for dirty hack (see mss.c) */
-  mss->nodes_hashes = malloc(sizeof(trit_t) * MAM_MSS_MT_HASH_WORDS(height, 1));
+  mss->nodes_hashes = (trit_t *)malloc(sizeof(trit_t) * MAM_MSS_MT_HASH_WORDS(height, 1));
   ERR_GUARD_RETURN(mss->nodes_hashes, RC_OOM);
 
   /* add 1 extra node for dirty hack (see mss.c) */
-  mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM_MSS_MT_NODES(height) + 1));
+  mss->nodes = (mss_mt_node_t *)malloc(sizeof(mss_mt_node_t) * (MAM_MSS_MT_NODES(height) + 1));
   ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 
-  mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM_MSS_MT_STACKS(height));
+  mss->stacks = (mss_mt_stack_t *)malloc(sizeof(mss_mt_stack_t) * MAM_MSS_MT_STACKS(height));
   ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 
   /* do not free here in case of error */

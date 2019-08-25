@@ -30,8 +30,10 @@ void BlowballCollector::collect() {
   using namespace prometheus;
   VLOG(3) << __FUNCTION__;
 
-  _zmqObservable = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-      [&](auto s) { zmqPublisher(std::move(s), _zmqPublisher); });
+  if (urlToZmqObservables.find(_zmqPublisher) == urlToZmqObservables.end()) {
+    urlToZmqObservables[_zmqPublisher] = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+        [&](auto s) { zmqPublisher(std::move(s), _zmqPublisher); });
+  }
 
   Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();
@@ -85,7 +87,8 @@ void BlowballCollector::analyzeBlowballs(const std::vector<double>& buckets) {
 
 void BlowballCollector::refCountPublishedTransactions() {
   auto counterFn = [](uint8_t& num) { ++num; };
-  _zmqObservable.observe_on(rxcpp::synchronize_new_thread())
+  urlToZmqObservables[_zmqPublisher]
+      .observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
           [&](std::shared_ptr<iri::IRIMessage> msg) {
             // assuming no tx is a milestone
