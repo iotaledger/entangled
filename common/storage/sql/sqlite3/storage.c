@@ -319,7 +319,7 @@ static void select_transactions_populate_metadata(sqlite3_stmt* const statement,
   transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, (*index)++));
 }
 
-retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count) {
+retcode_t storage_transaction_count(storage_connection_t const* const connection, uint64_t* const count) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_count;

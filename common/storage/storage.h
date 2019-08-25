@@ -70,7 +70,7 @@ typedef enum storage_value_type_e {
   INT64,
 } storage_value_type_t;
 
-extern retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count);
+extern retcode_t storage_transaction_count(storage_connection_t const* const connection, uint64_t* const count);
 
 extern retcode_t storage_transaction_store(storage_connection_t const* const connection,
                                            iota_transaction_t const* const transaction);

@@ -53,7 +53,29 @@ static void test_connection_init_destroy(void) {
   // Empty because connection init/destroy are handled by setUp/tearDown
 }
 
-static void test_transaction_count(void) {}
+static void test_transaction_count(void) {
+  uint64_t count = 0;
+  trit_t hash[HASH_LENGTH_TRIT];
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+  iota_transaction_t transaction;
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
+
+  TEST_ASSERT(storage_transaction_count(&connection, &count) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(count, 0);
+
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, transaction_hash(&transaction), HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
+  for (size_t i = 0; i < 10; i++) {
+    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+    TEST_ASSERT(storage_transaction_count(&connection, &count) == RC_OK);
+    TEST_ASSERT_EQUAL_INT(count, i + 1);
+    add_assign(hash, HASH_LENGTH_TRIT, 1);
+  }
+}
 
 static void test_transaction_store(void) {
   iota_transaction_t transaction;
