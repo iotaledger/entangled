@@ -12,21 +12,27 @@
 #include <string.h>
 
 #include "common/storage/defs.h"
+#include "utils/macros.h"
 
 /*
  * Generic statement builders
  */
 
 char *storage_statement_in_clause_build(size_t const count) {
-  char *in_clause = (char *)calloc(2 * count + 1, 1);
+  char *in_clause = NULL;
   size_t offset = 0;
 
   if (count != 0) {
+    in_clause = (char *)calloc(2 * count + 1, 1);
     for (size_t i = 0; i < count; i++) {
       offset += sprintf(in_clause + offset, "?,");
     }
     in_clause[offset - 1] = '\0';
+  } else {
+    in_clause = (char *)calloc(5, 1);
+    offset += sprintf(in_clause + offset, "NULL");
   }
+
   return in_clause;
 }
 
@@ -139,8 +145,8 @@ char *storage_statement_transaction_select_metadata =
 
 char *storage_statement_transaction_find_build(size_t const bundles_count, size_t const addresses_count,
                                                size_t const tags_count, size_t const approvees_count) {
-  // Base size of the query + enough space for '?' (bindings)
-  size_t statement_size = storage_statement_transaction_find_size + 2 * bundles_count + 2 * addresses_count +
+  // Base size of the query + enough space for "?" or "NULL" (bindings)
+  size_t statement_size = storage_statement_transaction_find_size + 16 + 2 * bundles_count + 2 * addresses_count +
                           2 * tags_count + 4 * approvees_count;
   char *statement = (char *)malloc(statement_size);
 
