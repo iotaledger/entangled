@@ -348,7 +348,6 @@ static void test_transaction_load_hashes_insufficient_capacity(void) {
 
   TEST_ASSERT(storage_transaction_load_hashes(&connection, TRANSACTION_FIELD_ADDRESS, transaction_address(&transaction),
                                               &pack) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 10);
   TEST_ASSERT_TRUE(pack.insufficient_capacity);
 
   hash_pack_free(&pack);
@@ -401,6 +400,8 @@ static void test_transaction_load_hashes(void) {
     TEST_ASSERT_EQUAL_MEMORY(pack.models[i], flex_hash, FLEX_TRIT_SIZE_243);
     add_assign(hash, HASH_LENGTH_TRIT, 2);
   }
+
+  hash_pack_reset(&pack);
 
   TEST_ASSERT(storage_transaction_load_hashes(&connection, TRANSACTION_FIELD_ADDRESS, second_address, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 5);
@@ -540,7 +541,7 @@ static void test_transactions_update_snapshot_index(void) {
                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   transaction_deserialize_from_trits(&transaction, transaction_trits, true);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, transaction_hash(&transaction), HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
   for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
@@ -557,6 +558,7 @@ static void test_transactions_update_snapshot_index(void) {
 
   for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    hash_pack_reset(&pack);
     TEST_ASSERT(storage_transaction_load_metadata(&connection, transaction_hash(&transaction), &pack) == RC_OK);
     if (i % 2) {
       TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(ptr), 42);
@@ -580,7 +582,7 @@ static void test_transactions_update_solidity(void) {
                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   transaction_deserialize_from_trits(&transaction, transaction_trits, true);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, transaction_hash(&transaction), HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
   for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
@@ -597,6 +599,7 @@ static void test_transactions_update_solidity(void) {
 
   for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    hash_pack_reset(&pack);
     TEST_ASSERT(storage_transaction_load_metadata(&connection, transaction_hash(&transaction), &pack) == RC_OK);
     if (i % 2) {
       TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), true);
