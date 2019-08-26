@@ -545,8 +545,8 @@ done:
 }
 
 retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
-                                                                  iota_stor_pack_t* const pack,
-                                                                  flex_trit_t const* const coordinator) {
+                                                                  flex_trit_t const* const coordinator,
+                                                                  iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_milestone_candidates;
