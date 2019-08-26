@@ -9,6 +9,16 @@ cc_test(
 )
 
 cc_test(
+    name = "test_ptrits",
+    timeout = "short",
+    srcs = ["test_ptrits.c"],
+    deps = [
+        "//common/trinary:ptrits",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_byte",
     timeout = "short",
     srcs = ["test_trit_byte.c"],
