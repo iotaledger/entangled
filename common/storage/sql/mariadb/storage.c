@@ -580,7 +580,6 @@ retcode_t storage_transaction_load_hashes(storage_connection_t const* const conn
                                           iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
   MYSQL_STMT* mariadb_statement = NULL;
-  retcode_t ret = RC_OK;
   size_t num_bytes_key;
   MYSQL_BIND bind[1];
 
@@ -757,8 +756,20 @@ retcode_t storage_transactions_delete(storage_connection_t const* const connecti
 retcode_t storage_bundle_update_validity(storage_connection_t const* const connection,
                                          bundle_transactions_t const* const bundle, bundle_status_t const status) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  iota_transaction_t* tx = NULL;
 
-  return RC_OK;
+  if ((ret = start_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  BUNDLE_FOREACH(bundle, tx) {
+    if ((ret = storage_transaction_update_validity(connection, transaction_hash(tx), status)) != RC_OK) {
+      break;
+    }
+  }
+
+  return end_transaction((MYSQL*)&mariadb_connection->db, ret);
 }
 
 retcode_t storage_milestone_clear(storage_connection_t const* const connection) {
