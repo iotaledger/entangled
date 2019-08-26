@@ -659,8 +659,65 @@ retcode_t storage_transaction_find(storage_connection_t const* const connection,
                                    hash243_queue_t const addresses, hash81_queue_t const tags,
                                    hash243_queue_t const approvees, iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  MYSQL_STMT* mariadb_statement = NULL;
+  size_t bundles_count = hash243_queue_count(bundles);
+  size_t addresses_count = hash243_queue_count(addresses);
+  size_t tags_count = hash81_queue_count(tags);
+  size_t approvees_count = hash243_queue_count(approvees);
+  hash243_queue_entry_t* iter243 = NULL;
+  hash81_queue_entry_t* iter81 = NULL;
+  size_t column = 0;
+  char* statement =
+      storage_statement_transaction_find_build(bundles_count, addresses_count, tags_count, approvees_count);
+  MYSQL_BIND bind[50];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  if ((ret = prepare_statement((MYSQL*)&mariadb_connection->db, &mariadb_statement, statement)) != RC_OK) {
+    goto done;
+  }
+
+  bool if_bundles = !bundles_count;
+  column_compress_bind(bind, column++, &if_bundles, MYSQL_TYPE_TINY, -1);
+
+  CDL_FOREACH(bundles, iter243) {
+    column_compress_bind(bind, column++, iter243->hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  }
+
+  bool if_addresses = !addresses_count;
+  column_compress_bind(bind, column++, &if_addresses, MYSQL_TYPE_TINY, -1);
+
+  CDL_FOREACH(addresses, iter243) {
+    column_compress_bind(bind, column++, iter243->hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  }
+
+  bool if_tags = !tags_count;
+  column_compress_bind(bind, column++, &if_tags, MYSQL_TYPE_TINY, -1);
+
+  CDL_FOREACH(tags, iter81) { column_compress_bind(bind, column++, iter81->hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_81); }
+
+  bool if_approvees = !approvees_count;
+  column_compress_bind(bind, column++, &if_approvees, MYSQL_TYPE_TINY, -1);
+
+  CDL_FOREACH(approvees, iter243) {
+    column_compress_bind(bind, column, iter243->hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+    column_compress_bind(bind, column + approvees_count, iter243->hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+    column++;
+  }
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  ret = storage_hashes_load_generic(mariadb_statement, pack);
+
+done:
+  finalize_statement(mariadb_statement);
+  free(statement);
+
+  return ret;
 }
 
 retcode_t storage_transaction_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
