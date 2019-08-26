@@ -330,6 +330,52 @@ static retcode_t storage_transaction_update_generic(MYSQL_STMT* const mariadb_st
   return RC_OK;
 }
 
+static retcode_t storage_hashes_load_generic(MYSQL_STMT* const mariadb_statement, iota_stor_pack_t* const pack) {
+  size_t i = 0;
+  size_t length = 0;
+  MYSQL_BIND bind[1];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+
+  memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+
+  if (mysql_stmt_execute(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  memset(bind, 0, sizeof(bind));
+
+  bind[0].buffer = (char*)hash;
+  bind[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind[0].buffer_length = FLEX_TRIT_SIZE_243;
+  bind[0].length = &length;
+
+  if (mysql_stmt_bind_result(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  if (mysql_stmt_store_result(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
+
+  pack->num_loaded = mysql_stmt_num_rows(mariadb_statement);
+  pack->insufficient_capacity = pack->num_loaded > pack->capacity;
+
+  if (pack->num_loaded == 0 || pack->insufficient_capacity == true) {
+    return RC_OK;
+  }
+
+  while (mysql_stmt_fetch(mariadb_statement) == 0) {
+    memcpy(pack->models[i], hash, FLEX_TRIT_SIZE_243);
+    memset(hash + length, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243 - length);
+    i++;
+  }
+
+  return RC_OK;
+}
+
 /**
  * Public functions
  */
@@ -533,9 +579,30 @@ retcode_t storage_transaction_load_hashes(storage_connection_t const* const conn
                                           storage_transaction_field_t const field, flex_trit_t const* const key,
                                           iota_stor_pack_t* const pack) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_by_address;
+  MYSQL_STMT* mariadb_statement = NULL;
+  retcode_t ret = RC_OK;
+  size_t num_bytes_key;
+  MYSQL_BIND bind[1];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  switch (field) {
+    case TRANSACTION_FIELD_ADDRESS:
+      mariadb_statement = mariadb_connection->statements.transaction_select_hashes_by_address;
+      num_bytes_key = FLEX_TRIT_SIZE_243;
+      break;
+    default:
+      return RC_STORAGE_FAILED_NOT_IMPLEMENTED;
+  }
+
+  column_compress_bind(bind, 0, key, MYSQL_TYPE_BLOB, num_bytes_key);
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return storage_hashes_load_generic(mariadb_statement, pack);
 }
 
 retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
