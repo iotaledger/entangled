@@ -35,6 +35,30 @@ retcode_t finalize_statement(MYSQL_STMT* const mariadb_statement) {
   return RC_OK;
 }
 
+retcode_t start_transaction(MYSQL* const db) {
+  if (mysql_query(db, "START TRANSACTION") != 0) {
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  return RC_OK;
+}
+
+retcode_t commit_transaction(MYSQL* const db) {
+  if (mysql_query(db, "COMMIT") != 0) {
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  return RC_OK;
+}
+
+retcode_t rollback_transaction(MYSQL* const db) {
+  if (mysql_query(db, "ROLLBACK") != 0) {
+    return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  return RC_OK;
+}
+
 void column_compress_bind(MYSQL_BIND* const bind, size_t const index, void const* const data,
                           enum enum_field_types const type, size_t const num_bytes) {
   ssize_t i = num_bytes - 1;
