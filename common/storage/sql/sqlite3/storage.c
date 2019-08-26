@@ -517,7 +517,7 @@ done:
 
 retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
                                                        flex_trit_t const* const approvee_hash,
-                                                       iota_stor_pack_t* const pack, int64_t before_timestamp) {
+                                                       iota_stor_pack_t* const pack, uint64_t before_timestamp) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement =
