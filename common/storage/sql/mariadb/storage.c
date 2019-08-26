@@ -968,6 +968,27 @@ retcode_t storage_spent_address_exist(storage_connection_t const* const connecti
 retcode_t storage_spent_addresses_store(storage_connection_t const* const connection, hash243_set_t const addresses) {
   mariadb_spent_addresses_connection_t const* mariadb_connection =
       (mariadb_spent_addresses_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  retcode_t ret_rollback = RC_OK;
+  hash243_set_entry_t *iter = NULL, *tmp = NULL;
 
-  return RC_OK;
+  if ((ret = start_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  HASH_SET_ITER(addresses, iter, tmp) {
+    if ((ret = storage_spent_address_store(connection, iter->hash)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  if (ret != RC_OK) {
+    if ((ret_rollback = rollback_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+
+  return commit_transaction((MYSQL*)&mariadb_connection->db);
 }
