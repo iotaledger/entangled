@@ -402,7 +402,7 @@ static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts, f
 retcode_t iota_consensus_transaction_solidifier_update_status(transaction_solidifier_t *const ts,
                                                               tangle_t *const tangle, iota_transaction_t *const tx) {
   retcode_t ret = RC_OK;
-  size_t approvers_count = 0;
+  uint64_t approvers_count = 0;
 
   if ((ret = requester_clear_request(ts->transaction_requester, transaction_hash(tx))) != RC_OK) {
     return ret;

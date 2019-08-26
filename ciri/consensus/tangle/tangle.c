@@ -28,7 +28,7 @@ retcode_t iota_tangle_destroy(tangle_t *const tangle) {
  * Transaction operations
  */
 
-retcode_t iota_tangle_transaction_count(tangle_t const *const tangle, size_t *const count) {
+retcode_t iota_tangle_transaction_count(tangle_t const *const tangle, uint64_t *const count) {
   return storage_transaction_count(&tangle->connection, count);
 }
 
@@ -149,7 +149,7 @@ retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle, storage_tr
 }
 
 retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle, flex_trit_t const *const hash,
-                                                  size_t *const count) {
+                                                  uint64_t *const count) {
   return storage_transaction_approvers_count(&tangle->connection, hash, count);
 }
 
