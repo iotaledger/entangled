@@ -367,6 +367,22 @@ static void test_transaction_approvers_count(void) {
 
 static void test_transaction_find(void) {}
 
+static void test_transaction_delete(void) {
+  iota_transaction_t transaction;
+  bool exist;
+
+  store_test_transaction(&transaction);
+
+  exist = false;
+  TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+
+  TEST_ASSERT(storage_transaction_delete(&connection, TEST_TX_HASH) == RC_OK);
+
+  TEST_ASSERT(storage_transaction_exist(&connection, TRANSACTION_FIELD_HASH, TEST_TX_HASH, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+}
+
 static void test_transactions_metadata_clear(void) {
   DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
   iota_transaction_t transaction;
@@ -915,6 +931,7 @@ int main(void) {
   RUN_TEST(test_transaction_load_hashes_of_milestone_candidates);
   RUN_TEST(test_transaction_approvers_count);
   RUN_TEST(test_transaction_find);
+  RUN_TEST(test_transaction_delete);
   RUN_TEST(test_transactions_metadata_clear);
   RUN_TEST(test_transactions_update_snapshot_index);
   RUN_TEST(test_transactions_update_solidity);

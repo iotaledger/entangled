@@ -790,6 +790,25 @@ done:
   return ret;
 }
 
+retcode_t storage_transaction_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_delete;
+  retcode_t ret = RC_OK;
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_STORAGE_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
 retcode_t storage_transactions_metadata_clear(storage_connection_t const* const connection) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
