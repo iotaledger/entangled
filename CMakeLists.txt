@@ -9,7 +9,11 @@ cmake_minimum_required(VERSION 3.5)
 
 cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 
-project(entangled DESCRIPTION "IOTA Entangled Monorepo")
+if(${CMAKE_VERSION} VERSION_LESS "3.9.6")
+  project(entangled)
+else()
+  project(entangled DESCRIPTION "IOTA Entangled Monorepo")
+endif()
 
 enable_language(C)
 enable_language(CXX)
