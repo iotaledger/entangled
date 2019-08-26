@@ -132,13 +132,19 @@ add_library(entangled::cclient ALIAS cclient)
 
 add_dependencies(cclient
   entangled::common
-  cjson
-  http_parser
+  ext_cjson
+  ext_http_parser
 )
 
 target_link_libraries(cclient PUBLIC
-  ${ENTANGLED_COMMON}
+  common
+  ${EXTERNAL_LINK_LIBS}
+  ${EXT_LIB_UNITY}
+  Threads::Threads
 )
+
+install(TARGETS cclient DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/cclient/" DESTINATION "${CMAKE_INSTALL_PREFIX}/include/entangled/cclient" FILES_MATCHING PATTERN "*.h")
 
 if(${CCLIENT_TEST})
   # ==============API test cases================
@@ -148,10 +154,10 @@ if(${CCLIENT_TEST})
       set_property(TARGET ${test_name} PROPERTY C_STANDARD 99)
     endif()
     target_include_directories(${test_name} PRIVATE ${PROJECT_SOURCE_DIR} ${EXTERNAL_INCLUDE_DIR})
-    add_dependencies(${test_name} entangled::cclient unity)
+    add_dependencies(${test_name} entangled::cclient ext_unity)
     target_link_libraries(${test_name} PRIVATE
-      ${ENTANGLED_CCLIENT}
-      ${ENTANGLED_COMMON}
+      cclient
+      common
       ${EXTERNAL_LINK_LIBS}
       ${EXT_LIB_UNITY}
       Threads::Threads

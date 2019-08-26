@@ -9,7 +9,7 @@ if (NOT __EMBEAR_LOGGER_INCLUDED)
   set(__EMBEAR_LOGGER_INCLUDED TRUE)
 
   ExternalProject_Add(
-    embear_logger
+    ext_embear_logger
     PREFIX ${EXTERNAL_BUILD_DIR}/embear_logger
     DOWNLOAD_DIR ${EXTERNAL_DOWNLOAD_DIR}
     DOWNLOAD_NAME embear_logger_v4.0.x.tar.gz
@@ -27,6 +27,6 @@ if (NOT __EMBEAR_LOGGER_INCLUDED)
     # LOG_INSTALL 1
   )
 
-  list(APPEND EXTERNAL_LINK_LIBS "${CMAKE_INSTALL_PREFIX}/lib/liblogger.a")
+  list(APPEND EXTERNAL_LINK_LIBS logger)
 
 endif()

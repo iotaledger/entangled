@@ -9,7 +9,7 @@ if (NOT __CJSON_INCLUDED)
   set(__CJSON_INCLUDED TRUE)
 
   ExternalProject_Add(
-    cjson
+    ext_cjson
     PREFIX ${EXTERNAL_BUILD_DIR}/cjson
     DOWNLOAD_DIR ${EXTERNAL_DOWNLOAD_DIR}
     DOWNLOAD_NAME cjson_v1.7.12.tar.gz
@@ -28,6 +28,6 @@ if (NOT __CJSON_INCLUDED)
   )
 
   include_directories("${CMAKE_INSTALL_PREFIX}/include/cjson")
-  list(APPEND EXTERNAL_LINK_LIBS "${CMAKE_INSTALL_PREFIX}/lib/libcjson.a")
+  list(APPEND EXTERNAL_LINK_LIBS cjson)
 
 endif()

@@ -20,7 +20,7 @@ if (NOT __HTTP_PARSER_INCLUDED)
     BUILD_COMMAND ""
   )
 
-  set(http_parser_cmake_dir ${EXTERNAL_BUILD_DIR}/http_parser/src/http_parser)
+  set(http_parser_cmake_dir ${EXTERNAL_BUILD_DIR}/http_parser/src/ext_http_parser)
   set(http_parser_src_dir ../http_parser_download)
   set(http_parser_install_include ${CMAKE_INSTALL_PREFIX}/include)
   set(http_parser_install_lib ${CMAKE_INSTALL_PREFIX}/lib)
@@ -37,7 +37,7 @@ if (NOT __HTTP_PARSER_INCLUDED)
   )
 
   ExternalProject_Add(
-    http_parser
+    ext_http_parser
     PREFIX ${EXTERNAL_BUILD_DIR}/http_parser
     DOWNLOAD_COMMAND ""
     BUILD_IN_SOURCE TRUE
@@ -49,8 +49,7 @@ if (NOT __HTTP_PARSER_INCLUDED)
     # LOG_CONFIGURE 1
     # LOG_INSTALL 1
   )
-  add_dependencies(http_parser http_parser_download) 
-
-  list(APPEND EXTERNAL_LINK_LIBS "${CMAKE_INSTALL_PREFIX}/lib/libhttp_parser.a")
+  add_dependencies(ext_http_parser http_parser_download)
+  list(APPEND EXTERNAL_LINK_LIBS http_parser)
 
 endif()

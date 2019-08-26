@@ -22,7 +22,7 @@ if (NOT __UNITY_INCLUDED)
     # LOG_DOWNLOAD 1
   )
 
-  set(unity_cmake_dir ${EXTERNAL_BUILD_DIR}/unity/src/unity)
+  set(unity_cmake_dir ${EXTERNAL_BUILD_DIR}/unity/src/ext_unity)
   set(unity_src_dir ../unity_download)
   set(unity_install_include ${CMAKE_INSTALL_PREFIX}/include/unity)
   set(unity_install_lib ${CMAKE_INSTALL_PREFIX}/lib)
@@ -39,7 +39,7 @@ if (NOT __UNITY_INCLUDED)
   )
 
   ExternalProject_Add(
-    unity 
+    ext_unity
     PREFIX ${EXTERNAL_BUILD_DIR}/unity
     DOWNLOAD_COMMAND ""
     BUILD_IN_SOURCE TRUE
@@ -50,8 +50,7 @@ if (NOT __UNITY_INCLUDED)
     # LOG_CONFIGURE 1
     # LOG_INSTALL 1
   )
-  add_dependencies(unity unity_download) 
-
-  set(EXT_LIB_UNITY "${CMAKE_INSTALL_PREFIX}/lib/libunity.a")
+  add_dependencies(ext_unity unity_download)
+  set(EXT_LIB_UNITY unity)
 
 endif()

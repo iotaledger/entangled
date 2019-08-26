@@ -11,7 +11,7 @@ if (NOT __MBEDTLS_INCLUDED)
   ExternalProject_Add(
     mbedtls_download
     PREFIX ${EXTERNAL_BUILD_DIR}/mbedtls
-    SOURCE_DIR ${EXTERNAL_BUILD_DIR}/mbedtls/src/mbedtls
+    SOURCE_DIR ${EXTERNAL_BUILD_DIR}/mbedtls/src/ext_mbedtls
     DOWNLOAD_DIR ${EXTERNAL_DOWNLOAD_DIR}
     DOWNLOAD_NAME mbedtls_v2.17.0.tar.gz
     URL https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.17.0.tar.gz
@@ -26,7 +26,7 @@ if (NOT __MBEDTLS_INCLUDED)
   ExternalProject_Add(
     crypto_download
     PREFIX ${EXTERNAL_BUILD_DIR}/mbedtls
-    SOURCE_DIR ${EXTERNAL_BUILD_DIR}/mbedtls/src/mbedtls/crypto
+    SOURCE_DIR ${EXTERNAL_BUILD_DIR}/mbedtls/src/ext_mbedtls/crypto
     DOWNLOAD_DIR ${EXTERNAL_DOWNLOAD_DIR}
     DOWNLOAD_NAME crypto_a78c958b17d75ddf.tar.gz
     URL https://github.com/ARMmbed/mbed-crypto/archive/a78c958b17d75ddf63d8dd17255b6379dcbf259f.tar.gz
@@ -39,7 +39,7 @@ if (NOT __MBEDTLS_INCLUDED)
   )
 
   ExternalProject_Add(
-    mbedtls
+    ext_mbedtls
     PREFIX ${EXTERNAL_BUILD_DIR}/mbedtls
     DOWNLOAD_COMMAND ""
     CMAKE_ARGS
@@ -53,12 +53,11 @@ if (NOT __MBEDTLS_INCLUDED)
   )
 
   add_dependencies(crypto_download mbedtls_download )
-  add_dependencies(mbedtls crypto_download)
-
+  add_dependencies(ext_mbedtls crypto_download)
   list(APPEND EXTERNAL_LINK_LIBS
-    "${CMAKE_INSTALL_PREFIX}/lib/libmbedtls.a"
-    "${CMAKE_INSTALL_PREFIX}/lib/libmbedcrypto.a"
-    "${CMAKE_INSTALL_PREFIX}/lib/libmbedx509.a"
+    mbedtls
+    mbedcrypto
+    mbedx509
   )
 
 endif()

@@ -36,13 +36,15 @@ include_directories(
   "${PROJECT_SOURCE_DIR}"
 )
 
+# libs in the sandbox
+link_directories("${CMAKE_INSTALL_PREFIX}/lib")
+
 set(EXTERNAL_BUILD_DIR "${PROJECT_BINARY_DIR}/external")
 set(EXTERNAL_DOWNLOAD_DIR "${PROJECT_BINARY_DIR}/download")
 set(EXTERNAL_INSTALL_DIR "${PROJECT_BINARY_DIR}/install")
+set(EXTERNAL_INSTALL_BIN_DIR "${PROJECT_BINARY_DIR}/install/bin")
 set(EXTERNAL_INCLUDE_DIR "${EXTERNAL_INSTALL_DIR}/include")
 set(EXTERNAL_LINK_LIBS "")
-set(ENTANGLED_COMMON "${PROJECT_BINARY_DIR}/libcommon.a")
-set(ENTANGLED_CCLIENT "${PROJECT_BINARY_DIR}/cclient/libcclient.a")
 
 # external libs
 include(cmake/embear_logger.cmake)
@@ -119,6 +121,16 @@ add_custom_command(
   "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash243_stack.c"
   "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash6561_stack.c"
   "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash8019_stack.c"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash27_queue.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash81_queue.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash243_queue.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash6561_queue.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash8019_queue.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash27_stack.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash81_stack.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash243_stack.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash6561_stack.h"
+  "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash8019_stack.h"
   COMMAND "./cmake/gen_hash_container.sh"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
@@ -152,14 +164,19 @@ add_library(common
 add_library(entangled::common ALIAS common)
 target_include_directories(common PUBLIC ${PROJECT_SOURCE_DIR})
 add_dependencies(common 
-  uthash
-  keccak
-  embear_logger
-  mbedtls
+  ext_uthash
+  ext_keccak
+  ext_embear_logger
+  ext_mbedtls
 )
 
 list(APPEND EXTERNAL_LINK_LIBS "${EXTERNAL_LINK_LIBS}" Threads::Threads)
 target_link_libraries(common PUBLIC "${EXTERNAL_LINK_LIBS}")
+
+# install
+install(TARGETS common DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/common/" DESTINATION "${CMAKE_INSTALL_PREFIX}/include/entangled/common" FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/utils/" DESTINATION "${CMAKE_INSTALL_PREFIX}/include/entangled/utils" FILES_MATCHING PATTERN "*.h")
 
 # remove build files
 add_custom_target(clean_build 
@@ -173,6 +190,7 @@ add_custom_target(clean_build
     Testing
     cmake_install.cmake 
     build_*
+    install_manifest.txt
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 

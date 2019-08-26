@@ -9,7 +9,7 @@ if (NOT __UTHASH_INCLUDED)
   set(__UTHASH_INCLUDED TRUE)
 
   ExternalProject_Add(
-    uthash 
+    ext_uthash
     PREFIX ${EXTERNAL_BUILD_DIR}/uthash
     DOWNLOAD_DIR ${EXTERNAL_DOWNLOAD_DIR}
     DOWNLOAD_NAME uthash_v2.1.0.tar.gz

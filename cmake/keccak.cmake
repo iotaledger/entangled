@@ -22,7 +22,7 @@ if (NOT __KECCAK_INCLUDED)
     # LOG_DOWNLOAD 1
   )
 
-  set(keccak_cmake_dir ${EXTERNAL_BUILD_DIR}/keccak/src/keccak)
+  set(keccak_cmake_dir ${EXTERNAL_BUILD_DIR}/keccak/src/ext_keccak)
   set(keccak_src_dir ../keccak_download)
   set(keccak_install_include ${CMAKE_INSTALL_PREFIX}/include/keccak)
   set(keccak_install_lib ${CMAKE_INSTALL_PREFIX}/lib)
@@ -46,7 +46,7 @@ if (NOT __KECCAK_INCLUDED)
     )
 
   ExternalProject_Add(
-    keccak
+    ext_keccak
     PREFIX ${EXTERNAL_BUILD_DIR}/keccak
     DOWNLOAD_COMMAND ""
     BUILD_IN_SOURCE TRUE
@@ -57,8 +57,7 @@ if (NOT __KECCAK_INCLUDED)
     # LOG_CONFIGURE 1
     # LOG_INSTALL 1
   )
-  add_dependencies(keccak keccak_download) 
-
-  list(APPEND EXTERNAL_LINK_LIBS "${CMAKE_INSTALL_PREFIX}/lib/libkeccak.a")
+  add_dependencies(ext_keccak keccak_download)
+  list(APPEND EXTERNAL_LINK_LIBS keccak)
 
 endif()
