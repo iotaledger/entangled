@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
   }
 
   {
-    size_t count = 0;
+    uint64_t count = 0;
 
     while (ciri_core.running) {
       if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {
