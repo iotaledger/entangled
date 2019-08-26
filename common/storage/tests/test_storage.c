@@ -490,7 +490,9 @@ static void test_transaction_approvers_count(void) {
   TEST_ASSERT_EQUAL_INT(count, 10);
 }
 
-static void test_transaction_find(void) {}
+static void test_transaction_find(void) {
+  // This test is delegated to //ciri/api/tests:test_find_transactions which is extremely complete
+}
 
 static void test_transaction_delete(void) {
   iota_transaction_t transaction;
