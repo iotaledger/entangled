@@ -7,7 +7,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <memory.h>
 #include <stdlib.h>
 
 #include "mam/mss/mss.h"

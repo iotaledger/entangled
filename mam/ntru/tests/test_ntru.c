@@ -8,7 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <memory.h>
 #include <unity/unity.h>
 
 #include "common/trinary/trit_tryte.h"
