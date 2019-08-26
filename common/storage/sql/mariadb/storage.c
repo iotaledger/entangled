@@ -615,12 +615,9 @@ retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t cons
 }
 
 retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
-                                                                  iota_stor_pack_t* const pack,
-                                                                  flex_trit_t const* const coordinator) {
-  mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_of_milestone_candidates;
-
-  return RC_OK;
+                                                                  flex_trit_t const* const coordinator,
+                                                                  iota_stor_pack_t* const pack) {
+  return storage_transaction_load_hashes(connection, TRANSACTION_FIELD_ADDRESS, coordinator, pack);
 }
 
 retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,

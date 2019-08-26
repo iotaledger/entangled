@@ -116,8 +116,8 @@ extern retcode_t storage_transaction_load_hashes_of_approvers(storage_connection
                                                               iota_stor_pack_t* const pack, int64_t before_timestamp);
 
 extern retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
-                                                                         iota_stor_pack_t* const pack,
-                                                                         flex_trit_t const* const coordinator);
+                                                                         flex_trit_t const* const coordinator,
+                                                                         iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
                                                      flex_trit_t const* const hash, uint64_t* const count);
