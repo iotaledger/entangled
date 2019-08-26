@@ -15,6 +15,9 @@ enable_language(C)
 enable_language(CXX)
 enable_testing()
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # default CLI options
 option(CCLIENT "Enable CClient library" ON)
 option(CCLIENT_TEST "Enable CClient library test cases" ON)
@@ -57,44 +60,49 @@ if(${MAM})
   add_subdirectory(mam)
 endif()
 
-
+set(COMMON_TRINARY_DIR "common/trinary")
+set(COMMON_CRYPTO_DIR "common/crypto")
+set(COMMON_HELPERS_DIR "common/helpers")
+set(COMMON_MODEL_DIR "common/model")
 set(COMMON_SRC 
   # error code 
   "common/errors.c"
   # trynary
-  "common/trinary/add.c"
-  "common/trinary/flex_trit.c"
-  "common/trinary/ptrit_incr.c"
-  "common/trinary/trit_array.c"
-  "common/trinary/trit_byte.c"
-  "common/trinary/trit_long.c"
-  "common/trinary/trit_ptrit.c"
-  "common/trinary/trit_tryte.c"
-  "common/trinary/tryte_ascii.c"
-  "common/trinary/tryte_long.c"
+  "${COMMON_TRINARY_DIR}/add.c"
+  "${COMMON_TRINARY_DIR}/flex_trit.c"
+  "${COMMON_TRINARY_DIR}/ptrit_incr.c"
+  "${COMMON_TRINARY_DIR}/trit_array.c"
+  "${COMMON_TRINARY_DIR}/trit_byte.c"
+  "${COMMON_TRINARY_DIR}/trit_long.c"
+  "${COMMON_TRINARY_DIR}/trit_ptrit.c"
+  "${COMMON_TRINARY_DIR}/trit_tryte.c"
+  "${COMMON_TRINARY_DIR}/tryte_ascii.c"
+  "${COMMON_TRINARY_DIR}/tryte_long.c"
   # curl
-  "common/crypto/curl-p/const.c"
-  "common/crypto/curl-p/curl_p.c"
-  "common/crypto/curl-p/digest.c"
-  #"common/crypto/curl-p/hashcash.c"
+  "${COMMON_CRYPTO_DIR}/curl-p/const.c"
+  "${COMMON_CRYPTO_DIR}/curl-p/curl_p.c"
+  "${COMMON_CRYPTO_DIR}/curl-p/digest.c"
+  "${COMMON_CRYPTO_DIR}/curl-p/hashcash.c"
+  "${COMMON_CRYPTO_DIR}/curl-p/pearl_diver.c"
+  "${COMMON_CRYPTO_DIR}/curl-p/ptrit.c"
   # kerl
-  "common/crypto/kerl/bigint.c"
-  "common/crypto/kerl/converter.c"
-  "common/crypto/kerl/kerl.c"
-  "common/crypto/kerl/hash.c"
+  "${COMMON_CRYPTO_DIR}/kerl/bigint.c"
+  "${COMMON_CRYPTO_DIR}/kerl/converter.c"
+  "${COMMON_CRYPTO_DIR}/kerl/kerl.c"
+  "${COMMON_CRYPTO_DIR}/kerl/hash.c"
   # sign
-  "common/crypto/iss/v1/iss_curl.c"
-  "common/crypto/iss/v1/iss_kerl.c"
-  "common/crypto/iss/normalize.c"
+  "${COMMON_CRYPTO_DIR}/iss/v1/iss_curl.c"
+  "${COMMON_CRYPTO_DIR}/iss/v1/iss_kerl.c"
+  "${COMMON_CRYPTO_DIR}/iss/normalize.c"
   # helpers
-  "common/helpers/checksum.c"
-  "common/helpers/digest.c"
-  "common/helpers/sign.c"
-  #"common/helpers/pow.c"
+  "${COMMON_HELPERS_DIR}/checksum.c"
+  "${COMMON_HELPERS_DIR}/digest.c"
+  "${COMMON_HELPERS_DIR}/sign.c"
+  "${COMMON_HELPERS_DIR}/pow.c"
   # models
-  "common/model/bundle.c"
-  "common/model/transaction.c"
-  "common/model/transfer.c"
+  "${COMMON_MODEL_DIR}/bundle.c"
+  "${COMMON_MODEL_DIR}/transaction.c"
+  "${COMMON_MODEL_DIR}/transfer.c"
 )
 
 set(HASH_CONTAINERS_DIR "utils/containers/hash")
@@ -121,6 +129,7 @@ set(UTILS_SRC
   "utils/handles/socket.c"
   "utils/char_buffer.c"
   "utils/memset_safe.c"
+  "utils/system.c"
   # hash container
   "${HASH_CONTAINERS_DIR}/hash_array.c"
   "${HASH_CONTAINERS_DIR}/hash27_queue.c"
@@ -149,6 +158,7 @@ add_dependencies(common
   mbedtls
 )
 
+list(APPEND EXTERNAL_LINK_LIBS "${EXTERNAL_LINK_LIBS}" Threads::Threads)
 target_link_libraries(common PUBLIC "${EXTERNAL_LINK_LIBS}")
 
 # remove build files

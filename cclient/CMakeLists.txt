@@ -154,12 +154,13 @@ if(${CCLIENT_TEST})
       ${ENTANGLED_COMMON}
       ${EXTERNAL_LINK_LIBS}
       ${EXT_LIB_UNITY}
+      Threads::Threads
     )
     add_test(${test_name} ${test_name})
   endfunction(add_cclient_test)
 
   add_cclient_test("test_add_neighbors.c" "test_add_neighbors")
-  # add_cclient_test("test_attach_to_tangle.c" "test_attach_to_tangle")
+  add_cclient_test("test_attach_to_tangle.c" "test_attach_to_tangle")
   add_cclient_test("test_broadcast_transactions.c" "test_broadcast_transactions")
   add_cclient_test("test_check_consistency.c" "test_check_consistency")
   add_cclient_test("test_find_transactions.c" "test_find_transactions")
