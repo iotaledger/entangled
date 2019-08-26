@@ -863,16 +863,19 @@ retcode_t storage_milestone_load_next(storage_connection_t const* const connecti
 retcode_t storage_milestone_exist(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                   bool* const exist) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.milestone_exist;
+  MYSQL_STMT* mariadb_statement = NULL;
   MYSQL_BIND bind[1];
 
-  memset(bind, 0, sizeof(bind));
-
-  column_compress_bind(bind, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
-
-  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
-    log_statement_error(mariadb_statement);
-    return RC_STORAGE_FAILED_BINDING;
+  if (hash) {
+    memset(bind, 0, sizeof(bind));
+    mariadb_statement = mariadb_connection->statements.milestone_exist_by_hash;
+    column_compress_bind(bind, 0, hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+    if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+      log_statement_error(mariadb_statement);
+      return RC_STORAGE_FAILED_BINDING;
+    }
+  } else {
+    mariadb_statement = mariadb_connection->statements.milestone_exist;
   }
 
   return execute_statement_exist(mariadb_statement, exist);

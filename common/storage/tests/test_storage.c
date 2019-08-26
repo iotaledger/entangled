@@ -782,18 +782,28 @@ static void test_milestone_load_next(void) {
 }
 
 static void test_milestone_exist_false(void) {
-  bool exist = true;
+  bool exist;
 
+  exist = true;
+  TEST_ASSERT(storage_milestone_exist(&connection, NULL, &exist) == RC_OK);
+  TEST_ASSERT_FALSE(exist);
+
+  exist = true;
   TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
   TEST_ASSERT_FALSE(exist);
 }
 
 static void test_milestone_exist_true(void) {
   iota_milestone_t milestone;
-  bool exist = false;
+  bool exist;
 
   store_test_milestone(&milestone);
 
+  exist = false;
+  TEST_ASSERT(storage_milestone_exist(&connection, NULL, &exist) == RC_OK);
+  TEST_ASSERT_TRUE(exist);
+
+  exist = false;
   TEST_ASSERT(storage_milestone_exist(&connection, TEST_TX_HASH, &exist) == RC_OK);
   TEST_ASSERT_TRUE(exist);
 }
@@ -925,57 +935,6 @@ static void test_spent_addresses_store(void) {
 
   hash243_set_free(&addresses);
 }
-
-// void test_stored_load_hashes_by_address(void) {
-//   flex_trit_t *hashes[5];
-//   iota_stor_pack_t pack = {.models = (void **)hashes, .capacity = 5,
-//   .num_loaded = 0, .insufficient_capacity = false}; for (size_t i =
-//   0; i < 5; ++i) {
-//     hashes[i] = (flex_trit_t *)malloc(FLEX_TRIT_SIZE_243);
-//   }
-//
-//   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
-//   flex_trits_from_trytes(tx_test_trits,
-//   NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-//                          NUM_TRITS_SERIALIZED_TRANSACTION,
-//                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-//   iota_transaction_t *test_tx =
-//   transaction_deserialize(tx_test_trits, true);
-//
-//   TEST_ASSERT(storage_transaction_load_hashes(&connection,
-//   TRANSACTION_FIELD_ADDRESS, transaction_address(test_tx),
-//                                               &pack) == RC_OK);
-//   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-//   TEST_ASSERT_EQUAL_MEMORY(transaction_hash(test_tx), ((flex_trit_t
-//   *)pack.models[0]), FLEX_TRIT_SIZE_243);
-//
-//   for (size_t i = 0; i < 5; ++i) {
-//     free(hashes[i]);
-//   }
-//   transaction_free(test_tx);
-// }
-//
-// void test_stored_load_hashes_of_approvers(void) {
-//   flex_trit_t hashes[5][FLEX_TRIT_SIZE_243];
-//   iota_stor_pack_t pack = {.models = (void **)hashes, .capacity = 5,
-//   .num_loaded = 0, .insufficient_capacity = false};
-//
-//   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
-//   flex_trits_from_trytes(tx_test_trits,
-//   NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
-//                          NUM_TRITS_SERIALIZED_TRANSACTION,
-//                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-//   iota_transaction_t *test_tx =
-//   transaction_deserialize(tx_test_trits, true);
-//
-//   TEST_ASSERT(storage_transaction_load_hashes_of_approvers(&connection,
-//   transaction_address(test_tx), &pack, 0) ==
-//               RC_OK);
-//   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
-//
-//   transaction_free(test_tx);
-// }
-//
 
 int main(void) {
   UNITY_BEGIN();
