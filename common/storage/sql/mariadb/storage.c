@@ -598,15 +598,57 @@ retcode_t storage_transactions_metadata_clear(storage_connection_t const* const 
 retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
                                                      hash243_set_t const hashes, uint64_t const snapshot_index) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  retcode_t ret_rollback = RC_OK;
+  hash243_set_entry_t *iter = NULL, *tmp = NULL;
 
-  return RC_OK;
+  if ((ret = start_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  HASH_SET_ITER(hashes, iter, tmp) {
+    if ((ret = storage_transaction_update_snapshot_index(connection, iter->hash, snapshot_index)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  if (ret != RC_OK) {
+    if ((ret_rollback = rollback_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+
+  return commit_transaction((MYSQL*)&mariadb_connection->db);
 }
 
 retcode_t storage_transactions_update_solidity(storage_connection_t const* const connection, hash243_set_t const hashes,
                                                bool const is_solid) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  retcode_t ret_rollback = RC_OK;
+  hash243_set_entry_t *iter = NULL, *tmp = NULL;
 
-  return RC_OK;
+  if ((ret = start_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+    return ret;
+  }
+
+  HASH_SET_ITER(hashes, iter, tmp) {
+    if ((ret = storage_transaction_update_solidity(connection, iter->hash, is_solid)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  if (ret != RC_OK) {
+    if ((ret_rollback = rollback_transaction((MYSQL*)&mariadb_connection->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+
+  return commit_transaction((MYSQL*)&mariadb_connection->db);
 }
 
 retcode_t storage_transactions_delete(storage_connection_t const* const connection, hash243_set_t const hashes) {
