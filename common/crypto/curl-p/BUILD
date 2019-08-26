@@ -29,12 +29,81 @@ cc_library(
     ],
 )
 
+config_setting(
+    name = "pcurl_s2_circuit4",
+    values = {"define": "pcurl_s2_circuit=PCURL_S2_CIRCUIT4"},
+)
+
+config_setting(
+    name = "pcurl_s2_circuit5",
+    values = {"define": "pcurl_s2_circuit=PCURL_S2_CIRCUIT5"},
+)
+
+config_setting(
+    name = "pcurl_s2_args_lut",
+    values = {"define": "pcurl_s2_args=PCURL_S2_ARGS_LUT"},
+)
+
+config_setting(
+    name = "pcurl_s2_args_ptr",
+    values = {"define": "pcurl_s2_args=PCURL_S2_ARGS_PTR"},
+)
+
+config_setting(
+    name = "pcurl_state_double",
+    values = {"define": "pcurl_state=PCURL_STATE_DOUBLE"},
+)
+
+config_setting(
+    name = "pcurl_state_short",
+    values = {"define": "pcurl_state=PCURL_STATE_SHORT"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_1",
+    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_1"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_2",
+    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_2"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_4",
+    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_4"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_8",
+    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_8"},
+)
+
 cc_library(
     name = "ptrit",
     srcs = ["ptrit.c"],
     hdrs = [
         "ptrit.h",
     ],
+    defines = select({
+        ":pcurl_s2_circuit4": ["PCURL_S2_CIRCUIT4"],
+        ":pcurl_s2_circuit5": ["PCURL_S2_CIRCUIT5"],
+        "//conditions:default": ["PCURL_S2_CIRCUIT4"],
+    }) + select({
+        ":pcurl_s2_args_lut": ["PCURL_S2_ARGS_LUT"],
+        ":pcurl_s2_args_ptr": ["PCURL_S2_ARGS_PTR"],
+        "//conditions:default": ["PCURL_S2_ARGS_PTR"],
+    }) + select({
+        ":pcurl_state_double": ["PCURL_STATE_DOUBLE"],
+        ":pcurl_state_short": ["PCURL_STATE_SHORT"],
+        "//conditions:default": ["PCURL_STATE_SHORT"],
+    }) + select({
+        ":pcurl_sbox_unwind_1": ["PCURL_SBOX_UNWIND_1"],
+        ":pcurl_sbox_unwind_2": ["PCURL_SBOX_UNWIND_2"],
+        ":pcurl_sbox_unwind_4": ["PCURL_SBOX_UNWIND_4"],
+        ":pcurl_sbox_unwind_8": ["PCURL_SBOX_UNWIND_8"],
+        "//conditions:default": ["PCURL_SBOX_UNWIND_2"],
+    }),
     deps = [
         ":curl-p-const",
         "//common:stdint",

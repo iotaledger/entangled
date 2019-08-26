@@ -17,146 +17,158 @@
 #include "utils/handles/thread.h"
 #include "utils/system.h"
 
-typedef enum { SEARCH_RUNNING, SEARCH_INTERRUPT, SEARCH_FINISHED } SearchStatus;
+typedef enum { SEARCH_RUNNING, SEARCH_INTERRUPT, SEARCH_FINISHED } search_status_t;
 
 typedef struct {
-  unsigned short index;
-  unsigned short offset;
-  unsigned short end;
-  PCurl curl;
-  short (*test)(PCurl *, unsigned short);
-  unsigned short param;
-  SearchStatus *status;
+  size_t index;
+  pcurl_t pcurl;
+  size_t begin;
+  size_t end;
+  test_fun_t test;
+  test_arg_t param;
+  test_result_t result;
+  search_status_t status;
+  search_status_t volatile *overall_status;
   rw_lock_handle_t *statusLock;
 } SearchInstance;
 
-void init_inst(SearchInstance *const inst, SearchStatus *const status, rw_lock_handle_t *const statusLock,
-               unsigned short const index, PCurl *const curl, unsigned short const offset, unsigned short const end,
-               unsigned short const param, short (*test)(PCurl *const, unsigned short const));
-void pt_start(thread_handle_t *const tid, SearchInstance *const inst, unsigned short const index);
+void init_inst(size_t n, SearchInstance *const inst, pcurl_t *pcurl, size_t begin, size_t end, test_fun_t test,
+               test_arg_t param, search_status_t volatile *overall_status, rw_lock_handle_t *statusLock);
+void pt_start(size_t n, thread_handle_t *tid, SearchInstance *inst);
 void *run_search_thread(void *const data);
-short do_pd_search(short (*test)(PCurl *const, unsigned short const), SearchInstance *const inst, PCurl *const copy);
 
-PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset, unsigned short const end,
-                           short (*test)(PCurl *const, unsigned short const), unsigned short const param) {
-  unsigned short found_thread = 0, n_procs = system_cpu_available();
-
-  intptr_t found_index = -1;
-  SearchStatus status = SEARCH_RUNNING;
+PearlDiverStatus pd_search(Curl const *ctx, size_t begin, size_t end, test_fun_t test, test_arg_t param) {
+  PearlDiverStatus pd_status = PEARL_DIVER_ERROR;
+  size_t n_procs = system_cpu_available();
+  search_status_t overall_status;
   rw_lock_handle_t statusLock;
+  SearchInstance *inst = NULL;
+  thread_handle_t *tid = NULL;
 
-  if (rw_lock_handle_init(&statusLock)) {
-    return PEARL_DIVER_ERROR;
-  }
-
-  SearchInstance *inst = (SearchInstance *)calloc(n_procs, sizeof(SearchInstance));
-  thread_handle_t *tid = (thread_handle_t *)calloc(n_procs, sizeof(thread_handle_t));
-
-  {
-    PCurl curl;
-    ptrit_curl_init(&curl, CURL_P_81);
-    trits_to_ptrits_fill(ctx->state, curl.state, STATE_LENGTH);
-    ptrit_offset(&curl.state[offset], 4);
-    curl.type = ctx->type;
-    init_inst(inst, &status, &statusLock, n_procs, &curl, offset + 4, end, param, test);
-  }
-
-  pt_start(tid, inst, n_procs - 1);
-
-  for (int i = n_procs; --i >= 0;) {
-    if (tid[i] == 0) continue;
-
-    if (found_index == -1) {
-      thread_handle_join(tid[i], (void **)&found_index);
-
-      if (found_index != -1) {
-        found_thread = i;
-      }
-    } else {
-      thread_handle_join(tid[i], NULL);
+  do {
+    if (end < begin + PTRIT_SIZE_LOG3) {
+      break;
     }
-  }
 
-  switch (found_index) {
-    case -1:
-      free(inst);
-      free(tid);
+    if (rw_lock_handle_init(&statusLock)) {
+      break;
+    }
 
-      return PEARL_DIVER_ERROR;
-  }
+    inst = (SearchInstance *)calloc(n_procs, sizeof(SearchInstance));
+    if (NULL == inst) {
+      break;
+    }
+
+    tid = (thread_handle_t *)calloc(n_procs, sizeof(thread_handle_t));
+    if (NULL == tid) {
+      break;
+    }
+
+    // Initialize search instances
+    {
+      pcurl_t pcurl;
+      ptrit_curl_init(&pcurl, ctx->type);
+      // `pcurl` state is filled with the initial `ctx` state
+      ptrits_fill(STATE_LENGTH, pcurl.state, ctx->state);
+      // but rewritten from `begin` with values [N,N+1,...,N+PTRIT_SIZE) for some N, so all slices in `pcurl` state are
+      // already different
+      ptrits_set_iota(pcurl.state + begin);
+      // now initialize each thread search instance with a shorter search range [begin + PTRIT_SIZE_LOG3, end)
+      init_inst(n_procs, inst, &pcurl, begin + PTRIT_SIZE_LOG3, end, test, param, &overall_status, &statusLock);
+    }
+
+    overall_status = SEARCH_RUNNING;
+    pt_start(n_procs, tid, inst);
+
+    SearchInstance const *found_inst = NULL;
+    for (size_t i = n_procs; i--;) {
+      if (tid[i] == 0) continue;
+
+      test_result_t result = -1;
+      thread_handle_join(tid[i], (void **)&result);
+
+      if (!found_inst && result >= 0) {
+        size_t found_index = (size_t)result;
+        found_inst = inst + i;
+        pd_status = PEARL_DIVER_SUCCESS;
+
+        ptrits_set_slice(end - begin, inst->pcurl.state + begin, found_index, ctx->state + begin);
+      }
+    }
+  } while (0);
 
   rw_lock_handle_destroy(&statusLock);
-
-  ptrits_to_trits(&inst[found_thread].curl.state[offset], &ctx->state[offset], found_index, end - offset);
 
   free(inst);
   free(tid);
 
-  return PEARL_DIVER_SUCCESS;
+  return pd_status;
 }
 
-void init_inst(SearchInstance *const inst, SearchStatus *const status, rw_lock_handle_t *const statusLock,
-               unsigned short const index, PCurl *const curl, unsigned short const offset, unsigned short const end,
-               unsigned short const param, short (*test)(PCurl *const, unsigned short const)) {
-  if (index == 0) {
-    return;
+void init_inst(size_t n, SearchInstance *const inst, pcurl_t *pcurl, size_t begin, size_t end, test_fun_t test,
+               test_arg_t param, search_status_t volatile *overall_status, rw_lock_handle_t *statusLock) {
+  for (; n--;) {
+    *inst = (SearchInstance){.index = n,
+                             .begin = begin,
+                             .end = end,
+                             .test = test,
+                             .param = param,
+                             .result = -1,
+                             .overall_status = overall_status,
+                             .statusLock = statusLock};
+    memcpy(&(inst->pcurl), pcurl, sizeof(pcurl_t));
+    // in order to make search instances different from the initial `pcurl` state, `pcurl` state is incremented starting
+    // from `begin`
+    ptrit_increment(pcurl->state, begin, HASH_LENGTH_TRIT);
   }
-  *inst = (SearchInstance){.index = index - 1,
-                           .offset = offset,
-                           .end = end,
-                           .param = param,
-                           .status = status,
-                           .statusLock = statusLock,
-                           .test = test};
-  memcpy(&(inst->curl), curl, sizeof(PCurl));
-  init_inst(&inst[1], status, statusLock, index - 1, curl, offset, end, param, test);
 }
 
-void pt_start(thread_handle_t *const tid, SearchInstance *const inst, unsigned short const index) {
-  if (thread_handle_create(&tid[index], run_search_thread, ((void *)&inst[index]))) {
-    tid[index] = 0;
+void pt_start(size_t n, thread_handle_t *tid, SearchInstance *inst) {
+  for (; n--; ++tid, ++inst) {
+    if (thread_handle_create(tid, run_search_thread, (void *)inst)) {
+      // TODO: check thread_handle_create
+      *tid = 0;
+    }
   }
-  if (index == 0) {
-    return;
-  }
-  pt_start(tid, inst, index - 1);
 }
 
 void *run_search_thread(void *const data) {
-  unsigned short i;
-  PCurl copy;
-
   SearchInstance *inst = ((SearchInstance *)data);
+  pcurl_t copy;
 
-  for (i = 0; i < inst->index; i++) {
-    ptrit_increment(inst->curl.state, inst->offset, HASH_LENGTH_TRIT);
-  }
+  for (;;) {
+    // TODO: why rdlock is needed?
+    // `*inst->overall_status` is assigned with a correct value
+    rw_lock_handle_rdlock(inst->statusLock);
+    inst->status = *inst->overall_status;
+    rw_lock_handle_unlock(inst->statusLock);
 
-  intptr_t ret = do_pd_search(inst->test, inst, &copy);
-  return (void *)ret;
-}
+    if (inst->status != SEARCH_RUNNING) {
+      break;
+    }
 
-short do_pd_search(short (*test)(PCurl *const, unsigned short const), SearchInstance *const inst, PCurl *const copy) {
-  short index;
+    memcpy(&copy, &inst->pcurl, sizeof(pcurl_t));
+    ptrit_transform(&copy);
+    // test a transformed pcurl state
+    // TODO: make sure test returns negative result if failed
+    inst->result = inst->test(&copy, inst->param);
 
-  SearchStatus status = SEARCH_RUNNING;
-  while (status == SEARCH_RUNNING) {
-    memcpy(copy, &inst->curl, sizeof(PCurl));
-    ptrit_transform(copy);
-    index = test(copy, inst->param);
-    if (index >= 0) {
+    if (inst->result >= 0) {
+      // TODO: why wrlock is needed?
+      // `*inst->overall_status` is only assigned `SEARCH_FINISHED`
+      // if it were to be assigned another overall_status it should be checked within the lock
       rw_lock_handle_wrlock(inst->statusLock);
-      *inst->status = SEARCH_FINISHED;
+      // TODO: check for other overall_status values
+      *inst->overall_status = SEARCH_FINISHED;
       rw_lock_handle_unlock(inst->statusLock);
 
-      return index;
+      break;
     }
-    ptrit_increment(inst->curl.state, inst->offset + 1, HASH_LENGTH_TRIT);
 
-    rw_lock_handle_rdlock(inst->statusLock);
-    status = *inst->status;
-    rw_lock_handle_unlock(inst->statusLock);
+    // super strange why pcurl state is incremented from begin+1
+    // can't they overlap???
+    ptrit_increment(inst->pcurl.state, inst->begin + 1, HASH_LENGTH_TRIT);
   }
-  return -1;
-  // return do_pd_search(test, inst, copy);
+
+  return (void *)inst->result;
 }
