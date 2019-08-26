@@ -637,7 +637,43 @@ static void test_spent_address_exist_true(void) {
   TEST_ASSERT_TRUE(exist);
 }
 
-static void test_spent_addresses_store(void) {}
+static void test_spent_addresses_store(void) {
+  bool exist = true;
+  tryte_t address_trytes[HASH_LENGTH_TRYTE];
+  flex_trit_t address_trits[FLEX_TRIT_SIZE_243];
+  hash243_set_t addresses = NULL;
+
+  memset(address_trytes, '9', HASH_LENGTH_TRYTE);
+  address_trytes[0] = 'A';
+
+  for (size_t i = 0; i < 26; i++) {
+    flex_trits_from_trytes(address_trits, HASH_LENGTH_TRIT, address_trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    if (i % 2) {
+      TEST_ASSERT(hash243_set_add(&addresses, address_trits) == RC_OK);
+    }
+    address_trytes[0]++;
+  }
+
+  TEST_ASSERT(storage_spent_addresses_store(&connection, addresses) == RC_OK);
+
+  address_trytes[0] = 'A';
+
+  for (size_t i = 0; i < 26; i++) {
+    flex_trits_from_trytes(address_trits, HASH_LENGTH_TRIT, address_trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    if (i % 2) {
+      exist = false;
+      TEST_ASSERT(storage_spent_address_exist(&connection, address_trits, &exist) == RC_OK);
+      TEST_ASSERT_TRUE(exist);
+    } else {
+      exist = true;
+      TEST_ASSERT(storage_spent_address_exist(&connection, address_trits, &exist) == RC_OK);
+      TEST_ASSERT_FALSE(exist);
+    }
+    address_trytes[0]++;
+  }
+
+  hash243_set_free(&addresses);
+}
 
 // void test_stored_load_hashes_by_address(void) {
 //   flex_trit_t *hashes[5];
