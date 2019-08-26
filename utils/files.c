@@ -14,7 +14,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
-#include <memory.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
