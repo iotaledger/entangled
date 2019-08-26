@@ -442,7 +442,45 @@ static void test_transactions_update_snapshot_index(void) {
   hash243_set_free(&hashes);
 }
 
-static void test_transactions_update_solidity(void) {}
+static void test_transactions_update_solidity(void) {
+  DECLARE_PACK_SINGLE_TX(loaded_transaction, ptr, pack);
+  trit_t hash[HASH_LENGTH_TRIT];
+  flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
+  iota_transaction_t transaction;
+  hash243_set_t hashes = NULL;
+
+  flex_trits_from_trytes(transaction_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TEST_TX_TRYTES,
+                         NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  transaction_deserialize_from_trits(&transaction, transaction_trits, true);
+
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, transaction_hash(&transaction), HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
+  for (size_t i = 0; i < 10; i++) {
+    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
+    if (i % 2) {
+      TEST_ASSERT(hash243_set_add(&hashes, transaction_hash(&transaction)) == RC_OK);
+    }
+    add_assign(hash, HASH_LENGTH_TRIT, 1);
+  }
+
+  TEST_ASSERT(storage_transactions_update_solidity(&connection, hashes, true) == RC_OK);
+
+  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
+  for (size_t i = 0; i < 10; i++) {
+    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(storage_transaction_load_metadata(&connection, transaction_hash(&transaction), &pack) == RC_OK);
+    if (i % 2) {
+      TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), true);
+    } else {
+      TEST_ASSERT_EQUAL_INT(transaction_solid(ptr), false);
+    }
+    add_assign(hash, HASH_LENGTH_TRIT, 1);
+  }
+
+  hash243_set_free(&hashes);
+}
 
 static void test_transactions_delete(void) {
   uint64_t count = 0;
