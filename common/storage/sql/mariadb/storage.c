@@ -609,9 +609,26 @@ retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t cons
                                                        flex_trit_t const* const approvee_hash,
                                                        iota_stor_pack_t* const pack, int64_t before_timestamp) {
   mariadb_tangle_connection_t const* mariadb_connection = (mariadb_tangle_connection_t*)connection->actual;
-  MYSQL_STMT* mariadb_statement = mariadb_connection->statements.transaction_select_hashes_of_approvers;
+  MYSQL_STMT* mariadb_statement =
+      before_timestamp != 0 ? mariadb_connection->statements.transaction_select_hashes_of_approvers_before_date
+                            : mariadb_connection->statements.transaction_select_hashes_of_approvers;
+  MYSQL_BIND bind[3];
 
-  return RC_OK;
+  memset(bind, 0, sizeof(bind));
+
+  column_compress_bind(bind, 0, approvee_hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+  column_compress_bind(bind, 1, approvee_hash, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
+
+  if (before_timestamp != 0) {
+    column_compress_bind(bind, 2, &before_timestamp, MYSQL_TYPE_LONGLONG, -1);
+  }
+
+  if (mysql_stmt_bind_param(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
+  }
+
+  return storage_hashes_load_generic(mariadb_statement, pack);
 }
 
 retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
