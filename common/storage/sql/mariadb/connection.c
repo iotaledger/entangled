@@ -198,7 +198,7 @@ retcode_t storage_connection_init(storage_connection_t* const connection,
     return RC_STORAGE_FAILED_INIT;
   }
 
-  if (mysql_real_connect(db, "localhost", "ciri", NULL, database, 0, NULL, 0) == 0) {
+  if (mysql_real_connect(db, "127.0.0.1", "ciri", NULL, database, 0, NULL, 0) == 0) {
     log_error(logger_id, "Connection to database %s failed: %s\n", database, mysql_error(db));
     return RC_STORAGE_FAILED_OPEN_DB;
   }
