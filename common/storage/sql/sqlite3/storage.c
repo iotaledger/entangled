@@ -161,14 +161,11 @@ static retcode_t execute_statement(sqlite3_stmt* const sqlite_statement) {
 }
 
 static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement, bool* const exist) {
-  int rc = sqlite3_step(sqlite_statement);
-  *exist = false;
-
-  if (rc == SQLITE_ROW) {
-    *exist = true;
-  } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+  if (sqlite3_step(sqlite_statement) != SQLITE_ROW) {
     return RC_STORAGE_FAILED_STEP;
   }
+
+  *exist = sqlite3_column_int(sqlite_statement, 0);
 
   return RC_OK;
 }

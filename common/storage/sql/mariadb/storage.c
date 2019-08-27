@@ -31,9 +31,21 @@ static void log_statement_error(MYSQL_STMT* const mariadb_statement) {
 }
 
 static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bool* const exist) {
+  MYSQL_BIND bind[1];
+
+  memset(bind, 0, sizeof(bind));
+
   if (mysql_stmt_execute(mariadb_statement) != 0) {
     log_statement_error(mariadb_statement);
     return RC_STORAGE_FAILED_EXECUTE;
+  }
+
+  bind[0].buffer = (char*)exist;
+  bind[0].buffer_type = MYSQL_TYPE_TINY;
+
+  if (mysql_stmt_bind_result(mariadb_statement, bind) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_BINDING;
   }
 
   if (mysql_stmt_store_result(mariadb_statement) != 0) {
@@ -41,7 +53,10 @@ static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bo
     return RC_STORAGE_FAILED_STORE_RESULT;
   }
 
-  *exist = mysql_stmt_num_rows(mariadb_statement) != 0;
+  if (mysql_stmt_fetch(mariadb_statement) != 0) {
+    log_statement_error(mariadb_statement);
+    return RC_STORAGE_FAILED_STORE_RESULT;
+  }
 
   return RC_OK;
 }
