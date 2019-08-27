@@ -1081,8 +1081,8 @@ retcode_t storage_state_delta_load(storage_connection_t const* const connection,
 
   *delta = NULL;
 
-  memset(bind_in, 0, sizeof(bind));
-  memset(bind_out, 0, sizeof(bind));
+  memset(bind_in, 0, sizeof(bind_in));
+  memset(bind_out, 0, sizeof(bind_out));
 
   column_compress_bind(bind_in, 0, &index, MYSQL_TYPE_LONGLONG, -1);
 
@@ -1149,6 +1149,9 @@ retcode_t storage_state_delta_load(storage_connection_t const* const connection,
 done:
   if (bytes) {
     free(bytes);
+  }
+  if (metadata) {
+    mysql_free_result(metadata);
   }
 
   return ret;
