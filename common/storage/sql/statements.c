@@ -84,10 +84,10 @@ char *storage_statement_transaction_update_solidity =
 char *storage_statement_transaction_update_validity =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_VALIDITY "=? WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_exist = "SELECT 1 WHERE EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME ")";
+char *storage_statement_transaction_exist = "SELECT EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME ")";
 
 char *storage_statement_transaction_exist_by_hash =
-    "SELECT 1 WHERE EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
+    "SELECT EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
 char *storage_statement_transaction_approvers_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";
@@ -195,13 +195,10 @@ char *storage_statement_milestone_select_next =
     "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
     ">? LIMIT 1";
 
-char *storage_statement_milestone_exist =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " MILESTONE_TABLE_NAME ")";
+char *storage_statement_milestone_exist = "SELECT EXISTS(SELECT 1 FROM " MILESTONE_TABLE_NAME ")";
 
 char *storage_statement_milestone_exist_by_hash =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
+    "SELECT EXISTS(SELECT 1 FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
 
 char *storage_statement_milestone_delete_by_hash =
     "DELETE FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
@@ -223,4 +220,4 @@ char *storage_statement_spent_address_insert =
     "INSERT INTO " SPENT_ADDRESS_TABLE_NAME "(" SPENT_ADDRESS_COL_HASH ")VALUES(?)";
 
 char *storage_statement_spent_address_exist =
-    "SELECT 1 WHERE EXISTS(SELECT 1 FROM " SPENT_ADDRESS_TABLE_NAME " WHERE " SPENT_ADDRESS_COL_HASH "=?)";
+    "SELECT EXISTS(SELECT 1 FROM " SPENT_ADDRESS_TABLE_NAME " WHERE " SPENT_ADDRESS_COL_HASH "=?)";
