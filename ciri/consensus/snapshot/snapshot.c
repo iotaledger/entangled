@@ -16,8 +16,8 @@
 #include "utils/macros.h"
 #include "utils/signed_files.h"
 
-#define SNAPSHOT_STATE_EXT ".state"
-#define SNAPSHOT_METADATA_EXT ".meta"
+#define SNAPSHOT_STATE_FILE_NAME "local_snapshot.state"
+#define SNAPSHOT_METADATA_FILE_NAME "local_snapshot.meta"
 
 #define SNAPSHOT_LOGGER_ID "snapshot"
 
@@ -61,10 +61,12 @@ retcode_t iota_snapshot_write_to_file(snapshot_t const *const snapshot, char con
   }
 
   strcpy(state_path, snapshot_file_base);
-  strcat(state_path, SNAPSHOT_STATE_EXT);
+  strcat(state_path, IOTA_UTILS_FILE_SEPARATOR);
+  strcat(state_path, SNAPSHOT_STATE_FILE_NAME);
 
   strcpy(metadata_path, snapshot_file_base);
-  strcat(metadata_path, SNAPSHOT_METADATA_EXT);
+  strcat(metadata_path, IOTA_UTILS_FILE_SEPARATOR);
+  strcat(metadata_path, SNAPSHOT_METADATA_FILE_NAME);
 
   ERR_BIND_GOTO(state_delta_serialize_str(snapshot->state, buffer), ret, cleanup);
   ERR_BIND_GOTO(iota_utils_overwrite_file(state_path, buffer), ret, cleanup);
@@ -162,16 +164,18 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   retcode_t ret = RC_OK;
   char file_path[256];
 
-  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
-  strcat(file_path, SNAPSHOT_METADATA_EXT);
+  strcpy(file_path, conf->local_snapshots.base_dir);
+  strcat(file_path, IOTA_UTILS_FILE_SEPARATOR);
+  strcat(file_path, SNAPSHOT_METADATA_FILE_NAME);
 
   if ((ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK)) {
     log_critical(logger_id, "Initializing snapshot metadata failed\n");
     return ret;
   }
 
-  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
-  strcat(file_path, SNAPSHOT_STATE_EXT);
+  strcpy(file_path, conf->local_snapshots.base_dir);
+  strcat(file_path, IOTA_UTILS_FILE_SEPARATOR);
+  strcat(file_path, SNAPSHOT_STATE_FILE_NAME);
 
   if ((ret = iota_snapshot_state_read_from_file(snapshot, file_path))) {
     log_critical(logger_id, "Initializing snapshot initial state failed\n");
