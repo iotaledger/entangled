@@ -22,12 +22,12 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
   PRIMARY KEY (hash(243))
 );
 
-CREATE INDEX IF NOT EXISTS address_index ON iota_transaction(address);
-CREATE INDEX IF NOT EXISTS bundle_index ON iota_transaction(bundle);
-CREATE INDEX IF NOT EXISTS trunk_index ON iota_transaction(trunk);
-CREATE INDEX IF NOT EXISTS branch_index ON iota_transaction(branch);
-CREATE INDEX IF NOT EXISTS tag_index ON iota_transaction(tag);
-CREATE INDEX IF NOT EXISTS transaction_hash_index ON iota_transaction(hash);
+CREATE INDEX IF NOT EXISTS address_index ON iota_transaction(address(243));
+CREATE INDEX IF NOT EXISTS bundle_index ON iota_transaction(bundle(243));
+CREATE INDEX IF NOT EXISTS trunk_index ON iota_transaction(trunk(243));
+CREATE INDEX IF NOT EXISTS branch_index ON iota_transaction(branch(243));
+CREATE INDEX IF NOT EXISTS tag_index ON iota_transaction(tag(81));
+CREATE INDEX IF NOT EXISTS transaction_hash_index ON iota_transaction(hash(243));
 CREATE INDEX IF NOT EXISTS arrival_time_index ON iota_transaction(arrival_timestamp);
 
 CREATE TABLE IF NOT EXISTS iota_milestone (
@@ -37,4 +37,4 @@ CREATE TABLE IF NOT EXISTS iota_milestone (
   PRIMARY KEY (id)
 );
 
-CREATE INDEX IF NOT EXISTS milestone_hash_index ON iota_milestone(hash);
+CREATE INDEX IF NOT EXISTS milestone_hash_index ON iota_milestone(hash(243));
