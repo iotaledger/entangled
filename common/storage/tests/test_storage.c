@@ -421,7 +421,7 @@ int main(void) {
 
   config.db_path = tangle_test_db_path;
 
-  RUN_TEST(test_connection_init_destroy);
+  // RUN_TEST(test_connection_init_destroy);
 
   // RUN_TEST(test_initialized_db_empty_transaction);
   // RUN_TEST(test_initialized_db_empty_milestone);
