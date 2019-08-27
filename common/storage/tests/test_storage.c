@@ -528,6 +528,7 @@ static void test_transaction_load_hashes_of_milestone_candidates(void) {
   trit_t hash[HASH_LENGTH_TRIT];
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
   iota_transaction_t transaction;
+  iota_milestone_t milestone;
   iota_stor_pack_t pack;
 
   hash_pack_init(&pack, 10);
@@ -540,6 +541,11 @@ static void test_transaction_load_hashes_of_milestone_candidates(void) {
 
   for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    if (i % 2) {
+      flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+      milestone.index = TEST_MS_INDEX + i;
+      TEST_ASSERT(storage_milestone_store(&connection, &milestone) == RC_OK);
+    }
     TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
     transaction_deserialize_from_trits(&transaction, transaction_trits, true);
     add_assign(hash, HASH_LENGTH_TRIT, 1);
@@ -547,15 +553,15 @@ static void test_transaction_load_hashes_of_milestone_candidates(void) {
 
   TEST_ASSERT(storage_transaction_load_hashes_of_milestone_candidates(&connection, transaction_address(&transaction),
                                                                       &pack) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 10);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 5);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
   flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
-  for (size_t i = 0; i < 10; i++) {
+  for (size_t i = 0; i < 5; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
     TEST_ASSERT_EQUAL_MEMORY(pack.models[i], transaction_hash(&transaction), FLEX_TRIT_SIZE_243);
-    add_assign(hash, HASH_LENGTH_TRIT, 1);
+    add_assign(hash, HASH_LENGTH_TRIT, 2);
   }
 
   hash_pack_free(&pack);
