@@ -190,9 +190,8 @@ retcode_t iota_snapshots_service_persist_snapshot(snapshots_service_t *const sna
                                                   snapshot_t *const snapshot) {
   retcode_t ret;
 
-  ERR_BIND_RETURN(iota_snapshots_provider_write_snapshot_to_file(
-                      snapshot, snapshots_service->conf->local_snapshots.local_snapshots_path_base),
-                  ret);
+  ERR_BIND_RETURN(
+      iota_snapshots_provider_write_snapshot_to_file(snapshot, snapshots_service->conf->local_snapshots.base_dir), ret);
 
   iota_snapshot_write_lock(&snapshots_service->snapshots_provider->initial_snapshot);
   ret = iota_snapshot_copy(snapshot, &snapshots_service->snapshots_provider->initial_snapshot);
