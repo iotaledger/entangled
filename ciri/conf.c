@@ -353,8 +353,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       consensus_conf->local_snapshots.min_depth = atoi(value);
       break;
     case CONF_LOCAL_SNAPSHOTS_BASE_DIR:
-      strncpy(consensus_conf->local_snapshots.local_snapshots_path_base, value,
-              sizeof(consensus_conf->local_snapshots.local_snapshots_path_base));
+      strncpy(consensus_conf->local_snapshots.base_dir, value, sizeof(consensus_conf->local_snapshots.base_dir));
       break;
 
     default:

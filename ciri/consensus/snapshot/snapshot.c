@@ -164,7 +164,7 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   retcode_t ret = RC_OK;
   char file_path[256];
 
-  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
+  strcpy(file_path, conf->local_snapshots.base_dir);
   strcat(file_path, IOTA_UTILS_FILE_SEPARATOR);
   strcat(file_path, SNAPSHOT_METADATA_FILE_NAME);
 
@@ -173,7 +173,7 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
     return ret;
   }
 
-  strcpy(file_path, conf->local_snapshots.local_snapshots_path_base);
+  strcpy(file_path, conf->local_snapshots.base_dir);
   strcat(file_path, IOTA_UTILS_FILE_SEPARATOR);
   strcat(file_path, SNAPSHOT_STATE_FILE_NAME);
 
