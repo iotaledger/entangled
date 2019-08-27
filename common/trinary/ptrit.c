@@ -5,9 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/trinary/ptrit.h"
 #include <assert.h>
 #include <string.h>
+
+#include "common/trinary/ptrit.h"
 
 #if defined(_MSC_VER)
 #include <immintrin.h>
@@ -121,15 +122,16 @@ size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p) {
   memset(&t, -1, sizeof(t));
   for (; n--; ++p) {
     // 0 -> (1,1)
-    // ~(p->low & p->high) & t
-    t = ANDNAND(p->low, p->high, t);
+    // t & (p->low & p->high)
+    t = ANDAND(t, p->low, p->high);
   }
 #elif defined(PTRIT_CVT_ORN)
   memset(&t, 0, sizeof(t));
+  t = XOR(t, t);
   for (; n--; ++p) {
     // 0 -> (0,1)
-    // (~p->high | p->low) | t
-    t = ORNOR(p->high, p->low, t);
+    // t | (~p->high | p->low)
+    t = ORORN(t, p->high, p->low);
   }
   t = NOT(t);
 #else

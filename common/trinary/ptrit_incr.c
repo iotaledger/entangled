@@ -423,7 +423,7 @@ int ptrit_hincr(ptrit_t *const begin, ptrit_t *const end) {
   return (end == t) ? 1 : 0;
 }
 
-void ptrit_increment(ptrit_t *const trits, size_t const offset, size_t const end) {
-  int carry = ptrit_hincr(trits + offset, trits + end);
+void ptrit_increment(ptrit_t *const trits, size_t const begin, size_t const end) {
+  int carry = ptrit_hincr(trits + begin, trits + end);
   (void)carry;  // TODO: check for carry in pearl diver
 }

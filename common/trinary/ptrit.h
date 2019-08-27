@@ -101,25 +101,25 @@ typedef struct {
 #define NOT(x) ORN(x, XOR(x, x))
 
 #define XORORN(x, y, z) XOR(x, ORN(y, z))
-#define ORNOR(x, y, z) ORN(OR(x, y), z)
+#define ORORN(x, y, z) OR(x, ORN(y, z))
 
 #else
 #if defined(PTRIT_AVX512F)
 /*
-  x y z x^(~y&z)  x^(y&z) ~(x&y)&z
+  x y z x^(~y&z)  x^(y&z) (x&y)&z
   0 0 0   0         0         0
-  0 0 1   1         0         1
+  0 0 1   1         0         0
   0 1 0   0         0         0
   0 1 1   0         1         0
   1 0 0   1         1         0
   1 0 1   0         1         0
   1 1 0   1         1         0
-  1 1 1   1         0         0
-         D2        78         02
+  1 1 1   1         0         1
+         D2        78         80
 */
 #define XORANDN(x, y, z) _mm512_ternarylogic_epi64(x, y, z, 0xD2)
 #define XORAND(x, y, z) _mm512_ternarylogic_epi64(x, y, z, 0x78)
-#define ANDNAND(x, y, z) _mm512_ternarylogic_epi64(x, y, z, 0x02)
+#define ANDAND(x, y, z) _mm512_ternarylogic_epi64(x, y, z, 0x80)
 #else
 
 #if defined(PTRIT_AVX2)
@@ -164,8 +164,8 @@ static __inline __m128i _mm_set_epi64x(__int64 _I1, __int64 _I0) {
 #endif  // PTRIT_PLATFORM generic
 
 #define XORANDN(x, y, z) XOR(x, ANDN(y, z))
-#define ANDNAND(x, y, z) ANDN(AND(x, y), z)
-#define ORNOR(x, y, z) ORN(OR(x, y), z)
+#define ANDAND(x, y, z) AND(x, AND(y, z))
+#define ORORN(x, y, z) OR(x, ORN(y, z))
 #define XORAND(x, y, z) XOR(x, AND(y, z))
 #define XORORN(x, y, z) XOR(x, ORN(y, z))
 #endif  // PTRIT_AVX512F

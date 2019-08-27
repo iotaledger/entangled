@@ -29,8 +29,7 @@ extern "C" {
 void ptrits_set_iota(ptrit_t range[PTRIT_SIZE_LOG3]);
 int ptrit_hincr(ptrit_t *const begin, ptrit_t *const end);
 
-void ptrit_offset(ptrit_t *const trits, size_t const length);
-void ptrit_increment(ptrit_t *const trits, size_t const offset, size_t const end);
+void ptrit_increment(ptrit_t *const trits, size_t const begin, size_t const end);
 
 #endif
 #ifdef __cplusplus
