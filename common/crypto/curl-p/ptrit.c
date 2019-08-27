@@ -5,11 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <assert.h>
 #include <string.h>
 
 #include "common/crypto/curl-p/ptrit.h"
 #include "utils/forced_inline.h"
+#include "utils/memset_safe.h"
 
 static FORCED_INLINE void pcurl_s2(ptrit_t const *a, ptrit_t const *b, ptrit_t *c) {
 #if defined(PCURL_S2_CIRCUIT4)
@@ -364,23 +364,6 @@ void pcurl_hash_data(pcurl_t *ctx, ptrit_t const *data, size_t size, ptrit_t *ha
   pcurl_get_hash(ctx, hash);
 }
 
-#if defined(PCURL_DEBUG)
-#include <stdio.h>
-void ptrit_print(ptrit_t const *p) { printf("%d:%d ", *(int const *)(&p->low) & 1, *(int const *)(&p->high) & 1); }
-void ptrits_print(size_t n, ptrit_t const *p) {
-  for (; n--;) ptrit_print(p++);
-  printf("\n");
-}
-void ptrits_print2(size_t n, ptrit_t const *p) {
-  ptrits_print((n + 1) / 2, p);
-  ptrits_print(n - (n + 1) / 2, p + (n + 1) / 2);
-}
-void ptrits_rprint(size_t n, ptrit_t const *p) {
-  for (p += n; n--;) ptrit_print(--p);
-  printf("\n");
-}
-#endif
-
 #if defined(PCURL_STATE_SHORT)
 void pcurl_transform(pcurl_t *ctx) {
   size_t round;
@@ -389,29 +372,10 @@ void pcurl_transform(pcurl_t *ctx) {
   ptrit_t *b = a + (CURL_STATE_SIZE + 1) / 2;
   ptrit_t *c = b + (CURL_STATE_SIZE + 1) / 2;
   b[364] = a[0];
-#if defined(PCURL_DEBUG)
-  ptrits_print((CURL_STATE_SIZE + 1) / 2, a);
-  ptrits_print((CURL_STATE_SIZE + 1) / 2, b);
-#endif
   for (round = 0; round < ctx->round_count / 3; ++round) {
     pcurl_sbox_0(a, b, c);
-#if defined(PCURL_DEBUG)
-    printf("---\n");
-    ptrits_print((CURL_STATE_SIZE + 1) / 2, c);
-    ptrits_rprint((CURL_STATE_SIZE + 1) / 2, a);
-#endif
     pcurl_sbox_1(a, b, c);
-#if defined(PCURL_DEBUG)
-    printf("---\n");
-    ptrits_rprint((CURL_STATE_SIZE + 1) / 2, b);
-    ptrits_rprint((CURL_STATE_SIZE + 1) / 2, c);
-#endif
     pcurl_sbox_2(a, b, c);
-#if defined(PCURL_DEBUG)
-    printf("---\n");
-    ptrits_print((CURL_STATE_SIZE + 1) / 2, a);
-    ptrits_print((CURL_STATE_SIZE + 1) / 2, b);
-#endif
   }
 }
 #elif defined(PCURL_STATE_DOUBLE)
@@ -420,18 +384,11 @@ void pcurl_transform(pcurl_t *ctx) {
 
   ptrit_t *a = ctx->state, *t;
   ptrit_t *c = a + CURL_STATE_SIZE;
-#if defined(PCURL_DEBUG)
-  ptrits_print2(CURL_STATE_SIZE, a);
-#endif
   for (round = 0; round < ctx->round_count; ++round) {
     pcurl_sbox(c, a);
     t = a;
     a = c;
     c = t;
-#if defined(PCURL_DEBUG)
-    printf("---\n");
-    ptrits_print2(CURL_STATE_SIZE, a);
-#endif
   }
   if (1 & ctx->round_count) memcpy(c, a, sizeof(ptrit_t) * CURL_STATE_SIZE);
 }
@@ -440,10 +397,9 @@ void pcurl_transform(pcurl_t *ctx) {
 #endif  // PCURL_STATE
 
 void pcurl_reset(pcurl_t *ctx) {
-  // TODO: memset_safe
 #if defined(PTRIT_CVT_ANDN)
   // 0 -> (1,1)
-  memset(ctx->state, -1, sizeof(ctx->state));
+  memset_safe(ctx->state, sizeof(ctx->state), -1, sizeof(ctx->state));
 
 #elif defined(PTRIT_CVT_ORN)
   // 0 -> (0,1)
@@ -456,8 +412,8 @@ void pcurl_reset(pcurl_t *ctx) {
 #error Invalid PCURL_STATE.
 #endif  // PCURL_STATE
   {
-    memset(&ctx->state[i].low, 0, sizeof(ptrit_s));
-    memset(&ctx->state[i].high, -1, sizeof(ptrit_s));
+    memset_safe(&ctx->state[i].low, sizeof(ptrit_s), 0, sizeof(ptrit_s));
+    memset_safe(&ctx->state[i].high, sizeof(ptrit_s), -1, sizeof(ptrit_s));
   }
 #else
 #error Invalid PTRIT_CVT.

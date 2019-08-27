@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-PearlDiverStatus hashcash(Curl const *ctx, size_t begin, size_t end, intptr_t min_weight);
+PearlDiverStatus hashcash(Curl *ctx, size_t begin, size_t end, intptr_t min_weight);
 
 #ifdef __cplusplus
 }

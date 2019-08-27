@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-PearlDiverStatus hamming(Curl const *ctx, size_t begin, size_t end, intptr_t security);
+PearlDiverStatus hamming(Curl *ctx, size_t begin, size_t end, intptr_t security);
 
 #ifdef __cplusplus
 }
