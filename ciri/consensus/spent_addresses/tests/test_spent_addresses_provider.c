@@ -8,22 +8,16 @@
 #include <unity/unity.h>
 
 #include "ciri/consensus/spent_addresses/spent_addresses_provider.h"
+#include "ciri/consensus/test_utils/spent_addresses.h"
 #include "utils/files.h"
 
-static char *test_db_path = "ciri/consensus/spent_addresses/tests/test.db";
-static char *spent_addresses_db_path = "ciri/consensus/spent_addresses/tests/spent-addresses.db";
-static connection_config_t config;
+static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/tests/test.db";
+static storage_connection_config_t config;
 static spent_addresses_provider_t sap;
 
-void setUp(void) {
-  TEST_ASSERT(iota_utils_copy_file(test_db_path, spent_addresses_db_path) == RC_OK);
-  TEST_ASSERT(iota_spent_addresses_provider_init(&sap, &config) == RC_OK);
-}
+void setUp(void) { TEST_ASSERT(spent_addresses_setup(&sap, &config, spent_addresses_test_db_path) == RC_OK); }
 
-void tearDown(void) {
-  TEST_ASSERT(iota_spent_addresses_provider_destroy(&sap) == RC_OK);
-  TEST_ASSERT(iota_utils_remove_file(test_db_path) == RC_OK);
-}
+void tearDown(void) { TEST_ASSERT(spent_addresses_cleanup(&sap, spent_addresses_test_db_path) == RC_OK); }
 
 static void test_spent_addresses_provider_store() {
   bool exist = true;
@@ -127,7 +121,7 @@ int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = spent_addresses_test_db_path;
 
   RUN_TEST(test_spent_addresses_provider_store);
   RUN_TEST(test_spent_addresses_provider_batch_store);

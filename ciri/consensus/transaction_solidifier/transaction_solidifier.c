@@ -98,7 +98,7 @@ static void *spawn_solid_transactions_propagation(void *arg) {
   tangle_t tangle;
 
   {
-    connection_config_t db_conf = {.db_path = ts->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = ts->conf->tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");

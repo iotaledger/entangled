@@ -3,7 +3,6 @@ cc_test(
     timeout = "moderate",
     srcs = ["test_exit_probability_randomizer.c"],
     data = [
-        ":db_file",
         ":snapshot.txt",
         "//ciri/consensus/snapshot/tests:snapshot_test_files",
     ],
@@ -13,17 +12,9 @@ cc_test(
         "//ciri/consensus/test_utils",
         "//ciri/consensus/tip_selection/cw_rating_calculator",
         "//ciri/consensus/tip_selection/exit_probability_randomizer",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
-        "//common/storage/tests/helpers",
+        "//common/storage",
+        "//common/storage/tests:defs",
         "//common/trinary:trit_ptrit",
         "@unity",
     ],
-)
-
-genrule(
-    name = "db_file",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["ciri.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
 )
