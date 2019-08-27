@@ -43,7 +43,7 @@ static iota_consensus_conf_t conf;
 static char *test_db_path = "ciri/consensus/ledger_validator/tests/test.db";
 static char *ciri_db_path = "ciri/consensus/ledger_validator/tests/ciri.db";
 static char *snapshot_path = "ciri/consensus/ledger_validator/tests/snapshot.txt";
-static char *local_snapshot_path_base = "ciri/consensus/ledger_validator/tests/local_snapshot";
+static char *local_snapshot_path_base = "ciri/consensus/ledger_validator/tests";
 static char *snapshot_conf_path = "ciri/consensus/ledger_validator/tests/snapshot_conf.json";
 
 static uint64_t initial_milestone_index = 1;
