@@ -8,7 +8,7 @@
 #ifndef __COMMON_CURL_P_PTRIT_H_
 #define __COMMON_CURL_P_PTRIT_H_
 
-#include "common/trinary/const.h"
+#include "common/crypto/curl-p/const.h"
 #include "common/trinary/ptrit.h"
 
 #ifdef __cplusplus
