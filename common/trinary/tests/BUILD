@@ -14,6 +14,7 @@ cc_test(
     srcs = ["test_ptrits.c"],
     deps = [
         "//common/trinary:ptrits",
+        "//common/trinary:trit_long",
         "@unity",
     ],
 )
