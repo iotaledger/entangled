@@ -31,52 +31,52 @@ cc_library(
 
 config_setting(
     name = "pcurl_s2_circuit4",
-    values = {"define": "pcurl_s2_circuit=PCURL_S2_CIRCUIT4"},
+    values = {"define": "pcurl_s2_circuit=4"},
 )
 
 config_setting(
     name = "pcurl_s2_circuit5",
-    values = {"define": "pcurl_s2_circuit=PCURL_S2_CIRCUIT5"},
+    values = {"define": "pcurl_s2_circuit=5"},
 )
 
 config_setting(
     name = "pcurl_s2_args_lut",
-    values = {"define": "pcurl_s2_args=PCURL_S2_ARGS_LUT"},
+    values = {"define": "pcurl_s2_args=lut"},
 )
 
 config_setting(
     name = "pcurl_s2_args_ptr",
-    values = {"define": "pcurl_s2_args=PCURL_S2_ARGS_PTR"},
+    values = {"define": "pcurl_s2_args=ptr"},
 )
 
 config_setting(
     name = "pcurl_state_double",
-    values = {"define": "pcurl_state=PCURL_STATE_DOUBLE"},
+    values = {"define": "pcurl_state=double"},
 )
 
 config_setting(
     name = "pcurl_state_short",
-    values = {"define": "pcurl_state=PCURL_STATE_SHORT"},
+    values = {"define": "pcurl_state=short"},
 )
 
 config_setting(
     name = "pcurl_sbox_unwind_1",
-    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_1"},
+    values = {"define": "pcurl_sbox_unwind=1"},
 )
 
 config_setting(
     name = "pcurl_sbox_unwind_2",
-    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_2"},
+    values = {"define": "pcurl_sbox_unwind=2"},
 )
 
 config_setting(
     name = "pcurl_sbox_unwind_4",
-    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_4"},
+    values = {"define": "pcurl_sbox_unwind=4"},
 )
 
 config_setting(
     name = "pcurl_sbox_unwind_8",
-    values = {"define": "pcurl_sbox_unwind=PCURL_SBOX_UNWIND_8"},
+    values = {"define": "pcurl_sbox_unwind=8"},
 )
 
 cc_library(

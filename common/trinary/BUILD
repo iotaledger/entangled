@@ -26,37 +26,37 @@ cc_library(
 
 config_setting(
     name = "ptrit_neon",
-    values = {"define": "ptrit_platform=PTRIT_NEON"},
+    values = {"define": "ptrit_platform=neon"},
 )
 
 config_setting(
     name = "ptrit_avx512",
-    values = {"define": "ptrit_platform=PTRIT_AVX512"},
+    values = {"define": "ptrit_platform=avx512"},
 )
 
 config_setting(
     name = "ptrit_avx2",
-    values = {"define": "ptrit_platform=PTRIT_AVX2"},
+    values = {"define": "ptrit_platform=avx2"},
 )
 
 config_setting(
     name = "ptrit_sse2",
-    values = {"define": "ptrit_platform=PTRIT_SSE2"},
+    values = {"define": "ptrit_platform=sse2"},
 )
 
 config_setting(
     name = "ptrit_64",
-    values = {"define": "ptrit_platform=PTRIT_64"},
+    values = {"define": "ptrit_platform=64"},
 )
 
 config_setting(
     name = "ptrit_cvt_orn",
-    values = {"define": "ptrit_cvt=PTRIT_CVT_ORN"},
+    values = {"define": "ptrit_cvt=orn"},
 )
 
 config_setting(
     name = "ptrit_cvt_andn",
-    values = {"define": "ptrit_cvt=PTRIT_CVT_ANDN"},
+    values = {"define": "ptrit_cvt=andn"},
 )
 
 cc_library(
