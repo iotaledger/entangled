@@ -12,10 +12,13 @@
 
 #if defined(_MSC_VER)
 #include <immintrin.h>
-// TODO: check for cpuid BMI1
-#define CTZLL(x) _tzcnt_u64(x)
+#if defined(_M_X64)
+#define CTZ64(x) _tzcnt_u64(x)
 #else
-#define CTZLL(x) __builtin_ctzll(x)
+#define CTZ32(x) _tzcnt_u32(x)
+#endif
+#else
+#define CTZ64(x) __builtin_ctzll(x)
 #endif
 
 // Not-a-Trit
@@ -123,6 +126,7 @@ size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p) {
   for (; n--; ++p) {
     // 0 -> (1,1)
     // t & (p->low & p->high)
+    // zero bit indicates non-zero trit in that position
     t = ANDAND(t, p->low, p->high);
   }
 #elif defined(PTRIT_CVT_ORN)
@@ -131,6 +135,7 @@ size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p) {
   for (; n--; ++p) {
     // 0 -> (0,1)
     // t | (~p->high | p->low)
+    // non-zero bit indicates non-zero trit in that position
     t = ORORN(t, p->high, p->low);
   }
   t = NOT(t);
@@ -138,14 +143,28 @@ size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p) {
 #error Invalid PTRIT_CVT
 #endif  // PTRIT_CVT
 
+  // find right-most non-zero bit
+#if defined(CTZ64)
   for (i = w = 0; w < PTRIT_SIZE / 64; ++w) {
     if (0 == ((uint64_t const *)(&t))[w]) {
       i += 64;
     } else {
-      i += CTZLL(((uint64_t const *)(&t))[w]);
+      i += CTZ64(((uint64_t const *)(&t))[w]);
       break;
     }
   }
+#elif defined(CTZ32)
+  for (i = w = 0; w < PTRIT_SIZE / 32; ++w) {
+    if (0 == ((uint32_t const *)(&t))[w]) {
+      i += 32;
+    } else {
+      i += CTZ32(((uint32_t const *)(&t))[w]);
+      break;
+    }
+  }
+#else
+#error CTZ not defined
+#endif
 
   return i;
 }
