@@ -123,7 +123,6 @@ cc_library(
 
 cc_library(
     name = "trit_ptrit",
-    srcs = ["trit_ptrit.c"],
     hdrs = ["trit_ptrit.h"],
     deps = [
         ":ptrits",
