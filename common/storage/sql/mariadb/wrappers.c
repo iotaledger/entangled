@@ -13,7 +13,7 @@ retcode_t prepare_statement(MYSQL* const db, MYSQL_STMT** const mariadb_statemen
   }
 
   if ((*mariadb_statement = mysql_stmt_init(db)) == NULL) {
-    return RC_STORAGE_FAILED_PREPARED_STATEMENT;
+    return RC_STORAGE_FAILED_INIT_STATEMENT;
   }
 
   if (mysql_stmt_prepare(*mariadb_statement, statement, -1) != 0) {
@@ -29,7 +29,7 @@ retcode_t finalize_statement(MYSQL_STMT* const mariadb_statement) {
   }
 
   if (mysql_stmt_close(mariadb_statement) != 0) {
-    return RC_STORAGE_FAILED_FINALIZE;
+    return RC_STORAGE_FAILED_CLOSE_STATEMENT;
   }
 
   return RC_OK;
