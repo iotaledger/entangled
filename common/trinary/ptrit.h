@@ -11,6 +11,21 @@
 #include "common/stdint.h"
 #include "common/trinary/trits.h"
 
+#if !defined(PTRIT_64) && !defined(PTRIT_SSE2) && !defined(PTRIT_AVX2) && !defined(PTRIT_AVX512) && !defined(PTRIT_NEON)
+// Detect PTRIT_PLATFORM
+#if defined(__AVX512F__)
+#define PTRIT_AVX512
+#elif defined(__AVX2__)
+#define PTRIT_AVX2
+#elif defined(__SSE2__)
+#define PTRIT_SSE2
+#elif defined(__ARM_NEON__)
+#define PTRIT_NEON
+#else
+#define PTRIT_64
+#endif
+#endif
+
 #if defined(PTRIT_64)
 typedef uint64_t ptrit_s;
 #define PTRIT_SIZE 64

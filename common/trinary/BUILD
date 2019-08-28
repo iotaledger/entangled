@@ -75,11 +75,11 @@ cc_library(
         ":ptrit_avx2": ["PTRIT_AVX2"],
         ":ptrit_sse2": ["PTRIT_SSE2"],
         ":ptrit_64": ["PTRIT_64"],
-        "//conditions:default": ["PTRIT_64"],
+        "//conditions:default": [],
     }) + select({
         ":ptrit_cvt_orn": ["PTRIT_CVT_ORN"],
         ":ptrit_cvt_andn": ["PTRIT_CVT_ANDN"],
-        "//conditions:default": ["PTRIT_CVT_ANDN"],
+        "//conditions:default": [],
     }),
     deps = [
         ":trits",
