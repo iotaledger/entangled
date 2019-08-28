@@ -14,22 +14,9 @@ extern "C" {
 
 #include "common/trinary/ptrit.h"
 
-#if (64 == PTRIT_SIZE)
-#define PTRIT_SIZE_LOG3 4
-#elif (128 == PTRIT_SIZE)
-#define PTRIT_SIZE_LOG3 5
-#elif (256 == PTRIT_SIZE)
-#define PTRIT_SIZE_LOG3 6
-#elif (512 == PTRIT_SIZE)
-#define PTRIT_SIZE_LOG3 6
-#else
-#error Invalid PTRIT_SIZE.
-#endif  // PTRIT_SIZE
-
-void ptrits_set_iota(ptrit_t range[PTRIT_SIZE_LOG3]);
-int ptrit_hincr(ptrit_t *const begin, ptrit_t *const end);
-
-void ptrit_increment(ptrit_t *const trits, size_t const begin, size_t const end);
+size_t ptrit_log3(size_t n);
+void ptrit_set_iota(size_t n, ptrit_t *range, trit_t *value);
+int ptrit_hincr(size_t n, ptrit_t *t);
 
 #endif
 #ifdef __cplusplus

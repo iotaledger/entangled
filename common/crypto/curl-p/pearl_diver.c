@@ -16,7 +16,7 @@
 #include "utils/handles/thread.h"
 #include "utils/system.h"
 
-typedef enum { SEARCH_RUNNING, SEARCH_INTERRUPT, SEARCH_FINISHED } search_status_t;
+typedef enum { SEARCH_RUNNING, SEARCH_INTERRUPT, SEARCH_FINISHED, SEARCH_NOT_FOUND } search_status_t;
 
 typedef struct {
   pcurl_t *pcurl;  // must be aligned, hence allocated separately
@@ -48,10 +48,6 @@ static PearlDiverStatus pd_search_n(Curl *ctx, size_t begin, size_t end, test_fu
   thread_handle_t *tid = NULL;
 
   do {
-    if (end < begin + PTRIT_SIZE_LOG3 + 1) {
-      break;
-    }
-
     if (rw_lock_handle_init(&statusLock)) {
       break;
     }
@@ -79,12 +75,8 @@ static PearlDiverStatus pd_search_n(Curl *ctx, size_t begin, size_t end, test_fu
       ptrit_curl_init(&pcurl, ctx->type);
       // `pcurl` state is filled with the initial `ctx` state
       ptrits_fill(STATE_LENGTH, pcurl.state, ctx->state);
-      // but rewritten from `begin` with values [N,N+1,...,N+PTRIT_SIZE) for some N, so all slices in `pcurl` state are
-      // already different
-      ptrits_set_iota(pcurl.state + begin);
-      // now initialize each thread search instance with a shorter search range [begin + PTRIT_SIZE_LOG3, end)
-      init_inst(n_procs, inst, pcurls_aligned, &pcurl, begin + PTRIT_SIZE_LOG3, end, test, param, &overall_status,
-                &statusLock);
+      // Now initialize each thread search instance based on this `pcurl` state
+      init_inst(n_procs, inst, pcurls_aligned, &pcurl, begin, end, test, param, &overall_status, &statusLock);
     }
 
     overall_status = SEARCH_RUNNING;
@@ -103,6 +95,7 @@ static PearlDiverStatus pd_search_n(Curl *ctx, size_t begin, size_t end, test_fu
         found_inst = inst + i;
         pd_status = PEARL_DIVER_SUCCESS;
 
+        // Copy slice found into `ctx` state
         ptrits_get_slice(end - begin, ctx->state + begin, found_inst->pcurl->state + begin, found_index);
       }
     }
@@ -122,23 +115,36 @@ PearlDiverStatus pd_search(Curl *ctx, size_t begin, size_t end, test_fun_t test,
   return pd_search_n(ctx, begin, end, test, param, n_procs);
 }
 
+static size_t min__(size_t a, size_t b) { return a < b ? a : b; }
+
 void init_inst(size_t n, SearchInstance *inst, pcurl_t *pcurls, pcurl_t *pcurl, size_t begin, size_t end,
                test_fun_t test, test_arg_t param, search_status_t volatile *overall_status,
                rw_lock_handle_t *statusLock) {
+  // Size of the initial fixed value range
+  size_t n_log3 = min__(ptrit_log3(PTRIT_SIZE * n), end - begin);
+  trit_t value[CURL_STATE_SIZE];
+  // Initial `value` is `-(3^n_log3-1)/2`
+  memset(value, -1, sizeof(value));
+  // Clear the variable value range
+  ptrits_fill(end - (begin + n_log3), pcurl->state + (begin + n_log3), value);
+
   for (; n--; ++inst) {
+    // Initial state value is just `pcurl` ...
+    memcpy(pcurls, pcurl, sizeof(pcurl_t));
+    // ... but rewritten from `begin` with values `[value .. value+PTRIT_SIZE)`, so all slices in `pcurl` state are
+    // already different
+    ptrit_set_iota(n_log3, pcurls->state + begin, value);
+
+    // Start search range for `inst` from `begin + n_log3` skipping initial fixed value
     *inst = (SearchInstance){.pcurl = pcurls++,
                              .index = n,
-                             .begin = begin,
+                             .begin = begin + n_log3,
                              .end = end,
                              .test = test,
                              .param = param,
                              .result = -1,
                              .overall_status = overall_status,
                              .statusLock = statusLock};
-    memcpy(inst->pcurl, pcurl, sizeof(pcurl_t));
-    // in order to make search instances different from the initial `pcurl` state, `pcurl` state is incremented starting
-    // from `begin`
-    ptrit_increment(pcurl->state, begin, HASH_LENGTH_TRIT);
   }
 }
 
@@ -163,9 +169,10 @@ void *run_search_thread(void *const data) {
       break;
     }
 
+    // Transform a copy
     memcpy(&copy, inst->pcurl, sizeof(pcurl_t));
     ptrit_transform(&copy);
-    // test a transformed pcurl state
+    // Test a transformed pcurl state
     inst->result = inst->test(&copy, inst->param);
 
     if (inst->result >= 0) {
@@ -176,10 +183,12 @@ void *run_search_thread(void *const data) {
       break;
     }
 
-    // TODO: super strange why pcurl state is incremented from begin+1
-    // can't they overlap???
-    // TODO: end = HASH_LENGTH_TRIT?
-    ptrit_increment(inst->pcurl->state, inst->begin + 1, inst->end);
+    // Update/increment range
+    if (ptrit_hincr(inst->end - inst->begin, inst->pcurl->state + inst->begin)) {
+      // Overflow, search range exhausted, set fail status and exit thread
+      inst->status = SEARCH_NOT_FOUND;
+      break;
+    }
   }
 
   return (void *)inst->result;

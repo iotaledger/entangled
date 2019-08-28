@@ -36,15 +36,34 @@ void run_pd_test(CurlType type, unsigned short mwm) {
   curl_reset(&curl);
 }
 
+void run_pd_test_fail(CurlType type, unsigned short mwm) {
+  Curl curl;
+  curl.type = type;
+  trit_t trits[] = {TRYTES_IN};
+  curl_init(&curl);
+  curl_absorb(&curl, trits, HASH_LENGTH_TRIT);
+  // [0,mwm/2) is too short range to find mwm zero trits in hash, so the search should fail
+  PearlDiverStatus result = hashcash(&curl, 0, mwm / 2, mwm);
+
+  TEST_ASSERT_EQUAL_INT8(PEARL_DIVER_ERROR, result);
+  curl_reset(&curl);
+}
+
 void test_pd_27_works(void) { run_pd_test(CURL_P_27, 13); }
 
 void test_pd_81_works(void) { run_pd_test(CURL_P_81, 10); }
+
+void test_pd_27_fail_works(void) { run_pd_test_fail(CURL_P_27, 13); }
+
+void test_pd_81_fail_works(void) { run_pd_test_fail(CURL_P_81, 10); }
 
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_pd_27_works);
   RUN_TEST(test_pd_81_works);
+  RUN_TEST(test_pd_27_fail_works);
+  RUN_TEST(test_pd_81_fail_works);
 
   return UNITY_END();
 }
