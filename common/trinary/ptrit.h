@@ -190,29 +190,86 @@ static __inline __m128i _mm_set_epi64x(__int64 _I1, __int64 _I0) {
 extern "C" {
 #endif
 
-// The lowest 2 bits of `t` are used.
-// An invalid value of `t` (i.e. `2`) maps to `NaT`.
-// The representation of `NaT` depends on `PTRIT_CVT`.
+/**
+ * @brief Fill ptrit with a fixed trit value
+ *
+ * The lowest 2 bits of `t` are used.
+ * An invalid value of `t` (i.e. `2`) maps to `NaT`.
+ * The representation of `NaT` depends on `PTRIT_CVT`.
+ *
+ * @param[out] p pointer to the ptrit
+ * @param[in] t trit value
+ */
 void ptrit_fill(ptrit_t *p, trit_t t);
 
-// Set `idx`-th trit of `*p` to `t`.
-// Precondition: `idx < PTRIT_SIZE`.
+/**
+ * @brief Set `idx`-th trit of `*p` to `t`.
+ *
+ * Precondition: `idx < PTRIT_SIZE`.
+ *
+ * @param[in,out] p pointer to the ptrit
+ * @param[in] idx slice index
+ * @param[in] t trit value
+ */
 void ptrit_set(ptrit_t *p, size_t idx, trit_t t);
 
-// Return `idx`-th trit of `*p`.
-// Precondition: `idx < PTRIT_SIZE`.
+/**
+ * @brief Return `idx`-th trit of `*p`.
+ *
+ * Precondition: `idx < PTRIT_SIZE`.
+ *
+ * @param[in] p pointer to the ptrit
+ * @param[in] idx slice index
+ * @return trit value
+ */
 trit_t ptrit_get(ptrit_t const *p, size_t idx);
 
+/**
+ * @brief Fill ptrits in `dst` with corresponding trits in `src`
+ *
+ * @param[in] n number of ptrits in `dst` and trits in `src`
+ * @param[out] dst pointer to ptrits
+ * @param[in] src pointer to trits
+ */
 void ptrits_fill(size_t n, ptrit_t *dst, trit_t const *src);
 
+/**
+ * @brief Set `idx`-th trits in ptrits in `dst` with corresponding trits in `src`
+ *
+ * @param[in] n number of ptrits in `dst` and trits in `src`
+ * @param[out] dst pointer to ptrits
+ * @param[in] idx slice index
+ * @param[in] src pointer to trits
+ */
 void ptrits_set_slice(size_t n, ptrit_t *dst, size_t idx, trit_t const *src);
 
+/**
+ * @brief Put `idx`-th trits in ptrits in `src` into corresponding trits in `dst`
+ *
+ * @param[in] n number of ptrits in `dst` and trits in `src`
+ * @param[out] dst pointer to trits
+ * @param[in] src pointer to ptrits
+ * @param[in] idx slice index
+ */
 void ptrits_get_slice(size_t n, trit_t *dst, ptrit_t const *src, size_t idx);
 
-// ptrits_find_zero_slice
+/**
+ * @brief Find such `idx` that all `idx`-th trits in ptrits in `p` are zero
+ *
+ * @param[in] n number of ptrits in `p`
+ * @param[in] p pointer to ptrits
+ * @return idx or `PTRIT_SIZE` if no such index is found
+ */
 size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p);
 
-// ptrits_sum_slice
+/**
+ * @brief Find sum of `idx`-th trits in ptrits in `p`
+ *
+ * @param[in] n number of ptrits in `p`
+ * @param[in] p pointer to ptrits
+ * @param[in] idx slice index
+ * @return sum of trits in `idx`-th slice
+ */
 ssize_t ptrits_sum_slice(size_t n, ptrit_t const *p, size_t idx);
 
 #ifdef __cplusplus
