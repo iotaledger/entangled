@@ -138,6 +138,60 @@ uint64_t const ptrit_iota[PTRIT_SIZE_LOG3][2][2] = {
         },
     },
 };
+#elif defined(PTRIT_CVT_ORN)
+uint64_t const ptrit_iota[PTRIT_SIZE_LOG3][2][2] = {
+    {
+        {
+            0x4924924924924924,
+            0x2492492492492492,
+        },
+        {
+            0x6db6db6db6db6db6,
+            0xb6db6db6db6db6db,
+        },
+    },
+    {
+        {
+            0x70381c0e070381c0,
+            0x381c0e070381c0e0,
+        },
+        {
+            0x7e3f1f8fc7e3f1f8,
+            0x3f1f8fc7e3f1f8fc,
+        },
+    },
+    {
+        {
+            0x003fe00007fc0000,
+            0xc0000ff80001ff00,
+        },
+        {
+            0x803ffff007fffe00,
+            0xffe00ffffc01ffff,
+        },
+    },
+    {
+        {
+            0xffc0000000000000,
+            0x000000000001ffff,
+        },
+        {
+            0xfffffffff8000000,
+            0xfffff0000001ffff,
+        },
+    },
+    {
+        {
+            0x0000000000000000,
+            0x0000000000000000,
+        },
+        {
+            0x0000000000000000,
+            0xfffffffffffe0000,
+        },
+    },
+};
+
 #else
 #error Invalid PTRIT_CVT
 #endif  // PTRIT_CVT
