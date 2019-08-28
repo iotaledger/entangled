@@ -424,6 +424,7 @@ static void test_transaction_load_hashes_of_approvers_no_timestamp(void) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
   iota_transaction_t transaction;
   iota_stor_pack_t pack;
+  hash243_set_t hashes = NULL;
 
   hash_pack_init(&pack, 10);
 
@@ -459,12 +460,17 @@ static void test_transaction_load_hashes_of_approvers_no_timestamp(void) {
   add_assign(hash, HASH_LENGTH_TRIT, 1);
 
   for (size_t i = 0; i < 10; i++) {
+    TEST_ASSERT(hash243_set_add(&hashes, pack.models[i]) == RC_OK);
+  }
+
+  for (size_t i = 0; i < 10; i++) {
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    TEST_ASSERT_EQUAL_MEMORY(pack.models[i], transaction_hash(&transaction), FLEX_TRIT_SIZE_243);
+    TEST_ASSERT_TRUE(hash243_set_contains(hashes, transaction_hash(&transaction)));
     add_assign(hash, HASH_LENGTH_TRIT, 1);
   }
 
   hash_pack_free(&pack);
+  hash243_set_free(&hashes);
 }
 
 static void test_transaction_load_hashes_of_approvers_timestamp(void) {
