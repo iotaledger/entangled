@@ -6,6 +6,7 @@
  */
 
 #include <string.h>
+
 #include <unity/unity.h>
 
 #include "common/trinary/ptrit.h"
