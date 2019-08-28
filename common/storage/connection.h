@@ -24,13 +24,14 @@ typedef struct storage_connection_s {
   storage_connection_type_t type;
 } storage_connection_t;
 
-typedef struct connection_config_t {
+typedef struct storage_connection_config_s {
   char const* db_path;
-} connection_config_t;
+} storage_connection_config_t;
 
-extern retcode_t connection_init(storage_connection_t* const connection, connection_config_t const* const config,
-                                 storage_connection_type_t const type);
-extern retcode_t connection_destroy(storage_connection_t* const connection);
+extern retcode_t storage_connection_init(storage_connection_t* const connection,
+                                         storage_connection_config_t const* const config,
+                                         storage_connection_type_t const type);
+extern retcode_t storage_connection_destroy(storage_connection_t* const connection);
 
 #ifdef __cplusplus
 }

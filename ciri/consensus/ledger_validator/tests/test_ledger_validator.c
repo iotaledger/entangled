@@ -11,11 +11,6 @@
 
 #include "math.h"
 
-#include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
-
 #include "ciri/consensus/ledger_validator/ledger_validator.h"
 #include "ciri/consensus/milestone/milestone_service.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
@@ -26,6 +21,10 @@
 #include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
 #include "common/helpers/digest.h"
 #include "common/model/milestone.h"
+#include "common/model/transaction.h"
+#include "common/storage/connection.h"
+#include "common/storage/storage.h"
+#include "common/storage/tests/defs.h"
 #include "utarray.h"
 #include "utils/containers/hash/hash_uint64_t_map.h"
 #include "utils/macros.h"
@@ -37,13 +36,12 @@
 #define TEST_NUM_SNAPSHOTS 2
 
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 static iota_consensus_conf_t conf;
 
-static char *test_db_path = "ciri/consensus/ledger_validator/tests/test.db";
-static char *ciri_db_path = "ciri/consensus/ledger_validator/tests/ciri.db";
+static char *tangle_test_db_path = "ciri/consensus/ledger_validator/tests/test.db";
 static char *snapshot_path = "ciri/consensus/ledger_validator/tests/snapshot.txt";
-static char *local_snapshot_path_base = "ciri/consensus/ledger_validator/tests/local_snapshot";
+static char *local_snapshot_base_dir = "ciri/consensus/ledger_validator/tests";
 static char *snapshot_conf_path = "ciri/consensus/ledger_validator/tests/snapshot_conf.json";
 
 static uint64_t initial_milestone_index = 1;
@@ -63,24 +61,24 @@ static pruning_service_t ps;
 static tips_cache_t tips;
 static flex_trit_t g_seed[FLEX_TRIT_SIZE_243];
 
-void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
+void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
-void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
+void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 
 static void init_test_structs() {
   conf.max_depth = initial_milestone_index;
 
   strcpy(conf.snapshot_file, snapshot_path);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(conf.local_snapshots.local_snapshots_path_base, local_snapshot_path_base);
+  strcpy(conf.local_snapshots.base_dir, local_snapshot_base_dir);
   conf.snapshot_signature_skip_validation = true;
-  strcpy(conf.tangle_db_path, test_db_path);
+  strcpy(conf.tangle_db_path, tangle_test_db_path);
   conf.last_milestone = 0;
   conf.coordinator_security_level = 1;
   conf.local_snapshots.local_snapshots_is_enabled = false;
   conf.local_snapshots.min_depth = 1;
   conf.snapshot_signature_index = 0;
-  strcpy(conf.local_snapshots.local_snapshots_path_base, local_snapshot_path_base);
+  strcpy(conf.local_snapshots.base_dir, local_snapshot_base_dir);
   memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   flex_trits_from_trytes(g_seed, NUM_TRITS_HASH, (tryte_t *)TEST_SEED, NUM_TRITS_HASH, NUM_TRYTES_HASH);
 
@@ -186,7 +184,7 @@ int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
 
   iota_consensus_conf_init(&conf);
 

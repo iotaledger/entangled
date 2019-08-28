@@ -169,7 +169,7 @@ static void* milestone_validator(void* arg) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = mt->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = mt->conf->tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");
@@ -289,7 +289,7 @@ static void* milestone_solidifier(void* arg) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = mt->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = mt->conf->tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");

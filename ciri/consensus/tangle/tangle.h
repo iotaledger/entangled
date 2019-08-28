@@ -39,7 +39,7 @@ typedef enum _partial_transaction_model {
   PARTIAL_TX_MODEL_ESSENCE_CONSENSUS,
 } partial_transaction_model_e;
 
-retcode_t iota_tangle_init(tangle_t *const tangle, connection_config_t const *const config);
+retcode_t iota_tangle_init(tangle_t *const tangle, storage_connection_config_t const *const config);
 
 retcode_t iota_tangle_destroy(tangle_t *const tangle);
 

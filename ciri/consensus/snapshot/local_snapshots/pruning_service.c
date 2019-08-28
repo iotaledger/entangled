@@ -103,7 +103,7 @@ static void *pruning_service_routine(void *arg) {
   lock_handle_t lock_cond;
 
   {
-    connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = ps->conf->tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Failed in initializing db\n");
@@ -112,7 +112,7 @@ static void *pruning_service_routine(void *arg) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = ps->spent_addresses_service->conf->spent_addresses_db_path};
+    storage_connection_config_t db_conf = {.db_path = ps->spent_addresses_service->conf->spent_addresses_db_path};
 
     if (iota_spent_addresses_provider_init(&sap, &db_conf) != RC_OK) {
       log_error(logger_id, "Initializing spent addresses database connection failed\n");
