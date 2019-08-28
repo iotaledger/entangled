@@ -58,7 +58,8 @@ static retcode_t mysql_stmt_bind_param_and_execute(MYSQL_STMT* const mariadb_sta
   return RC_OK;
 }
 
-static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bool* const exist) {
+static retcode_t execute_statement_one_result(MYSQL_STMT* const mariadb_statement, void* const buffer,
+                                              enum enum_field_types const buffer_type) {
   MYSQL_BIND bind[1];
 
   memset(bind, 0, sizeof(bind));
@@ -68,8 +69,8 @@ static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bo
     return RC_STORAGE_FAILED_EXECUTE;
   }
 
-  bind[0].buffer = (char*)exist;
-  bind[0].buffer_type = MYSQL_TYPE_TINY;
+  bind[0].buffer = (char*)buffer;
+  bind[0].buffer_type = buffer_type;
 
   if (mysql_stmt_bind_and_store_result(mariadb_statement, bind) != 0) {
     return RC_STORAGE_FAILED_BINDING;
@@ -83,29 +84,12 @@ static retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bo
   return RC_OK;
 }
 
-static retcode_t execute_statement_count(MYSQL_STMT* const mariadb_statement, uint64_t* const count) {
-  MYSQL_BIND bind[1];
+static inline retcode_t execute_statement_exist(MYSQL_STMT* const mariadb_statement, bool* const exist) {
+  return execute_statement_one_result(mariadb_statement, exist, MYSQL_TYPE_TINY);
+}
 
-  memset(bind, 0, sizeof(bind));
-
-  if (mysql_stmt_execute(mariadb_statement) != 0) {
-    log_statement_error(mariadb_statement);
-    return RC_STORAGE_FAILED_EXECUTE;
-  }
-
-  bind[0].buffer = (char*)count;
-  bind[0].buffer_type = MYSQL_TYPE_LONGLONG;
-
-  if (mysql_stmt_bind_and_store_result(mariadb_statement, bind) != 0) {
-    return RC_STORAGE_FAILED_BINDING;
-  }
-
-  if (mysql_stmt_fetch(mariadb_statement) != 0) {
-    log_statement_error(mariadb_statement);
-    return RC_STORAGE_FAILED_STORE_RESULT;
-  }
-
-  return RC_OK;
+static inline retcode_t execute_statement_count(MYSQL_STMT* const mariadb_statement, uint64_t* const count) {
+  return execute_statement_one_result(mariadb_statement, count, MYSQL_TYPE_LONGLONG);
 }
 
 static void storage_transaction_load_bind_essence(MYSQL_BIND* const bind, iota_transaction_t* const transaction,
