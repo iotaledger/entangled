@@ -30,26 +30,6 @@ cc_library(
 )
 
 config_setting(
-    name = "pcurl_s2_circuit4",
-    values = {"define": "pcurl_s2_circuit=4"},
-)
-
-config_setting(
-    name = "pcurl_s2_circuit5",
-    values = {"define": "pcurl_s2_circuit=5"},
-)
-
-config_setting(
-    name = "pcurl_s2_args_lut",
-    values = {"define": "pcurl_s2_args=lut"},
-)
-
-config_setting(
-    name = "pcurl_s2_args_ptr",
-    values = {"define": "pcurl_s2_args=ptr"},
-)
-
-config_setting(
     name = "pcurl_state_double",
     values = {"define": "pcurl_state=double"},
 )
@@ -86,14 +66,6 @@ cc_library(
         "ptrit.h",
     ],
     defines = select({
-        ":pcurl_s2_circuit4": ["PCURL_S2_CIRCUIT4"],
-        ":pcurl_s2_circuit5": ["PCURL_S2_CIRCUIT5"],
-        "//conditions:default": ["PCURL_S2_CIRCUIT4"],
-    }) + select({
-        ":pcurl_s2_args_lut": ["PCURL_S2_ARGS_LUT"],
-        ":pcurl_s2_args_ptr": ["PCURL_S2_ARGS_PTR"],
-        "//conditions:default": ["PCURL_S2_ARGS_PTR"],
-    }) + select({
         ":pcurl_state_double": ["PCURL_STATE_DOUBLE"],
         ":pcurl_state_short": ["PCURL_STATE_SHORT"],
         "//conditions:default": ["PCURL_STATE_SHORT"],
