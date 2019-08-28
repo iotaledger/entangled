@@ -384,7 +384,7 @@ static retcode_t storage_hashes_load_generic(MYSQL_STMT* const mariadb_statement
 
   while (mysql_stmt_fetch(mariadb_statement) == 0) {
     memcpy(pack->models[i], hash, FLEX_TRIT_SIZE_243);
-    memset(hash + length, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243 - length);
+    memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     i++;
   }
 
