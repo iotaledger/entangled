@@ -985,7 +985,7 @@ retcode_t storage_state_delta_store(storage_connection_t const* const connection
   }
 
   bind[0].buffer = (void*)bytes;
-  bind[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind[0].buffer_type = MYSQL_TYPE_LONG_BLOB;
   bind[0].buffer_length = size;
   bind[0].is_null = 0;
 
@@ -1059,7 +1059,7 @@ retcode_t storage_state_delta_load(storage_connection_t const* const connection,
   }
 
   bind_out[0].buffer = (char*)bytes;
-  bind_out[0].buffer_type = MYSQL_TYPE_BLOB;
+  bind_out[0].buffer_type = MYSQL_TYPE_LONG_BLOB;
   bind_out[0].buffer_length = size;
 
   if (mysql_stmt_bind_result(mariadb_statement, bind_out) != 0) {
