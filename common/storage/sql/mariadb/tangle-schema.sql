@@ -33,7 +33,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS transaction_hash_index ON iota_transaction(has
 CREATE TABLE IF NOT EXISTS iota_milestone (
   id INTEGER NOT NULL,
   hash BLOB NOT NULL,
-  delta BLOB,
+  delta LONGBLOB,
   PRIMARY KEY (id)
 );
 
