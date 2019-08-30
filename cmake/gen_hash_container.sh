@@ -11,7 +11,7 @@ for HASH_TYPE in ${TYPE_LIST[@]}; do
             echo "cp ${HASH_FILE} ${HASH_TEMPLATE_DIR}/${HASH_FILE_NAME}"
             cp ${HASH_FILE} ${HASH_TEMPLATE_DIR}/${HASH_FILE_NAME}
             if [[ "$OSTYPE" == "darwin"* ]]; then
-                sed -i.bak "s/{SIZE}/${HASH_SIZE}/g" ${HASH_TEMPLATE_DIR}/${HASH_FILE_NAME}
+                sed -i.bak "s/{SIZE}/${HASH_SIZE}/g" ${HASH_TEMPLATE_DIR}/${HASH_FILE_NAME} && rm -- "${HASH_TEMPLATE_DIR}/${HASH_FILE_NAME}.bak"
             else
                 sed -i "s/{SIZE}/${HASH_SIZE}/g" ${HASH_TEMPLATE_DIR}/${HASH_FILE_NAME}
             fi
