@@ -11,7 +11,7 @@ cc_library(
         "//cclient/serialization:serializer_json",
         "//ciri/api",
         "//common:errors",
-        "//common/storage",
+        "//common/storage:storage_common",
         "//utils:logger_helper",
         "//utils/handles:thread",
         "@cJSON",

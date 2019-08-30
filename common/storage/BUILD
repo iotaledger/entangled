@@ -1,9 +1,23 @@
+config_setting(
+    name = "sqlite3",
+    values = {"define": "storage=sqlite3"},
+)
+
+config_setting(
+    name = "mariadb",
+    values = {"define": "storage=mariadb"},
+)
+
 cc_library(
-    name = "storage",
-    srcs = glob(["*.c"]),
-    hdrs = glob(["*.h"]),
+    name = "storage_common",
+    hdrs = [
+        "connection.h",
+        "defs.h",
+        "storage.h",
+    ],
     visibility = ["//visibility:public"],
     deps = [
+        ":pack",
         "//ciri/consensus/snapshot:state_delta",
         "//common:errors",
         "//common/model:bundle",
@@ -13,6 +27,16 @@ cc_library(
         "//utils/containers/hash:hash243_queue",
         "//utils/containers/hash:hash81_queue",
     ],
+)
+
+cc_library(
+    name = "storage",
+    visibility = ["//visibility:public"],
+    deps = select({
+        ":sqlite3": ["//common/storage/sql/sqlite3:storage_sqlite3"],
+        ":mariadb": ["//common/storage/sql/mariadb:storage_mariadb"],
+        "//conditions:default": ["//common/storage/sql/sqlite3:storage_sqlite3"],
+    }),
 )
 
 cc_library(

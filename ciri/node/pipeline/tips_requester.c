@@ -35,7 +35,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = tips_requester->node->conf.tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = tips_requester->node->conf.tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");
