@@ -83,7 +83,7 @@ xcuserdata/
 *.framework/*
 
 # CMake generated files
-utils/containers/hash/hash27*
+utils/containers/hash/hash[0-9]*
 utils/containers/hash/hash81*
 utils/containers/hash/hash243*
 utils/containers/hash/hash6561*
