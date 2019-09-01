@@ -710,7 +710,6 @@ retcode_t iota_api_http_destroy(iota_api_http_t *const api) {
   for (tangle_iter = (tangle_t *)utarray_back(api->tangle_db_connections); tangle_iter != NULL;
        tangle_iter = (tangle_t *)utarray_back(api->tangle_db_connections)) {
     iota_tangle_destroy(tangle_iter);
-    free(tangle_iter);
   }
 
   utarray_free(api->tangle_db_connections);
@@ -719,7 +718,6 @@ retcode_t iota_api_http_destroy(iota_api_http_t *const api) {
        spent_addresses_iter != NULL;
        spent_addresses_iter = (spent_addresses_provider_t *)utarray_back(api->spent_addresses_db_connections)) {
     iota_spent_addresses_provider_destroy(spent_addresses_iter);
-    free(spent_addresses_iter);
   }
 
   utarray_free(api->spent_addresses_db_connections);
