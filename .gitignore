@@ -84,7 +84,3 @@ xcuserdata/
 
 # CMake generated files
 utils/containers/hash/hash[0-9]*
-utils/containers/hash/hash81*
-utils/containers/hash/hash243*
-utils/containers/hash/hash6561*
-utils/containers/hash/hash8019*
