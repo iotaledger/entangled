@@ -488,17 +488,15 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *const http, char
 
   if (!tangle) {
     storage_connection_config_t db_conf = {.db_path = http->api->conf.tangle_db_path};
-
-    tangle = (tangle_t *)calloc(1, sizeof(tangle_t));
-    utarray_push_back(http->tangle_db_connections, tangle);
+    utarray_extend_back(http->tangle_db_connections);
+    tangle = (tangle_t *)utarray_back(http->tangle_db_connections);
     iota_tangle_init(tangle, &db_conf);
   }
 
   if (!sap) {
     storage_connection_config_t db_conf = {.db_path = http->api->conf.spent_addresses_db_path};
-
-    sap = (spent_addresses_provider_t *)calloc(1, sizeof(spent_addresses_provider_t));
-    utarray_push_back(http->spent_addresses_db_connections, sap);
+    utarray_extend_back(http->spent_addresses_db_connections);
+    sap = (spent_addresses_provider_t *)utarray_back(http->spent_addresses_db_connections);
     iota_spent_addresses_provider_init(sap, &db_conf);
   }
 
