@@ -12,6 +12,7 @@
 
 #include "ciri/consensus/conf.h"
 #include "ciri/consensus/snapshot/snapshots_provider.h"
+#include "ciri/node/pipeline/transaction_requester.h"
 #include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
 #include "common/model/milestone.h"
@@ -56,6 +57,7 @@ typedef struct milestone_tracker_s {
   flex_trit_t latest_solid_milestone[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
+  transaction_requester_t* transaction_requester;
   hash243_queue_t candidates;
   lock_handle_t candidates_lock;
 } milestone_tracker_t;
@@ -72,7 +74,8 @@ typedef struct milestone_tracker_s {
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshots_provider_t* const snapshots_provider, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* ts);
+                                      transaction_solidifier_t* ts,
+                                      transaction_requester_t* const transaction_requester);
 
 /**
  * Starts a milestone tracker

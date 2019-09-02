@@ -330,7 +330,8 @@ static void* milestone_solidifier(void* arg) {
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshots_provider_t* const snapshots_provider, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* const ts) {
+                                      transaction_solidifier_t* const ts,
+                                      transaction_requester_t* const transaction_requester) {
   if (mt == NULL) {
     return RC_NULL_PARAM;
   }
@@ -347,6 +348,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_milestone_index = MAX(conf->last_milestone, snapshots_provider->initial_snapshot.metadata.index);
   mt->snapshots_provider = snapshots_provider;
+  mt->transaction_requester = transaction_requester;
   cond_handle_init(&mt->cond_validator);
   cond_handle_init(&mt->cond_solidifier);
 
