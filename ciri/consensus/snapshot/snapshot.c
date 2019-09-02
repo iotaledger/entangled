@@ -169,7 +169,7 @@ retcode_t iota_snapshot_load_local_snapshot(snapshot_t *const snapshot, iota_con
   strcat(file_path, SNAPSHOT_METADATA_FILE_NAME);
 
   if ((ret = (iota_snapshot_metadata_read_from_file(&snapshot->metadata, file_path)) != RC_OK)) {
-    log_critical(logger_id, "Initializing snapshot metadata failed\n");
+    log_critical(logger_id, "Initializing snapshot metadata failed, (file path: %s)\n", file_path);
     return ret;
   }
 
