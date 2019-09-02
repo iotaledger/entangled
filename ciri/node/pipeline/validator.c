@@ -123,14 +123,14 @@ static retcode_t validate_transaction_bytes(validator_stage_t const *const valid
     goto failure;
   }
 
-  if (ret = requester_clear_request(validator->milestone_tracker->transaction_requester, hash) != RC_OK) {
-    log_warning(logger_id, "Failed removing hash from requester\n");
-    goto failure;
-  }
-
   if (ret =
           requester_was_requested(validator->milestone_tracker->transaction_requester, hash, &was_requested) != RC_OK) {
     log_warning(logger_id, "Failed querying requester\n");
+    goto failure;
+  }
+
+  if (ret = requester_clear_request(validator->milestone_tracker->transaction_requester, hash) != RC_OK) {
+    log_warning(logger_id, "Failed removing hash from requester\n");
     goto failure;
   }
 
