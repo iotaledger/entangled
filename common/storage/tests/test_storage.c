@@ -44,7 +44,7 @@ static void store_test_transaction(iota_transaction_t* const transaction) {
 
 static void store_test_milestone(iota_milestone_t* const milestone) {
   milestone->index = TEST_MS_INDEX;
-  flex_trits_from_trytes(milestone->hash, NUM_TRITS_HASH, TEST_TX_HASH, NUM_TRITS_HASH, NUM_TRYTES_HASH);
+  memcpy(milestone->hash, TEST_TX_HASH, FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT(storage_milestone_store(&connection, milestone) == RC_OK);
 }
