@@ -28,9 +28,8 @@ typedef struct iota_api_http_session_s {
   char_buffer_t *request;
 } iota_api_http_session_t;
 
-
-UT_icd ut_tangle_icd = {sizeof(tangle_t), NULL, NULL, NULL};
-UT_icd ut_spent_addresses_provider_icd = {sizeof(spent_addresses_provider_t), NULL, NULL, NULL};
+static UT_icd ut_tangle_icd = {sizeof(tangle_t), NULL, NULL, NULL};
+static UT_icd ut_spent_addresses_provider_icd = {sizeof(spent_addresses_provider_t), NULL, NULL, NULL};
 
 static retcode_t error_serialize_response(iota_api_http_t *const http, error_res_t **const error,
                                           char const *const message, char_buffer_t *const out) {
