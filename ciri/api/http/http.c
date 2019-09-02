@@ -28,6 +28,10 @@ typedef struct iota_api_http_session_s {
   char_buffer_t *request;
 } iota_api_http_session_t;
 
+
+UT_icd ut_tangle_icd = {sizeof(tangle_t), NULL, NULL, NULL};
+UT_icd ut_spent_addresses_provider_icd = {sizeof(spent_addresses_provider_t), NULL, NULL, NULL};
+
 static retcode_t error_serialize_response(iota_api_http_t *const http, error_res_t **const error,
                                           char const *const message, char_buffer_t *const out) {
   retcode_t ret = RC_OK;
@@ -659,8 +663,8 @@ retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api)
   http->running = false;
   http->api = api;
 
-  utarray_new(http->tangle_db_connections, &ut_ptr_icd);
-  utarray_new(http->spent_addresses_db_connections, &ut_ptr_icd);
+  utarray_new(http->tangle_db_connections, &ut_tangle_icd);
+  utarray_new(http->spent_addresses_db_connections, &ut_spent_addresses_provider_icd);
 
   init_json_serializer(&http->serializer);
 
