@@ -19,7 +19,7 @@
 #include "utils/macros.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
-#define SOLID_MILESTONE_RESCAN_INTERVAL_MS 50ULL
+#define SOLID_MILESTONE_RESCAN_INTERVAL_MS 500ULL
 
 static logger_id_t logger_id;
 
