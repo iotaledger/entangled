@@ -307,6 +307,12 @@ static void* milestone_solidifier(void* arg) {
       if (update_latest_solid_milestone(mt, &tangle) != RC_OK) {
         log_warning(logger_id, "Updating latest solid milestone failed\n");
       }
+
+      if (iota_snapshot_get_index(&mt->snapshots_provider->latest_snapshot) == mt->latest_milestone_index) {
+        if (requester_clear_requested_hashes(mt->transaction_requester) != RC_OK) {
+          log_warning(logger_id, "Failed clearing requested hashes\n");
+        }
+      }
       if (previous_solid_latest_milestone_index != mt->latest_solid_milestone_index) {
         log_info(logger_id,
                  "Latest solid milestone was changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",

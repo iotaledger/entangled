@@ -131,6 +131,18 @@ retcode_t requester_clear_request(transaction_requester_t *const transaction_req
   return RC_OK;
 }
 
+retcode_t requester_clear_requested_hashes(transaction_requester_t *const transaction_requester) {
+  if (transaction_requester == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  rw_lock_handle_wrlock(&transaction_requester->requested_hashes_lock);
+  hash243_set_free(&transaction_requester->requested_hashes);
+  rw_lock_handle_unlock(&transaction_requester->requested_hashes_lock);
+
+  return RC_OK;
+}
+
 retcode_t requester_was_requested(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash,
                                   bool *const was_requested) {
   if (transaction_requester == NULL || hash == NULL || was_requested == NULL) {

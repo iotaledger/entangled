@@ -42,8 +42,8 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
 
   log_info(logger_id, "Initializing validator stage\n");
   if ((ret = validator_stage_init(&node->validator, node, &core->consensus.transaction_validator,
-                                  &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker)) !=
-      RC_OK) {
+                                  &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker,
+                                  &core->consensus.snapshots_provider)) != RC_OK) {
     log_critical(logger_id, "Initializing validator stage failed\n");
     return ret;
   }

@@ -93,6 +93,15 @@ bool requester_is_full(transaction_requester_t *const transaction_requester);
 retcode_t requester_clear_request(transaction_requester_t *const transaction_requester, flex_trit_t const *const hash);
 
 /**
+ * Clears set of requested_hashes
+ *
+ * @param[out]  transaction_requester The transaction requester
+ *
+ * @return a status code
+ */
+retcode_t requester_clear_requested_hashes(transaction_requester_t *const transaction_requester);
+
+/**
  * Checks if a transaction was requested
  *
  * @param[in]   transaction_requester The transaction requester

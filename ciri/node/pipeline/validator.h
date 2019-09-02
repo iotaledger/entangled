@@ -26,6 +26,7 @@ typedef struct node_s node_t;
 typedef struct transaction_validator_s transaction_validator_t;
 typedef struct transaction_solidifier_s transaction_solidifier_t;
 typedef struct milestone_tracker_s milestone_tracker_t;
+typedef struct snapshots_provider_s snapshots_provider_t;
 
 typedef struct validator_payload_s {
   protocol_gossip_queue_entry_t *gossip;
@@ -52,6 +53,7 @@ typedef struct validator_stage_s {
   transaction_validator_t *transaction_validator;
   transaction_solidifier_t *transaction_solidifier;
   milestone_tracker_t *milestone_tracker;
+  snapshots_provider_t *snapshots_provider;
 } validator_stage_t;
 
 /**
@@ -68,7 +70,8 @@ typedef struct validator_stage_s {
 retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const node,
                                transaction_validator_t *const transaction_validator,
                                transaction_solidifier_t *const transaction_solidifier,
-                               milestone_tracker_t *const milestone_tracker);
+                               milestone_tracker_t *const milestone_tracker,
+                               snapshots_provider_t *const snapshots_provider);
 
 /**
  * Starts a validator stage
