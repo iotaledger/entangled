@@ -15,7 +15,7 @@ static test_result_t test(pcurl_t const *pcurl, test_arg_t security) {
 
   for (i = 0; i < PTRIT_SIZE; i++) {
     ptrit_t const *p = pcurl->state;
-    ssize_t sum = 0;
+    long sum = 0;
     size_t j = 0;
 
     for (; j++ < (size_t)security;) {

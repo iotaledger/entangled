@@ -270,7 +270,7 @@ size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p);
  * @param[in] idx slice index
  * @return sum of trits in `idx`-th slice
  */
-ssize_t ptrits_sum_slice(size_t n, ptrit_t const *p, size_t idx);
+long ptrits_sum_slice(size_t n, ptrit_t const *p, size_t idx);
 
 #ifdef __cplusplus
 }

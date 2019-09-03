@@ -167,8 +167,8 @@ size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p) {
   return i;
 }
 
-ssize_t ptrits_sum_slice(size_t n, ptrit_t const *p, size_t idx) {
-  ssize_t sum = 0;
+long ptrits_sum_slice(size_t n, ptrit_t const *p, size_t idx) {
+  long sum = 0;
   for (; n--;) {
     sum += ptrit_get(p++, idx);
   }
