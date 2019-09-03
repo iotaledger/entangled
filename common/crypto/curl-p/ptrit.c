@@ -11,6 +11,8 @@
 #include "utils/forced_inline.h"
 #include "utils/memset_safe.h"
 
+#define CURL_STATE_HALF_SIZE ((CURL_STATE_SIZE + 1) / 2)
+
 static FORCED_INLINE void pcurl_s2(ptrit_t const *a, ptrit_t const *b, ptrit_t *c) {
 #if defined(PTRIT_CVT_ORN)
   // (Xor AH (Orn BL AL),Xor AL (Orn BH (Xor AH (Orn BL AL))))
@@ -30,9 +32,9 @@ static FORCED_INLINE void pcurl_sbox(ptrit_t *c, ptrit_t const *s) {
   size_t i;
 
   // 0, 364, 728, 363, 727, ..., 2, 366, 1, 365, 0
-  ptrit_t const *x = s + 0, *y = s + 364;
+  ptrit_t const *x = s + 0, *y = s + CURL_STATE_HALF_SIZE - 1;
   pcurl_s2(x, y, c++);
-  x = s + 728;
+  x = s + CURL_STATE_SIZE - 1;
 
 #if defined(PCURL_SBOX_UNWIND_2)
   // 728 = 8*91
@@ -74,8 +76,8 @@ static FORCED_INLINE void pcurl_sbox(ptrit_t *c, ptrit_t const *s) {
 static FORCED_INLINE void pcurl_sbox_0(ptrit_t *a, ptrit_t *b, ptrit_t *c) {
   size_t i;
 
-  a = a + 364;
-  b = b + 364;
+  a = a + CURL_STATE_HALF_SIZE - 1;
+  b = b + CURL_STATE_HALF_SIZE - 1;
   c = c + 0;
   ptrit_t *aa = a;
   ptrit_t *c0 = c;
@@ -117,9 +119,9 @@ static FORCED_INLINE void pcurl_sbox_0(ptrit_t *a, ptrit_t *b, ptrit_t *c) {
 static FORCED_INLINE void pcurl_sbox_1(ptrit_t *a, ptrit_t *b, ptrit_t *c) {
   size_t i;
 
-  c = c + 364;
+  c = c + CURL_STATE_HALF_SIZE - 1;
   a = a + 0;
-  b = b + 364;
+  b = b + CURL_STATE_HALF_SIZE - 1;
   ptrit_t *cc = c;
   ptrit_t *b0 = b;
 
@@ -259,9 +261,9 @@ void pcurl_transform(pcurl_t *ctx) {
   size_t round;
 
   ptrit_t *a = ctx->state;
-  ptrit_t *b = a + (CURL_STATE_SIZE + 1) / 2;
-  ptrit_t *c = b + (CURL_STATE_SIZE + 1) / 2;
-  b[364] = a[0];
+  ptrit_t *b = a + CURL_STATE_HALF_SIZE;
+  ptrit_t *c = b + CURL_STATE_HALF_SIZE;
+  b[CURL_STATE_HALF_SIZE - 1] = a[0];
   for (round = 0; round < ctx->round_count / 3; ++round) {
     pcurl_sbox_0(a, b, c);
     pcurl_sbox_1(a, b, c);
@@ -295,7 +297,7 @@ void pcurl_reset(pcurl_t *ctx) {
   // 0 -> (0,1)
   size_t i;
 #if defined(PCURL_STATE_SHORT)
-  for (i = 0; i < 3 * (CURL_STATE_SIZE + 1) / 2; ++i)
+  for (i = 0; i < 3 * CURL_STATE_HALF_SIZE; ++i)
 #elif defined(PCURL_STATE_DOUBLE)
   for (i = 0; i < 2 * CURL_STATE_SIZE; ++i)
 #else
