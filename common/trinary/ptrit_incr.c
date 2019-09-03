@@ -58,7 +58,7 @@ int ptrit_hincr(size_t n, ptrit_t *t) {
 #else
 #error Invalid PTRIT_CVT.
 #endif  // PTRIT_CVT
-    if (0 == *(uint64_t *)&carry) break;
+    if (0 == *(char *)&carry) break;
   }
 
   return (0 == n) ? 1 : 0;
