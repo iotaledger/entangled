@@ -115,8 +115,6 @@ void ptrits_get_slice(size_t n, trit_t *dst, ptrit_t const *src, size_t idx) {
   }
 }
 
-// Return index of all-zero n-trit slice or PTRIT_SIZE.
-// TODO: return SIZE_MAX?
 size_t ptrits_find_zero_slice(size_t n, ptrit_t const *p) {
   ptrit_s t;
   size_t i, w;
