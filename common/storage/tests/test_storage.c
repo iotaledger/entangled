@@ -32,6 +32,20 @@ void setUp(void) {
 
 void tearDown(void) { TEST_ASSERT(storage_test_teardown(&connection, tangle_test_db_path, connection_type) == RC_OK); }
 
+static bool cmp_pack_set(iota_stor_pack_t const* const pack, hash243_set_t const set) {
+  if (pack->num_loaded != hash243_set_size(set)) {
+    return false;
+  }
+
+  for (size_t i = 0; i < pack->num_loaded; i++) {
+    if (!hash243_set_contains(set, pack->models[i])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 static void store_test_transaction(iota_transaction_t* const transaction) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
 
@@ -358,9 +372,10 @@ static void test_transaction_load_hashes(void) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
   flex_trit_t first_address[FLEX_TRIT_SIZE_243];
   flex_trit_t second_address[FLEX_TRIT_SIZE_243];
-  flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
   iota_transaction_t transaction;
   iota_stor_pack_t pack;
+  hash243_set_t first_cmp_set = NULL;
+  hash243_set_t second_cmp_set = NULL;
 
   hash_pack_init(&pack, 10);
 
@@ -377,12 +392,15 @@ static void test_transaction_load_hashes(void) {
   flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
   for (size_t i = 0; i < 10; i++) {
+    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
     if (i % 2) {
       memcpy(transaction_address(&transaction), first_address, FLEX_TRIT_SIZE_243);
+      TEST_ASSERT(hash243_set_add(&first_cmp_set, transaction_hash(&transaction)) == RC_OK);
     } else {
       memcpy(transaction_address(&transaction), second_address, FLEX_TRIT_SIZE_243);
+      TEST_ASSERT(hash243_set_add(&second_cmp_set, transaction_hash(&transaction)) == RC_OK);
     }
-    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
     TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
     transaction_deserialize_from_trits(&transaction, transaction_trits, true);
     add_assign(hash, HASH_LENGTH_TRIT, 1);
@@ -392,14 +410,7 @@ static void test_transaction_load_hashes(void) {
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 5);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  add_assign(hash, HASH_LENGTH_TRIT, 1);
-
-  for (size_t i = 0; i < 5; i++) {
-    flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    TEST_ASSERT_EQUAL_MEMORY(pack.models[i], flex_hash, FLEX_TRIT_SIZE_243);
-    add_assign(hash, HASH_LENGTH_TRIT, 2);
-  }
+  TEST_ASSERT_TRUE(cmp_pack_set(&pack, first_cmp_set));
 
   hash_pack_reset(&pack);
 
@@ -407,15 +418,11 @@ static void test_transaction_load_hashes(void) {
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 5);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-
-  for (size_t i = 0; i < 5; i++) {
-    flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    TEST_ASSERT_EQUAL_MEMORY(pack.models[i], flex_hash, FLEX_TRIT_SIZE_243);
-    add_assign(hash, HASH_LENGTH_TRIT, 2);
-  }
+  TEST_ASSERT_TRUE(cmp_pack_set(&pack, second_cmp_set));
 
   hash_pack_free(&pack);
+  hash243_set_free(&first_cmp_set);
+  hash243_set_free(&second_cmp_set);
 }
 
 static void test_transaction_load_hashes_of_approvers_no_timestamp(void) {
@@ -424,7 +431,7 @@ static void test_transaction_load_hashes_of_approvers_no_timestamp(void) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
   iota_transaction_t transaction;
   iota_stor_pack_t pack;
-  hash243_set_t hashes = NULL;
+  hash243_set_t cmp_set = NULL;
 
   hash_pack_init(&pack, 10);
 
@@ -441,12 +448,14 @@ static void test_transaction_load_hashes_of_approvers_no_timestamp(void) {
   add_assign(hash, HASH_LENGTH_TRIT, 1);
 
   for (size_t i = 0; i < 10; i++) {
+    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
     if (i % 2) {
       memcpy(transaction_trunk(&transaction), TEST_TX_HASH, FLEX_TRIT_SIZE_243);
+      TEST_ASSERT(hash243_set_add(&cmp_set, transaction_hash(&transaction)) == RC_OK);
     } else {
       memcpy(transaction_branch(&transaction), TEST_TX_HASH, FLEX_TRIT_SIZE_243);
+      TEST_ASSERT(hash243_set_add(&cmp_set, transaction_hash(&transaction)) == RC_OK);
     }
-    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
     TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
     transaction_deserialize_from_trits(&transaction, transaction_trits, true);
     add_assign(hash, HASH_LENGTH_TRIT, 1);
@@ -456,21 +465,10 @@ static void test_transaction_load_hashes_of_approvers_no_timestamp(void) {
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 10);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, transaction_hash(&transaction), HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  add_assign(hash, HASH_LENGTH_TRIT, 1);
-
-  for (size_t i = 0; i < 10; i++) {
-    TEST_ASSERT(hash243_set_add(&hashes, pack.models[i]) == RC_OK);
-  }
-
-  for (size_t i = 0; i < 10; i++) {
-    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    TEST_ASSERT_TRUE(hash243_set_contains(hashes, transaction_hash(&transaction)));
-    add_assign(hash, HASH_LENGTH_TRIT, 1);
-  }
+  TEST_ASSERT_TRUE(cmp_pack_set(&pack, cmp_set));
 
   hash_pack_free(&pack);
-  hash243_set_free(&hashes);
+  hash243_set_free(&cmp_set);
 }
 
 static void test_transaction_load_hashes_of_approvers_timestamp(void) {
@@ -479,6 +477,7 @@ static void test_transaction_load_hashes_of_approvers_timestamp(void) {
   flex_trit_t transaction_trits[FLEX_TRIT_SIZE_8019];
   iota_transaction_t transaction;
   iota_stor_pack_t pack;
+  hash243_set_t cmp_set = NULL;
 
   hash_pack_init(&pack, 10);
 
@@ -497,6 +496,7 @@ static void test_transaction_load_hashes_of_approvers_timestamp(void) {
   for (size_t i = 0; i < 5; i++) {
     memcpy(transaction_trunk(&transaction), TEST_TX_HASH, FLEX_TRIT_SIZE_243);
     flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    TEST_ASSERT(hash243_set_add(&cmp_set, transaction_hash(&transaction)) == RC_OK);
     TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
     transaction_deserialize_from_trits(&transaction, transaction_trits, true);
     add_assign(hash, HASH_LENGTH_TRIT, 1);
@@ -518,16 +518,10 @@ static void test_transaction_load_hashes_of_approvers_timestamp(void) {
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 5);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, transaction_hash(&transaction), HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  add_assign(hash, HASH_LENGTH_TRIT, 1);
-
-  for (size_t i = 0; i < 5; i++) {
-    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    TEST_ASSERT_EQUAL_MEMORY(pack.models[i], transaction_hash(&transaction), FLEX_TRIT_SIZE_243);
-    add_assign(hash, HASH_LENGTH_TRIT, 1);
-  }
+  TEST_ASSERT_TRUE(cmp_pack_set(&pack, cmp_set));
 
   hash_pack_free(&pack);
+  hash243_set_free(&cmp_set);
 }
 
 static void test_transaction_load_hashes_of_milestone_candidates(void) {
@@ -536,6 +530,7 @@ static void test_transaction_load_hashes_of_milestone_candidates(void) {
   iota_transaction_t transaction;
   iota_milestone_t milestone;
   iota_stor_pack_t pack;
+  hash243_set_t cmp_set = NULL;
 
   hash_pack_init(&pack, 10);
 
@@ -551,6 +546,8 @@ static void test_transaction_load_hashes_of_milestone_candidates(void) {
       flex_trits_from_trits(milestone.hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
       milestone.index = TEST_MS_INDEX + i;
       TEST_ASSERT(storage_milestone_store(&connection, &milestone) == RC_OK);
+    } else {
+      TEST_ASSERT(hash243_set_add(&cmp_set, transaction_hash(&transaction)) == RC_OK);
     }
     TEST_ASSERT(storage_transaction_store(&connection, &transaction) == RC_OK);
     transaction_deserialize_from_trits(&transaction, transaction_trits, true);
@@ -562,15 +559,10 @@ static void test_transaction_load_hashes_of_milestone_candidates(void) {
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, 5);
   TEST_ASSERT_FALSE(pack.insufficient_capacity);
 
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, TEST_TX_HASH, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-
-  for (size_t i = 0; i < 5; i++) {
-    flex_trits_from_trits(transaction_hash(&transaction), HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    TEST_ASSERT_EQUAL_MEMORY(pack.models[i], transaction_hash(&transaction), FLEX_TRIT_SIZE_243);
-    add_assign(hash, HASH_LENGTH_TRIT, 2);
-  }
+  TEST_ASSERT_TRUE(cmp_pack_set(&pack, cmp_set));
 
   hash_pack_free(&pack);
+  hash243_set_free(&cmp_set);
 }
 
 static void test_transaction_approvers_count(void) {
