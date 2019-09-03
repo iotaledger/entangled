@@ -28,6 +28,7 @@ static void log_statement_error(MYSQL_STMT* const mariadb_statement) {
   log_error(logger_id, "Statement error with code: %d, state: %s and message: \"%s\"\n",
             mysql_stmt_errno(mariadb_statement), mysql_stmt_sqlstate(mariadb_statement),
             mysql_stmt_error(mariadb_statement));
+  fprintf(stderr, "%s\n", mysql_stmt_error(mariadb_statement));
 }
 
 static retcode_t mysql_stmt_bind_and_store_result(MYSQL_STMT* const mariadb_statement, MYSQL_BIND* const bind) {
