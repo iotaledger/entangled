@@ -117,12 +117,12 @@ static void storage_transaction_load_bind_essence(MYSQL_BIND* const bind, iota_t
   (*index)++;
 
   bind[*index].buffer = (char*)&transaction->essence.current_index;
-  bind[*index].buffer_type = MYSQL_TYPE_SHORT;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
   transaction->loaded_columns_mask.essence |= MASK_ESSENCE_CURRENT_INDEX;
   (*index)++;
 
   bind[*index].buffer = (char*)&transaction->essence.last_index;
-  bind[*index].buffer_type = MYSQL_TYPE_SHORT;
+  bind[*index].buffer_type = MYSQL_TYPE_LONGLONG;
   transaction->loaded_columns_mask.essence |= MASK_ESSENCE_LAST_INDEX;
   (*index)++;
 
@@ -404,8 +404,8 @@ retcode_t storage_transaction_store(storage_connection_t const* const connection
   column_compress_bind(bind, 2, &transaction->essence.value, MYSQL_TYPE_LONGLONG, -1);
   column_compress_bind(bind, 3, transaction->essence.obsolete_tag, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_81);
   column_compress_bind(bind, 4, &transaction->essence.timestamp, MYSQL_TYPE_LONGLONG, -1);
-  column_compress_bind(bind, 5, &transaction->essence.current_index, MYSQL_TYPE_SHORT, -1);
-  column_compress_bind(bind, 6, &transaction->essence.last_index, MYSQL_TYPE_SHORT, -1);
+  column_compress_bind(bind, 5, &transaction->essence.current_index, MYSQL_TYPE_LONGLONG, -1);
+  column_compress_bind(bind, 6, &transaction->essence.last_index, MYSQL_TYPE_LONGLONG, -1);
   column_compress_bind(bind, 7, transaction->essence.bundle, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
   column_compress_bind(bind, 8, transaction->attachment.trunk, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
   column_compress_bind(bind, 9, transaction->attachment.branch, MYSQL_TYPE_BLOB, FLEX_TRIT_SIZE_243);
