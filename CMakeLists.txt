@@ -25,8 +25,10 @@ find_package(Threads REQUIRED)
 # default CLI options
 option(CCLIENT "Enable CClient library" ON)
 option(CCLIENT_TEST "Enable CClient library test cases" ON)
-option(PCURL_SBOX_UNWIND "PCURL_SBOX_UNWIND_1 PCURL_SBOX_UNWIND_2 PCURL_SBOX_UNWIND_4 PCURL_SBOX_UNWIND_8" PCURL_SBOX_UNWIND_2)
-option(PCURL_STATE "PCURL_STATE_SHORT PCURL_STATE_DOUBLE" PCURL_STATE_SHORT)
+option(PCURL_SBOX_UNWIND_2 "Unwind 2 rounds of PCurl sbox" ON)
+option(PCURL_SBOX_UNWIND_4 "Unwind 4 rounds of PCurl sbox" OFF)
+option(PCURL_SBOX_UNWIND_8 "Unwind 8 rounds of PCurl sbox" OFF)
+option(PCURL_STATE_DOUBLE "Use PCurl double state; PCurl short state optimization is enabled by default" OFF)
 
 include(ExternalProject)
 
@@ -162,8 +164,22 @@ set(UTILS_SRC
   "${HASH_CONTAINERS_DIR}/hash8019_stack.c"
 )
 
-add_definitions("-D${PCURL_SBOX_UNWIND}")
-add_definitions("-D${PCURL_STATE}")
+if(${PCURL_SBOX_UNWIND_8})
+  add_definitions("-DPCURL_SBOX_UNWIND_8")
+elseif(${PCURL_SBOX_UNWIND_4})
+  add_definitions("-DPCURL_SBOX_UNWIND_4")
+elseif(${PCURL_SBOX_UNWIND_2})
+  add_definitions("-DPCURL_SBOX_UNWIND_2")
+else(${PCURL_SBOX_UNWIND_8})
+  # Unwind 2 loops by default
+  add_definitions("-DPCURL_SBOX_UNWIND_2")
+endif(${PCURL_SBOX_UNWIND_8})
+
+if(${PCURL_STATE_DOUBLE})
+  add_definitions("-DPCURL_STATE_DOUBLE")
+else(${PCURL_STATE_DOUBLE})
+  add_definitions("-DPCURL_STATE_SHORT")
+endif(${PCURL_STATE_DOUBLE})
 
 add_library(common 
   "${COMMON_SRC}"
