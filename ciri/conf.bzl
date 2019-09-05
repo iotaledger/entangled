@@ -1,4 +1,4 @@
-CIRI_VERSION = ["CIRI_VERSION='\"0.0.1-alpha\"'"]
+CIRI_VERSION = ["CIRI_VERSION='\"0.1.0-alpha\"'"]
 
 CIRI_MAINNET_VARIABLES = [
     "TANGLE_DB_PATH='\"ciri/db/tangle-mainnet.db\"'",
