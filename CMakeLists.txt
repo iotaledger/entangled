@@ -26,6 +26,12 @@ find_package(Threads REQUIRED)
 option(CCLIENT "Enable CClient library" ON)
 option(CCLIENT_TEST "Enable CClient library test cases" ON)
 
+# PCurl configuration flags
+option(PCURL_SBOX_UNWIND_2 "Unwind 2 rounds of PCurl sbox" ON)
+option(PCURL_SBOX_UNWIND_4 "Unwind 4 rounds of PCurl sbox" OFF)
+option(PCURL_SBOX_UNWIND_8 "Unwind 8 rounds of PCurl sbox" OFF)
+option(PCURL_STATE_DOUBLE "Use PCurl double state; PCurl short state optimization is enabled by default" OFF)
+
 include(ExternalProject)
 
 # we compile and install entangled all dependencies in a sandbox instead of system dirs.
@@ -76,11 +82,11 @@ set(COMMON_SRC
   # trynary
   "${COMMON_TRINARY_DIR}/add.c"
   "${COMMON_TRINARY_DIR}/flex_trit.c"
+  "${COMMON_TRINARY_DIR}/ptrit.c"
   "${COMMON_TRINARY_DIR}/ptrit_incr.c"
   "${COMMON_TRINARY_DIR}/trit_array.c"
   "${COMMON_TRINARY_DIR}/trit_byte.c"
   "${COMMON_TRINARY_DIR}/trit_long.c"
-  "${COMMON_TRINARY_DIR}/trit_ptrit.c"
   "${COMMON_TRINARY_DIR}/trit_tryte.c"
   "${COMMON_TRINARY_DIR}/tryte_ascii.c"
   "${COMMON_TRINARY_DIR}/tryte_long.c"
@@ -164,6 +170,23 @@ add_library(common
   "${COMMON_SRC}"
   "${UTILS_SRC}"
 )
+
+if(${PCURL_SBOX_UNWIND_8})
+  target_compile_definitions(common PRIVATE "-DPCURL_SBOX_UNWIND_8")
+elseif(${PCURL_SBOX_UNWIND_4})
+  target_compile_definitions(common PRIVATE "-DPCURL_SBOX_UNWIND_4")
+elseif(${PCURL_SBOX_UNWIND_2})
+  target_compile_definitions(common PRIVATE "-DPCURL_SBOX_UNWIND_2")
+else()
+  # Unwind 2 loops by default
+  target_compile_definitions(common PRIVATE "-DPCURL_SBOX_UNWIND_2")
+endif()
+
+if(${PCURL_STATE_DOUBLE})
+  target_compile_definitions(common PRIVATE "-DPCURL_STATE_DOUBLE")
+else()
+  target_compile_definitions(common PRIVATE "-DPCURL_STATE_SHORT")
+endif()
 
 add_library(entangled::common ALIAS common)
 target_include_directories(common PUBLIC ${PROJECT_SOURCE_DIR})
