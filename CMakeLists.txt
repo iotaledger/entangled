@@ -25,6 +25,8 @@ find_package(Threads REQUIRED)
 # default CLI options
 option(CCLIENT "Enable CClient library" ON)
 option(CCLIENT_TEST "Enable CClient library test cases" ON)
+option(PCURL_SBOX_UNWIND "PCURL_SBOX_UNWIND_1 PCURL_SBOX_UNWIND_2 PCURL_SBOX_UNWIND_4 PCURL_SBOX_UNWIND_8" PCURL_SBOX_UNWIND_2)
+option(PCURL_STATE "PCURL_STATE_SHORT PCURL_STATE_DOUBLE" PCURL_STATE_SHORT)
 
 include(ExternalProject)
 
@@ -76,11 +78,11 @@ set(COMMON_SRC
   # trynary
   "${COMMON_TRINARY_DIR}/add.c"
   "${COMMON_TRINARY_DIR}/flex_trit.c"
+  "${COMMON_TRINARY_DIR}/ptrit.c"
   "${COMMON_TRINARY_DIR}/ptrit_incr.c"
   "${COMMON_TRINARY_DIR}/trit_array.c"
   "${COMMON_TRINARY_DIR}/trit_byte.c"
   "${COMMON_TRINARY_DIR}/trit_long.c"
-  "${COMMON_TRINARY_DIR}/trit_ptrit.c"
   "${COMMON_TRINARY_DIR}/trit_tryte.c"
   "${COMMON_TRINARY_DIR}/tryte_ascii.c"
   "${COMMON_TRINARY_DIR}/tryte_long.c"
@@ -159,6 +161,9 @@ set(UTILS_SRC
   "${HASH_CONTAINERS_DIR}/hash6561_stack.c"
   "${HASH_CONTAINERS_DIR}/hash8019_stack.c"
 )
+
+add_definitions("-D${PCURL_SBOX_UNWIND}")
+add_definitions("-D${PCURL_STATE}")
 
 add_library(common 
   "${COMMON_SRC}"
