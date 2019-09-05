@@ -10,7 +10,7 @@ The IOTA network is an independent peer-to-peer network with a first-user, frien
 
 - As a 'friend-to-friend' network, you have the privilege of joining new users into the network through your node by adding them to your approved neighbors list — ensuring that you both broadcast to them and also receive their broadcasts.
 
-You can find neighbors quickly at both our [Discord](https://discord.iota.org/).
+You can find neighbors quickly on our [discord](https://discord.iota.org/) server.
 
 Everyone will be welcoming and very happy to help you get connected. If you want to get tokens for your testcase, please just ask in one of the communication channels.
 
@@ -33,7 +33,7 @@ cIRI offers two storage backends: `sqlite3` and `mariadb`. You can select the on
 
 #### SQLite3
 
-Create the databases, only the first time:
+Create the databases for the first time:
 ```
 $ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/sqlite3/tangle-schema.sql
 $ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/sqlite3/spent-addresses-schema.sql
@@ -48,7 +48,7 @@ $ bazel run -c opt --define network=mainnet --define storage=sqlite3 -- ciri # o
 
 You need to have a mysql/mariadb server running.
 
-Create the databases, only the first time:
+Create the databases for the first time:
 ```
 $ mysql -u root < common/storage/sql/mariadb/setup.sql
 $ mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
@@ -64,7 +64,7 @@ $ bazel run -c opt --define network=mainnet --define storage=mariadb -- ciri # o
 
 #### SQLite3
 
-Create the databases, only the first time:
+Create the databases for the first time:
 ```
 $ sqlite3 ciri/db/tangle-testnet.db < common/storage/sql/sqlite3/tangle-schema.sql
 $ sqlite3 ciri/db/spent-addresses-testnet.db < common/storage/sql/sqlite3/spent-addresses-schema.sql
@@ -79,7 +79,7 @@ $ bazel run -c opt --define network=testnet --define storage=sqlite3 -- ciri # o
 
 You need to have a mysql/mariadb server running.
 
-Create the databases, only the first time:
+Create the databases for the first time:
 ```
 $ mysql -u root < common/storage/sql/mariadb/setup.sql
 $ mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
