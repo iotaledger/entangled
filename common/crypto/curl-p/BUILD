@@ -29,12 +29,53 @@ cc_library(
     ],
 )
 
+config_setting(
+    name = "pcurl_state_double",
+    values = {"define": "pcurl_state=double"},
+)
+
+config_setting(
+    name = "pcurl_state_short",
+    values = {"define": "pcurl_state=short"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_1",
+    values = {"define": "pcurl_sbox_unwind=1"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_2",
+    values = {"define": "pcurl_sbox_unwind=2"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_4",
+    values = {"define": "pcurl_sbox_unwind=4"},
+)
+
+config_setting(
+    name = "pcurl_sbox_unwind_8",
+    values = {"define": "pcurl_sbox_unwind=8"},
+)
+
 cc_library(
     name = "ptrit",
     srcs = ["ptrit.c"],
     hdrs = [
         "ptrit.h",
     ],
+    defines = select({
+        ":pcurl_state_double": ["PCURL_STATE_DOUBLE"],
+        ":pcurl_state_short": ["PCURL_STATE_SHORT"],
+        "//conditions:default": ["PCURL_STATE_SHORT"],
+    }) + select({
+        ":pcurl_sbox_unwind_1": ["PCURL_SBOX_UNWIND_1"],
+        ":pcurl_sbox_unwind_2": ["PCURL_SBOX_UNWIND_2"],
+        ":pcurl_sbox_unwind_4": ["PCURL_SBOX_UNWIND_4"],
+        ":pcurl_sbox_unwind_8": ["PCURL_SBOX_UNWIND_8"],
+        "//conditions:default": ["PCURL_SBOX_UNWIND_2"],
+    }),
     deps = [
         ":curl-p-const",
         "//common:stdint",
