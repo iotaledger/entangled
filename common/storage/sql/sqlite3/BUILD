@@ -13,7 +13,6 @@ cc_library(
         ":spent_addresses_db",
         ":tangle_db",
     ],
-    defines = ["STORAGE_SQLITE3"],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
     deps = [
@@ -54,4 +53,15 @@ genrule(
     cmd = "$(location @sqlite3//:shell) $@ < $<",
     tools = ["@sqlite3//:shell"],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "test_utils_sqlite3",
+    srcs = ["test_utils.c"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":storage_sqlite3",
+        "//common/storage:test_utils_hdr",
+        "//utils:files",
+    ],
 )

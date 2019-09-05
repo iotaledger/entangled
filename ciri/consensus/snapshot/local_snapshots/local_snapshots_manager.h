@@ -33,7 +33,7 @@ typedef struct local_snapshots_manager_s {
   cond_handle_t cond_local_snapshots;
   milestone_tracker_t const *mt;
   snapshots_service_t *snapshots_service;
-  size_t last_snapshot_transactions_count;
+  uint64_t last_snapshot_transactions_count;
   pruning_service_t ps;
 } local_snapshots_manager_t;
 
