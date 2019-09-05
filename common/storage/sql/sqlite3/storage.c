@@ -94,18 +94,8 @@ static void select_transactions_populate_data(sqlite3_stmt* const statement, iot
 static void select_transactions_populate_metadata(sqlite3_stmt* const statement, iota_transaction_t* const tx,
                                                   size_t* const index);
 
-enum load_model {
-  MODEL_HASH,
-  MODEL_MILESTONE,
-  MODEL_TRANSACTION,
-  MODEL_TRANSACTION_ESSENCE_METADATA,
-  MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
-  MODEL_TRANSACTION_ESSENCE_CONSENSUS,
-  MODEL_TRANSACTION_METADATA,
-};
-
 static retcode_t execute_statement_load_gen(sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack,
-                                            uint32_t const max_records, enum load_model const model) {
+                                            uint32_t const max_records, storage_load_model_t const model) {
   size_t index = 0;
 
   pack->insufficient_capacity = false;
@@ -123,25 +113,30 @@ static retcode_t execute_statement_load_gen(sqlite3_stmt* const sqlite_statement
       select_milestones_populate_from_row(sqlite_statement, pack->models[pack->num_loaded]);
       pack->num_loaded++;
     } else if (model == MODEL_TRANSACTION) {
+      transaction_reset(pack->models[pack->num_loaded]);
       select_transactions_populate_essence(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_attachment(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_consensus(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_data(sqlite_statement, pack->models[pack->num_loaded], &index);
       pack->num_loaded++;
     } else if (model == MODEL_TRANSACTION_ESSENCE_METADATA) {
+      transaction_reset(pack->models[pack->num_loaded]);
       select_transactions_populate_essence(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_metadata(sqlite_statement, pack->models[pack->num_loaded], &index);
       pack->num_loaded++;
     } else if (model == MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA) {
+      transaction_reset(pack->models[pack->num_loaded]);
       select_transactions_populate_essence(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_attachment(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_metadata(sqlite_statement, pack->models[pack->num_loaded], &index);
       pack->num_loaded++;
     } else if (model == MODEL_TRANSACTION_ESSENCE_CONSENSUS) {
+      transaction_reset(pack->models[pack->num_loaded]);
       select_transactions_populate_essence(sqlite_statement, pack->models[pack->num_loaded], &index);
       select_transactions_populate_consensus(sqlite_statement, pack->models[pack->num_loaded], &index);
       pack->num_loaded++;
     } else if (model == MODEL_TRANSACTION_METADATA) {
+      transaction_reset(pack->models[pack->num_loaded]);
       select_transactions_populate_metadata(sqlite_statement, pack->models[pack->num_loaded], &index);
       pack->num_loaded++;
     } else {
@@ -166,26 +161,18 @@ static retcode_t execute_statement(sqlite3_stmt* const sqlite_statement) {
 }
 
 static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement, bool* const exist) {
-  int rc = sqlite3_step(sqlite_statement);
-  *exist = false;
-
-  if (rc == SQLITE_ROW) {
-    *exist = true;
-  } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+  if (sqlite3_step(sqlite_statement) != SQLITE_ROW) {
     return RC_STORAGE_FAILED_STEP;
   }
+
+  *exist = sqlite3_column_int(sqlite_statement, 0);
 
   return RC_OK;
 }
 
-enum value_type {
-  BOOLEAN,
-  INT64,
-};
-
 static retcode_t update_transactions(storage_connection_t const* const connection, hash243_set_t const hashes,
                                      void const* const value, sqlite3_stmt* const sqlite_statement,
-                                     enum value_type const type) {
+                                     storage_value_type_t const type) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   retcode_t ret_rollback;
@@ -259,19 +246,19 @@ static retcode_t execute_statement_load_transactions(sqlite3_stmt* const sqlite_
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_TRANSACTION);
 }
 
-static retcode_t execute_statement_load_transaction_for_essence_and_metadata(sqlite3_stmt* const sqlite_statement,
-                                                                             iota_stor_pack_t* const pack) {
+static retcode_t execute_statement_load_transaction_for_essence_metadata(sqlite3_stmt* const sqlite_statement,
+                                                                         iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_TRANSACTION_ESSENCE_METADATA);
 }
 
-static retcode_t execute_statement_load_transaction_for_essence_attachment_and_metadata(
+static retcode_t execute_statement_load_transaction_for_essence_attachment_metadata(
     sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
                                     MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA);
 }
 
-static retcode_t execute_statement_load_transaction_essence_and_consensus(sqlite3_stmt* const sqlite_statement,
-                                                                          iota_stor_pack_t* const pack) {
+static retcode_t execute_statement_load_transaction_essence_consensus(sqlite3_stmt* const sqlite_statement,
+                                                                      iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity, MODEL_TRANSACTION_ESSENCE_CONSENSUS);
 }
 
@@ -329,7 +316,7 @@ static void select_transactions_populate_metadata(sqlite3_stmt* const statement,
   transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, (*index)++));
 }
 
-retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count) {
+retcode_t storage_transaction_count(storage_connection_t const* const connection, uint64_t* const count) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_count;
@@ -382,8 +369,9 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
-                                   flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load(storage_connection_t const* const connection,
+                                   storage_transaction_field_t const field, flex_trit_t const* const key,
+                                   iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
@@ -412,18 +400,18 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
-                                                        flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_metadata(storage_connection_t const* const connection,
+                                                    flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_and_metadata;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
-  if ((ret = execute_statement_load_transaction_for_essence_and_metadata(sqlite_statement, pack)) != RC_OK) {
+  if ((ret = execute_statement_load_transaction_for_essence_metadata(sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 
@@ -432,19 +420,19 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
-                                                                   flex_trit_t const* const hash,
-                                                                   iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_attachment_metadata(storage_connection_t const* const connection,
+                                                               flex_trit_t const* const hash,
+                                                               iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_attachment_and_metadata;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_attachment_metadata;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
-  if ((ret = execute_statement_load_transaction_for_essence_attachment_and_metadata(sqlite_statement, pack)) != RC_OK) {
+  if ((ret = execute_statement_load_transaction_for_essence_attachment_metadata(sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 
@@ -453,18 +441,18 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
-                                                         flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_essence_consensus(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_and_consensus;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_essence_consensus;
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = RC_STORAGE_FAILED_BINDING;
     goto done;
   }
 
-  if ((ret = execute_statement_load_transaction_essence_and_consensus(sqlite_statement, pack)) != RC_OK) {
+  if ((ret = execute_statement_load_transaction_essence_consensus(sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 
@@ -493,8 +481,9 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection, transaction_field_t const field,
-                                          flex_trit_t const* const key, iota_stor_pack_t* const pack) {
+retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection,
+                                          storage_transaction_field_t const field, flex_trit_t const* const key,
+                                          iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   size_t num_bytes_key;
@@ -525,7 +514,7 @@ done:
 
 retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
                                                        flex_trit_t const* const approvee_hash,
-                                                       iota_stor_pack_t* const pack, int64_t before_timestamp) {
+                                                       iota_stor_pack_t* const pack, uint64_t before_timestamp) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement =
@@ -553,8 +542,8 @@ done:
 }
 
 retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
-                                                                  iota_stor_pack_t* const pack,
-                                                                  flex_trit_t const* const coordinator) {
+                                                                  flex_trit_t const* const coordinator,
+                                                                  iota_stor_pack_t* const pack) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_select_hashes_of_milestone_candidates;
@@ -573,11 +562,11 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
-                                                 flex_trit_t const* const hash, bool const is_solid) {
+retcode_t storage_transaction_update_solidity(storage_connection_t const* const connection,
+                                              flex_trit_t const* const hash, bool const is_solid) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
-  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_update_solid_state;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_update_solidity;
 
   if (sqlite3_bind_int(sqlite_statement, 1, (int)is_solid) != SQLITE_OK ||
       column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
@@ -594,16 +583,18 @@ done:
   return ret;
 }
 
-retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
-                                                  hash243_set_t const hashes, bool const is_solid) {
+retcode_t storage_transactions_update_solidity(storage_connection_t const* const connection, hash243_set_t const hashes,
+                                               bool const is_solid) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
-  return update_transactions(connection, hashes, &is_solid,
-                             sqlite3_connection->statements.transaction_update_solid_state, BOOLEAN);
+
+  return update_transactions(connection, hashes, &is_solid, sqlite3_connection->statements.transaction_update_solidity,
+                             BOOLEAN);
 }
 
 retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
                                                      hash243_set_t const hashes, uint64_t const snapshot_index) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+
   return update_transactions(connection, hashes, &snapshot_index,
                              sqlite3_connection->statements.transaction_update_snapshot_index, INT64);
 }
@@ -629,8 +620,30 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_exist(storage_connection_t const* const connection, transaction_field_t const field,
-                                    flex_trit_t const* const key, bool* const exist) {
+retcode_t storage_transaction_update_validity(storage_connection_t const* const connection,
+                                              flex_trit_t const* const hash, bundle_status_t const validity) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_update_validity;
+
+  if (sqlite3_bind_int64(sqlite_statement, 1, validity) != SQLITE_OK ||
+      column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_STORAGE_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
+retcode_t storage_transaction_exist(storage_connection_t const* const connection,
+                                    storage_transaction_field_t const field, flex_trit_t const* const key,
+                                    bool* const exist) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
@@ -665,7 +678,7 @@ done:
 }
 
 retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
-                                              flex_trit_t const* const hash, size_t* const count) {
+                                              flex_trit_t const* const hash, uint64_t* const count) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   int rc = 0;
   retcode_t ret = RC_OK;
@@ -774,7 +787,26 @@ done:
   return ret;
 }
 
-retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection) {
+retcode_t storage_transaction_delete(storage_connection_t const* const connection, flex_trit_t const* const hash) {
+  sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
+  sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_delete;
+  retcode_t ret = RC_OK;
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = RC_STORAGE_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
+retcode_t storage_transactions_metadata_clear(storage_connection_t const* const connection) {
   sqlite3_tangle_connection_t const* sqlite3_connection = (sqlite3_tangle_connection_t*)connection->actual;
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = sqlite3_connection->statements.transaction_metadata_clear;

@@ -49,72 +49,93 @@ extern retcode_t storage_destroy();
  * Transaction operations
  */
 
-typedef enum transaction_field_e {
+typedef enum storage_transaction_field_e {
   TRANSACTION_FIELD_NONE,
   TRANSACTION_FIELD_HASH,
   TRANSACTION_FIELD_ADDRESS
-} transaction_field_t;
+} storage_transaction_field_t;
 
-extern retcode_t storage_transaction_count(storage_connection_t const* const connection, size_t* const count);
+typedef enum storage_load_model_e {
+  MODEL_HASH,
+  MODEL_MILESTONE,
+  MODEL_TRANSACTION,
+  MODEL_TRANSACTION_ESSENCE_METADATA,
+  MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
+  MODEL_TRANSACTION_ESSENCE_CONSENSUS,
+  MODEL_TRANSACTION_METADATA,
+} storage_load_model_t;
+
+typedef enum storage_value_type_e {
+  BOOLEAN,
+  INT64,
+} storage_value_type_t;
+
+extern retcode_t storage_transaction_count(storage_connection_t const* const connection, uint64_t* const count);
 
 extern retcode_t storage_transaction_store(storage_connection_t const* const connection,
-                                           iota_transaction_t const* const data_in);
+                                           iota_transaction_t const* const transaction);
 
-extern retcode_t storage_transaction_load(storage_connection_t const* const connection, transaction_field_t const field,
-                                          flex_trit_t const* const key, iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load(storage_connection_t const* const connection,
+                                          storage_transaction_field_t const field, flex_trit_t const* const key,
+                                          iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_load_essence_and_metadata(storage_connection_t const* const connection,
-                                                               flex_trit_t const* const hash,
-                                                               iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load_essence_metadata(storage_connection_t const* const connection,
+                                                           flex_trit_t const* const hash, iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_load_essence_attachment_and_metadata(storage_connection_t const* const connection,
-                                                                          flex_trit_t const* const hash,
-                                                                          iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load_essence_attachment_metadata(storage_connection_t const* const connection,
+                                                                      flex_trit_t const* const hash,
+                                                                      iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_load_essence_and_consensus(storage_connection_t const* const connection,
-                                                                flex_trit_t const* const hash,
-                                                                iota_stor_pack_t* const pack);
+extern retcode_t storage_transaction_load_essence_consensus(storage_connection_t const* const connection,
+                                                            flex_trit_t const* const hash,
+                                                            iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_load_metadata(storage_connection_t const* const connection,
                                                    flex_trit_t const* const hash, iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_exist(storage_connection_t const* const connection,
-                                           transaction_field_t const field, flex_trit_t const* const key,
+                                           storage_transaction_field_t const field, flex_trit_t const* const key,
                                            bool* const exist);
 
 extern retcode_t storage_transaction_update_snapshot_index(storage_connection_t const* const connection,
                                                            flex_trit_t const* const hash,
                                                            uint64_t const snapshot_index);
 
-extern retcode_t storage_transaction_update_solid_state(storage_connection_t const* const connection,
-                                                        flex_trit_t const* const hash, bool const is_solid);
+extern retcode_t storage_transaction_update_solidity(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, bool const is_solid);
+
+extern retcode_t storage_transaction_update_validity(storage_connection_t const* const connection,
+                                                     flex_trit_t const* const hash, bundle_status_t const validity);
 
 extern retcode_t storage_transaction_load_hashes(storage_connection_t const* const connection,
-                                                 transaction_field_t const field, flex_trit_t const* const key,
+                                                 storage_transaction_field_t const field, flex_trit_t const* const key,
                                                  iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_load_hashes_of_approvers(storage_connection_t const* const connection,
                                                               flex_trit_t const* const approvee_hash,
-                                                              iota_stor_pack_t* const pack, int64_t before_timestamp);
+                                                              iota_stor_pack_t* const pack, uint64_t before_timestamp);
 
 extern retcode_t storage_transaction_load_hashes_of_milestone_candidates(storage_connection_t const* const connection,
-                                                                         iota_stor_pack_t* const pack,
-                                                                         flex_trit_t const* const coordinator);
+                                                                         flex_trit_t const* const coordinator,
+                                                                         iota_stor_pack_t* const pack);
 
 extern retcode_t storage_transaction_approvers_count(storage_connection_t const* const connection,
-                                                     flex_trit_t const* const hash, size_t* const count);
+                                                     flex_trit_t const* const hash, uint64_t* const count);
 
 extern retcode_t storage_transaction_find(storage_connection_t const* const connection, hash243_queue_t const bundles,
                                           hash243_queue_t const addresses, hash81_queue_t const tags,
                                           hash243_queue_t const approvees, iota_stor_pack_t* const pack);
 
-extern retcode_t storage_transaction_metadata_clear(storage_connection_t const* const connection);
+extern retcode_t storage_transaction_delete(storage_connection_t const* const connection,
+                                            flex_trit_t const* const hash);
+
+extern retcode_t storage_transactions_metadata_clear(storage_connection_t const* const connection);
 
 extern retcode_t storage_transactions_update_snapshot_index(storage_connection_t const* const connection,
                                                             hash243_set_t const hashes, uint64_t const snapshot_index);
 
-extern retcode_t storage_transactions_update_solid_state(storage_connection_t const* const connection,
-                                                         hash243_set_t const hashes, bool const is_solid);
+extern retcode_t storage_transactions_update_solidity(storage_connection_t const* const connection,
+                                                      hash243_set_t const hashes, bool const is_solid);
 
 extern retcode_t storage_transactions_delete(storage_connection_t const* const connection, hash243_set_t const hashes);
 
@@ -133,7 +154,7 @@ extern retcode_t storage_bundle_update_validity(storage_connection_t const* cons
 extern retcode_t storage_milestone_clear(storage_connection_t const* const connection);
 
 extern retcode_t storage_milestone_store(storage_connection_t const* const connection,
-                                         iota_milestone_t const* const data_in);
+                                         iota_milestone_t const* const milestone);
 
 extern retcode_t storage_milestone_load(storage_connection_t const* const connection, flex_trit_t const* const hash,
                                         iota_stor_pack_t* const pack);

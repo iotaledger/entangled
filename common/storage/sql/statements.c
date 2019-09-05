@@ -12,21 +12,27 @@
 #include <string.h>
 
 #include "common/storage/defs.h"
+#include "utils/macros.h"
 
 /*
  * Generic statement builders
  */
 
 char *storage_statement_in_clause_build(size_t const count) {
-  char *in_clause = (char *)calloc(2 * count + 1, 1);
+  char *in_clause = NULL;
   size_t offset = 0;
 
   if (count != 0) {
+    in_clause = (char *)calloc(2 * count + 1, 1);
     for (size_t i = 0; i < count; i++) {
       offset += sprintf(in_clause + offset, "?,");
     }
     in_clause[offset - 1] = '\0';
+  } else {
+    in_clause = (char *)calloc(5, 1);
+    offset += sprintf(in_clause + offset, "NULL");
   }
+
   return in_clause;
 }
 
@@ -64,25 +70,24 @@ char *storage_statement_transaction_select_hashes_of_approvers_before_date =
     "=? OR " TRANSACTION_COL_TRUNK "=?) AND " TRANSACTION_COL_ARRIVAL_TIME "<?";
 
 char *storage_statement_transaction_select_hashes_of_milestone_candidates =
-    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_ADDRESS
-    " LIKE ? AND " TRANSACTION_COL_CURRENT_INDEX "=0 EXCEPT SELECT " MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME;
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME " LEFT JOIN " MILESTONE_TABLE_NAME
+    " USING (" TRANSACTION_COL_HASH ") WHERE " TRANSACTION_TABLE_NAME "." TRANSACTION_COL_ADDRESS
+    " LIKE ? AND " TRANSACTION_TABLE_NAME "." TRANSACTION_COL_CURRENT_INDEX "=0 AND " MILESTONE_TABLE_NAME
+    "." MILESTONE_COL_HASH " IS NULL ";
 
 char *storage_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX "=? WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_update_solid_state =
+char *storage_statement_transaction_update_solidity =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID "=? WHERE " TRANSACTION_COL_HASH "=?";
 
 char *storage_statement_transaction_update_validity =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_VALIDITY "=? WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_exist =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " TRANSACTION_TABLE_NAME ")";
+char *storage_statement_transaction_exist = "SELECT EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME ")";
 
 char *storage_statement_transaction_exist_by_hash =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
+    "SELECT EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
 char *storage_statement_transaction_approvers_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";
@@ -111,13 +116,13 @@ char *storage_statement_transaction_delete = "DELETE FROM " TRANSACTION_TABLE_NA
  * Partial Transaction statements
  */
 
-char *storage_statement_transaction_select_essence_and_metadata =
+char *storage_statement_transaction_select_essence_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
     "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_select_essence_attachment_and_metadata =
+char *storage_statement_transaction_select_essence_attachment_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_TRUNK "," TRANSACTION_COL_BRANCH
@@ -126,7 +131,7 @@ char *storage_statement_transaction_select_essence_attachment_and_metadata =
     "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_VALIDITY
     "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
-char *storage_statement_transaction_select_essence_and_consensus =
+char *storage_statement_transaction_select_essence_consensus =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE "," TRANSACTION_COL_OBSOLETE_TAG
     "," TRANSACTION_COL_TIMESTAMP "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH
@@ -142,8 +147,8 @@ char *storage_statement_transaction_select_metadata =
 
 char *storage_statement_transaction_find_build(size_t const bundles_count, size_t const addresses_count,
                                                size_t const tags_count, size_t const approvees_count) {
-  // Base size of the query + enough space for '?' (bindings)
-  size_t statement_size = storage_statement_transaction_find_size + 2 * bundles_count + 2 * addresses_count +
+  // Base size of the query + enough space for "?" or "NULL" (bindings)
+  size_t statement_size = storage_statement_transaction_find_size + 16 + 2 * bundles_count + 2 * addresses_count +
                           2 * tags_count + 4 * approvees_count;
   char *statement = (char *)malloc(statement_size);
 
@@ -190,13 +195,10 @@ char *storage_statement_milestone_select_next =
     "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
     ">? LIMIT 1";
 
-char *storage_statement_milestone_exist =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " MILESTONE_TABLE_NAME ")";
+char *storage_statement_milestone_exist = "SELECT EXISTS(SELECT 1 FROM " MILESTONE_TABLE_NAME ")";
 
 char *storage_statement_milestone_exist_by_hash =
-    "SELECT 1 WHERE EXISTS(SELECT 1 "
-    "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
+    "SELECT EXISTS(SELECT 1 FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
 
 char *storage_statement_milestone_delete_by_hash =
     "DELETE FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
@@ -218,4 +220,4 @@ char *storage_statement_spent_address_insert =
     "INSERT INTO " SPENT_ADDRESS_TABLE_NAME "(" SPENT_ADDRESS_COL_HASH ")VALUES(?)";
 
 char *storage_statement_spent_address_exist =
-    "SELECT 1 WHERE EXISTS(SELECT 1 FROM " SPENT_ADDRESS_TABLE_NAME " WHERE " SPENT_ADDRESS_COL_HASH "=?)";
+    "SELECT EXISTS(SELECT 1 FROM " SPENT_ADDRESS_TABLE_NAME " WHERE " SPENT_ADDRESS_COL_HASH "=?)";

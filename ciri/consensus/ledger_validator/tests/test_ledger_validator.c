@@ -137,12 +137,10 @@ static void test_replay_several_milestones() {
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
   size_t num_milestones = 3;
   uint64_t sk_index = 0;
-
   flex_trit_t milestone_hash[FLEX_TRIT_SIZE_243];
-
   bool exist;
-  TEST_ASSERT(iota_tangle_milestone_exist(&tangle, NULL, &exist) == RC_OK);
 
+  TEST_ASSERT(iota_tangle_milestone_exist(&tangle, NULL, &exist) == RC_OK);
   TEST_ASSERT(!exist);
 
   init_test_structs();
