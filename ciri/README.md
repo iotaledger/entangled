@@ -1,14 +1,6 @@
-Tracking issues
----------------
-
-- [API](https://github.com/iotaledger/entangled/issues/325)
-- [Generic event-routing system](https://github.com/iotaledger/entangled/issues/306)
-
 # cIRI
 
-A low level implementation of an IOTA node in C.
-
-This is a WIP [IOTA](https://iota.org/) node. It allows users to become part of the [IOTA](https://iota.org/) network as both a transaction relay and network information provider through the easy-to-use [API](https://iota.readme.io/reference).
+A low level implementation of an [IOTA](https://iota.org/) node in C that allows users to become part of the IOTA network as both a transaction relay and network information provider through the easy-to-use [API](https://iota.readme.io/reference).
 
 ## How to get started
 
@@ -18,7 +10,7 @@ The IOTA network is an independent peer-to-peer network with a first-user, frien
 
 - As a 'friend-to-friend' network, you have the privilege of joining new users into the network through your node by adding them to your approved neighbors list — ensuring that you both broadcast to them and also receive their broadcasts.
 
-You can find neighbors quickly at both our [Discord Community](https://discord.gg/7Gu2mG5) and [Forum](https://forum.iota.org/).
+You can find neighbors quickly at both our [Discord](https://discord.iota.org/).
 
 Everyone will be welcoming and very happy to help you get connected. If you want to get tokens for your testcase, please just ask in one of the communication channels.
 
@@ -35,30 +27,63 @@ $ cd entangled
 
 *First build can take some time due to dependencies downloading.*
 
-### For a mainnet node
+cIRI offers two storage backends: `sqlite3` and `mariadb`. You can select the one you prefer with the compilation option `--define storage=sqlite3|mariadb`.
+
+### Mainnet node
+
+#### SQLite3
 
 Create the databases, only the first time:
 ```
-$ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/tangle-schema.sql
-$ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/spent-addresses-schema.sql
+$ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/sqlite3/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/sqlite3/spent-addresses-schema.sql
 ```
 
 Build and run cIRI
 ```
-$ bazel run -c opt --define network=mainnet -- ciri # optional flags
+$ bazel run -c opt --define network=mainnet --define storage=sqlite3 -- ciri # optional flags
 ```
 
-### For a testnet node
+#### MariaDB
+
+You need to have a mysql/mariadb server running.
 
 Create the databases, only the first time:
 ```
-$ sqlite3 ciri/db/tangle-testnet.db < common/storage/sql/tangle-schema.sql
-$ sqlite3 ciri/db/spent-addresses-testnet.db < common/storage/sql/spent-addresses-schema.sql
+$ mysql -u root < common/storage/sql/mariadb/setup.sql
+$ mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
+$ mysql -u ciri spent-addresses < common/storage/sql/mariadb/spent-addresses-schema.sql
 ```
 
 Build and run cIRI
 ```
-$ bazel run -c opt --define network=testnet -- ciri # optional flags
+$ bazel run -c opt --define network=mainnet --define storage=mariadb -- ciri # optional flags
+```
+
+### Testnet node
+
+#### SQLite3
+
+Create the databases, only the first time:
+```
+$ sqlite3 ciri/db/tangle-testnet.db < common/storage/sql/sqlite3/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-testnet.db < common/storage/sql/sqlite3/spent-addresses-schema.sql
+```
+
+Build and run cIRI
+```
+$ bazel run -c opt --define network=testnet --define storage=sqlite3 -- ciri # optional flags
+```
+
+#### MariaDB
+
+You need to have a mysql/mariadb server running.
+
+Create the databases, only the first time:
+```
+$ mysql -u root < common/storage/sql/mariadb/setup.sql
+$ mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
+$ mysql -u ciri spent-addresses < common/storage/sql/mariadb/spent-addresses-schema.sql
 ```
 
 ### Docker
