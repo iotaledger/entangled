@@ -17,6 +17,7 @@ cc_test(
     ],
     deps = [
         "//common/crypto/curl-p:ptrit",
+        "//common/crypto/curl-p:trit",
         "@unity",
     ],
 )

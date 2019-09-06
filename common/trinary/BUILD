@@ -24,16 +24,65 @@ cc_library(
     ],
 )
 
+config_setting(
+    name = "ptrit_neon",
+    values = {"define": "ptrit_platform=neon"},
+)
+
+config_setting(
+    name = "ptrit_avx512",
+    values = {"define": "ptrit_platform=avx512"},
+)
+
+config_setting(
+    name = "ptrit_avx2",
+    values = {"define": "ptrit_platform=avx2"},
+)
+
+config_setting(
+    name = "ptrit_sse2",
+    values = {"define": "ptrit_platform=sse2"},
+)
+
+config_setting(
+    name = "ptrit_64",
+    values = {"define": "ptrit_platform=64"},
+)
+
+config_setting(
+    name = "ptrit_cvt_orn",
+    values = {"define": "ptrit_cvt=orn"},
+)
+
+config_setting(
+    name = "ptrit_cvt_andn",
+    values = {"define": "ptrit_cvt=andn"},
+)
+
 cc_library(
     name = "ptrits",
     srcs = [
+        "ptrit.c",
         "ptrit_incr.c",
     ],
     hdrs = [
         "ptrit.h",
         "ptrit_incr.h",
     ],
+    defines = select({
+        ":ptrit_neon": ["PTRIT_NEON"],
+        ":ptrit_avx512": ["PTRIT_AVX512"],
+        ":ptrit_avx2": ["PTRIT_AVX2"],
+        ":ptrit_sse2": ["PTRIT_SSE2"],
+        ":ptrit_64": ["PTRIT_64"],
+        "//conditions:default": [],
+    }) + select({
+        ":ptrit_cvt_orn": ["PTRIT_CVT_ORN"],
+        ":ptrit_cvt_andn": ["PTRIT_CVT_ANDN"],
+        "//conditions:default": [],
+    }),
     deps = [
+        ":trits",
         "//common:stdint",
     ],
 )
@@ -74,7 +123,6 @@ cc_library(
 
 cc_library(
     name = "trit_ptrit",
-    srcs = ["trit_ptrit.c"],
     hdrs = ["trit_ptrit.h"],
     deps = [
         ":ptrits",

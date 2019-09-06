@@ -1,37 +1,20 @@
 /*
- * Copyright (c) 2018 IOTA Stiftung
+ * Copyright (c) 2019 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
-
 #include "common/crypto/curl-p/hashcash.h"
 #include "common/crypto/curl-p/ptrit.h"
 #include "common/crypto/curl-p/search.h"
 
-#ifdef _WIN32
-#define CTZLL(x) _tzcnt_u64(x)
-#else
-#define CTZLL(x) __builtin_ctzll(x)
-#endif
-
-short test(PCurl *const curl, unsigned short const mwm) {
-  unsigned short i;
-  ptrit_s probe = HIGH_BITS;
-  for (i = HASH_LENGTH_TRIT; i-- > HASH_LENGTH_TRIT - mwm && probe != 0;) {
-    probe &= ~(curl->state[i].low ^ curl->state[i].high);
-  }
-  if (probe == 0) {
-    return -1;
-  }
-  return CTZLL(probe);
+static test_result_t test(pcurl_t const *pcurl, test_arg_t mwm) {
+  ptrit_t const *p = pcurl->state + HASH_LENGTH_TRIT - mwm;
+  size_t i = ptrits_find_zero_slice((size_t)mwm, p);
+  return (PTRIT_SIZE == i) ? (test_result_t)-1 : (test_result_t)i;
 }
 
-#undef CTZLL
-
-PearlDiverStatus hashcash(Curl *const ctx, unsigned short const offset, unsigned short const end,
-                          unsigned short const min_weight) {
-  return pd_search(ctx, offset, end, &test, min_weight);
+PearlDiverStatus hashcash(Curl *ctx, size_t begin, size_t end, intptr_t min_weight) {
+  return pd_search(ctx, begin, end, &test, min_weight);
 }

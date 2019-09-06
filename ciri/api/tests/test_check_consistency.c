@@ -96,7 +96,7 @@ void test_check_consistency_tail_not_solid(void) {
 
   transaction_deserialize_from_trits(&tx, trits, true);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, false) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, hash, false) == RC_OK);
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
   TEST_ASSERT(error == NULL);
@@ -126,7 +126,7 @@ void test_check_consistency_invalid_bundle(void) {
                         NUM_TRITS_PER_FLEX_TRIT);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, hash, true) == RC_OK);
   hash243_queue_push(&req->tails, hash);
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
@@ -167,7 +167,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   }
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, hash, true) == RC_OK);
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
 

@@ -94,7 +94,8 @@ cleanup:
 
 bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm,
                                                        tangle_t const *const tangle) {
-  size_t new_transactions_count;
+  uint64_t new_transactions_count;
+
   if (iota_tangle_transaction_count(tangle, &new_transactions_count) != RC_OK) {
     log_critical(logger_id, "Failed in querying db size\n");
     return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 IOTA Stiftung
+ * Copyright (c) 2019 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
@@ -7,41 +7,59 @@
 
 #include "ptrit_incr.h"
 
-#define LOW_0 0xDB6DB6DB6DB6DB6D
-#define HIGH_0 0xB6DB6DB6DB6DB6DB
-#define LOW_1 0xF1F8FC7E3F1F8FC7
-#define HIGH_1 0x8FC7E3F1F8FC7E3F
-#define LOW_2 0x7FFFE00FFFFC01FF
-#define HIGH_2 0xFFC01FFFF803FFFF
-#define LOW_3 0xFFC0000007FFFFFF
-#define HIGH_3 0x003FFFFFFFFFFFFF
-
-uint64_t const HIGH_BITS = 0xFFFFFFFFFFFFFFFF;
-uint64_t const LOW_BITS = 0x0000000000000000;
-
-void ptrit_offset(ptrit_t *const trits, size_t const length) {
-  if (length < 4) {
-    return;
-  }
-  trits->low = LOW_0;
-  trits->high = HIGH_0;
-  trits[1].low = LOW_1;
-  trits[1].high = HIGH_1;
-  trits[2].low = LOW_2;
-  trits[2].high = HIGH_2;
-  trits[3].low = LOW_3;
-  trits[3].high = HIGH_3;
+static void trits_inc(size_t n, trit_t *t) {
+  for (; n--;)
+    if (2 == ++*t)
+      *t++ = -1;
+    else
+      break;
 }
 
-void ptrit_increment(ptrit_t *const trits, size_t const offset, size_t const end) {
+size_t ptrit_log3(size_t n) {
+  size_t k = 0, g = 1;
+  for (; g < n; ++k, g *= 3)
+    ;
+  return k;
+}
+
+void ptrit_set_iota(size_t n, ptrit_t *range, trit_t *value) {
   size_t i;
-  ptrit_s carry = 1;
-  ptrit_t copy;
-  for (i = offset; i < end && carry != 0; i++) {
-    copy.low = trits[i].low;
-    copy.high = trits[i].high;
-    trits[i].low = copy.high ^ copy.low;
-    trits[i].high = copy.low;
-    carry = copy.high & (~copy.low);
+  for (i = 0; i < PTRIT_SIZE; ++i) {
+    ptrits_set_slice(n, range, i, value);
+    trits_inc(n, value);
   }
+}
+
+int ptrit_hincr(size_t n, ptrit_t *t) {
+  ptrit_s a, carry;
+  for (; n; ++t, --n) {
+#if defined(PTRIT_CVT_ANDN)
+    // -1 -> (1,0); 0 -> (1,1); +1 -> (0,1); NaT -> (0,0)
+    //   t    t+1  carry
+    // (1,0) (1,1)  0
+    // (1,1) (0,1)  0
+    // (0,1) (1,0)  1
+    // (0,0) (0,0)  0
+    a = t->low;
+    t->low = XOR(t->low, t->high);
+    t->high = a;
+    carry = ANDN(a, t->low);
+#elif defined(PTRIT_CVT_ORN)
+    // -1 -> (0,0); 0 -> (0,1); +1 -> (1,1); NaT -> (1,0)
+    //   t    t+1  carry
+    // (0,0) (0,1)  0
+    // (0,1) (1,1)  0
+    // (1,1) (0,0)  1
+    // (1,0) (1,0)  0
+    a = t->low;
+    t->low = XOR(t->low, t->high);
+    carry = AND(a, t->high);
+    t->high = NOT(a);
+#else
+#error Invalid PTRIT_CVT.
+#endif  // PTRIT_CVT
+    if (0 == *(char *)&carry) break;
+  }
+
+  return (0 == n) ? 1 : 0;
 }
