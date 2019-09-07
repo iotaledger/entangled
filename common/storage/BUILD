@@ -49,3 +49,23 @@ cc_library(
         "//common/trinary:trit_array",
     ],
 )
+
+cc_library(
+    name = "test_utils_hdr",
+    hdrs = ["test_utils.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":storage_common",
+        "//common:errors",
+    ],
+)
+
+cc_library(
+    name = "test_utils",
+    visibility = ["//visibility:public"],
+    deps = select({
+        ":sqlite3": ["//common/storage/sql/sqlite3:test_utils_sqlite3"],
+        ":mariadb": ["//common/storage/sql/mariadb:test_utils_mariadb"],
+        "//conditions:default": ["//common/storage/sql/sqlite3:test_utils_sqlite3"],
+    }),
+)
