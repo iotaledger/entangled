@@ -5,16 +5,16 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "ciri/consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include <inttypes.h>
+
 #include "ciri/consensus/snapshot/local_snapshots/conf.h"
+#include "ciri/consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include "ciri/consensus/snapshot/snapshots_service.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/time.h"
 
 #define LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS 10000
-
 #define LOCAL_SNAPSHOTS_MANAGER_LOGGER_ID "local_snapshots_manager"
 
 static logger_id_t logger_id;
