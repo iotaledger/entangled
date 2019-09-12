@@ -108,11 +108,11 @@ static struct cli_argument_s {
      "Probability of sending a milestone transaction when the node looks for a "
      "random transaction to send to a neighbor. Value must be in [0,1].",
      REQUIRED_ARG},
-    {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE, "Size of the transaction requester queue.", REQUIRED_ARG},
     {"recent-seen-bytes-cache-size", CONF_RECENT_SEEN_BYTES_CACHE_SIZE,
      "The number of entries to keep in the network cache.", REQUIRED_ARG},
     {"reconnect-attempt-interval", CONF_RECONNECT_ATTEMPT_INTERVAL,
      "The interval (in seconds) at which to reconnect to neighbors.", REQUIRED_ARG},
+    {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE, "Size of the transaction requester queue.", REQUIRED_ARG},
     {"tips-cache-size", CONF_TIPS_CACHE_SIZE,
      "Size of the tips cache. Also bounds the number of tips returned by "
      "getTips API call.",

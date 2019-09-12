@@ -163,3 +163,8 @@ Long option | Short option | Description | Example input
 `--snapshot-signature-skip-validation` | | Skip validation of snapshot signature. Must be "true" or "false". | `--snapshot-signature-skip-validation false`
 `--snapshot-timestamp` | | Epoch time of the last snapshot. | `--snapshot-timestamp 1554904800`
 `--spent-addresses-files` | | List of whitespace separated files that contains spent addresses to be merged into the database. | `--spent-addresses-files "file0 file1"`
+`--local-snapshots-enabled` | | Whether or not local snapshots should be enabled. | `----local-snapshots-enabled false`
+`--local-snapshots-pruning-enabled` | | Whether or not pruning should be enabled. | `--local-snapshots-pruning-enabled false`
+`--local-snapshots-transactions-growth-threshold` | | Minimal number of new transactions from last local snapshot for triggering a new local snapshot. | `--local-snapshots-transactions-growth-threshold 1000`
+`--local-snapshots-min-depth` | | Minimal milestones depth for new local snapshot entry point. | `--local-snapshots-min-depth 100`
+`--local-snapshots-base-dir` | | The base dir for both local snapshot addresses/balances data and metadata file. | `--local-snapshots-base-dir "/absolute/path/to/local/snapshots/directory"`

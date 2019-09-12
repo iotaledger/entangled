@@ -16,8 +16,15 @@
 #include "utils/macros.h"
 #include "utils/signed_files.h"
 
-#define SNAPSHOT_STATE_FILE_NAME "local_snapshot.state"
-#define SNAPSHOT_METADATA_FILE_NAME "local_snapshot.meta"
+#if defined(IOTA_MAINNET)
+#define SNAPSHOT_STATE_FILE_NAME "mainnet.snapshot.state"
+#define SNAPSHOT_METADATA_FILE_NAME "mainnet.snapshot.meta"
+#elif defined(IOTA_TESTNET)
+#define SNAPSHOT_STATE_FILE_NAME "testnet.snapshot.state"
+#define SNAPSHOT_METADATA_FILE_NAME "testnet.snapshot.meta"
+#else
+#error "Unrecognized network: not mainnet nor testnet"
+#endif
 
 #define SNAPSHOT_LOGGER_ID "snapshot"
 
