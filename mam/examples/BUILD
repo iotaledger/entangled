@@ -55,6 +55,6 @@ cc_binary(
     name = "ntru-key-exchange",
     srcs = ["ntru-key-exchange.c"],
     deps = [
-    	 "//mam/api",
+        "//mam/api",
     ],
 )
