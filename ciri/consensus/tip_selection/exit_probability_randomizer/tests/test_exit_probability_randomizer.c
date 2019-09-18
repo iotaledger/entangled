@@ -22,18 +22,17 @@
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
+#include "common/storage/tests/defs.h"
 #include "utils/containers/hash/hash_double_map.h"
 #include "utils/macros.h"
 #include "utils/time.h"
 
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 static iota_consensus_conf_t conf;
 
-static char *test_db_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/test.db";
-static char *ciri_db_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/ciri.db";
+static char *tangle_test_db_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/test.db";
 static char *snapshot_path = "ciri/consensus/tip_selection/exit_probability_randomizer/tests/snapshot.txt";
 static char *snapshot_conf_path = "ciri/consensus/snapshot/tests/snapshot_conf.json";
 
@@ -65,9 +64,9 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
                                                 ep_randomizer_t *const ep_randomizer);
 void test_single_tx_tangle_base(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *const ep_randomizer);
 
-void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
+void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
-void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
+void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   conf.max_depth = max_depth;
@@ -114,7 +113,7 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
 
   iota_transaction_t *tx = transaction_deserialize(tx_trits, true);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, tx->consensus.hash, true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, tx->consensus.hash, max_depth) == RC_OK);
 
   iota_transaction_t txs[num_approvers];
@@ -137,7 +136,7 @@ void test_cw_gen_topology(test_tangle_topology topology, ep_randomizer_implement
 
   for (size_t i = 0; i < num_approvers; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i].consensus.hash, true) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[i].consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i].consensus.hash, max_depth) == RC_OK);
   }
 
@@ -248,7 +247,7 @@ void test_single_tx_tangle_base(ep_randomizer_implementation_t ep_impl, ep_rando
   flex_trit_t *ep = transaction_hash(tx);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, tx->consensus.hash, true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, tx->consensus.hash, max_depth) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
@@ -350,7 +349,7 @@ void test_cw_topology_four_transactions_diamond(ep_randomizer_implementation_t e
 
   for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i].consensus.hash, true) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[i].consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i].consensus.hash, max_depth) == RC_OK);
   }
 
@@ -458,7 +457,7 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(ep_randomizer_impleme
 
   for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i].consensus.hash, true) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[i].consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i].consensus.hash, max_depth) == RC_OK);
   }
 
@@ -552,7 +551,7 @@ void test_cw_topology_two_inequal_tips(ep_randomizer_implementation_t ep_impl, e
 
   for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i].consensus.hash, true) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[i].consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i].consensus.hash, max_depth) == RC_OK);
   }
 
@@ -675,7 +674,7 @@ void test_1_bundle(ep_randomizer_implementation_t ep_impl, ep_randomizer_t *cons
   }
 
   for (size_t i = 0; i < 5; ++i) {
-    TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i]->consensus.hash, true) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[i]->consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i]->consensus.hash, max_depth) == RC_OK);
   }
 
@@ -759,7 +758,7 @@ void test_2_chained_bundles(ep_randomizer_implementation_t ep_impl, ep_randomize
   transactions_deserialize(trytes, txs, 6, true);
   build_tangle(&tangle, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
-    TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[i]->consensus.hash, true) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[i]->consensus.hash, true) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, txs[i]->consensus.hash, max_depth) == RC_OK);
   }
 
@@ -777,7 +776,7 @@ void test_2_chained_bundles(ep_randomizer_implementation_t ep_impl, ep_randomize
   transaction_set_solid(tx_entry_point, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx_entry_point) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx_entry_point->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, tx_entry_point->consensus.hash, true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, tx_entry_point->consensus.hash, max_depth) ==
               RC_OK);
 
@@ -840,7 +839,7 @@ int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
 
   iota_consensus_conf_init(&conf);
 

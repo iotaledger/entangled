@@ -18,14 +18,13 @@
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/storage.h"
-#include "common/storage/tests/helpers/defs.h"
+#include "common/storage/tests/defs.h"
 #include "common/trinary/flex_trit.h"
 
 static tangle_t tangle;
-static connection_config_t config;
+static storage_connection_config_t config;
 
-static char *test_db_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/test.db";
-static char *ciri_db_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/ciri.db";
+static char *tangle_test_db_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/test.db";
 static char *snapshot_path = "ciri/consensus/tip_selection/exit_probability_validator/tests/snapshot.txt";
 static char *snapshot_conf_path = "ciri/consensus/snapshot/tests/snapshot_conf.json";
 
@@ -39,9 +38,9 @@ static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 static iota_consensus_conf_t consensus_conf;
 
-void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
+void setUp() { TEST_ASSERT(tangle_setup(&tangle, &config, tangle_test_db_path) == RC_OK); }
 
-void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
+void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, tangle_test_db_path) == RC_OK); }
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   iota_consensus_conf_init(&consensus_conf);
@@ -104,7 +103,7 @@ void test_transaction_not_a_tail() {
   iota_transaction_t *tx3 = transaction_deserialize(transaction_3_trits, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, transaction_hash(tx3), true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, transaction_hash(tx3), true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
 
@@ -131,7 +130,7 @@ void test_transaction_invalid_delta() {
   iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, transaction_hash(tx1), true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, transaction_hash(tx1), true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
@@ -157,8 +156,8 @@ void test_transaction_below_max_depth() {
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(&tangle, transaction_hash(txs[0]), max_depth + 1) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, transaction_hash(txs[0]), true) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, transaction_hash(txs[1]), true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, transaction_hash(txs[0]), true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, transaction_hash(txs[1]), true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
 
@@ -188,8 +187,8 @@ void test_transaction_exceed_max_transactions() {
   transaction_set_branch(txs[0], consensus_conf.genesis_hash);
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[0]->consensus.hash, true) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[1]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
 
@@ -219,8 +218,8 @@ void test_transaction_valid() {
   transaction_set_trunk(txs[1], consensus_conf.genesis_hash);
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, transaction_hash(txs[0]), true) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, transaction_hash(txs[1]), true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, transaction_hash(txs[0]), true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solidity(&tangle, transaction_hash(txs[1]), true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE, NULL, &exist) == RC_OK);
 
@@ -239,7 +238,7 @@ int main() {
   UNITY_BEGIN();
   TEST_ASSERT(storage_init() == RC_OK);
 
-  config.db_path = test_db_path;
+  config.db_path = tangle_test_db_path;
 
   memset(consensus_conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 

@@ -39,7 +39,7 @@ typedef enum _partial_transaction_model {
   PARTIAL_TX_MODEL_ESSENCE_CONSENSUS,
 } partial_transaction_model_e;
 
-retcode_t iota_tangle_init(tangle_t *const tangle, connection_config_t const *const config);
+retcode_t iota_tangle_init(tangle_t *const tangle, storage_connection_config_t const *const config);
 
 retcode_t iota_tangle_destroy(tangle_t *const tangle);
 
@@ -47,11 +47,11 @@ retcode_t iota_tangle_destroy(tangle_t *const tangle);
  * Transaction operations
  */
 
-retcode_t iota_tangle_transaction_count(tangle_t const *const tangle, size_t *const count);
+retcode_t iota_tangle_transaction_count(tangle_t const *const tangle, uint64_t *const count);
 
 retcode_t iota_tangle_transaction_store(tangle_t const *const tangle, iota_transaction_t const *const tx);
 
-retcode_t iota_tangle_transaction_load(tangle_t const *const tangle, transaction_field_t const field,
+retcode_t iota_tangle_transaction_load(tangle_t const *const tangle, storage_transaction_field_t const field,
                                        flex_trit_t const *const key, iota_stor_pack_t *const tx);
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(tangle_t const *const tangle,
@@ -84,8 +84,8 @@ retcode_t iota_tangle_transaction_load_partial(tangle_t const *const tangle, fle
  * @return a status code
  */
 retcode_t iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle_t const *const tangle,
-                                                                      iota_stor_pack_t *const pack,
-                                                                      flex_trit_t const *const coordinator);
+                                                                      flex_trit_t const *const coordinator,
+                                                                      iota_stor_pack_t *const pack);
 
 retcode_t iota_tangle_transaction_update_snapshot_index(tangle_t const *const tangle, flex_trit_t const *const hash,
                                                         uint64_t const snapshot_index);
@@ -93,19 +93,19 @@ retcode_t iota_tangle_transaction_update_snapshot_index(tangle_t const *const ta
 retcode_t iota_tangle_transactions_update_snapshot_index(tangle_t const *const tangle, hash243_set_t const hashes,
                                                          uint64_t const snapshot_index);
 
-retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle, transaction_field_t const field,
+retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle, storage_transaction_field_t const field,
                                         flex_trit_t const *const key, bool *const exist);
 
-retcode_t iota_tangle_transaction_update_solid_state(tangle_t const *const tangle, flex_trit_t const *const hash,
-                                                     bool const state);
+retcode_t iota_tangle_transaction_update_solidity(tangle_t const *const tangle, flex_trit_t const *const hash,
+                                                  bool const state);
 
-retcode_t iota_tangle_transactions_update_solid_state(tangle_t const *const tangle, hash243_set_t const hashes,
-                                                      bool const is_solid);
+retcode_t iota_tangle_transactions_update_solidity(tangle_t const *const tangle, hash243_set_t const hashes,
+                                                   bool const is_solid);
 
 retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle, flex_trit_t const *const hash,
-                                                  size_t *const count);
+                                                  uint64_t *const count);
 
-retcode_t iota_tangle_transaction_metadata_clear(tangle_t const *const tangle);
+retcode_t iota_tangle_transactions_metadata_clear(tangle_t const *const tangle);
 
 retcode_t iota_tangle_transactions_delete(tangle_t const *const tangle, hash243_set_t const hashes);
 

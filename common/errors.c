@@ -16,14 +16,15 @@ const char* error_2_string(retcode_t err) {
     case RC_NULL_PARAM:
       return STR_NULL_PARAM;
 
-    // Storage SQLite3 Module
-    case RC_SQLITE3_FAILED_OPEN_DB:
-    case RC_SQLITE3_FAILED_INSERT_DB:
-    case RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED:
-    case RC_SQLITE3_FAILED_NOT_IMPLEMENTED:
-    case RC_SQLITE3_FAILED_BINDING:
-    case RC_SQLITE3_FAILED_FINALIZE:
-    case RC_SQLITE3_FAILED_STEP:
+    // Storage Module
+    case RC_STORAGE_FAILED_OPEN_DB:
+    case RC_STORAGE_FAILED_INSERT_DB:
+    case RC_STORAGE_NO_PATH_FOR_DB_SPECIFIED:
+    case RC_STORAGE_FAILED_NOT_IMPLEMENTED:
+    case RC_STORAGE_FAILED_BINDING:
+    case RC_STORAGE_FAILED_FINALIZE:
+    case RC_STORAGE_FAILED_STEP:
+
     // Neighbor Module
     case RC_NEIGHBOR_FAILED_URI_PARSING:
     case RC_NEIGHBOR_INVALID_PROTOCOL:
@@ -77,6 +78,7 @@ const char* error_2_string(retcode_t err) {
     case RC_CW_FAILED_IN_DFS_FROM_DB:
     case RC_CW_FAILED_IN_LIGHT_DFS:
     case RC_EXIT_PROBABILITIES_INVALID_ENTRYPOINT:
+
     // Utils module
     case RC_UTILS_FAILED_REMOVE_FILE:
     case RC_UTILS_FAILED_TO_COPY_FILE:
@@ -106,8 +108,10 @@ const char* error_2_string(retcode_t err) {
 
     // Processor component module
     case RC_PROCESSOR_INVALID_TRANSACTION:
+
     // Conf Module
     case RC_CONF_INVALID_ARGUMENT:
+
     // Snapshot Module
     case RC_SNAPSHOT_FILE_NOT_FOUND:
     case RC_SNAPSHOT_INVALID_FILE:

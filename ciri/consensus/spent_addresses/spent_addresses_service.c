@@ -25,7 +25,7 @@ static retcode_t iota_spent_addresses_service_read_files(spent_addresses_service
   char *cpy = NULL;
   char *ptr = NULL;
   spent_addresses_provider_t sap;
-  connection_config_t db_conf = {.db_path = sas->conf->spent_addresses_db_path};
+  storage_connection_config_t db_conf = {.db_path = sas->conf->spent_addresses_db_path};
 
   if (sas->conf->spent_addresses_files == NULL) {
     return RC_OK;

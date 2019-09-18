@@ -27,6 +27,7 @@
 # http-port: 14265
 # max-find-transactions: 100000
 # max-get-trytes: 10000
+# remote-limit-api: "attachToTangle, addNeighbors"
 
 # Consensus configuration
 
@@ -46,3 +47,11 @@
 # snapshot-signature-skip-validation: false
 # snapshot-timestamp: 1554904800
 # spent-addresses-files: "/absolute/path/to/file0 /absolute/path/to/file1"
+
+# Local snapshots configuration
+
+# local-snapshots-enabled: false
+# local-snapshots-pruning-enabled: false
+# local-snapshots-transactions-growth-threshold: 1000
+# local-snapshots-min-depth: 100
+# local-snapshots-base-dir: "/absolute/path/to/local/snapshots/directory"

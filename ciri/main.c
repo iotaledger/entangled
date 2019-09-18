@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = ciri_core.conf.tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = ciri_core.conf.tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");
@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
 
   if (ciri_core.conf.tangle_db_revalidate) {
     log_info(logger_id, "Revalidating database\n");
-    if (iota_tangle_milestone_clear(&tangle) != RC_OK || iota_tangle_transaction_metadata_clear(&tangle) != RC_OK) {
+    if (iota_tangle_milestone_clear(&tangle) != RC_OK || iota_tangle_transactions_metadata_clear(&tangle) != RC_OK) {
       log_critical(logger_id, "Revalidating database failed\n");
       return EXIT_FAILURE;
     }
@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
   }
 
   {
-    size_t count = 0;
+    uint64_t count = 0;
 
     while (ciri_core.running) {
       if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {

@@ -3,7 +3,6 @@ cc_test(
     timeout = "moderate",
     srcs = ["exit_probability_validator.c"],
     data = [
-        ":db_file",
         ":snapshot.txt",
         "//ciri/consensus/snapshot/tests:snapshot_test_files",
     ],
@@ -11,16 +10,8 @@ cc_test(
     deps = [
         "//ciri/consensus/test_utils",
         "//ciri/consensus/tip_selection/exit_probability_validator",
-        "//common/storage/tests/helpers",
+        "//common/storage/tests:defs",
         "//common/trinary:trit_ptrit",
         "@unity",
     ],
-)
-
-genrule(
-    name = "db_file",
-    srcs = ["//common/storage/sql:tangle-schema"],
-    outs = ["ciri.db"],
-    cmd = "$(location @sqlite3//:shell) $@ < $<",
-    tools = ["@sqlite3//:shell"],
 )

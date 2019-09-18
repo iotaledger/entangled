@@ -9,31 +9,15 @@
 
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/consensus/test_utils/tangle.h"
+#include "common/storage/test_utils.h"
 #include "utils/files.h"
 
-retcode_t tangle_setup(tangle_t *const tangle, connection_config_t *const config, char *test_db_path,
-                       char *ciri_db_path) {
-  retcode_t ret = RC_OK;
-
-  if ((ret = iota_utils_copy_file(test_db_path, ciri_db_path))) {
-    return ret;
-  }
-  if ((ret = iota_tangle_init(tangle, config))) {
-    return ret;
-  }
-  return ret;
+retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path) {
+  return storage_test_setup(&tangle->connection, config, test_db_path, STORAGE_CONNECTION_TANGLE);
 }
 
 retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
-  retcode_t ret = RC_OK;
-
-  if ((ret = iota_tangle_destroy(tangle))) {
-    return ret;
-  }
-  if ((ret = iota_utils_remove_file(test_db_path))) {
-    return ret;
-  }
-  return ret;
+  return storage_test_teardown(&tangle->connection, test_db_path, STORAGE_CONNECTION_TANGLE);
 }
 
 void transactions_deserialize(tryte_t const *const *const transactions_trytes, iota_transaction_t **txs,

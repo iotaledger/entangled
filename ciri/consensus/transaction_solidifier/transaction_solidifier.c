@@ -98,7 +98,7 @@ static void *spawn_solid_transactions_propagation(void *arg) {
   tangle_t tangle;
 
   {
-    connection_config_t db_conf = {.db_path = ts->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = ts->conf->tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");
@@ -273,7 +273,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(transaction_solid
     *is_solid = true;
     log_debug(logger_id, "In %s, updating solid state\n", __FUNCTION__);
 
-    ret = iota_tangle_transactions_update_solid_state(tangle, solid_transactions_candidates, true);
+    ret = iota_tangle_transactions_update_solidity(tangle, solid_transactions_candidates, true);
 
     lock_handle_lock(&ts->lock);
     hash243_set_append(&solid_transactions_candidates, &ts->newly_set_solid_transactions);
@@ -320,7 +320,7 @@ static retcode_t check_transaction_and_update_solid_state(transaction_solidifier
     }
 
     if ((*is_new_solid = is_trunk_solid && is_branch_solid)) {
-      if ((ret = iota_tangle_transaction_update_solid_state(tangle, hash, true)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_update_solidity(tangle, hash, true)) != RC_OK) {
         log_error(logger_id, "Updating solid state failed\n");
         return ret;
       }
@@ -402,7 +402,7 @@ static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts, f
 retcode_t iota_consensus_transaction_solidifier_update_status(transaction_solidifier_t *const ts,
                                                               tangle_t *const tangle, iota_transaction_t *const tx) {
   retcode_t ret = RC_OK;
-  size_t approvers_count = 0;
+  uint64_t approvers_count = 0;
 
   if ((ret = requester_clear_request(ts->transaction_requester, transaction_hash(tx))) != RC_OK) {
     return ret;

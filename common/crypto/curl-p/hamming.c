@@ -1,47 +1,40 @@
 /*
- * Copyright (c) 2018 IOTA Stiftung
+ * Copyright (c) 2019 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
-
-#include <stdio.h>
 
 #include "common/crypto/curl-p/hamming.h"
 #include "common/crypto/curl-p/ptrit.h"
 #include "common/crypto/curl-p/search.h"
 #include "common/crypto/curl-p/trit.h"
 
-short test(PCurl *const curl, unsigned short const security) {
-  unsigned short i, j, k;
-  signed short sum;
-  for (i = 0; i < sizeof(ptrit_s) * 8; i++) {
-    sum = 0;
+static test_result_t test(pcurl_t const *pcurl, test_arg_t security) {
+  size_t i;
 
-    for (j = 0; j < security; j++) {
-      for (k = j * HASH_LENGTH_TRYTE; k < (j + 1) * HASH_LENGTH_TRYTE; k++) {
-        if ((curl->state[k].low & (1uLL << i)) == 0) {
-          sum--;
-        } else if ((curl->state[k].high & (1uLL << i)) == 0) {
-          sum++;
-        }
-      }
+  for (i = 0; i < PTRIT_SIZE; i++) {
+    ptrit_t const *p = pcurl->state;
+    long sum = 0;
+    size_t j = 0;
 
-      if (sum == 0 && j < security - 1) {
-        sum = 1;
+    for (; j++ < (size_t)security;) {
+      sum += ptrits_sum_slice(HASH_LENGTH_TRIT / 3, p, i);
+      p += HASH_LENGTH_TRIT / 3;
+
+      if (0 == sum) {
         break;
       }
     }
 
-    if (sum == 0) {
-      return i;
+    if ((size_t)security == j) {
+      break;
     }
   }
 
-  return -1;
+  return (PTRIT_SIZE == i) ? (test_result_t)-1 : (test_result_t)i;
 }
 
-PearlDiverStatus hamming(Curl *const ctx, unsigned short const offset, unsigned short const end,
-                         unsigned short const security) {
-  return pd_search(ctx, offset, end, test, security);
+PearlDiverStatus hamming(Curl *ctx, size_t begin, size_t end, intptr_t security) {
+  return pd_search(ctx, begin, end, test, security);
 }

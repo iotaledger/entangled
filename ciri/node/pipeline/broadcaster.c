@@ -37,7 +37,7 @@ static void *broadcaster_stage_routine(broadcaster_stage_t *const broadcaster) {
   }
 
   {
-    connection_config_t db_conf = {.db_path = broadcaster->node->conf.tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = broadcaster->node->conf.tangle_db_path};
 
     if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
       log_critical(logger_id, "Initializing tangle connection failed\n");

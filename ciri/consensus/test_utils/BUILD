@@ -3,19 +3,35 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bundle",
-        ":tangle_setup",
+        ":spent_addresses",
+        ":tangle",
     ],
 )
 
 cc_library(
-    name = "tangle_setup",
+    name = "tangle",
     srcs = ["tangle.c"],
     hdrs = ["tangle.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/tangle",
         "//common:errors",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//common/storage",
+        "//common/storage:test_utils",
+        "//utils:files",
+    ],
+)
+
+cc_library(
+    name = "spent_addresses",
+    srcs = ["spent_addresses.c"],
+    hdrs = ["spent_addresses.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ciri/consensus/spent_addresses:spent_addresses_provider",
+        "//common:errors",
+        "//common/storage",
+        "//common/storage:test_utils",
         "//utils:files",
     ],
 )

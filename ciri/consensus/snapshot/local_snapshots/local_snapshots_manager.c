@@ -5,16 +5,16 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "ciri/consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include <inttypes.h>
+
 #include "ciri/consensus/snapshot/local_snapshots/conf.h"
+#include "ciri/consensus/snapshot/local_snapshots/local_snapshots_manager.h"
 #include "ciri/consensus/snapshot/snapshots_service.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/time.h"
 
 #define LOCAL_SNAPSHOTS_RESCAN_INTERVAL_MS 10000
-
 #define LOCAL_SNAPSHOTS_MANAGER_LOGGER_ID "local_snapshots_manager"
 
 static logger_id_t logger_id;
@@ -31,7 +31,7 @@ static void *local_snapshots_manager_routine(void *arg) {
   uint64_t initial_delta_size;
 
   {
-    connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
+    storage_connection_config_t db_conf = {.db_path = lsm->conf->tangle_db_path};
 
     if ((err = iota_tangle_init(&tangle, &db_conf))) {
       log_critical(logger_id, "Failed in initializing db\n");
@@ -94,7 +94,8 @@ cleanup:
 
 bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm,
                                                        tangle_t const *const tangle) {
-  size_t new_transactions_count;
+  uint64_t new_transactions_count;
+
   if (iota_tangle_transaction_count(tangle, &new_transactions_count) != RC_OK) {
     log_critical(logger_id, "Failed in querying db size\n");
     return false;
