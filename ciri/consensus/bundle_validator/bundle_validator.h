@@ -11,7 +11,6 @@
 #include "ciri/consensus/tangle/tangle.h"
 #include "common/errors.h"
 #include "common/model/bundle.h"
-#include "common/trinary/trit_array.h"
 
 #ifdef __cplusplus
 extern "C" {

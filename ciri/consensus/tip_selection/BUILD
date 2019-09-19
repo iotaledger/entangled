@@ -13,7 +13,6 @@ cc_library(
         "//ciri/consensus/tip_selection/exit_probability_randomizer",
         "//ciri/consensus/tip_selection/exit_probability_validator",
         "//common:errors",
-        "//common/trinary:trit_array",
         "//utils:logger_helper",
     ],
 )

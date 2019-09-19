@@ -202,6 +202,7 @@ char *storage_statement_milestone_exist_by_hash =
 
 char *storage_statement_milestone_delete_by_hash =
     "DELETE FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
+
 /*
  * State delta statements
  */

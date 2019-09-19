@@ -21,7 +21,6 @@
 #include "ciri/consensus/tip_selection/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "ciri/consensus/tip_selection/exit_probability_validator/exit_probability_validator.h"
 #include "common/errors.h"
-#include "common/trinary/trit_array.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -10,7 +10,6 @@ cc_library(
         "//ciri/consensus/tip_selection/entry_point_selector",
         "//ciri/consensus/transaction_solidifier",
         "//common:errors",
-        "//common/trinary:trit_array",
         "//utils:hash_maps",
         "//utils:logger_helper",
         "@com_github_uthash//:uthash",

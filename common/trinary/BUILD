@@ -246,23 +246,3 @@ cc_library(
         "//utils:macros",
     ],
 )
-
-cc_library(
-    name = "trit_array",
-    srcs = ["trit_array.c"],
-    hdrs = ["trit_array.h"],
-    deps = [
-        ":flex_trit",
-        "//common:stdint",
-    ],
-)
-
-cc_library(
-    name = "flex_trit_array",
-    srcs = ["flex_trit_array.cc"],
-    hdrs = ["flex_trit_array.h"],
-    deps = [
-        ":flex_trit",
-        "//common:stdint",
-    ],
-)
