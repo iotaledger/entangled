@@ -27,7 +27,6 @@ cc_library(
         "//common/crypto/iss/v1:iss_kerl",
         "//common/crypto/kerl",
         "//common/trinary:flex_trit",
-        "//common/trinary:trit_array",
         "//common/trinary:trit_tryte",
         "//utils:export",
         "//utils:memset_safe",

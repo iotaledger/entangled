@@ -76,15 +76,14 @@ set(COMMON_TRINARY_DIR "common/trinary")
 set(COMMON_CRYPTO_DIR "common/crypto")
 set(COMMON_HELPERS_DIR "common/helpers")
 set(COMMON_MODEL_DIR "common/model")
-set(COMMON_SRC 
-  # error code 
+set(COMMON_SRC
+  # error code
   "common/errors.c"
   # trynary
   "${COMMON_TRINARY_DIR}/add.c"
   "${COMMON_TRINARY_DIR}/flex_trit.c"
   "${COMMON_TRINARY_DIR}/ptrit.c"
   "${COMMON_TRINARY_DIR}/ptrit_incr.c"
-  "${COMMON_TRINARY_DIR}/trit_array.c"
   "${COMMON_TRINARY_DIR}/trit_byte.c"
   "${COMMON_TRINARY_DIR}/trit_long.c"
   "${COMMON_TRINARY_DIR}/trit_tryte.c"
@@ -120,7 +119,7 @@ set(COMMON_SRC
 set(HASH_CONTAINERS_DIR "utils/containers/hash")
 # genrate hash containers
 add_custom_command(
-  OUTPUT 
+  OUTPUT
   "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash27_queue.c"
   "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash81_queue.c"
   "${PROJECT_SOURCE_DIR}/${HASH_CONTAINERS_DIR}/hash243_queue.c"
@@ -145,7 +144,7 @@ add_custom_command(
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-set(UTILS_SRC 
+set(UTILS_SRC
   "utils/time.c"
   "utils/logger_helper.c"
   "utils/handles/socket.c"
@@ -166,7 +165,7 @@ set(UTILS_SRC
   "${HASH_CONTAINERS_DIR}/hash8019_stack.c"
 )
 
-add_library(common 
+add_library(common
   "${COMMON_SRC}"
   "${UTILS_SRC}"
 )
@@ -190,7 +189,7 @@ endif()
 
 add_library(entangled::common ALIAS common)
 target_include_directories(common PUBLIC ${PROJECT_SOURCE_DIR})
-add_dependencies(common 
+add_dependencies(common
   ext_uthash
   ext_keccak
   ext_embear_logger
@@ -206,28 +205,28 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/common/" DESTINATION "${CMAKE_INSTALL_P
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/utils/" DESTINATION "${CMAKE_INSTALL_PREFIX}/include/entangled/utils" FILES_MATCHING PATTERN "*.h")
 
 # remove build files
-add_custom_target(clean_build 
+add_custom_target(clean_build
   COMMAND make clean
-  COMMAND rm -rf ${EXTERNAL_BUILD_DIR} 
+  COMMAND rm -rf ${EXTERNAL_BUILD_DIR}
     ${PROJECT_BINARY_DIR}/install
-    Makefile 
+    Makefile
     cclient
-    CMake* 
+    CMake*
     CTest*
     Testing
-    cmake_install.cmake 
+    cmake_install.cmake
     build_*
     install_manifest.txt
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 # remove download cashes
-add_custom_target(clean_download 
+add_custom_target(clean_download
   COMMAND rm -rf ${EXTERNAL_DOWNLOAD_DIR}
 )
 
 # empty build dir
-add_custom_target(distclean 
+add_custom_target(distclean
   COMMAND make clean clean_build clean_download
 )
 

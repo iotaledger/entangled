@@ -15,7 +15,6 @@
 #include "ciri/consensus/snapshot/snapshot_metadata.h"
 #include "ciri/consensus/snapshot/state_delta.h"
 #include "common/errors.h"
-#include "common/trinary/trit_array.h"
 #include "utils/handles/rw_lock.h"
 
 #ifdef __cplusplus

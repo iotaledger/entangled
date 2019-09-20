@@ -22,7 +22,6 @@ cc_library(
         "//ciri/consensus/snapshot:state_delta",
         "//common:errors",
         "//common/model:transaction",
-        "//common/trinary:trit_array",
         "//utils:files",
         "//utils:logger_helper",
         "//utils:signed_files",

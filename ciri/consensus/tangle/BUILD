@@ -9,7 +9,6 @@ cc_library(
         "//common/model:bundle",
         "//common/model:transaction",
         "//common/storage",
-        "//common/trinary:trit_array",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_queue",
         "//utils/containers/hash:hash243_set",

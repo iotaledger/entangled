@@ -88,23 +88,3 @@ cc_test(
         "@unity",
     ],
 )
-
-cc_test(
-    name = "test_trit_array",
-    timeout = "short",
-    srcs = ["test_trit_array.c"],
-    deps = [
-        "//common/trinary:trit_array",
-        "@unity",
-    ],
-)
-
-cc_test(
-    name = "test_flex_trit_array",
-    timeout = "short",
-    srcs = ["test_flex_trit_array.cc"],
-    deps = [
-        "//common/trinary:flex_trit_array",
-        "@com_google_googletest//:gtest_main",
-    ],
-)

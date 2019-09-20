@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "common/storage/pack.h"
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 
 retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
   if (resize_factor < 1) {

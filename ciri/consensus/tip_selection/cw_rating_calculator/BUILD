@@ -7,7 +7,6 @@ cc_library(
         "//ciri/consensus:model",
         "//ciri/consensus/tangle",
         "//common:errors",
-        "//common/trinary:trit_array",
         "//utils:hash_maps",
         "//utils:logger_helper",
         "//utils/containers:bitset",
