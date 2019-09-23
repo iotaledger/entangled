@@ -330,7 +330,7 @@ MAM_EXPORT retcode_t mam_api_save(mam_api_t const *const api, char const *const 
                                   tryte_t const *const encr_key_trytes, size_t encr_key_trytes_size);
 
 /**
- * Loads an API into a file
+ * Loads an API from a file
  *
  * @param filename - The file name where the API is serialized [in]
  * @param api - The API [out]
