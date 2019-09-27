@@ -103,6 +103,7 @@ int main() {
   // example_replay_bundle(&serv);
   // example_broadcast_bundle(&serv);
   // example_promote_transaction(&serv);
+  // example_get_unspent_address(&serv);
 
   /* Send data and balance */
   // example_send_data(&serv);

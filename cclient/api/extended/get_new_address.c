@@ -34,6 +34,8 @@ static retcode_t was_address_spent_from(iota_client_service_t const* const serv,
       log_debug(client_extended_logger_id, "the address was spent from\n");
       *is_unused = false;
       goto done;
+    } else {
+      *is_unused = true;
     }
   } else {
     log_error(client_extended_logger_id, "Error: %s\n", error_2_string(ret_code));
@@ -154,5 +156,51 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
   }
 done:
   free(tmp);
+  return ret;
+}
+
+retcode_t iota_client_get_unspent_address(iota_client_service_t const* const serv, flex_trit_t const* const seed,
+                                          address_opt_t const addr_opt, flex_trit_t* unspent_addr,
+                                          uint64_t* unspent_index) {
+  retcode_t ret = RC_OK;
+  flex_trit_t* tmp_addr = NULL;
+  uint64_t addr_index = 0;
+  bool is_unspent = true;
+
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  // security validation
+  if (addr_opt.security == 0 || addr_opt.security > 3) {
+    ret = RC_CCLIENT_INVALID_SECURITY;
+    log_error(client_extended_logger_id, "%s %s\n", __func__, error_2_string(ret));
+    return ret;
+  }
+
+  for (addr_index = addr_opt.start; addr_index < addr_opt.total; addr_index++) {
+    tmp_addr = iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
+    if (tmp_addr) {
+      if (was_address_spent_from(serv, tmp_addr, &is_unspent) != RC_OK) {
+        log_error(client_extended_logger_id, "were_address_spent_from failed\n");
+        free(tmp_addr);
+        goto done;
+      }
+
+      if (is_unspent) {
+        memcpy(unspent_addr, tmp_addr, NUM_FLEX_TRITS_ADDRESS);
+        *unspent_index = addr_index;
+        goto done;
+      }
+
+      free(tmp_addr);
+      tmp_addr = NULL;
+    } else {
+      // gen address failed.
+      ret = RC_OOM;
+      log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret));
+      goto done;
+    }
+  }
+
+done:
+  free(tmp_addr);
   return ret;
 }
