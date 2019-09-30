@@ -24,6 +24,8 @@ retcode_t mam_endpoint_create(mam_prng_t *const prng, mss_mt_height_t const heig
 
   MAM_ASSERT(name_size % NUMBER_OF_TRITS_IN_A_TRYTE == 0);
 
+  memset(endpoint, 0, sizeof(mam_endpoint_t));
+
   if (trits_is_null(endpoint->name_size = trits_alloc(MAM_TRITS_MAX_SIZEOF_SIZE_T))) {
     ret = RC_OOM;
     goto done;
