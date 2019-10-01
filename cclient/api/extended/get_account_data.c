@@ -54,20 +54,20 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv, 
   // get addresses
   for (addr_index = 0;; addr_index++) {
     log_debug(client_extended_logger_id, "checking address on: %" PRIu64 "\n", addr_index);
-    bool is_unused_addr = false;
+    bool is_used_addr = false;
     tmp_addr = iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
     if (tmp_addr) {
-      if ((ret_code = is_unused_address(serv, tmp_addr, &is_unused_addr, true, &out_account->transactions)) != RC_OK) {
+      if ((ret_code = is_used_address(serv, tmp_addr, &is_used_addr, true, &out_account->transactions)) != RC_OK) {
         log_error(client_extended_logger_id, "checking address status failed: %s\n", error_2_string(ret_code));
         goto done;
       }
 
-      if (is_unused_addr) {
+      if (!is_used_addr) {
         // it's the latest(unused) address
         memcpy(out_account->latest_address, tmp_addr, FLEX_TRIT_SIZE_243);
         break;
       } else {
-        // spent addresses
+        // used addresses
         if ((ret_code = hash243_queue_push(&out_account->addresses, tmp_addr)) != RC_OK) {
           log_error(client_extended_logger_id, "push address to list failed: %s\n", error_2_string(ret_code));
           goto done;

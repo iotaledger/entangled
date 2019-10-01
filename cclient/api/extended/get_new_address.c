@@ -11,7 +11,7 @@
 #include "common/helpers/sign.h"
 
 static retcode_t was_address_spent_from(iota_client_service_t const* const serv, flex_trit_t const* const addr,
-                                        bool* const is_unused) {
+                                        bool* const is_spent) {
   retcode_t ret_code = RC_ERROR;
   // Is it a spent address?
   were_addresses_spent_from_req_t* addr_spent_req = were_addresses_spent_from_req_new();
@@ -32,8 +32,10 @@ static retcode_t was_address_spent_from(iota_client_service_t const* const serv,
   if ((ret_code = iota_client_were_addresses_spent_from(serv, addr_spent_req, addr_spent_res)) == RC_OK) {
     if (were_addresses_spent_from_res_states_at(addr_spent_res, 0)) {
       log_debug(client_extended_logger_id, "the address was spent from\n");
-      *is_unused = false;
+      *is_spent = true;
       goto done;
+    } else {
+      *is_spent = false;
     }
   } else {
     log_error(client_extended_logger_id, "Error: %s\n", error_2_string(ret_code));
@@ -47,7 +49,7 @@ done:
 }
 
 static retcode_t find_transactions_by_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
-                                              bool* const is_unused, bool get_tx_list, hash243_queue_t* txs) {
+                                              bool* const is_used, bool get_tx_list, hash243_queue_t* txs) {
   // if it's not a spent address, does it have transactions?
   retcode_t ret_code = RC_ERROR;
   size_t ret_num = 0;
@@ -74,10 +76,10 @@ static retcode_t find_transactions_by_address(iota_client_service_t const* const
         log_debug(client_extended_logger_id, "cloning transactions\n");
         ret_code = hash243_queue_copy(txs, find_tran_res->hashes, ret_num);
       }
-      *is_unused = false;
+      *is_used = true;
     } else {
       log_debug(client_extended_logger_id, "the address has no transactions and was not spent from\n");
-      *is_unused = true;
+      *is_used = false;
     }
   }
 done:
@@ -85,13 +87,12 @@ done:
   find_transactions_res_free(&find_tran_res);
   return ret_code;
 }
-retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
-                            bool* const is_unused, bool with_txs, hash243_queue_t* transactions) {
-  *is_unused = true;
-  if (was_address_spent_from(serv, addr, is_unused) != RC_OK) {
+retcode_t is_used_address(iota_client_service_t const* const serv, flex_trit_t const* const addr, bool* const is_used,
+                          bool with_txs, hash243_queue_t* transactions) {
+  if (was_address_spent_from(serv, addr, is_used) != RC_OK) {
     log_warning(client_extended_logger_id, "were_address_spent_from failed\n");
   }
-  return find_transactions_by_address(serv, addr, is_unused, with_txs, transactions);
+  return find_transactions_by_address(serv, addr, is_used, with_txs, transactions);
 }
 
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, flex_trit_t const* const seed,
@@ -99,7 +100,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
   retcode_t ret = RC_ERROR;
   flex_trit_t* tmp = NULL;
   size_t addr_index = 0;
-  bool is_unused = true;
+  bool is_used = false;
 
   log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
   // security validation
@@ -138,8 +139,8 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
                     error_2_string(ret));
           goto done;
         }
-        ret = is_unused_address(serv, tmp, &is_unused, false, NULL);
-        if (ret == RC_OK && is_unused) {
+        ret = is_used_address(serv, tmp, &is_used, false, NULL);
+        if (ret == RC_OK && !is_used) {
           goto done;
         }
         free(tmp);
@@ -154,5 +155,51 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, f
   }
 done:
   free(tmp);
+  return ret;
+}
+
+retcode_t iota_client_get_unspent_address(iota_client_service_t const* const serv, flex_trit_t const* const seed,
+                                          address_opt_t const addr_opt, flex_trit_t* unspent_addr,
+                                          uint64_t* unspent_index) {
+  retcode_t ret = RC_OK;
+  flex_trit_t* tmp_addr = NULL;
+  uint64_t addr_index = 0;
+  bool is_spent = true;
+
+  log_debug(client_extended_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  // security validation
+  if (addr_opt.security == 0 || addr_opt.security > 3) {
+    ret = RC_CCLIENT_INVALID_SECURITY;
+    log_error(client_extended_logger_id, "%s %s\n", __func__, error_2_string(ret));
+    return ret;
+  }
+
+  for (addr_index = addr_opt.start; addr_index < addr_opt.total; addr_index++) {
+    tmp_addr = iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
+    if (tmp_addr) {
+      if (was_address_spent_from(serv, tmp_addr, &is_spent) != RC_OK) {
+        log_error(client_extended_logger_id, "were_address_spent_from failed\n");
+        free(tmp_addr);
+        goto done;
+      }
+
+      if (!is_spent) {
+        memcpy(unspent_addr, tmp_addr, NUM_FLEX_TRITS_ADDRESS);
+        *unspent_index = addr_index;
+        goto done;
+      }
+
+      free(tmp_addr);
+      tmp_addr = NULL;
+    } else {
+      // gen address failed.
+      ret = RC_OOM;
+      log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret));
+      goto done;
+    }
+  }
+
+done:
+  free(tmp_addr);
   return ret;
 }

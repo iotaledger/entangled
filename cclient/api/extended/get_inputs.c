@@ -20,7 +20,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
   out_inputs->total_balance = 0;
 
   flex_trit_t* addr = NULL;
-  bool is_unused = false;
+  bool is_used = false;
   uint64_t addr_index, addr_index_end;
   if (addr_opt.total == 0) {
     addr_index = 0;
@@ -58,8 +58,8 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv, flex_t
 
     // For request without `addr_opt.total`, end this loop if the current addr is an unused address
     if (addr_opt.total == 0) {
-      ret_code = is_unused_address(serv, addr, &is_unused, false, NULL);
-      if (ret_code == RC_OK && is_unused) {
+      ret_code = is_used_address(serv, addr, &is_used, false, NULL);
+      if (ret_code == RC_OK && !is_used) {
         break;
       }
     }
