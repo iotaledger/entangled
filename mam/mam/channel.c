@@ -24,6 +24,8 @@ retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const heigh
 
   MAM_ASSERT(name_size % NUMBER_OF_TRITS_IN_A_TRYTE == 0);
 
+  memset(channel, 0, sizeof(mam_channel_t));
+
   if (trits_is_null(channel->name_size = trits_alloc(MAM_TRITS_MAX_SIZEOF_SIZE_T))) {
     ret = RC_OOM;
     goto done;
@@ -38,8 +40,6 @@ retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const heigh
   }
   trits_copy(name, channel->name);
 
-  memset(channel->msg_ord, 0, MAM_CHANNEL_MSG_ORD_SIZE);
-
   if ((ret = mam_mss_create(&channel->mss, height)) != RC_OK) {
     goto done;
   }
@@ -48,9 +48,6 @@ retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const heigh
                trits_null());
 
   mam_mss_gen(&channel->mss);
-
-  channel->endpoints = NULL;
-  channel->endpoint_ord = 0;
 
 done:
 
