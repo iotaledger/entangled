@@ -9,6 +9,15 @@ cc_library(
 )
 
 cc_library(
+    name = "trit_tryte_sse42",
+    hdrs = ["trit_tryte_sse42.h"],
+    deps = [
+        ":tryte",
+        "//common:defs",
+    ],
+)
+
+cc_library(
     name = "trits",
     hdrs = ["trits.h"],
     deps = [
@@ -102,7 +111,10 @@ cc_library(
 cc_library(
     name = "trit_tryte",
     srcs = ["trit_tryte.c"],
-    hdrs = ["trit_tryte.h"],
+    hdrs = [
+        "trit_tryte.h",
+        "trit_tryte_sse42.h",
+    ],
     deps = [
         ":trits",
         ":tryte",
