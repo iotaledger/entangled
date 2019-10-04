@@ -429,7 +429,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len, const by
 }
 
 void flex_trit_print(flex_trit_t const *flex_trits, size_t trits_len) {
-  #define TRYTE_BUFF_SIZE 729
+#define TRYTE_BUFF_SIZE (243 * NUM_TRITS_PER_FLEX_TRIT)
   tryte_t tryte_buff[TRYTE_BUFF_SIZE + 1];
   for(; 0 < trits_len;) {
     size_t chunk_trits_len = (trits_len < 3 * TRYTE_BUFF_SIZE) ? trits_len : (3 * TRYTE_BUFF_SIZE);
@@ -439,6 +439,6 @@ void flex_trit_print(flex_trit_t const *flex_trits, size_t trits_len) {
     tryte_buff[chunk_tryte_len] = '\0';
     printf("%s", tryte_buff);
     trits_len -= chunk_trits_len;
-    flex_trits += chunk_trits_len;
+    flex_trits += chunk_trits_len / NUM_TRITS_PER_FLEX_TRIT;
   }
 }
