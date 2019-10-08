@@ -17,6 +17,7 @@
 #include "cclient/api/core/get_balances.h"
 #include "cclient/api/core/get_inclusion_states.h"
 #include "cclient/api/core/get_neighbors.h"
+#include "cclient/api/core/get_node_api_conf.h"
 #include "cclient/api/core/get_node_info.h"
 #include "cclient/api/core/get_tips.h"
 #include "cclient/api/core/get_transactions_to_approve.h"
