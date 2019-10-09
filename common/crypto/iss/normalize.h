@@ -14,6 +14,7 @@
 extern "C" {
 #endif
 
+void normalize_hash(trit_t const *const hash, byte_t *const normalized_hash);
 void normalize_hash_to_trits(trit_t const *const hash, trit_t *const normalized_hash);
 void normalize_flex_hash(flex_trit_t const *const hash, byte_t *const normalized_hash);
 void normalize_flex_hash_to_trits(flex_trit_t const *const hash, trit_t *const normalized_hash);

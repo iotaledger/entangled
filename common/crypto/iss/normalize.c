@@ -9,7 +9,7 @@
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 
-static void normalize_hash(trit_t const *const hash, byte_t *const normalized_hash) {
+void normalize_hash(trit_t const *const hash, byte_t *const normalized_hash) {
   for (int i = 0; i < SECURITY_LEVEL_MAX; i++) {
     int sum = 0;
     for (int j = i * NORMALIZED_FRAGMENT_LENGTH; j < (i + 1) * NORMALIZED_FRAGMENT_LENGTH; j++) {
