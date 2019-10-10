@@ -53,7 +53,7 @@ void bundle_miner_min_normalized_bundle(byte_t const *const a, byte_t const *con
   }
 }
 
-uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t const *const essence,
+uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t *const essence,
                            size_t const essence_length, uint32_t const offset, uint32_t const count) {
   uint32_t index = offset;
   uint32_t best_index = 0;
@@ -68,7 +68,7 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
   kerl_init(&kerl);
 
   while (index < offset + count) {
-    index = trits_to_long(essence + OBSOLETE_TAG_OFFSET, OBSOLETE_TAG_LENGTH);
+    long_to_trits(index, essence + OBSOLETE_TAG_OFFSET);
     kerl_reset(&kerl);
 
     kerl_absorb(&kerl, essence, essence_length);
@@ -78,6 +78,7 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
 
     normalize_hash(bundle_hash, bundle_hash_normalized);
 
+    secure = true;
     for (size_t i = 0; i < NORMALIZED_BUNDLE_LENGTH; i++) {
       if (bundle_hash_normalized[i] == TRYTE_VALUE_MAX) {
         secure = false;

@@ -19,7 +19,7 @@ double bundle_miner_probability_of_losing(byte_t const *const nb, uint64_t const
 double bundle_miner_security_level(double const probability, double const radix);
 void bundle_miner_min_normalized_bundle(byte_t const *const a, byte_t const *const b, byte_t *const out,
                                         size_t const length);
-uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t const *const essence,
+uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t *const essence,
                            size_t const essence_length, uint32_t const offset, uint32_t const count);
 
 #ifdef __cplusplus

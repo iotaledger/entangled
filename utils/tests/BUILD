@@ -2,7 +2,7 @@ load("//ciri/consensus:conf.bzl", "CONSENSUS_MAINNET_VARIABLES")
 
 cc_test(
     name = "test_bundle_miner",
-    timeout = "moderate",
+    timeout = "long",
     srcs = ["test_bundle_miner.c"],
     deps =
         [

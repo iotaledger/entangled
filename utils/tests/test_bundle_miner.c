@@ -102,9 +102,7 @@ static void test_bundle_miner_mine(void) {
 
   index = bundle_miner_mine(min, N, essence, E, 0, 1000);
 
-  fprintf(stderr, "%d\n", index);
-
-  //     assert_eq!(i, 722);
+  TEST_ASSERT_EQUAL_INT(index, 722);
 }
 
 int main(void) {
