@@ -100,7 +100,7 @@ static void test_bundle_miner_mine(void) {
 
   bundle_miner_normalized_bundle_max(nb1, nb2, min, NORMALIZED_BUNDLE_LENGTH);
 
-  index = bundle_miner_mine(min, N, essence, E, 0, 1000);
+  index = bundle_miner_mine(min, N, essence, E, 1000);
 
   TEST_ASSERT_EQUAL_INT(index, 722);
 }

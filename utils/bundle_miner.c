@@ -16,6 +16,7 @@
 #include "utils/macros.h"
 
 #define OBSOLETE_TAG_OFFSET (243 + 81)
+#define OBSOLETE_TAG_LENGTH 81
 
 /**
  * Public functions
@@ -50,8 +51,8 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
 }
 
 uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t *const essence,
-                           size_t const essence_length, uint32_t const offset, uint32_t const count) {
-  uint32_t index = offset;
+                           size_t const essence_length, uint32_t const count) {
+  uint32_t index = 0;
   uint32_t best_index = 0;
   double best = 1.0;
   Kerl kerl;
@@ -62,8 +63,9 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
   double p = 0.0;
 
   kerl_init(&kerl);
+  index = trits_to_long(essence + OBSOLETE_TAG_OFFSET, OBSOLETE_TAG_LENGTH);
 
-  while (index < offset + count) {
+  for (size_t i = 0; i < count; i++) {
     long_to_trits(index, essence + OBSOLETE_TAG_OFFSET);
     kerl_reset(&kerl);
 
@@ -75,8 +77,8 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
     normalize_hash(bundle_hash, bundle_hash_normalized);
 
     secure = true;
-    for (size_t i = 0; i < NORMALIZED_BUNDLE_LENGTH; i++) {
-      if (bundle_hash_normalized[i] == TRYTE_VALUE_MAX) {
+    for (size_t j = 0; j < NORMALIZED_BUNDLE_LENGTH; j++) {
+      if (bundle_hash_normalized[j] == TRYTE_VALUE_MAX) {
         secure = false;
         break;
       }
