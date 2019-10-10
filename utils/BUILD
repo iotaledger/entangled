@@ -1,6 +1,20 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "bundle_miner",
+    srcs = ["bundle_miner.c"],
+    hdrs = ["bundle_miner.h"],
+    deps = [
+        "//common:defs",
+        "//common/crypto/iss:normalize",
+        "//common/crypto/kerl",
+        "//common/trinary:bytes",
+        "//common/trinary:trit_long",
+        "//common/trinary:trits",
+    ],
+)
+
+cc_library(
     name = "export",
     hdrs = ["export.h"],
 )
