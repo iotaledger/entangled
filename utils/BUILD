@@ -11,6 +11,7 @@ cc_library(
         "//common/trinary:bytes",
         "//common/trinary:trit_long",
         "//common/trinary:trits",
+        "//utils:macros",
     ],
 )
 

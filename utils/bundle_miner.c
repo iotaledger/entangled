@@ -13,9 +13,9 @@
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 #include "utils/bundle_miner.h"
+#include "utils/macros.h"
 
 #define OBSOLETE_TAG_OFFSET (243 + 81)
-#define OBSOLETE_TAG_LENGTH 81
 
 /**
  * Public functions
@@ -42,14 +42,10 @@ double bundle_miner_security_level(double const probability, double const radix)
   return log(1.0 / probability) / log(radix);
 }
 
-void bundle_miner_min_normalized_bundle(byte_t const *const a, byte_t const *const b, byte_t *const out,
+void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *const rhs, byte_t *const max,
                                         size_t const length) {
   for (size_t i = 0; i < length; i++) {
-    if (TRYTE_VALUE_MAX - a[i] < TRYTE_VALUE_MAX - b[i]) {
-      out[i] = a[i];
-    } else {
-      out[i] = b[i];
-    }
+    max[i] = MAX(lhs[i], rhs[i]);
   }
 }
 
@@ -88,7 +84,7 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
 
     if (secure) {
       memset(bundle_hash_normalized_min, TRYTE_VALUE_MIN, NORMALIZED_BUNDLE_LENGTH);
-      bundle_miner_min_normalized_bundle(min, bundle_hash_normalized, bundle_hash_normalized_min,
+      bundle_miner_normalized_bundle_max(min, bundle_hash_normalized, bundle_hash_normalized_min,
                                          NORMALIZED_BUNDLE_LENGTH);
 
       p = bundle_miner_probability_of_losing(bundle_hash_normalized_min, number_of_fragments);

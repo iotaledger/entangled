@@ -57,7 +57,7 @@ static void test_bundle_miner_normalize_hash(void) {
   TEST_ASSERT_EQUAL_MEMORY(bundle_expected, bundle_actual, L);
 }
 
-static void test_bundle_miner_min_normalized_bundle(void) {
+static void test_bundle_miner_normalized_bundle_max(void) {
   byte_t a[L] = {0};
   byte_t b[L] = {0};
   byte_t expected[L] = {0};
@@ -69,7 +69,7 @@ static void test_bundle_miner_min_normalized_bundle(void) {
   expected[0] = 13;
   expected[3] = 12;
 
-  bundle_miner_min_normalized_bundle(a, b, actual, L);
+  bundle_miner_normalized_bundle_max(a, b, actual, L);
 
   TEST_ASSERT_EQUAL_MEMORY(expected, actual, L);
 }
@@ -98,7 +98,7 @@ static void test_bundle_miner_mine(void) {
   normalize_hash(v1_trits, nb1);
   normalize_hash(v2_trits, nb2);
 
-  bundle_miner_min_normalized_bundle(nb1, nb2, min, NORMALIZED_BUNDLE_LENGTH);
+  bundle_miner_normalized_bundle_max(nb1, nb2, min, NORMALIZED_BUNDLE_LENGTH);
 
   index = bundle_miner_mine(min, N, essence, E, 0, 1000);
 
@@ -114,7 +114,7 @@ int main(void) {
   RUN_TEST(test_bundle_miner_probability_of_losing);
   RUN_TEST(test_bundle_miner_security_level);
   RUN_TEST(test_bundle_miner_normalize_hash);
-  RUN_TEST(test_bundle_miner_min_normalized_bundle);
+  RUN_TEST(test_bundle_miner_normalized_bundle_max);
   RUN_TEST(test_bundle_miner_mine);
 
   return UNITY_END();
