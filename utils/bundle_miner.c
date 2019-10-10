@@ -59,7 +59,6 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
   trit_t bundle_hash[HASH_LENGTH_TRIT];
   byte_t bundle_hash_normalized[NORMALIZED_BUNDLE_LENGTH];
   byte_t bundle_hash_normalized_min[NORMALIZED_BUNDLE_LENGTH];
-  bool secure = true;
   double p = 0.0;
 
   kerl_init(&kerl);
@@ -76,15 +75,7 @@ uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragm
 
     normalize_hash(bundle_hash, bundle_hash_normalized);
 
-    secure = true;
-    for (size_t j = 0; j < NORMALIZED_BUNDLE_LENGTH; j++) {
-      if (bundle_hash_normalized[j] == TRYTE_VALUE_MAX) {
-        secure = false;
-        break;
-      }
-    }
-
-    if (secure) {
+    if (normalized_hash_is_secure(bundle_hash_normalized, NORMALIZED_BUNDLE_LENGTH)) {
       memset(bundle_hash_normalized_min, TRYTE_VALUE_MIN, NORMALIZED_BUNDLE_LENGTH);
       bundle_miner_normalized_bundle_max(min, bundle_hash_normalized, bundle_hash_normalized_min,
                                          NORMALIZED_BUNDLE_LENGTH);

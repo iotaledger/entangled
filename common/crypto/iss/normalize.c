@@ -9,6 +9,16 @@
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 
+bool normalized_hash_is_secure(byte_t const *const normalized_hash, size_t const length) {
+  for (size_t i = 0; i < length; i++) {
+    if (normalized_hash[i] == TRYTE_VALUE_MAX) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void normalize_hash(trit_t const *const hash, byte_t *const normalized_hash) {
   for (int i = 0; i < SECURITY_LEVEL_MAX; i++) {
     int sum = 0;
