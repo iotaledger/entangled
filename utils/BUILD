@@ -8,6 +8,7 @@ cc_library(
         "//common:defs",
         "//common/crypto/iss:normalize",
         "//common/crypto/kerl",
+        "//common/trinary:add",
         "//common/trinary:bytes",
         "//common/trinary:trit_long",
         "//common/trinary:trits",
