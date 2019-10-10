@@ -50,10 +50,10 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
   }
 }
 
-uint32_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t *const essence,
+uint64_t bundle_miner_mine(byte_t const *const min, size_t const number_of_fragments, trit_t *const essence,
                            size_t const essence_length, uint32_t const count) {
-  uint32_t index = 0;
-  uint32_t best_index = 0;
+  uint64_t index = 0;
+  uint64_t best_index = 0;
   double best = 1.0;
   Kerl kerl;
   trit_t bundle_hash[HASH_LENGTH_TRIT];
