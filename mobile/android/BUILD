@@ -11,6 +11,7 @@ cc_library(
     ],
     deps = [
         "//common/helpers",
+        "//utils:bundle_miner",
         "//utils:memset_safe",
     ],
 )
