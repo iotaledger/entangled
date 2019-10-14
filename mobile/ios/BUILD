@@ -12,5 +12,8 @@ objc_library(
     name = "ios_bindings_classes",
     srcs = ["Interface.mm"],
     hdrs = ["Interface.h"],
-    deps = ["//common/helpers"],
+    deps = [
+        "//common/helpers",
+        "//utils:bundle_miner",
+    ],
 )
