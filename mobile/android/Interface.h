@@ -66,7 +66,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(JNIEnv *, 
 /*
  * Class:     org_iota_mobile_Interface
  * Method:    bundle_miner_mine
- * Signature: ([Ljava/lang/Byte;ILjava/lang/Byte;III)J;
+ * Signature: ([Ljava/lang/Byte;I[Ljava/lang/Byte;III)J
  */
 JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEnv *, jclass, jbyteArray, jint,
                                                                            jbyteArray, jint, jint, jint);
