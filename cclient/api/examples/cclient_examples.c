@@ -85,6 +85,7 @@ int main() {
   // example_get_tips(&serv);
   // example_get_transactions_to_approve(&serv);
   // example_get_trytes(&serv);
+  // example_node_api_conf(&serv);
   example_node_info(&serv);
   // example_prepare_transfer(&serv);
   // example_store_transactions(&serv);

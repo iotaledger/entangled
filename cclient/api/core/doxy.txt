@@ -28,6 +28,7 @@
  * - #iota_client_get_balances
  * - #iota_client_get_inclusion_states
  * - #iota_client_get_neighbors
+ * - #iota_client_get_node_api_conf
  * - #iota_client_get_node_info
  * - #iota_client_get_tips
  * - #iota_client_get_transactions_to_approve

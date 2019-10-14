@@ -207,3 +207,17 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_get_node_api_conf",
+    timeout = "short",
+    srcs = [
+        "cclient_service_init.c",
+        "cclient_test_defs.h",
+        "test_get_node_api_conf.c",
+    ],
+    deps = [
+        "//cclient/api",
+        "@unity",
+    ],
+)
