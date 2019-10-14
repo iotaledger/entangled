@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief Converts a get node configuration request into a JSON string.
  *
- * @param[in] obj A get node configuration request object.
+ * @param[out] out A JSON string of the getNodeAPIConfiguration command.
  * @return #retcode_t
  */
 retcode_t json_get_node_api_conf_serialize_request(char_buffer_t* out);

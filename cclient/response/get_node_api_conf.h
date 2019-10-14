@@ -42,7 +42,7 @@ typedef struct get_node_api_conf_res_s {
   uint32_t max_requests_list;
 
   /**
-   * a maximum number of trytes that may be returned by the #iota_client_get_trytes.
+   * The maximum number of trytes that may be returned by the #iota_client_get_trytes.
    */
   uint32_t max_get_trytes;
 
