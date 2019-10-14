@@ -46,6 +46,7 @@ static void *bundle_miner_mine_routine(void *const param) {
 
   for (size_t i = 0; i < ctx->count; i++) {
     long_to_trits(ctx->index, ctx->essence + OBSOLETE_TAG_OFFSET);
+
     kerl_reset(&kerl);
     kerl_absorb(&kerl, ctx->essence, ctx->essence_length);
     kerl_squeeze(&kerl, candidate, HASH_LENGTH_TRIT);
@@ -100,23 +101,42 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
   }
 }
 
-uint64_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security, trit_t *const essence,
-                           size_t const essence_length, uint32_t const count, uint8_t const nprocs) {
+retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security, trit_t *const essence,
+                            size_t const essence_length, uint32_t const count, uint8_t const nprocs,
+                            uint64_t *const index) {
+  retcode_t ret = RC_OK;
   uint8_t procs = nprocs == 0 ? system_cpu_available() : nprocs;
   uint32_t rounded_count = count + (procs - count % procs);
   bundle_miner_ctx_t *ctxs = (bundle_miner_ctx_t *)malloc(sizeof(bundle_miner_ctx_t) * procs);
   thread_handle_t *threads = (thread_handle_t *)malloc(sizeof(thread_handle_t) * procs);
-  uint64_t index = trits_to_long(essence + OBSOLETE_TAG_OFFSET, OBSOLETE_TAG_LENGTH);
-  uint64_t optimal_index = 0;
+  uint64_t start_index = 0;
   double probability = 1.0;
+
+  if (bundle_normalized_max == NULL || essence == NULL || index == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (security > 3 || essence_length % HASH_LENGTH_TRIT != 0) {
+    return RC_UTILS_BUNDLE_MINER_BAD_PARAM;
+  }
+
+  if (ctxs == NULL || threads == NULL) {
+    return RC_OOM;
+  }
+
+  start_index = trits_to_long(essence + OBSOLETE_TAG_OFFSET, OBSOLETE_TAG_LENGTH);
+  *index = 0;
 
   for (size_t i = 0; i < procs; i++) {
     ctxs[i].bundle_normalized_max = bundle_normalized_max;
     ctxs[i].security = security;
-    ctxs[i].essence = (trit_t *)malloc(sizeof(trit_t) * essence_length);
+    if ((ctxs[i].essence = (trit_t *)malloc(sizeof(trit_t) * essence_length)) == NULL) {
+      ret = RC_OOM;
+      goto done;
+    }
     memcpy(ctxs[i].essence, essence, essence_length);
     ctxs[i].essence_length = essence_length;
-    ctxs[i].index = index + (i * (rounded_count / procs));
+    ctxs[i].index = start_index + (i * (rounded_count / procs));
     ctxs[i].count = rounded_count / procs;
     ctxs[i].optimal_index = 0;
     ctxs[i].probability = 1.0;
@@ -127,13 +147,15 @@ uint64_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t co
     thread_handle_join(threads[i], NULL);
     if (ctxs[i].probability < probability) {
       probability = ctxs[i].probability;
-      optimal_index = ctxs[i].optimal_index;
+      *index = ctxs[i].optimal_index;
     }
     free(ctxs[i].essence);
   }
 
+done:
+
   free(ctxs);
   free(threads);
 
-  return optimal_index;
+  return ret;
 }

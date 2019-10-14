@@ -25,8 +25,6 @@ static void test_bundle_miner_probability_of_losing(void) {
   double min_probability = bundle_miner_probability_of_losing(MIN_ARRAY, N);
   double max_probability = bundle_miner_probability_of_losing(MAX_ARRAY, N);
 
-  fprintf(stderr, "%.6f %.6f\n", min_probability, max_probability);
-
   // TODO
   // TEST_ASSERT_EQUAL_DOUBLE(min_probability, 0.0);
   // TEST_ASSERT_EQUAL_DOUBLE(max_probability, 1.0);
@@ -34,8 +32,6 @@ static void test_bundle_miner_probability_of_losing(void) {
 
 static void test_bundle_miner_security_level(void) {
   double security = bundle_miner_security_level(bundle_miner_probability_of_losing(MAX_ARRAY, N), 3.0);
-
-  fprintf(stderr, "%.6f\n", security);
 
   // TODO
   // TEST_ASSERT_EQUAL_DOUBLE(security, 0.0);
@@ -86,7 +82,7 @@ static void test_bundle_miner_mine(void) {
   byte_t min[NORMALIZED_BUNDLE_LENGTH];
   size_t const E = 486 * 4;
   trit_t essence[E];
-  uint32_t index = 0;
+  uint64_t index = 0;
 
   trytes_to_trits(v1_trytes, v1_trits, HASH_LENGTH_TRYTE);
   memset(nb1, 0, NORMALIZED_BUNDLE_LENGTH);
@@ -100,9 +96,9 @@ static void test_bundle_miner_mine(void) {
 
   bundle_miner_normalized_bundle_max(nb1, nb2, min, NORMALIZED_BUNDLE_LENGTH);
 
-  index = bundle_miner_mine(min, N, essence, E, 1000000, 0);
+  TEST_ASSERT(bundle_miner_mine(min, N, essence, E, 1000000, 0, &index) == RC_OK);
 
-  TEST_ASSERT_EQUAL_INT(index, 410235);
+  TEST_ASSERT_EQUAL_UINT64(index, 410235);
 }
 
 int main(void) {
