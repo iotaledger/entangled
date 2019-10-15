@@ -10,9 +10,9 @@ build:i686 --crosstool_top=@iota_toolchains//tools/x86-i686--glibc--bleeding-edg
 build:i686 --cpu=i686
 build:i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 
-build:x86_64 --crosstool_top=@iota_toolchains//tools/x86-64-core-i7--glibc--bleeding-edge-2018.07-1:toolchain
-build:x86_64 --cpu=x86_64
-build:x86_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:bootlin_x86_64_core_i7 --crosstool_top=@iota_toolchains//tools/x86-64-core-i7--glibc--bleeding-edge-2018.07-1:toolchain
+build:bootlin_x86_64_core_i7 --cpu=x86_64
+build:bootlin_x86_64_core_i7 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
 
 build:esp32_64 --crosstool_top=@iota_toolchains//tools/xtensa-esp32-elf-linux64-1.22.0-80-g6c4433a-5.2.0:toolchain
 build:esp32_64 --cpu=xtensa
