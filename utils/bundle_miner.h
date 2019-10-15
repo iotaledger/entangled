@@ -8,6 +8,7 @@
 #ifndef __UTILS_BUNDLE_MINER_H__
 #define __UTILS_BUNDLE_MINER_H__
 
+#include "common/errors.h"
 #include "common/trinary/bytes.h"
 #include "common/trinary/trits.h"
 
@@ -19,8 +20,9 @@ double bundle_miner_probability_of_losing(byte_t const *const normalized_hash, u
 double bundle_miner_security_level(double const probability, double const radix);
 void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *const rhs, byte_t *const max,
                                         size_t const length);
-uint64_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security, trit_t *const essence,
-                           size_t const essence_length, uint32_t const count, uint8_t const nprocs);
+retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security, trit_t *const essence,
+                            size_t const essence_length, uint32_t const count, uint8_t const nprocs,
+                            uint64_t *const index);
 
 #ifdef __cplusplus
 }

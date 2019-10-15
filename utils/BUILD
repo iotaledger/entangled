@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["bundle_miner.h"],
     deps = [
         "//common:defs",
+        "//common:errors",
         "//common/crypto/iss:normalize",
         "//common/crypto/kerl",
         "//common/trinary:bytes",
