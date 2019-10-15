@@ -88,9 +88,9 @@
                                                             count:@1000000
                                                            nprocs:@0];
   NSLog(@"Calculated bundle index: %@ ", bundleIndex);
-    NSDate* endBundleMiner = [NSDate date];
-    NSTimeInterval durationBundleMiner = [endBundleMiner timeIntervalSinceDate:startBundleMiner] * 1000;
-    NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationBundleMiner, @"ms"]);
+  NSDate* endBundleMiner = [NSDate date];
+  NSTimeInterval durationBundleMiner = [endBundleMiner timeIntervalSinceDate:startBundleMiner] * 1000;
+  NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationBundleMiner, @"ms"]);
 }
 
 - (void)didReceiveMemoryWarning {
