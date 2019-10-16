@@ -53,9 +53,9 @@ static void *bundle_miner_mine_routine(void *const param) {
 
     normalize_hash(candidate, candidate_normalized);
 
-    if (normalized_hash_is_secure(candidate_normalized, NORMALIZED_BUNDLE_LENGTH)) {
+    if (normalized_hash_is_secure(candidate_normalized, ctx->security * NORMALIZED_FRAGMENT_LENGTH)) {
       bundle_miner_normalized_bundle_max(ctx->bundle_normalized_max, candidate_normalized, candidate_normalized_max,
-                                         NORMALIZED_BUNDLE_LENGTH);
+                                         ctx->security * NORMALIZED_FRAGMENT_LENGTH);
       probability = bundle_miner_probability_of_losing(candidate_normalized_max, ctx->security);
       if (probability < ctx->probability) {
         ctx->probability = probability;
