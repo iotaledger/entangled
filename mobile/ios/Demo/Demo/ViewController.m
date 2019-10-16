@@ -74,6 +74,23 @@
   NSDate* endDigest = [NSDate date];
   NSTimeInterval durationDigest = [endDigest timeIntervalSinceDate:startDigest] * 1000;
   NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationDigest, @"ms"]);
+
+  // Bundle miner
+  NSLog(@"Starting Bundle Miner");
+  NSDate* startBundleMiner = [NSDate date];
+  NSNumber* essenceLength = @(486 * 4);
+  int8_t essence[486 * 4];
+  memset((void*)essence, 0, [essenceLength intValue]);
+  NSNumber* bundleIndex = [EntangledIOSBindings bundle_miner_mine:BUNDLE_NORMALIZED_MAX
+                                                         security:@2
+                                                          essence:essence
+                                                    essenceLength:essenceLength
+                                                            count:@1000000
+                                                           nprocs:@0];
+  NSLog(@"Calculated bundle index: %@ ", bundleIndex);
+  NSDate* endBundleMiner = [NSDate date];
+  NSTimeInterval durationBundleMiner = [endBundleMiner timeIntervalSinceDate:startBundleMiner] * 1000;
+  NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationBundleMiner, @"ms"]);
 }
 
 - (void)didReceiveMemoryWarning {
