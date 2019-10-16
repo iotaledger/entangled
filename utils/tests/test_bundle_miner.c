@@ -98,7 +98,7 @@ static void test_bundle_miner_mine(void) {
 
   TEST_ASSERT(bundle_miner_mine(min, N, essence, E, 1000000, 0, &index) == RC_OK);
 
-  TEST_ASSERT_EQUAL_UINT64(index, 410235);
+  TEST_ASSERT_EQUAL_UINT64(index, 687226);
 }
 
 int main(void) {
