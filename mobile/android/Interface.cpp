@@ -238,15 +238,20 @@ JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEn
                                                                            jint jsecurity, jbyteArray jessence,
                                                                            jint jessenceLength, jint jcount,
                                                                            jint jnprocs) {
+  retcode_t ret = RC_OK;
   uint64_t index = 0;
 
   byte_t const* bundleNormalizedMax = (byte_t*)env->GetByteArrayElements(jbundleNormalizedMax, 0);
   trit_t* essence = (trit_t*)env->GetByteArrayElements(jessence, 0);
 
-  index = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs);
+  ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, &index);
 
   env->ReleaseByteArrayElements(jbundleNormalizedMax, (jbyte*)bundleNormalizedMax, 0);
   env->ReleaseByteArrayElements(jessence, (jbyte*)essence, 0);
+
+  if (ret != RC_OK) {
+    return -1;
+  }
 
   return index;
 }
