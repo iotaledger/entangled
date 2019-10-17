@@ -16,8 +16,9 @@
 #include "common/trinary/tryte.h"
 #include "utils/bundle_miner.h"
 
-static size_t const N = 2;
-static size_t const L = N * NORMALIZED_FRAGMENT_LENGTH;
+#define N 2
+#define L (N * NORMALIZED_FRAGMENT_LENGTH)
+
 static int8_t MIN_ARRAY[L];
 static int8_t MAX_ARRAY[L];
 
