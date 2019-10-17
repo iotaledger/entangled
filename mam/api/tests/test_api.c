@@ -540,8 +540,7 @@ static void test_api_trust() {
   free(payload);
   payload = NULL;
 
-  bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
+  bundle_transactions_clear(bundle);
 
   // We check that the read fails due to the endpoint not being trusted
   TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
@@ -550,15 +549,13 @@ static void test_api_trust() {
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) ==
               RC_MAM_ENDPOINT_NOT_TRUSTED);
 
-  bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
+  bundle_transactions_clear(bundle);
 
   // We trust the endpoint by announcing it
   TEST_ASSERT(mam_api_bundle_announce_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
 
-  bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
+  bundle_transactions_clear(bundle);
 
   // The test now succeeds
   TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(&sender_api, ch_id, ep_id, NULL, NULL, bundle, msg_id) == RC_OK);
@@ -568,8 +565,7 @@ static void test_api_trust() {
   free(payload);
   payload = NULL;
 
-  bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
+  bundle_transactions_clear(bundle);
 
   // We check that the read fails due to the channel not being trusted
   TEST_ASSERT(mam_api_bundle_write_header_on_channel(&sender_api, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
@@ -578,15 +574,13 @@ static void test_api_trust() {
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) ==
               RC_MAM_CHANNEL_NOT_TRUSTED);
 
-  bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
+  bundle_transactions_clear(bundle);
 
   // We trust the channel by announcing it
   TEST_ASSERT(mam_api_bundle_announce_channel(&sender_api, ch_id, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);
   TEST_ASSERT(mam_api_bundle_read(&receiver_api, bundle, &payload, &payload_size, &is_last_packet) == RC_OK);
 
-  bundle_transactions_free(&bundle);
-  bundle_transactions_new(&bundle);
+  bundle_transactions_clear(bundle);
 
   // The test now succeeds
   TEST_ASSERT(mam_api_bundle_write_header_on_channel(&sender_api, ch1_id, NULL, NULL, bundle, msg_id) == RC_OK);

@@ -97,6 +97,13 @@ static inline size_t bundle_transactions_size(bundle_transactions_t const *const
 }
 
 /**
+ * @brief Clear the bundle_transactions_t object to empty.
+ *
+ * @param[in] bundle The pointer of bundle object.
+ */
+static inline void bundle_transactions_clear(bundle_transactions_t *bundle) { utarray_clear(bundle); }
+
+/**
  * @brief Get bundle hash from a bundle transaction object
  *
  * @param[in] bundle The bundle transaction object
