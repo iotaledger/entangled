@@ -45,7 +45,8 @@ static retcode_t add_remainder(iota_client_service_t const* const serv, flex_tri
   INPUTS_FOREACH(inputs->input_array, input) {
     int64_t input_value = input->balance;
     int64_t substract = 0 - input_value;
-    uint64_t timestamp = current_timestamp_ms();
+    // timestamp is in secondes
+    uint64_t timestamp = current_timestamp_ms() / 1000;
     if (input_value == 0) {
       continue;
     }
@@ -137,7 +138,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
   kerl_init(&kerl);
 
   if (timestamp == 0) {
-    timestamp = current_timestamp_ms();
+    timestamp = current_timestamp_ms() / 1000;
   }
 
   // fill in the transfer and inputs
