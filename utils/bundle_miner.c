@@ -97,9 +97,9 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
   }
 }
 
-retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security, trit_t *const essence,
-                            size_t const essence_length, uint32_t const count, uint8_t const nprocs,
-                            uint64_t *const index) {
+retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
+                            trit_t const *const essence, size_t const essence_length, uint32_t const count,
+                            uint8_t const nprocs, uint64_t *const index) {
   retcode_t ret = RC_OK;
   uint8_t procs = nprocs == 0 ? system_cpu_available() : nprocs;
   uint32_t rounded_count = count + (procs - count % procs);
