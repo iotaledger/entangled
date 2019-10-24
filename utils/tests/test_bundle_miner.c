@@ -21,12 +21,11 @@ static int8_t MIN_ARRAY[NORMALIZED_LENGTH];
 static int8_t MAX_ARRAY[NORMALIZED_LENGTH];
 
 static void test_bundle_miner_probability_of_losing(void) {
-  double min_probability = bundle_miner_probability_of_losing(MIN_ARRAY, SECURITY);
-  double max_probability = bundle_miner_probability_of_losing(MAX_ARRAY, SECURITY);
+  float min_probability = bundle_miner_probability_of_losing(MIN_ARRAY, SECURITY);
+  float max_probability = bundle_miner_probability_of_losing(MAX_ARRAY, SECURITY);
 
-  // TODO
-  // TEST_ASSERT_EQUAL_DOUBLE(min_probability, 0.0);
-  // TEST_ASSERT_EQUAL_DOUBLE(max_probability, 1.0);
+  TEST_ASSERT_EQUAL_FLOAT(min_probability, 0.0);
+  TEST_ASSERT_EQUAL_FLOAT(max_probability, 1.0);
 }
 
 static void test_bundle_miner_normalize_hash(void) {
