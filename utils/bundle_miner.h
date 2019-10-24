@@ -17,7 +17,6 @@ extern "C" {
 #endif
 
 double bundle_miner_probability_of_losing(byte_t const *const normalized_hash, uint8_t const security);
-double bundle_miner_security_level(double const probability, double const radix);
 void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *const rhs, byte_t *const max,
                                         size_t const length);
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security, trit_t *const essence,

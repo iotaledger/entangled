@@ -90,10 +90,6 @@ double bundle_miner_probability_of_losing(byte_t const *const normalized_hash, u
   return p;
 }
 
-double bundle_miner_security_level(double const probability, double const radix) {
-  return log(1.0 / probability) / log(radix);
-}
-
 void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *const rhs, byte_t *const max,
                                         size_t const length) {
   for (size_t i = 0; i < length; i++) {

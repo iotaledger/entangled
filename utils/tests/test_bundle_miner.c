@@ -29,13 +29,6 @@ static void test_bundle_miner_probability_of_losing(void) {
   // TEST_ASSERT_EQUAL_DOUBLE(max_probability, 1.0);
 }
 
-static void test_bundle_miner_security_level(void) {
-  double security = bundle_miner_security_level(bundle_miner_probability_of_losing(MAX_ARRAY, SECURITY), 3.0);
-
-  // TODO
-  // TEST_ASSERT_EQUAL_DOUBLE(security, 0.0);
-}
-
 static void test_bundle_miner_normalize_hash(void) {
   tryte_t const* const bundle_trytes =
       (tryte_t const* const) "QVXRKNRXFZIPFPREXRAPNHNSRFFQOWBGCAFZEGFCKDPDXRNVZQ9VJPQPPTFXKPVZVAIENQLETXRVSFKFO";
@@ -106,7 +99,6 @@ int main(void) {
   memset(MAX_ARRAY, TRYTE_VALUE_MAX, NORMALIZED_LENGTH);
 
   RUN_TEST(test_bundle_miner_probability_of_losing);
-  RUN_TEST(test_bundle_miner_security_level);
   RUN_TEST(test_bundle_miner_normalize_hash);
   RUN_TEST(test_bundle_miner_normalized_bundle_max);
   RUN_TEST(test_bundle_miner_mine);
