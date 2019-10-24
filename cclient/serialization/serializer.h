@@ -81,6 +81,10 @@ typedef struct {
   retcode_t (*get_neighbors_serialize_response)(get_neighbors_res_t const* const obj, char_buffer_t* out);
   retcode_t (*get_neighbors_deserialize_response)(char const* const obj, get_neighbors_res_t* out);
 
+  retcode_t (*get_node_api_conf_serialize_request)(char_buffer_t* out);
+  retcode_t (*get_node_api_conf_deserialize_response)(const char* const obj, get_node_api_conf_res_t* out);
+  retcode_t (*get_node_api_conf_serialize_response)(const get_node_api_conf_res_t* const obj, char_buffer_t* out);
+
   retcode_t (*get_node_info_serialize_request)(char_buffer_t* out);
   retcode_t (*get_node_info_deserialize_response)(const char* const obj, get_node_info_res_t* out);
   retcode_t (*get_node_info_serialize_response)(const get_node_info_res_t* const obj, char_buffer_t* out);

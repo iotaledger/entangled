@@ -65,6 +65,12 @@ extern "C" {
 #define TEST_BALANCES_MILESTONEINDEX 128
 #define TEST_TRANSACTION_TO_APPROVE_DEPTH 15
 
+#define TEST_NODE_CONF_MAX_TX 100000
+#define TEST_NODE_CONF_MAX_REQ_LIST 1000
+#define TEST_NODE_CONF_MAX_TRYTES 10000
+#define TEST_NODE_CONF_MAX_BODY_LEN 1000000
+#define TEST_NODE_CONF_MS_IDX 1950000
+
 #define CONSISTENCY_INFO                                                  \
   "tails are not consistent (would lead to inconsistent ledger state or " \
   "below max depth)"

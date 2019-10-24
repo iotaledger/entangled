@@ -24,6 +24,7 @@
 #include "cclient/serialization/json/get_inclusion_states.h"
 #include "cclient/serialization/json/get_missing_transactions.h"
 #include "cclient/serialization/json/get_neighbors.h"
+#include "cclient/serialization/json/get_node_api_conf.h"
 #include "cclient/serialization/json/get_node_info.h"
 #include "cclient/serialization/json/get_tips.h"
 #include "cclient/serialization/json/get_transactions_to_approve.h"
@@ -73,6 +74,10 @@ static serializer_vtable json_vtable = {
     .get_neighbors_serialize_request = json_get_neighbors_serialize_request,
     .get_neighbors_serialize_response = json_get_neighbors_serialize_response,
     .get_neighbors_deserialize_response = json_get_neighbors_deserialize_response,
+
+    .get_node_api_conf_serialize_request = json_get_node_api_conf_serialize_request,
+    .get_node_api_conf_serialize_response = json_get_node_api_conf_serialize_response,
+    .get_node_api_conf_deserialize_response = json_get_node_api_conf_deserialize_response,
 
     .get_node_info_serialize_request = json_get_node_info_serialize_request,
     .get_node_info_serialize_response = json_get_node_info_serialize_response,

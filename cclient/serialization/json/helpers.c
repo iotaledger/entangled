@@ -251,6 +251,22 @@ retcode_t json_get_string(cJSON const* const json_obj, char const* const obj_nam
   return ret;
 }
 
+retcode_t json_get_boolean(cJSON const* const json_obj, char const* const obj_name, bool* const boolean) {
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
+  if (json_value == NULL) {
+    log_error(json_logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__, STR_CCLIENT_JSON_KEY, obj_name);
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsBool(json_value)) {
+    *boolean = cJSON_IsTrue(json_value);
+  } else {
+    log_error(json_logger_id, "[%s:%d] %s not bool\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return RC_OK;
+}
+
 retcode_t hash243_queue_to_json_array(hash243_queue_t queue, cJSON* const json_root, char const* const obj_name) {
   size_t array_count;
   cJSON* array_obj = NULL;

@@ -182,6 +182,16 @@ retcode_t json_get_uint64(cJSON const *const json_obj, char const *const obj_nam
 retcode_t json_get_string(cJSON const *const json_obj, char const *const obj_name, char_buffer_t *const text);
 
 /**
+ * @brief Gets a boolean value from a JSON object.
+ *
+ * @param[in] json_obj A JSON object.
+ * @param[in] obj_name A key of a JSON element.
+ * @param[out] boolean bool.
+ * @return #retcode_t
+ */
+retcode_t json_get_boolean(cJSON const *const json_obj, char const *const obj_name, bool *const boolean);
+
+/**
  * @brief Converts a hash243 queue to a JSON array.
  *
  * @param[in] queue A hash243 queue object.

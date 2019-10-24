@@ -189,3 +189,14 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "get_node_api_conf",
+    timeout = "short",
+    srcs = ["get_node_api_conf.c"],
+    deps = [
+        ":shared",
+        "//cclient/serialization:serializer_json",
+        "@unity",
+    ],
+)
