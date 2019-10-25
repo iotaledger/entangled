@@ -10,14 +10,14 @@
 #include "common/crypto/iss/normalize.h"
 #include "common/crypto/kerl/kerl.h"
 #include "common/defs.h"
+#include "common/model/transaction.h"
 #include "common/trinary/trit_long.h"
 #include "utils/bundle_miner.h"
 #include "utils/handles/thread.h"
 #include "utils/macros.h"
 #include "utils/system.h"
 
-#define OBSOLETE_TAG_OFFSET (243 + 81)
-#define OBSOLETE_TAG_LENGTH 81
+#define OBSOLETE_TAG_OFFSET (NUM_TRITS_ADDRESS + NUM_TRITS_VALUE)
 
 typedef struct bundle_miner_ctx_s {
   byte_t const *bundle_normalized_max;
@@ -120,7 +120,7 @@ retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t c
     return RC_OOM;
   }
 
-  start_index = trits_to_long(essence + OBSOLETE_TAG_OFFSET, OBSOLETE_TAG_LENGTH);
+  start_index = trits_to_long(essence + OBSOLETE_TAG_OFFSET, NUM_TRITS_OBSOLETE_TAG);
   *index = 0;
 
   for (size_t i = 0; i < procs; i++) {

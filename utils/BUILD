@@ -9,6 +9,7 @@ cc_library(
         "//common:errors",
         "//common/crypto/iss:normalize",
         "//common/crypto/kerl",
+        "//common/model:transaction",
         "//common/trinary:bytes",
         "//common/trinary:trit_long",
         "//common/trinary:trits",
