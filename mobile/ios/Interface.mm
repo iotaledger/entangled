@@ -12,6 +12,7 @@
 #include "common/helpers/digest.h"
 #include "common/helpers/pow.h"
 #include "common/helpers/sign.h"
+#include "utils/bundle_miner.h"
 
 @implementation EntangledIOSBindings
 
@@ -94,6 +95,28 @@
 done:
   bundle_transactions_free(&bundle);
   return outputTxsTrytes;
+}
+
++ (NSNumber*)bundle_miner_mine:(int8_t*)bundleNormalizedMax
+                      security:(NSNumber*)security
+                       essence:(int8_t*)essence
+                 essenceLength:(NSNumber*)essenceLength
+                         count:(NSNumber*)count
+                        nprocs:(NSNumber*)nprocs {
+  uint64_t cindex = 0;
+
+  byte_t const* cbundleNormalizedMax = (byte_t*)bundleNormalizedMax;
+
+  retcode_t rc = bundle_miner_mine(cbundleNormalizedMax, (uint8_t)[security unsignedCharValue], (trit_t*)essence,
+                                   (size_t)[essenceLength unsignedLongValue], (uint32_t)[count unsignedIntValue],
+                                   (uint8_t)[nprocs unsignedCharValue], &cindex);
+
+  if (rc != RC_OK) {
+    return @(-1);
+  }
+
+  NSNumber* index = [NSNumber numberWithUnsignedLongLong:cindex];
+  return index;
 }
 
 @end

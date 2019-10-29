@@ -6,7 +6,7 @@
 #include "common/helpers/digest.h"
 #include "common/helpers/pow.h"
 #include "common/helpers/sign.h"
-
+#include "utils/bundle_miner.h"
 #include "utils/memset_safe.h"
 
 #include "Interface.h"
@@ -226,5 +226,33 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(JNIEnv* en
   free(digest);
 
   return out;
+}
+
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    bundle_miner_mine
+ * Signature: ([Ljava/lang/Byte;I[Ljava/lang/Byte;III)J
+ */
+JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEnv* env, jclass,
+                                                                           jbyteArray jbundleNormalizedMax,
+                                                                           jint jsecurity, jbyteArray jessence,
+                                                                           jint jessenceLength, jint jcount,
+                                                                           jint jnprocs) {
+  retcode_t ret = RC_OK;
+  uint64_t index = 0;
+
+  byte_t const* bundleNormalizedMax = (byte_t*)env->GetByteArrayElements(jbundleNormalizedMax, 0);
+  trit_t* essence = (trit_t*)env->GetByteArrayElements(jessence, 0);
+
+  ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, &index);
+
+  env->ReleaseByteArrayElements(jbundleNormalizedMax, (jbyte*)bundleNormalizedMax, 0);
+  env->ReleaseByteArrayElements(jessence, (jbyte*)essence, 0);
+
+  if (ret != RC_OK) {
+    return -1;
+  }
+
+  return index;
 }
 }
