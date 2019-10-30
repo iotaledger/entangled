@@ -1,5 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
+config_setting(
+    name = "windows_platform",
+    constraint_values = [
+        "@bazel_tools//platforms:windows",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "bundle_miner",
     srcs = ["bundle_miner.c"],
@@ -22,6 +30,11 @@ cc_library(
 cc_library(
     name = "export",
     hdrs = ["export.h"],
+)
+
+cc_library(
+    name = "windows",
+    hdrs = ["windows.h"],
 )
 
 cc_library(
@@ -53,6 +66,10 @@ cc_library(
 cc_library(
     name = "macros",
     hdrs = ["macros.h"],
+    deps = select({
+        ":windows_platform": ["//utils:windows"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
@@ -83,12 +100,20 @@ cc_library(
     name = "system",
     srcs = ["system.c"],
     hdrs = ["system.h"],
+    deps = select({
+        ":windows_platform": ["//utils:windows"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
     name = "time",
     srcs = ["time.c"],
     hdrs = ["time.h"],
+    deps = select({
+        ":windows_platform": ["//utils:windows"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(

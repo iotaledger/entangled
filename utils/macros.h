@@ -9,7 +9,7 @@
 #define __UTILS_MACROS_H__
 
 #if defined(_WIN32)
-#include <winsock2.h>
+#include "utils/windows.h"
 #else
 #include <arpa/inet.h>
 #endif
