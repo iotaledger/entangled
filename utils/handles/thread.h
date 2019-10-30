@@ -23,7 +23,7 @@ typedef void *(*thread_routine_t)(void *);
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
 #elif defined(_WIN32)
-#include <Windows.h>
+#include "utils/windows.h"
 #endif
 
 #ifdef _POSIX_THREADS

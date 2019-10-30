@@ -21,8 +21,10 @@
 
 // Windows headers
 #ifdef __WIN32__
-#include <winsock2.h>
+#include "utils/windows.h"
+
 #include <ws2tcpip.h>
+
 // ESP headers
 #elif __XTENSA__
 #include "lwip/netdb.h"
