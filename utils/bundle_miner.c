@@ -27,6 +27,7 @@ typedef struct bundle_miner_ctx_s {
   uint64_t index;
   uint64_t optimal_index;
   uint64_t count;
+  uint32_t mining_threshold;
   double probability;
 } bundle_miner_ctx_t;
 
@@ -60,6 +61,9 @@ static void *bundle_miner_mine_routine(void *const param) {
       if (probability < ctx->probability) {
         ctx->probability = probability;
         ctx->optimal_index = ctx->index;
+        if (1 / (probability) >= ctx->mining_threshold) {
+          break;
+        }
       }
     }
 
@@ -78,7 +82,7 @@ double bundle_miner_probability_of_losing(byte_t const *const normalized_hash, u
   double pi = 0.0;
 
   for (size_t i = 0; i < security * NORMALIZED_FRAGMENT_LENGTH; i++) {
-    pi = 1.0 - ((double)(TRYTE_VALUE_MAX - normalized_hash[i]) / (double)(TRYTE_VALUE_MAX - TRYTE_VALUE_MIN));
+    pi = 1.0 - ((double)(TRYTE_VALUE_MAX - normalized_hash[i]) / (double)(TRYTE_VALUE_MAX - TRYTE_VALUE_MIN + 1));
     if (pi > 0.0) {
       if (p == 0.0) {
         p = 1.0;
@@ -99,7 +103,7 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
 
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
                             trit_t const *const essence, size_t const essence_length, uint32_t const count,
-                            uint8_t const nprocs, uint64_t *const index) {
+                            uint8_t const nprocs, uint64_t mining_threshold, uint64_t *const index) {
   retcode_t ret = RC_OK;
   uint8_t procs = nprocs == 0 ? system_cpu_available() : nprocs;
   uint32_t rounded_count = count + (procs - count % procs);
@@ -136,6 +140,7 @@ retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t c
     ctxs[i].count = rounded_count / procs;
     ctxs[i].optimal_index = 0;
     ctxs[i].probability = 1.0;
+    ctxs[i].mining_threshold = mining_threshold;
     thread_handle_create(&threads[i], (thread_routine_t)bundle_miner_mine_routine, &ctxs[i]);
   }
 

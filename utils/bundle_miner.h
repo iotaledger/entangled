@@ -46,13 +46,16 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
  * @param[in]   essence_length        The length of the bundle essence
  * @param[in]   count                 The desired number of iterations
  * @param[in]   nprocs                The desired number of threads to run the miner on
+ * @param[in]   mining_threshold      If the found index has expected number of adversarial bundles
+ *                                    needed in order to exploit published private key fragments that is
+ *                                    greater than mining_threshold, then mining should be stopped
  * @param[out]  index                 The resulting index
  *
  * @return an error code
  */
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
                             trit_t const *const essence, size_t const essence_length, uint32_t const count,
-                            uint8_t const nprocs, uint64_t *const index);
+                            uint8_t const nprocs, uint64_t mining_threshold, uint64_t *const index);
 
 #ifdef __cplusplus
 }
