@@ -61,7 +61,7 @@ static void *bundle_miner_mine_routine(void *const param) {
       if (probability < ctx->probability) {
         ctx->probability = probability;
         ctx->optimal_index = ctx->index;
-        if ((uint32_t)(1 / (probability)) >= ctx->mining_threshold) {
+        if ((uint32_t)(1 / probability) >= ctx->mining_threshold) {
           break;
         }
       }
