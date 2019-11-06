@@ -86,7 +86,7 @@ static void test_bundle_miner_mine(void) {
 
   bundle_miner_normalized_bundle_max(nb1, nb2, min, NORMALIZED_BUNDLE_LENGTH);
 
-  TEST_ASSERT(bundle_miner_mine(min, SECURITY, essence, essence_length, 1000000, 0, ULLONG_MAX, &index) == RC_OK);
+  TEST_ASSERT(bundle_miner_mine(min, SECURITY, essence, essence_length, 1000000, 0, UINT32_MAX, &index) == RC_OK);
 
   TEST_ASSERT_EQUAL_UINT64(index, 687226);
 }
