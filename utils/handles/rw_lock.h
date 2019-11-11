@@ -21,7 +21,7 @@ extern "C" {
     (defined(__APPLE__) && defined(__MACH__) || defined(__XTENSA__))
 #include <unistd.h>
 #elif defined(_WIN32)
-#include <Windows.h>
+#include "utils/windows.h"
 #endif
 
 #ifdef _POSIX_THREADS

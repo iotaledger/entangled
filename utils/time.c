@@ -14,7 +14,7 @@
 #include <unistd.h>  // for usleep
 #endif
 #elif defined(_WIN32)
-#include <windows.h>
+#include "utils/windows.h"
 #endif
 
 #include "utils/time.h"

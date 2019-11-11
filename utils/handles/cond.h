@@ -22,7 +22,7 @@ extern "C" {
 #include <sys/time.h>
 #include <unistd.h>
 #elif defined(_WIN32)
-#include <Windows.h>
+#include "utils/windows.h"
 #endif
 
 #include <stdint.h>
