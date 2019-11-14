@@ -55,7 +55,10 @@ set(API_EXTENDED_SRC
   ${API_EXTENDED_DIR}/traverse_bundle.c
 )
 
-set(HTTP_SRC "http/http.c")
+set(HTTP_SRC 
+  "http/http.c"
+  "http/socket.c"
+)
 
 set(REQ_DIR "request")
 set(REQ_SRC
