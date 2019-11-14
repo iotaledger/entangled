@@ -9,8 +9,8 @@
 #define __CONSENSUS_TEST_UTILS_TANGLE_H__
 
 #include "ciri/consensus/tangle/tangle.h"
+#include "ciri/storage/connection.h"
 #include "common/errors.h"
-#include "common/storage/connection.h"
 
 #ifdef __cplusplus
 extern "C" {

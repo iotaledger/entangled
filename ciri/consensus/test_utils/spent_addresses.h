@@ -9,8 +9,8 @@
 #define __CIRI_CONSENSUS_TEST_UTILS_SPENT_ADDRESSES_H__
 
 #include "ciri/consensus/spent_addresses/spent_addresses_provider.h"
+#include "ciri/storage/connection.h"
 #include "common/errors.h"
-#include "common/storage/connection.h"
 
 #ifdef __cplusplus
 extern "C" {

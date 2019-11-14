@@ -3,7 +3,7 @@ cc_library(
     srcs = ["endpoint.c"],
     hdrs = ["endpoint.h"],
     visibility = ["//visibility:public"],
-    deps = ["//common/network"],
+    deps = [":network"],
 )
 
 cc_library(
@@ -22,10 +22,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":neighbor_shared",
+        ":uri",
         "//ciri/node:node_shared",
         "//ciri/node/pipeline:transaction_requester",
         "//ciri/node/protocol",
-        "//common/network:uri",
         "//utils/handles:rand",
     ],
 )
@@ -54,4 +54,16 @@ cc_library(
         "//ciri/node:node_shared",
         "//utils:logger_helper",
     ],
+)
+
+cc_library(
+    name = "network",
+    hdrs = ["network.h"],
+)
+
+cc_library(
+    name = "uri",
+    srcs = ["uri.c"],
+    hdrs = ["uri.h"],
+    deps = [":network"],
 )

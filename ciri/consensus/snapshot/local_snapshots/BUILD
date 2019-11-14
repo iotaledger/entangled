@@ -4,8 +4,8 @@ cc_library(
     hdrs = ["conf.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//ciri/utils:files",
         "//common:errors",
-        "//utils:files",
         "//utils:logger_helper",
     ],
 )

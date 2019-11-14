@@ -17,8 +17,8 @@
 #include "ciri/api/api.h"
 #include "ciri/consensus/consensus.h"
 #include "ciri/node/pipeline/broadcaster.h"
+#include "ciri/storage/connection.h"
 #include "common/errors.h"
-#include "common/storage/connection.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus

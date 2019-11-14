@@ -6,7 +6,7 @@ cc_test(
     deps = [
         "//ciri/consensus/bundle_validator",
         "//ciri/consensus/test_utils",
-        "//common/storage/tests:defs",
+        "//ciri/storage/tests:defs",
         "@unity",
     ],
 )

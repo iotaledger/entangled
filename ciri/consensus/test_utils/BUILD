@@ -15,10 +15,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/tangle",
+        "//ciri/storage",
+        "//ciri/storage:test_utils",
+        "//ciri/utils:files",
         "//common:errors",
-        "//common/storage",
-        "//common/storage:test_utils",
-        "//utils:files",
     ],
 )
 
@@ -29,10 +29,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/spent_addresses:spent_addresses_provider",
+        "//ciri/storage",
+        "//ciri/storage:test_utils",
+        "//ciri/utils:files",
         "//common:errors",
-        "//common/storage",
-        "//common/storage:test_utils",
-        "//utils:files",
     ],
 )
 

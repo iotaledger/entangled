@@ -16,8 +16,8 @@
 #include "ciri/consensus/milestone/milestone_tracker.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/consensus/tip_selection/entry_point_selector/entry_point_selector.h"
+#include "ciri/storage/connection.h"
 #include "common/errors.h"
-#include "common/storage/connection.h"
 #include "utils/hash_indexed_map.h"
 
 #ifdef __cplusplus

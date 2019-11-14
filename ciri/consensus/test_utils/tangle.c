@@ -9,8 +9,8 @@
 
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/consensus/test_utils/tangle.h"
-#include "common/storage/test_utils.h"
-#include "utils/files.h"
+#include "ciri/storage/test_utils.h"
+#include "ciri/utils/files.h"
 
 retcode_t tangle_setup(tangle_t *const tangle, storage_connection_config_t *const config, char *test_db_path) {
   return storage_test_setup(&tangle->connection, config, test_db_path, STORAGE_CONNECTION_TANGLE);

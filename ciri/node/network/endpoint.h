@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "common/network/network.h"
+#include "ciri/node/network/network.h"
 
 typedef struct endpoint_s {
   char domain[MAX_HOST_LENGTH];

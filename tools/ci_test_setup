@@ -1,6 +1,6 @@
 #!/bin/bash
 
 /etc/init.d/mysql start
-mysql -u root < common/storage/sql/mariadb/setup.sql
-mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
-mysql -u ciri spent-addresses < common/storage/sql/mariadb/spent-addresses-schema.sql
+mysql -u root < ciri/storage/sql/mariadb/setup.sql
+mysql -u ciri tangle < ciri/storage/sql/mariadb/tangle-schema.sql
+mysql -u ciri spent-addresses < ciri/storage/sql/mariadb/spent-addresses-schema.sql

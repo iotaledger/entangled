@@ -1,5 +1,3 @@
-load("//ciri/consensus:conf.bzl", "CONSENSUS_MAINNET_VARIABLES")
-
 cc_test(
     name = "test_bundle_miner",
     timeout = "long",
@@ -17,7 +15,7 @@ cc_test(
 
 cc_test(
     name = "test_merkle",
-    timeout = "moderate",
+    timeout = "long",
     srcs = ["test_merkle.c"],
     deps =
         [
@@ -25,20 +23,4 @@ cc_test(
             "//utils:merkle",
             "@unity",
         ],
-)
-
-cc_test(
-    name = "test_signed_files",
-    timeout = "long",
-    srcs = ["test_signed_files.c"],
-    data = [
-        "fake.sig",
-        "//ciri/consensus/snapshot:snapshot_files",
-    ],
-    defines = CONSENSUS_MAINNET_VARIABLES,
-    deps = [
-        "//ciri/consensus/snapshot",
-        "//utils:signed_files",
-        "@unity",
-    ],
 )

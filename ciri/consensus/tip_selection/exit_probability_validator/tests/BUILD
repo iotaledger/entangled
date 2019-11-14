@@ -10,7 +10,7 @@ cc_test(
     deps = [
         "//ciri/consensus/test_utils",
         "//ciri/consensus/tip_selection/exit_probability_validator",
-        "//common/storage/tests:defs",
+        "//ciri/storage/tests:defs",
         "//common/trinary:trit_ptrit",
         "@unity",
     ],

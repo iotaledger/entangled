@@ -11,7 +11,7 @@
 #include "ciri/consensus/test_utils/bundle.h"
 #include "ciri/consensus/test_utils/tangle.h"
 #include "ciri/node/node.h"
-#include "utils/files.h"
+#include "ciri/utils/files.h"
 
 static char *tangle_test_db_path = "ciri/api/tests/tangle-test.db";
 static storage_connection_config_t config;
