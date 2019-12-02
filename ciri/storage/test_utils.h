@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_TEST_UTILS_H__
-#define __COMMON_STORAGE_TEST_UTILS_H__
+#ifndef __CIRI_STORAGE_TEST_UTILS_H__
+#define __CIRI_STORAGE_TEST_UTILS_H__
 
 #include "ciri/storage/connection.h"
 #include "common/errors.h"
@@ -24,4 +24,4 @@ retcode_t storage_test_teardown(storage_connection_t* const connection, char con
 }
 #endif
 
-#endif  // __COMMON_STORAGE_TEST_UTILS_H__
+#endif  // __CIRI_STORAGE_TEST_UTILS_H__

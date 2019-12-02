@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_SQL_MARIADB_WRAPPERS_H__
-#define __COMMON_STORAGE_SQL_MARIADB_WRAPPERS_H__
+#ifndef __CIRI_STORAGE_SQL_MARIADB_WRAPPERS_H__
+#define __CIRI_STORAGE_SQL_MARIADB_WRAPPERS_H__
 
 #include <mysql.h>
 
@@ -32,4 +32,4 @@ void column_compress_bind(MYSQL_BIND* const bind, size_t const index, void const
 }
 #endif
 
-#endif  // __COMMON_STORAGE_SQL_MARIADB_WRAPPERS_H__
+#endif  // __CIRI_STORAGE_SQL_MARIADB_WRAPPERS_H__

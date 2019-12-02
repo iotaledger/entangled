@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_SQL_SQLITE3_CONNECTION_H__
-#define __COMMON_STORAGE_SQL_SQLITE3_CONNECTION_H__
+#ifndef __CIRI_STORAGE_SQL_SQLITE3_CONNECTION_H__
+#define __CIRI_STORAGE_SQL_SQLITE3_CONNECTION_H__
 
 #include <sqlite3.h>
 
@@ -31,4 +31,4 @@ typedef struct sqlite3_spent_addresses_connection_s {
 }
 #endif
 
-#endif  // __COMMON_STORAGE_SQL_SQLITE3_CONNECTION_H__
+#endif  // __CIRI_STORAGE_SQL_SQLITE3_CONNECTION_H__

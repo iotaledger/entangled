@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __SOCKETS_H
-#define __SOCKETS_H
+#ifndef __CCLIENT_HTTP_SOCKETS_H__
+#define __CCLIENT_HTTP_SOCKETS_H__
 
 #include "mbedtls/certs.h"
 #include "mbedtls/config.h"
@@ -73,4 +73,4 @@ void tls_socket_close(mbedtls_ctx_t *tls_ctx);
 }
 #endif
 
-#endif  // __SOCKETS_H
+#endif  // __CCLIENT_HTTP_SOCKETS_H__

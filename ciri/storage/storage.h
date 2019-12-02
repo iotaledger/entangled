@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_STORAGE_H__
-#define __COMMON_STORAGE_STORAGE_H__
+#ifndef __CIRI_STORAGE_STORAGE_H__
+#define __CIRI_STORAGE_STORAGE_H__
 
 #include <stdbool.h>
 
@@ -203,4 +203,4 @@ extern retcode_t storage_spent_addresses_store(storage_connection_t const* const
 }
 #endif
 
-#endif  // __COMMON_STORAGE_STORAGE_H__
+#endif  // __CIRI_STORAGE_STORAGE_H__

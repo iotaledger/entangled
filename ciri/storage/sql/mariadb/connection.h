@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_SQL_MARIADB_CONNECTION_H__
-#define __COMMON_STORAGE_SQL_MARIADB_CONNECTION_H__
+#ifndef __CIRI_STORAGE_SQL_MARIADB_CONNECTION_H__
+#define __CIRI_STORAGE_SQL_MARIADB_CONNECTION_H__
 
 #include <mysql.h>
 
@@ -31,4 +31,4 @@ typedef struct mariadb_spent_addresses_connection_s {
 }
 #endif
 
-#endif  // __COMMON_STORAGE_SQL_MARIADB_CONNECTION_H__
+#endif  // __CIRI_STORAGE_SQL_MARIADB_CONNECTION_H__

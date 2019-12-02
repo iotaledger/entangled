@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __UTILS_FILES_H__
-#define __UTILS_FILES_H__
+#ifndef __CIRI_UTILS_FILES_H__
+#define __CIRI_UTILS_FILES_H__
 
 #include <stdbool.h>
 
@@ -76,4 +76,4 @@ bool iota_utils_file_exist(char const *const file_path);
 }
 #endif
 
-#endif  // __UTILS_FILES_H__
+#endif  // __CIRI_UTILS_FILES_H__

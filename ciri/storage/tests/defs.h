@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_TESTS_HELPERS_H__
-#define __COMMON_STORAGE_TESTS_HELPERS_H__
+#ifndef __CIRI_STORAGE_TESTS_HELPERS_H__
+#define __CIRI_STORAGE_TESTS_HELPERS_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,4 +84,4 @@ flex_trit_t const TEST_TX_HASH[] = {-76, 44, 28,  43,  -80, -96, 112, 46,   -37,
 }
 #endif
 
-#endif  // __COMMON_STORAGE_TESTS_HELPERS_H__
+#endif  // __CIRI_STORAGE_TESTS_HELPERS_H__

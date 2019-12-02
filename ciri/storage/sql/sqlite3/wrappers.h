@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_SQL_SQLITE3_WRAPPERS_H__
-#define __COMMON_STORAGE_SQL_SQLITE3_WRAPPERS_H__
+#ifndef __CIRI_STORAGE_SQL_SQLITE3_WRAPPERS_H__
+#define __CIRI_STORAGE_SQL_SQLITE3_WRAPPERS_H__
 
 #include <sqlite3.h>
 
@@ -33,4 +33,4 @@ void column_decompress_load(sqlite3_stmt* const statement, size_t const index, f
 }
 #endif
 
-#endif  // __COMMON_STORAGE_SQL_SQLITE3_WRAPPERS_H__
+#endif  // __CIRI_STORAGE_SQL_SQLITE3_WRAPPERS_H__

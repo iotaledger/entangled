@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_CONNECTION_H__
-#define __COMMON_STORAGE_CONNECTION_H__
+#ifndef __CIRI_STORAGE_CONNECTION_H__
+#define __CIRI_STORAGE_CONNECTION_H__
 
 #include "common/errors.h"
 
@@ -37,4 +37,4 @@ extern retcode_t storage_connection_destroy(storage_connection_t* const connecti
 }
 #endif
 
-#endif  // __COMMON_STORAGE_CONNECTION_H__
+#endif  // __CIRI_STORAGE_CONNECTION_H__

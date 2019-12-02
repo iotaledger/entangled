@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_PACK_H__
-#define __COMMON_STORAGE_PACK_H__
+#ifndef __CIRI_STORAGE_PACK_H__
+#define __CIRI_STORAGE_PACK_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -45,4 +45,4 @@ retcode_t hash_pack_free(iota_stor_pack_t *pack);
 }
 #endif
 
-#endif  // __COMMON_STORAGE_PACK_H__
+#endif  // __CIRI_STORAGE_PACK_H__

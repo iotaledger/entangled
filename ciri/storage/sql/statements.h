@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_SQL_STATEMENTS_H__
-#define __COMMON_STORAGE_SQL_STATEMENTS_H__
+#ifndef __CIRI_STORAGE_SQL_STATEMENTS_H__
+#define __CIRI_STORAGE_SQL_STATEMENTS_H__
 
 #include <inttypes.h>
 
@@ -129,4 +129,4 @@ extern char* storage_statement_spent_address_exist;
 }
 #endif
 
-#endif  // __COMMON_STORAGE_SQL_STATEMENTS_H__
+#endif  // __CIRI_STORAGE_SQL_STATEMENTS_H__

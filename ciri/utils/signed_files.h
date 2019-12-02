@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __UTILS_SIGNED_FILES_H__
-#define __UTILS_SIGNED_FILES_H__
+#ifndef __CIRI_UTILS_SIGNED_FILES_H__
+#define __CIRI_UTILS_SIGNED_FILES_H__
 
 #include <stdbool.h>
 
@@ -25,4 +25,4 @@ retcode_t iota_file_signature_validate(char const *const filename, char const *c
 }
 #endif
 
-#endif  // __UTILS_SIGNED_FILES_H__
+#endif  // __CIRI_UTILS_SIGNED_FILES_H__

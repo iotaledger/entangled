@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_DEFS_H__
-#define __COMMON_STORAGE_DEFS_H__
+#ifndef __CIRI_STORAGE_DEFS_H__
+#define __CIRI_STORAGE_DEFS_H__
 
 /*
  * Transaction definitions
@@ -59,4 +59,4 @@
 
 #define SPENT_ADDRESS_NUM_COLS 1
 
-#endif  // __COMMON_STORAGE_DEFS_H__
+#endif  // __CIRI_STORAGE_DEFS_H__
