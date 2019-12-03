@@ -8,8 +8,8 @@
 #include <stdlib.h>
 
 #include "ciri/node/network/neighbor.h"
+#include "ciri/node/network/uri.h"
 #include "ciri/node/node.h"
-#include "common/network/uri.h"
 #include "utils/handles/rand.h"
 
 retcode_t neighbor_init(neighbor_t *const neighbor) {

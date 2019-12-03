@@ -80,16 +80,3 @@ cc_library(
     hdrs = ["signal.h"],
     deps = ["//utils:logger_helper"],
 )
-
-cc_library(
-    name = "socket",
-    srcs = ["socket.c"],
-    hdrs = ["socket.h"],
-    deps = [
-        "//common:errors",
-        "@mbedtls",
-    ] + select({
-        ":windows_platform": ["//utils:windows"],
-        "//conditions:default": [],
-    }),
-)

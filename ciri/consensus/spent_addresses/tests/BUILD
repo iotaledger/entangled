@@ -14,7 +14,7 @@ cc_test(
     deps = [
         "//ciri/consensus/spent_addresses:spent_addresses_provider",
         "//ciri/consensus/test_utils",
-        "//utils:files",
+        "//ciri/utils:files",
         "@unity",
     ],
 )
@@ -26,7 +26,7 @@ cc_test(
     deps = [
         "//ciri/consensus/spent_addresses:spent_addresses_service",
         "//ciri/consensus/test_utils",
-        "//utils:files",
+        "//ciri/utils:files",
         "@unity",
     ],
 )

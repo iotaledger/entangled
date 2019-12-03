@@ -6,8 +6,8 @@
  */
 
 #include "ciri/consensus/tangle/traversal.h"
-#include "common/storage/defs.h"
-#include "common/storage/pack.h"
+#include "ciri/storage/defs.h"
+#include "ciri/storage/pack.h"
 #include "utils/containers/hash/hash243_stack.h"
 
 retcode_t tangle_traversal_dfs_to_past(tangle_t const *const tangle, tangle_traversal_functor func,

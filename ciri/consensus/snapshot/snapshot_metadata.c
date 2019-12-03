@@ -8,8 +8,8 @@
 #include "ciri/consensus/snapshot/snapshot_metadata.h"
 #include <inttypes.h>
 #include <stdlib.h>
+#include "ciri/utils/files.h"
 #include "common/model/transaction.h"
-#include "utils/files.h"
 #include "utils/macros.h"
 
 retcode_t iota_snapshot_metadata_init(snapshot_metadata_t *const snapshot_metadata, flex_trit_t const *const hash,

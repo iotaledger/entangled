@@ -11,9 +11,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "ciri/utils/files.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/files.h"
 
 #define DEFAULT_AUTO_TETHERING_ENABLED false
 #define DEFAULT_COORDINATOR_ADDRESS COORDINATOR_ADDRESS

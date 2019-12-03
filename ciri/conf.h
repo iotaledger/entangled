@@ -13,8 +13,8 @@
 #include "ciri/api/conf.h"
 #include "ciri/consensus/conf.h"
 #include "ciri/node/conf.h"
+#include "ciri/utils/files.h"
 #include "common/errors.h"
-#include "utils/files.h"
 #include "utils/logger_helper.h"
 
 #define DEFAULT_CONF_PATH "ciri/conf.yml"

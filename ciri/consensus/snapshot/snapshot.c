@@ -10,11 +10,11 @@
 
 #include "ciri/consensus/conf.h"
 #include "ciri/consensus/snapshot/snapshot.h"
+#include "ciri/utils/files.h"
+#include "ciri/utils/signed_files.h"
 #include "common/model/transaction.h"
-#include "utils/files.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
-#include "utils/signed_files.h"
 
 #if defined(IOTA_MAINNET)
 #define SNAPSHOT_STATE_FILE_NAME "mainnet.snapshot.state"

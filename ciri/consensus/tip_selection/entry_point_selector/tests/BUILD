@@ -6,9 +6,9 @@ cc_test(
     deps = [
         "//ciri/consensus/test_utils",
         "//ciri/consensus/tip_selection/entry_point_selector",
+        "//ciri/utils:files",
         "//common/helpers:digest",
         "//common/model/tests:defs",
-        "//utils:files",
         "@unity",
     ],
 )

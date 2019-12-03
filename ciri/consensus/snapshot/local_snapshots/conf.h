@@ -10,8 +10,8 @@
 
 #include <stdbool.h>
 
+#include "ciri/utils/files.h"
 #include "common/errors.h"
-#include "utils/files.h"
 
 #ifdef __cplusplus
 extern "C" {

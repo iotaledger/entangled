@@ -8,8 +8,8 @@
 #ifndef __CONSENSUS_SPENT_ADDRESSES_SPENT_ADDRESSES_PROVIDER_H__
 #define __CONSENSUS_SPENT_ADDRESSES_SPENT_ADDRESSES_PROVIDER_H__
 
+#include "ciri/storage/storage.h"
 #include "common/errors.h"
-#include "common/storage/storage.h"
 
 #ifdef __cplusplus
 extern "C" {

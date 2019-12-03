@@ -8,7 +8,7 @@
 #include <inttypes.h>
 
 #include "ciri/consensus/tip_selection/cw_rating_calculator/cw_rating_dfs_impl.h"
-#include "common/storage/pack.h"
+#include "ciri/storage/pack.h"
 #include "utils/containers/bitset.h"
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/logger_helper.h"

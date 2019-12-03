@@ -7,9 +7,9 @@
 
 #include "http.h"
 #include <string.h>
+#include "cclient/http/socket.h"
 #include "cclient/service.h"
 #include "http_parser.h"
-#include "utils/handles/socket.h"
 #include "utils/macros.h"
 
 typedef enum { IOTA_REQUEST_STATUS_OK, IOTA_REQUEST_STATUS_DONE, IOTA_REQUEST_STATUS_ERROR } IOTA_REQUEST_STATUS;
