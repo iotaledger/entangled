@@ -34,6 +34,9 @@ static void *bundle_miner_mine_routine(void *const param) {
   kerl_init(&kerl);
 
   for (size_t i = 0; i < ctx->count; i++) {
+    if (ctx->optimal_index_found_by_some_thread && *ctx->optimal_index_found_by_some_thread) {
+      break;
+    }
     long_to_trits(ctx->index, ctx->essence + OBSOLETE_TAG_OFFSET);
 
     kerl_reset(&kerl);
@@ -50,7 +53,9 @@ static void *bundle_miner_mine_routine(void *const param) {
         ctx->probability = probability;
         ctx->optimal_index = ctx->index;
         if ((uint32_t)(1 / probability) >= ctx->mining_threshold) {
-          // TODO - find a safe way to notify other threads and cancel them
+          if (ctx->optimal_index_found_by_some_thread) {
+            *ctx->optimal_index_found_by_some_thread = true;
+          }
           break;
         }
       }
@@ -93,7 +98,7 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
                             trit_t const *const essence, size_t const essence_length, uint32_t const count,
                             uint32_t mining_threshold, uint64_t *const index, bundle_miner_ctx_t *const ctxs,
-                            size_t num_ctxs) {
+                            size_t num_ctxs, bool *const optimal_index_found) {
   retcode_t ret = RC_OK;
   uint32_t rounded_count = count + (num_ctxs - count % num_ctxs);
   thread_handle_t *threads = (thread_handle_t *)malloc(sizeof(thread_handle_t) * num_ctxs);
@@ -130,6 +135,7 @@ retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t c
     ctxs[i].optimal_index = 0;
     ctxs[i].probability = 1.0;
     ctxs[i].mining_threshold = mining_threshold;
+    ctxs[i].optimal_index_found_by_some_thread = optimal_index_found;
     thread_handle_create(&threads[i], (thread_routine_t)bundle_miner_mine_routine, &ctxs[i]);
     ctxs[i].was_thread_created = true;
   }
@@ -164,7 +170,7 @@ retcode_t bundle_miner_allocate_ctxs(uint8_t const nprocs, bundle_miner_ctx_t **
   return RC_OK;
 }
 
-retcode_t bundle_miner_deallocate_ctxs(bundle_miner_ctx_t **const ctxs) { free(*ctxs); }
+void bundle_miner_deallocate_ctxs(bundle_miner_ctx_t **const ctxs) { free(*ctxs); }
 
 float bundle_miner_get_progress_ratio(bundle_miner_ctx_t const *const ctxs, size_t num_ctxs) {
   double progress = 0;
@@ -179,7 +185,7 @@ float bundle_miner_get_progress_ratio(bundle_miner_ctx_t const *const ctxs, size
 
   for (size_t i = 0; i < num_ctxs; i++) {
     // If we hit the threshold, we're finished
-    if ((uint32_t)(1 / ctxs[i].probability) >= ctxs[i].mining_threshold) {
+    if (ctxs[i].optimal_index_found_by_some_thread) {
       return 1.0;
     }
   }

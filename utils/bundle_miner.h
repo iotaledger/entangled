@@ -28,6 +28,7 @@ typedef struct bundle_miner_ctx_s {
   uint32_t mining_threshold;
   double probability;
   bool was_thread_created;
+  bool *optimal_index_found_by_some_thread;
 } bundle_miner_ctx_t;
 
 /**
@@ -54,24 +55,25 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
 /**
  * @brief Mines a bundle hash that minimizes the risks of a brute force signature forging attack
  *
- * @param[in]   bundle_normalized_max The maximum already published bundle hash
- * @param[in]   security              The desired security
- * @param[in]   essence               The bundle essence
- * @param[in]   essence_length        The length of the bundle essence
- * @param[in]   count                 The desired number of iterations
- * @param[in]   mining_threshold      If the found index has expected number of adversarial bundles
- *                                    needed in order to exploit published private key fragments that is
- *                                    greater than mining_threshold, then mining should be stopped
- * @param[out]  index                 The resulting index
- * @param[in, out]   ctxs             The ctxs
- * @param[in]   num_ctxs         The number of ctxs
+ * @param[in]       bundle_normalized_max       The maximum already published bundle hash
+ * @param[in]       security                    The desired security
+ * @param[in]       essence                     The bundle essence
+ * @param[in]       essence_length              The length of the bundle essence
+ * @param[in]       count                       The desired number of iterations
+ * @param[in]       mining_threshold            If the found index has expected number of adversarial bundles
+ *                                              needed in order to exploit published private key fragments that is
+ *                                              greater than mining_threshold, then mining should be stopped
+ * @param[out]      index                       The resulting index
+ * @param[in, out]  ctxs                        The ctxs
+ * @param[in]       num_ctxs                    The number of ctxs
+ * @param[in, out]  optimal_index_found         Whether or not some thread found the optimal index
  *
  * @return an error code
  */
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
                             trit_t const *const essence, size_t const essence_length, uint32_t const count,
                             uint32_t mining_threshold, uint64_t *const index, bundle_miner_ctx_t *const ctxs,
-                            size_t num_ctxs);
+                            size_t num_ctxs, bool *const optimal_index_found);
 
 /**
  * @brief Allocates ctxs to use to mine bundles, the number of mined ctxs is dependent on
@@ -90,9 +92,9 @@ retcode_t bundle_miner_allocate_ctxs(uint8_t const nprocs, bundle_miner_ctx_t **
  *
  * @param[in]   ctxs             The ctxs to allocate
  *
- * @return an error code
+ * @return void
  */
-retcode_t bundle_miner_deallocate_ctxs(bundle_miner_ctx_t **const ctxs);
+void bundle_miner_deallocate_ctxs(bundle_miner_ctx_t **const ctxs);
 
 /**
  * @brief Deallocates ctxs
