@@ -50,7 +50,7 @@ static void *bundle_miner_mine_routine(void *const param) {
         ctx->probability = probability;
         ctx->optimal_index = ctx->index;
         if ((uint32_t)(1 / probability) >= ctx->mining_threshold) {
-          // TODO - find a safe way to announce other threads and cancel them
+          // TODO - find a safe way to notify other threads and cancel them
           break;
         }
       }
