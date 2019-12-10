@@ -10,23 +10,25 @@
 
 #include "common/trinary/trit_tryte.h"
 
-#define TRYTES_IN "AZN9"
-#define EXP 1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0, 0
+#define TRYTES_IN "AZN9AZN9AZN9AZN9AZN9"
+#define EXP                                                                                                            \
+  1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0, \
+      0, 1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, -1, -1, 0, 0, 0
 
 void test_trits_to_trytes(void) {
   trit_t trits[] = {EXP};
-  tryte_t trytes[4];
+  tryte_t trytes[20];
   tryte_t exp[] = {TRYTES_IN};
-  trits_to_trytes(trits, trytes, 12);
-  TEST_ASSERT_EQUAL_MEMORY(exp, trytes, 4);
+  trits_to_trytes(trits, trytes, 60);
+  TEST_ASSERT_EQUAL_MEMORY(exp, trytes, 20);
 }
 
 void test_trytes_to_trits(void) {
   tryte_t trytes[] = {TRYTES_IN};
-  trit_t trits[12];
+  trit_t trits[60];
   trit_t exp[] = {EXP};
-  trytes_to_trits(trytes, trits, 4);
-  TEST_ASSERT_EQUAL_MEMORY(exp, trits, 12);
+  trytes_to_trits(trytes, trits, 20);
+  TEST_ASSERT_EQUAL_MEMORY(exp, trits, 60);
 }
 
 void test_get_trit_at(void) {
