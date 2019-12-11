@@ -36,6 +36,20 @@ void example_node_info(iota_client_service_t *s) {
     printf("time %" PRIu64 " \n", node_res->time);
     printf("tips %d \n", node_res->tips);
     printf("transactionsToRequest %d \n", node_res->transactions_to_request);
+
+    // print out features
+    printf("features: ");
+    size_t num_features = get_node_info_req_features_num(node_res);
+    for (; num_features > 0; num_features--) {
+      printf("%s, ", get_node_info_res_features_at(node_res, num_features - 1));
+    }
+    printf("\n");
+
+    // print out the coordinator address
+    printf("coordinatorAddress: ");
+    flex_trit_print(node_res->coordinator_address, NUM_TRITS_ADDRESS);
+    printf("\n");
+
   } else {
     printf("Error: %s", error_2_string(ret));
   }
