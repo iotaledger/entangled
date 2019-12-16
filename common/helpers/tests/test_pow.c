@@ -70,14 +70,14 @@ static void test_flex_pow(void) {
   flex_trits_from_trytes(tx, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t *)TX_TRYTES, NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  flex_trit_t *nonce = iota_pow_flex(tx, FLEX_TRIT_SIZE_8019, 9);
+  flex_trit_t *nonce = iota_pow_flex(tx, NUM_TRITS_SERIALIZED_TRANSACTION, 9);
 
   flex_trits_insert_from_pos(tx, NUM_TRITS_SERIALIZED_TRANSACTION, nonce, NUM_TRITS_NONCE, 0,
                              NUM_TRITS_SERIALIZED_TRANSACTION - NUM_TRITS_NONCE, NUM_TRITS_NONCE);
-  flex_trit_t *fhash = iota_flex_digest(tx, FLEX_TRIT_SIZE_8019);
+  flex_trit_t *fhash = iota_flex_digest(tx, NUM_TRITS_SERIALIZED_TRANSACTION);
 
   tryte_t hash[NUM_TRYTES_HASH] = {0};
-  flex_trits_to_trytes(hash, NUM_TRYTES_HASH, fhash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
+  flex_trits_to_trytes(hash, NUM_TRYTES_HASH, fhash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
   TEST_ASSERT_EQUAL_MEMORY(hash + HASH_LENGTH_TRYTE - 3, "999", 3);
 
