@@ -167,17 +167,19 @@ size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits, size_t const dst
   if (num_trits >= NUM_TRITS_PER_FLEX_TRIT &&
       (src_start_pos % NUM_TRITS_PER_FLEX_TRIT) == (dst_start_pos % NUM_TRITS_PER_FLEX_TRIT)) {
     // Handle head
-    size_t const head_num_trits = NUM_TRITS_PER_FLEX_TRIT - (src_start_pos % NUM_TRITS_PER_FLEX_TRIT);
+    size_t const head_num_trits =
+        (NUM_TRITS_PER_FLEX_TRIT - (src_start_pos % NUM_TRITS_PER_FLEX_TRIT)) % NUM_TRITS_PER_FLEX_TRIT;
     for (size_t i = 0; i < head_num_trits; i++) {
       trit_t t = flex_trits_at(src_trits, src_len, src_start_pos + i);
       flex_trits_set_at(dst_trits, dst_len, dst_start_pos + i, t);
     }
     // Copy flex trits as bytes
-    size_t const body_num_bytes = (num_trits - head_num_trits) / NUM_TRITS_PER_FLEX_TRIT;
-    memcpy(dst_trits + (dst_start_pos + NUM_TRITS_PER_FLEX_TRIT - 1) / NUM_TRITS_PER_FLEX_TRIT,
-           src_trits + (src_start_pos + NUM_TRITS_PER_FLEX_TRIT - 1) / NUM_TRITS_PER_FLEX_TRIT, body_num_bytes);
+    size_t const body_num_bytes = (num_trits - head_num_trits) / NUM_TRITS_PER_FLEX_TRIT * sizeof(flex_trit_t);
+    memcpy(dst_trits + (dst_start_pos + head_num_trits) / NUM_TRITS_PER_FLEX_TRIT,
+           src_trits + (src_start_pos + head_num_trits) / NUM_TRITS_PER_FLEX_TRIT, body_num_bytes);
     // Handle tail
-    for (size_t i = head_num_trits + body_num_bytes * NUM_TRITS_PER_FLEX_TRIT; i < num_trits; i++) {
+    for (size_t i = head_num_trits + body_num_bytes * NUM_TRITS_PER_FLEX_TRIT / sizeof(flex_trit_t); i < num_trits;
+         i++) {
       trit_t t = flex_trits_at(src_trits, src_len, src_start_pos + i);
       flex_trits_set_at(dst_trits, dst_len, dst_start_pos + i, t);
     }
