@@ -25,7 +25,7 @@ typedef struct bundle_miner_ctx_s {
   uint64_t start_index;
   uint64_t optimal_index;
   uint64_t count;
-  uint32_t mining_threshold;
+  uint64_t mining_threshold;
   double probability;
   bool was_thread_created;
   bool *optimal_index_found_by_some_thread;
@@ -72,7 +72,7 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
  */
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
                             trit_t const *const essence, size_t const essence_length, uint32_t const count,
-                            uint32_t mining_threshold, uint64_t *const index, bundle_miner_ctx_t *const ctxs,
+                            uint64_t mining_threshold, uint64_t *const index, bundle_miner_ctx_t *const ctxs,
                             size_t num_ctxs, bool *const optimal_index_found);
 
 /**

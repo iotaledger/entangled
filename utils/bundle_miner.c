@@ -52,7 +52,7 @@ static void *bundle_miner_mine_routine(void *const param) {
       if (probability < ctx->probability) {
         ctx->probability = probability;
         ctx->optimal_index = ctx->index;
-        if ((uint32_t)(1 / probability) >= ctx->mining_threshold) {
+        if (ctx->mining_threshold > 0 && (uint32_t)(1 / probability) >= ctx->mining_threshold) {
           if (ctx->optimal_index_found_by_some_thread) {
             *ctx->optimal_index_found_by_some_thread = true;
           }
@@ -97,7 +97,7 @@ void bundle_miner_normalized_bundle_max(byte_t const *const lhs, byte_t const *c
 
 retcode_t bundle_miner_mine(byte_t const *const bundle_normalized_max, uint8_t const security,
                             trit_t const *const essence, size_t const essence_length, uint32_t const count,
-                            uint32_t mining_threshold, uint64_t *const index, bundle_miner_ctx_t *const ctxs,
+                            uint64_t mining_threshold, uint64_t *const index, bundle_miner_ctx_t *const ctxs,
                             size_t num_ctxs, bool *const optimal_index_found) {
   retcode_t ret = RC_OK;
   uint32_t rounded_count = count + (num_ctxs - count % num_ctxs);
