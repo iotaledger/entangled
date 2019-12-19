@@ -14,7 +14,7 @@
 #include <unistd.h>
 #endif
 
-int system_cpu_available() {
+size_t system_cpu_available() {
 #ifdef WIN32
   SYSTEM_INFO sysinfo;
   GetSystemInfo(&sysinfo);
@@ -22,7 +22,7 @@ int system_cpu_available() {
 #elif MACOS
   int nm[2];
   size_t len = 4;
-  uint32_t count;
+  uint32_t count = 0;
 
   nm[0] = CTL_HW;
   nm[1] = HW_AVAILCPU;
@@ -37,6 +37,7 @@ int system_cpu_available() {
   }
   return count;
 #else
-  return sysconf(_SC_NPROCESSORS_ONLN);
+  long count = sysconf(_SC_NPROCESSORS_ONLN);
+  return count < 1 ? 1 : count;
 #endif
 }
