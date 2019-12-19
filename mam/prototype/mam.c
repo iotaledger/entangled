@@ -79,7 +79,11 @@ int mam_create(trit_t *const payload, size_t const payload_length, trit_t const 
   Curl curl;
   curl.type = CURL_P_27;
   memcpy(curl.state, enc_curl->state, sizeof(enc_curl->state));
-  hamming(&curl, 0, HASH_LENGTH_TRYTE, security);
+  PearlDiverStatus status = hamming(&curl, 0, HASH_LENGTH_TRYTE, security);
+  if (PEARL_DIVER_SUCCESS != status) {
+    fprintf(stderr, "hamming PoW failed with status %d\n", (int)status);
+    return -1;
+  }
   mask(payload + offset, curl.state, HASH_LENGTH_TRYTE, enc_curl);
   offset += HASH_LENGTH_TRYTE;
 
