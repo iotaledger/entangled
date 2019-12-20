@@ -5,10 +5,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/snapshot:state_delta",
+        "//ciri/storage",
         "//common:errors",
         "//common/model:bundle",
         "//common/model:transaction",
-        "//common/storage",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_queue",
         "//utils/containers/hash:hash243_set",
@@ -24,8 +24,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/tangle",
+        "//ciri/storage:pack",
         "//common/model:transaction",
-        "//common/storage:pack",
         "//utils/containers/hash:hash243_set",
         "//utils/containers/hash:hash243_stack",
     ],

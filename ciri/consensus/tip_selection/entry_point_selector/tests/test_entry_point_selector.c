@@ -11,10 +11,10 @@
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/consensus/test_utils/tangle.h"
 #include "ciri/consensus/tip_selection/entry_point_selector/entry_point_selector.h"
+#include "ciri/utils/files.h"
 #include "common/helpers/digest.h"
 #include "common/model/milestone.h"
 #include "common/model/tests/defs.h"
-#include "utils/files.h"
 
 #define START_MILESTONE 814854
 #define LATEST_SOLID_MILESTONE 814904

@@ -26,9 +26,13 @@ trit_t *do_pow(Curl *const curl, trit_t const *const trits_in, size_t const trit
   memcpy(curl->state, trits_in + trits_len - HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
   // FIXME(th0br0) deal with result value of `hashcash` call
-  hashcash(curl, HASH_LENGTH_TRIT - NONCE_LENGTH, HASH_LENGTH_TRIT, mwm);
-
-  memcpy(nonce_trits, curl->state + HASH_LENGTH_TRIT - NONCE_LENGTH, NONCE_LENGTH);
+  PearlDiverStatus status = hashcash(curl, HASH_LENGTH_TRIT - NONCE_LENGTH, HASH_LENGTH_TRIT, mwm);
+  if (PEARL_DIVER_SUCCESS == status) {
+    memcpy(nonce_trits, curl->state + HASH_LENGTH_TRIT - NONCE_LENGTH, NONCE_LENGTH);
+  } else {
+    free(nonce_trits);
+    nonce_trits = NULL;
+  }
 
   return nonce_trits;
 }

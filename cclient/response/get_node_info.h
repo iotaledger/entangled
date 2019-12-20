@@ -241,19 +241,41 @@ static inline retcode_t get_node_info_res_coordinator_address_set(get_node_info_
   memcpy(res->coordinator_address, hash, FLEX_TRIT_SIZE_243);
   return RC_OK;
 }
+
+/**
+ * @brief Gets the coordinator address
+ *
+ * @param[in] res The response object.
+ * @return The coordinator address.
+ */
 static inline flex_trit_t const* get_node_info_res_coordinator_address(get_node_info_res_t const* const res) {
   if (!res) {
     return NULL;
   }
   return res->coordinator_address;
 }
+
+/**
+ * @brief Gets a feature from index.
+ *
+ * @param[in] res The response object.
+ * @param[in] idx The feature index.
+ * @return A string of a feature.
+ */
 static inline char const* get_node_info_res_features_at(get_node_info_res_t* res, size_t idx) {
   if (!res) {
     return NULL;
   }
   return *(const char**)utarray_eltptr(res->features, idx);
 }
-static inline size_t get_node_info_req_features_len(get_node_info_res_t* res) {
+
+/**
+ * @brief Gets the number of features.
+ *
+ * @param[in] res The response object.
+ * @return The number of features.
+ */
+static inline size_t get_node_info_req_features_num(get_node_info_res_t* res) {
   if (!res) {
     return 0;
   }

@@ -4,8 +4,8 @@ cc_library(
     hdrs = ["spent_addresses_provider.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//ciri/storage",
         "//common:errors",
-        "//common/storage",
         "//utils:logger_helper",
     ],
 )

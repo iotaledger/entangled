@@ -29,8 +29,8 @@ cc_library(
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     deps = [
+        "//ciri/utils:files",
         "//common:errors",
-        "//utils:files",
     ],
 )
 

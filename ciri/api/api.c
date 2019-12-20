@@ -9,8 +9,8 @@
 
 #include "ciri/api/api.h"
 #include "ciri/api/feature.h"
+#include "ciri/node/network/uri.h"
 #include "common/helpers/pow.h"
-#include "common/network/uri.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 

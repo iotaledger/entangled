@@ -15,10 +15,10 @@
 #include "ciri/consensus/test_utils/tangle.h"
 #include "ciri/consensus/tip_selection/exit_probability_validator/exit_probability_validator.h"
 #include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
+#include "ciri/storage/connection.h"
+#include "ciri/storage/storage.h"
+#include "ciri/storage/tests/defs.h"
 #include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/storage/storage.h"
-#include "common/storage/tests/defs.h"
 #include "common/trinary/flex_trit.h"
 
 static tangle_t tangle;

@@ -12,12 +12,12 @@
 #include <stdint.h>
 
 #include "ciri/consensus/snapshot/state_delta.h"
+#include "ciri/storage/connection.h"
+#include "ciri/storage/defs.h"
+#include "ciri/storage/storage.h"
 #include "common/errors.h"
 #include "common/model/bundle.h"
 #include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/storage/defs.h"
-#include "common/storage/storage.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/containers/hash/hash243_set.h"

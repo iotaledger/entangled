@@ -11,7 +11,7 @@
 #include "ciri/consensus/test_utils/bundle.h"
 #include "ciri/consensus/test_utils/spent_addresses.h"
 #include "ciri/consensus/test_utils/tangle.h"
-#include "utils/files.h"
+#include "ciri/utils/files.h"
 
 static char *spent_addresses_test_db_path = "ciri/consensus/spent_addresses/tests/spent-addresses-test.db";
 static char *tangle_test_db_path = "ciri/consensus/spent_addresses/tests/tangle-test.db";

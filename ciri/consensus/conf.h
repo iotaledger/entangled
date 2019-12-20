@@ -9,10 +9,10 @@
 #define __CONSENSUS_CONF_H__
 
 #include "ciri/consensus/snapshot/local_snapshots/conf.h"
+#include "ciri/utils/files.h"
 #include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/files.h"
 
 #define IOTA_SUPPLY 2779530283277761LL
 

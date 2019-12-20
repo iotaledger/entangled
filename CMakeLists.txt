@@ -147,7 +147,6 @@ add_custom_command(
 set(UTILS_SRC
   "utils/time.c"
   "utils/logger_helper.c"
-  "utils/handles/socket.c"
   "utils/char_buffer.c"
   "utils/memset_safe.c"
   "utils/system.c"

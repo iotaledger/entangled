@@ -13,10 +13,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/consensus/snapshot/local_snapshots:conf",
+        "//ciri/utils:files",
         "//common:errors",
         "//common/crypto/sponge",
         "//common/trinary:flex_trit",
-        "//utils:files",
         "//utils:logger_helper",
         "@cJSON",
     ],

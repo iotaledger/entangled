@@ -8,8 +8,8 @@
 #include <string.h>
 
 #include "ciri/consensus/test_utils/spent_addresses.h"
-#include "common/storage/test_utils.h"
-#include "utils/files.h"
+#include "ciri/storage/test_utils.h"
+#include "ciri/utils/files.h"
 
 retcode_t spent_addresses_setup(spent_addresses_provider_t *const sap, storage_connection_config_t *const config,
                                 char *test_db_path) {

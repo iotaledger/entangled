@@ -35,8 +35,8 @@ cIRI offers two storage backends: `sqlite3` and `mariadb`. You can select the on
 
 Create the databases for the first time:
 ```
-$ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/sqlite3/tangle-schema.sql
-$ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/sqlite3/spent-addresses-schema.sql
+$ sqlite3 ciri/db/tangle-mainnet.db < ciri/storage/sql/sqlite3/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-mainnet.db < ciri/storage/sql/sqlite3/spent-addresses-schema.sql
 ```
 
 Build and run cIRI
@@ -50,9 +50,9 @@ You need to have a mysql/mariadb server running.
 
 Create the databases for the first time:
 ```
-$ mysql -u root < common/storage/sql/mariadb/setup.sql
-$ mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
-$ mysql -u ciri spent-addresses < common/storage/sql/mariadb/spent-addresses-schema.sql
+$ mysql -u root < ciri/storage/sql/mariadb/setup.sql
+$ mysql -u ciri tangle < ciri/storage/sql/mariadb/tangle-schema.sql
+$ mysql -u ciri spent-addresses < ciri/storage/sql/mariadb/spent-addresses-schema.sql
 ```
 
 Build and run cIRI
@@ -66,8 +66,8 @@ $ bazel run -c opt --define network=mainnet --define storage=mariadb -- ciri # o
 
 Create the databases for the first time:
 ```
-$ sqlite3 ciri/db/tangle-testnet.db < common/storage/sql/sqlite3/tangle-schema.sql
-$ sqlite3 ciri/db/spent-addresses-testnet.db < common/storage/sql/sqlite3/spent-addresses-schema.sql
+$ sqlite3 ciri/db/tangle-testnet.db < ciri/storage/sql/sqlite3/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-testnet.db < ciri/storage/sql/sqlite3/spent-addresses-schema.sql
 ```
 
 Build and run cIRI
@@ -81,17 +81,17 @@ You need to have a mysql/mariadb server running.
 
 Create the databases for the first time:
 ```
-$ mysql -u root < common/storage/sql/mariadb/setup.sql
-$ mysql -u ciri tangle < common/storage/sql/mariadb/tangle-schema.sql
-$ mysql -u ciri spent-addresses < common/storage/sql/mariadb/spent-addresses-schema.sql
+$ mysql -u root < ciri/storage/sql/mariadb/setup.sql
+$ mysql -u ciri tangle < ciri/storage/sql/mariadb/tangle-schema.sql
+$ mysql -u ciri spent-addresses < ciri/storage/sql/mariadb/spent-addresses-schema.sql
 ```
 
 ### Docker
 
 To run cIRI on docker, you also have to create databases first (mainnet as example here):
 ```
-$ sqlite3 ciri/db/tangle-mainnet.db < common/storage/sql/tangle-schema.sql
-$ sqlite3 ciri/db/spent-addresses-mainnet.db < common/storage/sql/spent-addresses-schema.sql
+$ sqlite3 ciri/db/tangle-mainnet.db < ciri/storage/sql/tangle-schema.sql
+$ sqlite3 ciri/db/spent-addresses-mainnet.db < ciri/storage/sql/spent-addresses-schema.sql
 ```
 
 Build the docker image with:

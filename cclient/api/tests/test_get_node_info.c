@@ -24,7 +24,7 @@ static void test_get_node_info(void) {
   TEST_ASSERT(node_res->latest_solid_subtangle_milestone_index > STARTING_MILESTONE_INDEX);
   TEST_ASSERT(node_res->time > OLDER_TIMESTAMP);
   TEST_ASSERT(!flex_trits_are_null(get_node_info_res_coordinator_address(node_res), NUM_FLEX_TRITS_HASH));
-  TEST_ASSERT(get_node_info_req_features_len(node_res) > 0);
+  TEST_ASSERT(get_node_info_req_features_num(node_res) > 0);
 
   get_node_info_res_free(&node_res);
   TEST_ASSERT_NULL(node_res);
