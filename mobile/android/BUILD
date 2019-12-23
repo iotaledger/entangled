@@ -14,6 +14,7 @@ cc_library(
         "//utils:bundle_miner",
         "//utils:memset_safe",
     ],
+    alwayslink = True,
 )
 
 android_binary(
