@@ -25,7 +25,7 @@ typedef struct bundle_miner_ctx_s {
   uint64_t start_index;
   uint64_t optimal_index;
   uint64_t count;
-  uint64_t mining_threshold;
+  uint32_t mining_threshold;
   double probability;
   bool was_thread_created;
   bool *optimal_index_found_by_some_thread;
