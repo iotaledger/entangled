@@ -65,9 +65,6 @@
   NSMutableArray* outputTxsTrytes = [NSMutableArray array];
   NSMutableString* outputTxsTrytesSerialized = [NSMutableString string];
   uint8_t cmwm = (uint8_t)[mwm unsignedCharValue];
-  //bundle_miner_ctx_t* ctxs = NULL;
-  //size_t num_ctxs = 0;
-  //bool found_optimal_index = false;
 
   flex_trits_from_trytes(flexTrunk, NUM_TRITS_TRUNK, (tryte_t*)[trunk cStringUsingEncoding:NSUTF8StringEncoding],
                          NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
@@ -115,17 +112,6 @@ done:
   retcode_t rc = bundle_miner_mine(cbundleNormalizedMax, (uint8_t)[security unsignedCharValue], (trit_t*)essence,
                                    (size_t)[essenceLength unsignedLongValue], (uint32_t)[count unsignedIntValue],
                                    (uint8_t)[nprocs unsignedCharValue], (uint32_t)[miningThreshold unsignedIntValue], &cindex);
-
-  //retcode_t rc = bundle_miner_allocate_ctxs(0, &ctxs, &num_ctxs);
-  //if (rc != RC_OK) {
-  //    return @(-1);
-  //}
-
-  //rc = bundle_miner_mine(cbundleNormalizedMax, (uint8_t)[security unsignedCharValue], (trit_t*)essence,
-    //                           (size_t)[essenceLength unsignedLongValue], (uint32_t)[count unsignedIntValue],
-      //                         (uint8_t)[nprocs unsignedCharValue], &cindex, ctxs, num_ctxs, &found_optimal_index);
-
-  //bundle_miner_deallocate_ctxs(&ctxs);
 
   if (rc != RC_OK) {
     return @(-1);

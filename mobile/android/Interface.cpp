@@ -241,20 +241,11 @@ JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEn
   retcode_t ret = RC_OK;
   uint64_t index = 0;
 
-  // bundle_miner_ctx_t* ctxs = NULL;
-  // size_t num_ctxs = 0;
-  // bool found_optimal_index = false;
-
   byte_t const* bundleNormalizedMax = (byte_t*)env->GetByteArrayElements(jbundleNormalizedMax, 0);
   trit_t* essence = (trit_t*)env->GetByteArrayElements(jessence, 0);
 
   ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, jminingThreshold,
                           &index);
-
-  //  ret = bundle_miner_allocate_ctxs(0, &ctxs, &num_ctxs);
-  //  if (ret != RC_OK) {
-  //    return -1;
-  //  }
 
   ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, &index, ctxs,
                           num_ctxs, &found_optimal_index);
@@ -262,11 +253,9 @@ JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEn
   env->ReleaseByteArrayElements(jbundleNormalizedMax, (jbyte*)bundleNormalizedMax, 0);
   env->ReleaseByteArrayElements(jessence, (jbyte*)essence, 0);
 
-  // bundle_miner_deallocate_ctxs(&ctxs);
-
-  // if (ret != RC_OK) {
-  //  return -1;
-  //}
+  if (ret != RC_OK) {
+    return -1;
+  }
 
   return index;
 }
