@@ -30,7 +30,7 @@ static void *bundle_miner_mine_routine(void *const param) {
   byte_t candidate_normalized[NORMALIZED_BUNDLE_LENGTH];
   byte_t candidate_normalized_max[NORMALIZED_BUNDLE_LENGTH];
   bundle_miner_ctx_t *ctx = (bundle_miner_ctx_t *)param;
-  uint32_t num_trials_threshold = pow(3, ctx->mining_threshold);
+  uint64_t num_trials_threshold = pow(3, ctx->mining_threshold);
 
   kerl_init(&kerl);
 
@@ -53,7 +53,7 @@ static void *bundle_miner_mine_routine(void *const param) {
       if (probability < ctx->probability) {
         ctx->probability = probability;
         ctx->optimal_index = ctx->index;
-        if (num_trials_threshold > 1 && (uint32_t)(1 / probability) >= num_trials_threshold) {
+        if (num_trials_threshold > 1 && (uint64_t)(1.0L / probability) >= num_trials_threshold) {
           if (ctx->optimal_index_found_by_some_thread) {
             *ctx->optimal_index_found_by_some_thread = true;
           }
