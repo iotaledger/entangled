@@ -81,7 +81,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
   }
 
   // trytes to transaction objects
-  HASH_ARRAY_FOREACH(trytes, elt) {
+  HASH_ARRAY_FOREACH(attach_res->trytes, elt) {
     tx_deserialize_offset = transaction_deserialize_from_trits(&tx, elt, true);
     if (tx_deserialize_offset) {
       transaction_array_push_back(out_transactions, &tx);
