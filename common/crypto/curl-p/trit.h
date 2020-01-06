@@ -22,7 +22,7 @@ typedef struct {
   CurlType type;
 } Curl;
 
-void curl_init(Curl* ctx);
+void curl_init(Curl* const ctx);
 void curl_absorb(Curl* const ctx, trit_t const* const trits, size_t length);
 void curl_squeeze(Curl* const ctx, trit_t* const trits, size_t length);
 void curl_reset(Curl* const ctx);
