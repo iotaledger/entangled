@@ -231,20 +231,21 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(JNIEnv* en
 /*
  * Class:     org_iota_mobile_Interface
  * Method:    bundle_miner_mine
- * Signature: ([Ljava/lang/Byte;I[Ljava/lang/Byte;III)J
+ * Signature: ([Ljava/lang/Byte;I[Ljava/lang/Byte;IIII)J
  */
 JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEnv* env, jclass,
                                                                            jbyteArray jbundleNormalizedMax,
                                                                            jint jsecurity, jbyteArray jessence,
                                                                            jint jessenceLength, jint jcount,
-                                                                           jint jnprocs) {
+                                                                           jint jnprocs, jint jminingThreshold) {
   retcode_t ret = RC_OK;
   uint64_t index = 0;
 
   byte_t const* bundleNormalizedMax = (byte_t*)env->GetByteArrayElements(jbundleNormalizedMax, 0);
   trit_t* essence = (trit_t*)env->GetByteArrayElements(jessence, 0);
 
-  ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, &index);
+  ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, jminingThreshold,
+                          &index);
 
   env->ReleaseByteArrayElements(jbundleNormalizedMax, (jbyte*)bundleNormalizedMax, 0);
   env->ReleaseByteArrayElements(jessence, (jbyte*)essence, 0);

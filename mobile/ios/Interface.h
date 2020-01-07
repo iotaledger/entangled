@@ -27,7 +27,8 @@
                        essence:(int8_t*)essence
                  essenceLength:(NSNumber*)essenceLength
                          count:(NSNumber*)count
-                        nprocs:(NSNumber*)nprocs;
+                        nprocs:(NSNumber*)nprocs
+               miningThreshold:(NSNumber*)miningThreshold;
 
 @end
 
