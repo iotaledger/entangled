@@ -61,7 +61,7 @@ void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length) {
   }
 }
 
-void kerl_reset(Kerl* ctx) { kerl_init(ctx); }
+void kerl_reset(Kerl* const ctx) { kerl_init(ctx); }
 
 #undef SUFFIX
 #undef HASH_BIT_LEN

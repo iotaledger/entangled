@@ -484,7 +484,7 @@ size_t transaction_serialize_on_flex_trits(iota_transaction_t const *const trans
 // Fills up an existing transaction with the serialized data in trits - returns
 // non 0 on success
 size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction, flex_trit_t const *const trits,
-                                          bool compute_hash);
+                                          bool const compute_hash);
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
