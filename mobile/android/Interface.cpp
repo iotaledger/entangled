@@ -247,9 +247,6 @@ JNIEXPORT jlong JNICALL Java_org_iota_mobile_Interface_bundle_1miner_1mine(JNIEn
   ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, jminingThreshold,
                           &index);
 
-  ret = bundle_miner_mine(bundleNormalizedMax, jsecurity, essence, jessenceLength, jcount, jnprocs, &index, ctxs,
-                          num_ctxs, &found_optimal_index);
-
   env->ReleaseByteArrayElements(jbundleNormalizedMax, (jbyte*)bundleNormalizedMax, 0);
   env->ReleaseByteArrayElements(jessence, (jbyte*)essence, 0);
 

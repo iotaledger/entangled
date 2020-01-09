@@ -107,7 +107,7 @@ done:
   uint64_t cindex = 0;
 
   byte_t const* cbundleNormalizedMax = (byte_t*)bundleNormalizedMax;
-  
+
   retcode_t rc = bundle_miner_mine(cbundleNormalizedMax, (uint8_t)[security unsignedCharValue], (trit_t*)essence,
                                    (size_t)[essenceLength unsignedLongValue], (uint32_t)[count unsignedIntValue],
                                    (uint8_t)[nprocs unsignedCharValue], (uint32_t)[miningThreshold unsignedIntValue], &cindex);
