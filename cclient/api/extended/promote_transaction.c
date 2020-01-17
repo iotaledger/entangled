@@ -16,7 +16,7 @@ retcode_t iota_client_promote_transaction(iota_client_service_t const* const ser
   retcode_t ret_code = RC_ERROR;
   if (out_bundle == NULL) {
     ret_code = RC_NULL_PARAM;
-    log_error(client_extended_logger_id, "%s the out_bundle parameter cannot be NULL \n", __func__,
+    log_error(client_extended_logger_id, "%s the out_bundle parameter cannot be NULL: %s\n", __func__,
               error_2_string(ret_code));
     goto done;
   }
