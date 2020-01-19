@@ -73,6 +73,9 @@ static void test_bundle_miner_mine(void) {
   size_t const essence_length = 486 * 4;
   trit_t essence[essence_length];
   uint64_t index = 0;
+  bundle_miner_ctx_t* ctxs = NULL;
+  size_t num_ctxs = 0;
+  bool found_optimal_index = false;
 
   trytes_to_trits(v1_trytes, v1_trits, HASH_LENGTH_TRYTE);
   memset(nb1, 0, NORMALIZED_BUNDLE_LENGTH);
@@ -86,7 +89,16 @@ static void test_bundle_miner_mine(void) {
 
   bundle_miner_normalized_bundle_max(nb1, nb2, min, NORMALIZED_BUNDLE_LENGTH);
 
-  TEST_ASSERT(bundle_miner_mine(min, SECURITY, essence, essence_length, 1000000, 0, UINT32_MAX, &index) == RC_OK);
+  TEST_ASSERT_EQUAL_UINT64(RC_OK, bundle_miner_allocate_ctxs(0, &ctxs, &num_ctxs));
+
+  TEST_ASSERT_EQUAL_FLOAT(0.0, bundle_miner_get_progress_ratio(ctxs, num_ctxs));
+
+  TEST_ASSERT_EQUAL_UINT64(RC_OK, bundle_miner_mine(min, SECURITY, essence, essence_length, 1000000, UINT32_MAX, &index,
+                                                    ctxs, num_ctxs, &found_optimal_index));
+
+  TEST_ASSERT_EQUAL_FLOAT(1.0, bundle_miner_get_progress_ratio(ctxs, num_ctxs));
+
+  bundle_miner_deallocate_ctxs(&ctxs);
 
   TEST_ASSERT_EQUAL_UINT64(index, 687226);
 }
