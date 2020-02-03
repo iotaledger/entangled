@@ -1,3 +1,12 @@
+# Notice  
+
+**This repository is archived and split to separated repositories shown below:**  
+
+* [iota_common](https://github.com/iotaledger/iota_common): Common functions and crypto implementations.  
+* [iota.c](https://github.com/iotaledger/iota.c): An IOTA Client library in C.  
+* [mam.c](https://github.com/iotaledger/mam.c): A data communication protocol.  
+* [TangleScope](https://github.com/iotaledger/TangleScope): A program composed of metric collectors.  
+
 ## IOTA Entangled Monorepo
 [![Build status](https://badge.buildkite.com/42ef0512276a270bd34cb0010fd641558b344dab4aa2225fba.svg)](https://buildkite.com/iota-foundation/entangled)
 
