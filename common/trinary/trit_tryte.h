@@ -12,6 +12,9 @@
 #include "common/trinary/trits.h"
 #include "common/trinary/tryte.h"
 
+#define TRITS_TO_TRYTES_THRESHOLD 192
+#define TRYTES_TO_TRITS_THRESHOLD 736
+
 #ifdef __cplusplus
 extern "C" {
 #endif

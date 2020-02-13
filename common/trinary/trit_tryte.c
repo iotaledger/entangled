@@ -48,9 +48,16 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t const ind
 }
 
 void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes, size_t const length) {
+  if (length == 0) {
+    return;
+  }
+
 #if defined(__SSE4_2__)
-  trits_to_trytes_sse42(trits, trytes, length);
-#else
+  if (length >= TRITS_TO_TRYTES_THRESHOLD) {
+    trits_to_trytes_sse42(trits, trytes, length);
+    return;
+  }
+#endif
   int k = 0;
 
   for (size_t i = 0, j = 0; i < length; i += RADIX, j++) {
@@ -64,7 +71,6 @@ void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes, size_t co
     }
     trytes[j] = TRYTE_ALPHABET[k];
   }
-#endif
 }
 
 void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits, size_t const length) {
@@ -73,10 +79,12 @@ void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits, size_t co
   }
 
 #if defined(__SSE4_2__)
-  trytes_to_trits_sse42(trytes, trits, length);
-#else
+  if (length >= TRYTES_TO_TRITS_THRESHOLD) {
+    trytes_to_trits_sse42(trytes, trits, length);
+    return;
+  }
+#endif
   for (size_t i = 0, j = 0; i < length; i++, j += RADIX) {
     memcpy(trits + j, TRYTES_TRITS_LUT[INDEX_OF_TRYTE(trytes[i])], NUMBER_OF_TRITS_IN_A_TRYTE);
   }
-#endif
 }
