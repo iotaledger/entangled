@@ -12,9 +12,17 @@
 #include "common/trinary/trits.h"
 #include "common/trinary/tryte.h"
 
+#define TRITS_TO_TRYTES_THRESHOLD 192
+#define TRYTES_TO_TRITS_THRESHOLD 736
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static const trit_t TRYTES_TRITS_LUT[TRYTE_SPACE_SIZE][NUMBER_OF_TRITS_IN_A_TRYTE] = {
+    {0, 0, 0},  {1, 0, 0},  {-1, 1, 0},  {0, 1, 0},  {1, 1, 0},  {-1, -1, 1},  {0, -1, 1},  {1, -1, 1},  {-1, 0, 1},
+    {0, 0, 1},  {1, 0, 1},  {-1, 1, 1},  {0, 1, 1},  {1, 1, 1},  {-1, -1, -1}, {0, -1, -1}, {1, -1, -1}, {-1, 0, -1},
+    {0, 0, -1}, {1, 0, -1}, {-1, 1, -1}, {0, 1, -1}, {1, 1, -1}, {-1, -1, 0},  {0, -1, 0},  {1, -1, 0},  {-1, 0, 0}};
 
 static inline size_t num_trytes_for_trits(size_t num_trits) {
   return (num_trits + NUMBER_OF_TRITS_IN_A_TRYTE - 1) / NUMBER_OF_TRITS_IN_A_TRYTE;
