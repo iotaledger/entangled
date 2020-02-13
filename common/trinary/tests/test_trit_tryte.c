@@ -9,6 +9,7 @@
 #include <unity/unity.h>
 
 #include "common/trinary/trit_tryte.h"
+#include "common/trinary/trit_tryte_sse42.h"
 
 #define TRYTES_IN "AZN9AZN9AZN9AZN9AZN9"
 #define EXP                                                                                                            \
@@ -30,6 +31,24 @@ void test_trytes_to_trits(void) {
   trytes_to_trits(trytes, trits, 20);
   TEST_ASSERT_EQUAL_MEMORY(exp, trits, 60);
 }
+
+#if defined(__SSE4_2__)
+void test_trits_to_trytes_sse42(void) {
+  trit_t trits[] = {EXP};
+  tryte_t trytes[20];
+  tryte_t exp[] = {TRYTES_IN};
+  trits_to_trytes_sse42(trits, trytes, 60);
+  TEST_ASSERT_EQUAL_MEMORY(exp, trytes, 20);
+}
+
+void test_trytes_to_trits_sse42(void) {
+  tryte_t trytes[] = {TRYTES_IN};
+  trit_t trits[60];
+  trit_t exp[] = {EXP};
+  trytes_to_trits_sse42(trytes, trits, 20);
+  TEST_ASSERT_EQUAL_MEMORY(exp, trits, 60);
+}
+#endif
 
 void test_get_trit_at(void) {
   tryte_t trytes[] = {TRYTES_IN};
@@ -59,6 +78,10 @@ int main(void) {
 
   RUN_TEST(test_trits_to_trytes);
   RUN_TEST(test_trytes_to_trits);
+#if defined(__SSE4_2__)
+  RUN_TEST(test_trits_to_trytes_sse42);
+  RUN_TEST(test_trytes_to_trits_sse42);
+#endif
   RUN_TEST(test_get_trit_at);
   RUN_TEST(test_set_trit_at);
 
