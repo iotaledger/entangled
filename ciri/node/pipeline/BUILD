@@ -160,6 +160,7 @@ cc_library(
     srcs = ["validator.c"],
     deps = [
         "//ciri/consensus/milestone:milestone_tracker",
+        "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/tangle",
         "//ciri/consensus/transaction_solidifier",
         "//ciri/consensus/transaction_validator",

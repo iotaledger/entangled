@@ -21,6 +21,7 @@ cc_library(
         "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/tangle",
         "//ciri/consensus/tangle:traversal",
+        "//ciri/node/pipeline:transaction_requester",
         "//utils:hash_maps",
         "//utils/containers/hash:hash243_stack",
     ],

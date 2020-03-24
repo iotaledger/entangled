@@ -22,6 +22,7 @@ cc_library(
         "//ciri/consensus/snapshot",
         "//ciri/consensus/snapshot:snapshots_provider",
         "//ciri/consensus/transaction_solidifier",
+        "//ciri/node/pipeline:transaction_requester",
         "//common/crypto/iss/v1:iss",
         "//utils:macros",
         "//utils:time",

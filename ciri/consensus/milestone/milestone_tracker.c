@@ -19,7 +19,7 @@
 #include "utils/macros.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
-#define SOLID_MILESTONE_RESCAN_INTERVAL_MS 50ULL
+#define SOLID_MILESTONE_RESCAN_INTERVAL_MS 500ULL
 
 static logger_id_t logger_id;
 
@@ -307,6 +307,12 @@ static void* milestone_solidifier(void* arg) {
       if (update_latest_solid_milestone(mt, &tangle) != RC_OK) {
         log_warning(logger_id, "Updating latest solid milestone failed\n");
       }
+
+      if (iota_snapshot_get_index(&mt->snapshots_provider->latest_snapshot) == mt->latest_milestone_index) {
+        if (requester_clear_requested_hashes(mt->transaction_requester) != RC_OK) {
+          log_warning(logger_id, "Failed clearing requested hashes\n");
+        }
+      }
       if (previous_solid_latest_milestone_index != mt->latest_solid_milestone_index) {
         log_info(logger_id,
                  "Latest solid milestone was changed from #%" PRIu64 " to #%" PRIu64 " (%d remaining candidates)\n",
@@ -330,7 +336,8 @@ static void* milestone_solidifier(void* arg) {
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshots_provider_t* const snapshots_provider, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* const ts) {
+                                      transaction_solidifier_t* const ts,
+                                      transaction_requester_t* const transaction_requester) {
   if (mt == NULL) {
     return RC_NULL_PARAM;
   }
@@ -343,10 +350,11 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
   lock_handle_init(&mt->candidates_lock);
-  mt->milestone_start_index = conf->last_milestone;
+  mt->milestone_start_index = iota_snapshot_get_index(&snapshots_provider->initial_snapshot);
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_milestone_index = MAX(conf->last_milestone, snapshots_provider->initial_snapshot.metadata.index);
   mt->snapshots_provider = snapshots_provider;
+  mt->transaction_requester = transaction_requester;
   cond_handle_init(&mt->cond_validator);
   cond_handle_init(&mt->cond_solidifier);
 

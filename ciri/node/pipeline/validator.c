@@ -7,6 +7,7 @@
 
 #include "ciri/node/pipeline/validator.h"
 #include "ciri/consensus/milestone/milestone_tracker.h"
+#include "ciri/consensus/snapshot/snapshots_provider.h"
 #include "ciri/consensus/tangle/tangle.h"
 #include "ciri/consensus/transaction_solidifier/transaction_solidifier.h"
 #include "ciri/consensus/transaction_validator/transaction_validator.h"
@@ -20,6 +21,50 @@ static logger_id_t logger_id;
 /*
  * Private functions
  */
+
+/**
+ * Requests for trunk and branch transactions
+
+ * @param validator The validator stage
+ * @param tangle A tangle
+ * @param transaction The transaction
+ *
+ * @return a status code
+ */
+static retcode_t request_branch_and_trunk(validator_stage_t const *const validator, tangle_t *const tangle,
+                                          iota_transaction_t const *const transaction) {
+  bool approvee_exist;
+  retcode_t ret = RC_OK;
+  if (!iota_snapshot_has_solid_entry_point(&validator->snapshots_provider->initial_snapshot,
+                                           transaction_branch(transaction))) {
+    if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_branch(transaction),
+                                             &approvee_exist) != RC_OK)) {
+      log_warning(logger_id, "Failed checking if transaction exist\n");
+      return ret;
+    }
+    if (!approvee_exist && (ret = request_transaction(validator->milestone_tracker->transaction_requester, tangle,
+                                                      transaction_branch(transaction))) != RC_OK) {
+      log_warning(logger_id, "Failed requesting transaction\n");
+      return ret;
+    }
+  }
+
+  if (!iota_snapshot_has_solid_entry_point(&validator->snapshots_provider->initial_snapshot,
+                                           transaction_trunk(transaction))) {
+    if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_trunk(transaction),
+                                             &approvee_exist) != RC_OK)) {
+      log_warning(logger_id, "Failed checking if transaction exist\n");
+      return ret;
+    }
+    if (!approvee_exist && (ret = request_transaction(validator->milestone_tracker->transaction_requester, tangle,
+                                                      transaction_trunk(transaction))) != RC_OK) {
+      log_warning(logger_id, "Failed requesting transaction\n");
+      return ret;
+    }
+  }
+
+  return ret;
+}
 
 /**
  * Converts transaction bytes from a packet to a transaction, validates it and
@@ -41,6 +86,7 @@ static retcode_t validate_transaction_bytes(validator_stage_t const *const valid
   bool exists = false;
   iota_transaction_t transaction;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  bool was_requested;
 
   if (validator == NULL || gossip == NULL || hash == NULL) {
     return RC_NULL_PARAM;
@@ -77,6 +123,17 @@ static retcode_t validate_transaction_bytes(validator_stage_t const *const valid
     goto failure;
   }
 
+  if (ret =
+          requester_was_requested(validator->milestone_tracker->transaction_requester, hash, &was_requested) != RC_OK) {
+    log_warning(logger_id, "Failed querying requester\n");
+    goto failure;
+  }
+
+  if (ret = requester_clear_request(validator->milestone_tracker->transaction_requester, hash) != RC_OK) {
+    log_warning(logger_id, "Failed removing hash from requester\n");
+    goto failure;
+  }
+
   if (!exists) {
     // Stores the new transaction
     log_debug(logger_id, "Storing new transaction\n");
@@ -89,6 +146,11 @@ static retcode_t validate_transaction_bytes(validator_stage_t const *const valid
     if ((ret = iota_consensus_transaction_solidifier_update_status(validator->transaction_solidifier, tangle,
                                                                    &transaction)) != RC_OK) {
       log_warning(logger_id, "Updating transaction status failed\n");
+      return ret;
+    }
+
+    if (was_requested && request_branch_and_trunk(validator, tangle, &transaction) != RC_OK) {
+      log_warning(logger_id, "Failed requesting trunk and branch transactions\n");
       return ret;
     }
 
@@ -183,7 +245,8 @@ static void *validator_stage_routine(validator_stage_t *const validator) {
 retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const node,
                                transaction_validator_t *const transaction_validator,
                                transaction_solidifier_t *const transaction_solidifier,
-                               milestone_tracker_t *const milestone_tracker) {
+                               milestone_tracker_t *const milestone_tracker,
+                               snapshots_provider_t *const snapshots_provider) {
   if (validator == NULL || node == NULL || transaction_validator == NULL || transaction_solidifier == NULL ||
       milestone_tracker == NULL) {
     return RC_NULL_PARAM;
@@ -199,6 +262,7 @@ retcode_t validator_stage_init(validator_stage_t *const validator, node_t *const
   validator->transaction_validator = transaction_validator;
   validator->transaction_solidifier = transaction_solidifier;
   validator->milestone_tracker = milestone_tracker;
+  validator->snapshots_provider = snapshots_provider;
 
   return RC_OK;
 }

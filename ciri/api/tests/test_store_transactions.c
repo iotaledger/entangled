@@ -125,7 +125,7 @@ int main(void) {
                                              &api.core->consensus.snapshots_provider, &api.core->node.tips);
   iota_milestone_tracker_init(&core.consensus.milestone_tracker, &core.consensus.conf,
                               &core.consensus.snapshots_provider, &core.consensus.ledger_validator,
-                              &core.consensus.transaction_solidifier);
+                              &core.consensus.transaction_solidifier, NULL);
 
   RUN_TEST(test_store_transactions_empty);
   RUN_TEST(test_store_transactions_invalid_tx);

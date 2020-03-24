@@ -35,7 +35,7 @@ void milestone_validation_curl_p_27_sec_lvl_1(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 1;
   conf.coordinator_signature_type = SPONGE_CURLP27;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {(tryte_t*)
@@ -115,7 +115,7 @@ void milestone_validation_kerl_sec_lvl_1(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 1;
   conf.coordinator_signature_type = SPONGE_KERL;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {(tryte_t*)
@@ -195,7 +195,7 @@ void milestone_validation_curl_p_27_sec_lvl_3(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 3;
   conf.coordinator_signature_type = SPONGE_CURLP27;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = { (tryte_t*)
@@ -325,7 +325,7 @@ void milestone_validation_kerl_sec_lvl_3(void) {
   conf.coordinator_max_milestone_index = 1 << conf.coordinator_depth;
   conf.coordinator_security_level = 3;
   conf.coordinator_signature_type = SPONGE_KERL;
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshots_provider, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = { (tryte_t*)
